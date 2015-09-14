@@ -1,0 +1,10 @@
+*.pyc
+*~
+*.sqlite*
+*.orig
+*.log
+media/**
+collected-static/**
+elife-articles
+venv
+src/core/settings.py
