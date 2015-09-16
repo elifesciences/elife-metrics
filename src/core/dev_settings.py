@@ -11,10 +11,10 @@ SECRET_KEY = 'dev-settings-secret-key-do-not-use'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-TEMPLATE_DEBUG = DEBUG
 
 ALLOWED_HOSTS = []
 
+GA_TABLE_ID = '82618489'
 
 # Application definition
 
@@ -25,6 +25,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'metrics'
 )
 
 MIDDLEWARE_CLASSES = (

@@ -1,8 +1,25 @@
-# <project>
+# elife-metrics
+
+A data store and API for accessing the article level metrics that power the 
+graphs on the elifesciences.org article metrics page.
 
 ## installation
 
-## usage
+    ./install.sh
+
+## usage (development)
+
+Load the stats contained in the `elife-ga-metrics` repository.
+    
+    ./manage.sh import_metrics
+    
+Run the development server
+
+    ./manage.sh runserver
+    
+Visit the Swagger documentation
+    
+    firefox http://127.0.0.1/api/docs/
 
 ## Copyright & Licence
 
