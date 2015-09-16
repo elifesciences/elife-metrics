@@ -8,3 +8,6 @@ collected-static/**
 elife-articles
 venv
 src/core/settings.py
+src/output
+analytics.dat
+elife_ga_metrics
