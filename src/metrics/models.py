@@ -30,6 +30,7 @@ class GAMetric(models.Model):
 
     class Meta:
         unique_together = ('article', 'date', 'type')
+        ordering = ('date',)
 
     def __unicode__(self):
         return '%s,%s,%s,%s' % (self.article, self.date, self.full, self.pdf)

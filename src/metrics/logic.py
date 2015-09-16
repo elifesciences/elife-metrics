@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from datetime import datetime, timedelta
 import elife_ga_metrics as ga_metrics
 from elife_ga_metrics import bulk
@@ -27,6 +28,7 @@ def create_row(doi, ymd, views, downloads):
 
 @transaction.atomic
 def import_ga_metrics(from_date=None, to_date=None):
+    "import metrics from GA between the two given dates or from inception"
     table_id = 'ga:%s' % settings.GA_TABLE_ID
     the_beginning = ga_metrics.core.VIEWS_INCEPTION
     yesterday = datetime.now() - timedelta(days=1)
@@ -59,3 +61,45 @@ def import_ga_metrics(from_date=None, to_date=None):
                 obj = models.GAMetric(**row)
                 obj.save()
                 #print 'saved',obj
+
+#
+#
+#
+
+def ymd(dt):
+    return dt.strftime("%Y-%m-%d")
+
+from rest_framework import serializers as szr
+
+class MetricSerializer(szr.ModelSerializer):
+    class Meta:
+        exclude = ('article', 'id', 'type')
+        model = models.GAMetric
+
+
+#
+#
+#
+
+def daily(doi, from_date, to_date):
+    return models.GAMetric.objects \
+      .filter(article__doi__iexact=doi) \
+      .filter(type='day', date__gte=ymd(from_date), date__lte=ymd(to_date))
+
+def group_daily_by_date(daily_results):
+    def grouper(iterable, func):
+        results = OrderedDict({})
+        for item in iterable:
+            key = func(item)
+            del item['date']
+            results[key] = dict(item)
+        return results    
+    return grouper(MetricSerializer(daily_results, many=True).data, lambda obj: obj['date'])
+
+def daily_last_n_days(doi, days=30):
+    yesterday = datetime.now() - timedelta(days=1)
+    n_days_ago = datetime.now() - timedelta(days=days)
+    return daily(doi, n_days_ago, yesterday)
+
+def monthly(doi):    
+    return {}
