@@ -10,6 +10,6 @@ class Command(BaseCommand):
         pass
 
     def handle(self, *args, **options):
-        #day_to_import = datetime(year=2015, month=9, day=11)
-        logic.import_ga_metrics() #from_date=day_to_import, to_date=day_to_import)
+        logic.import_ga_metrics('daily')
+        logic.import_ga_metrics('monthly')
         self.stdout.write("done")
