@@ -16,6 +16,6 @@ def api_article_metrics(request, doi):
     return Response({
         doi: {
             'daily': logic.group_daily_by_date(logic.daily_last_n_days(doi, 30)),
-            'monthly': logic.monthly(doi)
+            'monthly': logic.group_monthly_results(logic.monthly_since_ever(doi)),
         }
     })
