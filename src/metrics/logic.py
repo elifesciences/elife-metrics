@@ -56,13 +56,15 @@ def insert_row(data, update=True):
             # data has changed!
             # this happens when importing partial daily/monthly stats
             LOG.debug('metric found and data has changed. updating.')
-            [setattr(metric, attr, val) for attr, val in row]
+            [setattr(metric, attr, val) for attr, val in row.items()]
             metric.save()
 
     except models.Metric.DoesNotExist:
         metric = models.Metric(**row)
         metric.save()
         LOG.info('created metric %r', metric)
+
+    return metric
 
 
 @transaction.atomic

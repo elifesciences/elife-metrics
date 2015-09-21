@@ -25,6 +25,38 @@ class TestGAImport(BaseCase):
         expected_article_count = 1090 # we know this day reveals this many articles
         self.assertEqual(expected_article_count, models.Article.objects.count())
 
+    def test_partial_data_is_updated(self):
+        "ensure that any partial data is updated correctly when detected"
+        self.assertEqual(0, models.Article.objects.count())
+        ds1 = {
+            'pdf': 0,
+            'full': 0,
+            'abstract': 0,
+            'digest': 0,
+            'period': 'day',
+            'date': '2001-01-01',
+            'doi': '10.7554/DUMMY',
+        }
+        logic.insert_row(ds1)
+        self.assertEqual(1, models.Article.objects.count())
+        self.assertEqual(1, models.Metric.objects.count())
+        clean_metric = models.Metric.objects.get(article__doi='10.7554/DUMMY')
+        self.assertEqual(0, clean_metric.pdf)
+        
+        expected_update = {
+            'pdf': 1,
+            'full': 0,
+            'abstract': 0,
+            'digest': 0,
+            'period': 'day',
+            'date': '2001-01-01',
+            'doi': '10.7554/DUMMY',
+        }
+        logic.insert_row(expected_update)
+        self.assertEqual(1, models.Metric.objects.count())
+        clean_metric = models.Metric.objects.get(article__doi='10.7554/DUMMY')
+        self.assertEqual(1, clean_metric.pdf)
+
 
 class TestHWImport(BaseCase):
     def setUp(self):
@@ -175,3 +207,4 @@ class TestAPI(BaseCase):
         print 'got data',resp.data
         self.assertEqual(200, resp.status_code)
         self.assertEqual(expected_data, resp.data)
+
