@@ -1,6 +1,7 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 import elife_ga_metrics as ga_metrics
+from elife_hw_metrics import core as hw_metrics
 from elife_ga_metrics import bulk
 from django.conf import settings
 import models
@@ -14,6 +15,9 @@ LOG.level = logging.DEBUG
 
 def subdict(d, kl):
     return {k:v for k, v in d.items() if k in kl}
+
+def exsubdict(d, kl):
+    return {k:v for k, v in d.items() if k not in kl}
 
 def format_dt_pair(dt_pair):
     from_date, to_date = dt_pair
@@ -38,6 +42,38 @@ def create_row(doi, dt_pair, views, downloads):
     row = dict(zip(['period', 'date'], format_dt_pair(dt_pair)))
     row.update(views)
     return row
+
+@transaction.atomic
+def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
+    assert metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"'
+
+    def create_hw_row(data):
+        # the data is very close to something that can be inserted directly
+        print 'given data',data
+        row = exsubdict(data, 'doi')
+        row['digest'] = 0
+
+        article_obj, created = models.Article.objects.get_or_create(doi=data['doi'])
+        row['article'] = article_obj
+
+        try:
+            # TODO: just try to insert it?
+            sd = subdict(row, ['article', 'date', 'period'])
+            models.Metric.objects.get(**sd)
+            LOG.debug('metric found for %r, skipping', sd)
+            # update here if necessary
+        except models.Metric.DoesNotExist:
+            obj = models.Metric(**row)
+            obj.save()
+            LOG.info('created metric %r',obj)
+
+    # not going to be delicate about this. just import all we can find.
+    results = hw_metrics.metrics_between(from_date, to_date, metrics_type)
+    print 'results',dict(results)
+    for dt, items in results.items():
+        print 'handling',metrics_type,'for',dt
+        map(create_hw_row, items)            
+
 
 @transaction.atomic
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
