@@ -52,8 +52,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework_swagger',
 
-    'metrics'
+    'metrics',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -86,6 +87,12 @@ TEMPLATES = [
         },
     },
 ]
+
+TEMPLATE_LOADERS = (
+
+'django.template.loaders.eggs.Loader',
+
+)
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
