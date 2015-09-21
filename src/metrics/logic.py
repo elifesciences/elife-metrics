@@ -19,10 +19,10 @@ def format_dt_pair(dt_pair):
     from_date, to_date = dt_pair
     if from_date == to_date:
         # daily, looks like 2015-01-01, 2015-01-01
-        return 'day', from_date
+        return models.DAY, from_date
     if from_date[-2:] == '01' and to_date[-2:] in ['31', '30', '28']:
         # monthly, looks 2015-01-01, 2015-01-31
-        return 'month', from_date[:7]
+        return models.MONTH, from_date[:7]
     raise ValueError("given dtpair %r but it doesn't look like a daily or monthly result!" % dt_pair)
 
 def create_row(doi, dt_pair, views, downloads):
@@ -35,7 +35,7 @@ def create_row(doi, dt_pair, views, downloads):
         }
     views['pdf'] = downloads or 0
 
-    row = dict(zip(['type', 'date'], format_dt_pair(dt_pair)))
+    row = dict(zip(['period', 'date'], format_dt_pair(dt_pair)))
     row.update(views)
     return row
 
@@ -71,7 +71,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
             row = create_row(doi, dt_pair, views.get(doi), downloads.get(doi))
             article_obj, created = models.Article.objects.get_or_create(doi=doi)
             row['article'] = article_obj
-            sd = subdict(row, ['article', 'date', 'type'])
+            sd = subdict(row, ['article', 'date', 'period'])
             try:
                 models.GAMetric.objects.get(**sd)
                 LOG.debug('metric found for %r, skipping', sd)
@@ -89,7 +89,7 @@ from rest_framework import serializers as szr
 
 class MetricSerializer(szr.ModelSerializer):
     class Meta:
-        exclude = ('article', 'id', 'type')
+        exclude = ('article', 'id', 'period')
         model = models.GAMetric
 
 
@@ -100,7 +100,7 @@ class MetricSerializer(szr.ModelSerializer):
 def daily(doi, from_date, to_date):
     return models.GAMetric.objects \
       .filter(article__doi__iexact=doi) \
-      .filter(type='day') \
+      .filter(period=models.DAY) \
       .filter(date__gte=ymd(from_date), date__lte=ymd(to_date)) # does this even work with charfields??
 
 def group_daily_by_date(daily_results):
@@ -127,7 +127,7 @@ def monthly(doi, from_date, to_date):
     date_list = [ymd(i[0])[:7] for i in date_list] # ll:  [2013-01, 2013-02, 2013-03]
     return models.GAMetric.objects \
       .filter(article__doi__iexact=doi) \
-      .filter(type='month') \
+      .filter(period=models.MONTH) \
       .filter(date__in=date_list)
 
 def monthly_since_ever(doi):
