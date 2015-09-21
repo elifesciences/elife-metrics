@@ -2,4 +2,5 @@ Django==1.8.4
 django-annoying==0.8.4
 django-rest-swagger==0.3.4
 djangorestframework==3.2.3
--e git+https://github.com/elifesciences/elife-ga-metrics.git#egg=elife-ga-metrics
+#-e git+https://github.com/elifesciences/elife-ga-metrics.git#egg=elife-ga-metrics
+#-e git+https://github.com/elifesciences/elife-hw-metrics.git#egg=elife-hw-metrics
