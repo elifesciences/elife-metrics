@@ -20,6 +20,10 @@ def exsubdict(d, kl):
     return {k:v for k, v in d.items() if k not in kl}
 
 def format_dt_pair(dt_pair):
+    """the database expects values in yyyy-mm or yyyy-mm-dd format.
+    this function takes a pair of datetime objects and returns a pair of
+    `(type, datestring)`, for example `('day', '2015-01-31')` for daily
+    of `('month', '2015-01')` for monthly"""
     from_date, to_date = dt_pair
     if from_date == to_date:
         # daily, looks like 2015-01-01, 2015-01-01
@@ -29,51 +33,57 @@ def format_dt_pair(dt_pair):
         return models.MONTH, from_date[:7]
     raise ValueError("given dtpair %r but it doesn't look like a daily or monthly result!" % dt_pair)
 
-def create_row(doi, dt_pair, views, downloads):
-    "creates a row from the given data suitable for inserting into the metrics table"
-    if not views:
-        views = {
-            'full': 0,
-            'abstract': 0,
-            'digest': 0
-        }
-    views['pdf'] = downloads or 0
+def insert_row(data, update=True):
+    row = exsubdict(data, 'doi')
+    
+    article_obj, created = models.Article.objects.get_or_create(doi=data['doi'])
+    row['article'] = article_obj
+    
+    try:
+        # fetch the metric if it exists
+        sd = subdict(row, ['article', 'date', 'period'])
+        metric = models.Metric.objects.get(**sd)
+        if not update:
+            # for bulk operations the overhead of two checks adds up
+            # and is unnecessary.
+            return
+        try:
+            # it exists!
+            # now we must test it's data for changes
+            models.Metric.objects.get(**row)
+            LOG.debug('metric found and data is exact %r, skipping', sd)
+        except models.Metric.DoesNotExist:
+            # data has changed!
+            # this happens when importing partial daily/monthly stats
+            LOG.debug('metric found and data has changed. updating.')
+            [setattr(metric, attr, val) for attr, val in row]
+            metric.save()
 
-    row = dict(zip(['period', 'date'], format_dt_pair(dt_pair)))
-    row.update(views)
-    return row
+    except models.Metric.DoesNotExist:
+        metric = models.Metric(**row)
+        metric.save()
+        LOG.info('created metric %r', metric)
+
 
 @transaction.atomic
 def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
+    "import metrics from Highwire between the two given dates or from inception"
     assert metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"'
+    if not from_date:
+        # HW metrics go back further than GA metrics
+        from_date = hw_metrics.INCEPTION
+    if not to_date:
+        to_date = datetime.now()
 
     def create_hw_row(data):
-        # the data is very close to something that can be inserted directly
-        print 'given data',data
-        row = exsubdict(data, 'doi')
-        row['digest'] = 0
-
-        article_obj, created = models.Article.objects.get_or_create(doi=data['doi'])
-        row['article'] = article_obj
-
-        try:
-            # TODO: just try to insert it?
-            sd = subdict(row, ['article', 'date', 'period'])
-            models.Metric.objects.get(**sd)
-            LOG.debug('metric found for %r, skipping', sd)
-            # update here if necessary
-        except models.Metric.DoesNotExist:
-            obj = models.Metric(**row)
-            obj.save()
-            LOG.info('created metric %r',obj)
-
+        "wrangles the data into something that can be inserted directly"
+        data['digest'] = 0
+        return insert_row(data)
+    
     # not going to be delicate about this. just import all we can find.
     results = hw_metrics.metrics_between(from_date, to_date, metrics_type)
-    print 'results',dict(results)
     for dt, items in results.items():
-        print 'handling',metrics_type,'for',dt
-        map(create_hw_row, items)            
-
+        map(create_hw_row, items)
 
 @transaction.atomic
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
@@ -97,25 +107,30 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
     }
     results = f[metrics_type](table_id, from_date, to_date)
     
+    def create_row(doi, dt_pair, views, downloads):
+        "wrangles the data into a format suitable for `insert_row`"
+        if not views:
+            views = {
+                'full': 0,
+                'abstract': 0,
+                'digest': 0,
+            }
+        views['pdf'] = downloads or 0
+        views['doi'] = doi
+        row = dict(zip(['period', 'date'], format_dt_pair(dt_pair)))
+        row.update(views)
+        return insert_row(row)
+
     for dt_pair, metrics in results.items():
         downloads = metrics['downloads']
         views = metrics['views']
         
         doi_list = set(views.keys()).union(downloads.keys())
         for doi in doi_list:
+            create_row(doi, dt_pair, views.get(doi), downloads.get(doi))
             
-            row = create_row(doi, dt_pair, views.get(doi), downloads.get(doi))
-            article_obj, created = models.Article.objects.get_or_create(doi=doi)
-            row['article'] = article_obj
-            sd = subdict(row, ['article', 'date', 'period'])
-            try:
-                models.Metric.objects.get(**sd)
-                LOG.debug('metric found for %r, skipping', sd)
-                # update here if necessary
-            except models.Metric.DoesNotExist:
-                obj = models.Metric(**row)
-                obj.save()
-                LOG.info('created metric %r',obj)
+
+
 
 #
 #

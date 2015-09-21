@@ -2,7 +2,7 @@ from collections import OrderedDict
 from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 from metrics import models, logic
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class BaseCase(TestCase):
     def __init__(self, *args, **kwargs):
@@ -82,7 +82,7 @@ class TestAPI(BaseCase):
     def tearDown(self):
         pass
 
-    def test_monthly_import(self):
+    def test_monthly_data(self):
         self.assertEqual(0, models.Article.objects.count())
         self.assertEqual(0, models.Metric.objects.count())
         month_to_import = datetime(year=2015, month=8, day=01)
@@ -112,7 +112,7 @@ class TestAPI(BaseCase):
         data = resp.data
         self.assertEqual(expected_data, resp.data)
 
-    def test_daily_import(self):
+    def test_daily_data(self):
         "a very simple set of data returns the expected daily and monthly data in the expected structure"
         day_to_import = datetime(year=2015, month=9, day=11)
         logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import)
@@ -143,5 +143,35 @@ class TestAPI(BaseCase):
         }
         url = reverse('api-article-metrics', kwargs={'doi': doi})
         resp = self.c.get(url)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(expected_data, resp.data)
+
+    def test_multiple_daily_data(self):
+        from_date = datetime(year=2015, month=9, day=11)
+        to_date = from_date + timedelta(days=1)
+        logic.import_ga_metrics('daily', from_date, to_date)
+        doi = '10.7554/eLife.09560'
+        expected_data = {
+            doi: {
+                'daily': OrderedDict({
+                    '2015-09-11': {
+                        'full': 21922,
+                        'abstract': 325,
+                        'digest': 114,
+                        'pdf': 1533,
+                    },
+                    '2015-09-12': { 
+                        'full': 21922,
+                        'abstract': 325,
+                        'digest': 114,
+                        'pdf': 1533,
+                    }
+                }),
+                'monthly': OrderedDict({})
+            },
+        }
+        url = reverse('api-article-metrics', kwargs={'doi': doi})
+        resp = self.c.get(url)
+        print 'got data',resp.data
         self.assertEqual(200, resp.status_code)
         self.assertEqual(expected_data, resp.data)
