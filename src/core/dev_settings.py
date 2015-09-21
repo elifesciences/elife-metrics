@@ -36,7 +36,6 @@ REST_FRAMEWORK = {
 
 SWAGGER_SETTINGS = {
     'api_version': '1',
-    'api_path': '/api/v1/', # TODO - useful?
     'exclude_namespaces': ['proxied'], # swagger docs are broken, but this gives them the right namespace
 }
 
@@ -88,11 +87,6 @@ TEMPLATES = [
     },
 ]
 
-TEMPLATE_LOADERS = (
-
-'django.template.loaders.eggs.Loader',
-
-)
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
