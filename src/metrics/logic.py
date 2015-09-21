@@ -33,7 +33,7 @@ def format_dt_pair(dt_pair):
         return models.MONTH, from_date[:7]
     raise ValueError("given dtpair %r but it doesn't look like a daily or monthly result!" % dt_pair)
 
-def insert_row(data, update=True):
+def insert_row(data):
     row = exsubdict(data, 'doi')
     
     article_obj, created = models.Article.objects.get_or_create(doi=data['doi'])
@@ -41,12 +41,8 @@ def insert_row(data, update=True):
     
     try:
         # fetch the metric if it exists
-        sd = subdict(row, ['article', 'date', 'period'])
+        sd = subdict(row, ['article', 'date', 'period', 'source'])
         metric = models.Metric.objects.get(**sd)
-        if not update:
-            # for bulk operations the overhead of two checks adds up
-            # and is unnecessary.
-            return
         try:
             # it exists!
             # now we must test it's data for changes
@@ -54,8 +50,8 @@ def insert_row(data, update=True):
             LOG.debug('metric found and data is exact %r, skipping', sd)
         except models.Metric.DoesNotExist:
             # data has changed!
-            # this happens when importing partial daily/monthly stats
-            LOG.debug('metric found and data has changed. updating.')
+            # this happens when importing partial daily/monthly stats            
+            LOG.debug('metric found and data has changed from %r to %r. updating', metric.pdf, data['pdf'])
             [setattr(metric, attr, val) for attr, val in row.items()]
             metric.save()
 
@@ -80,6 +76,7 @@ def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
     def create_hw_row(data):
         "wrangles the data into something that can be inserted directly"
         data['digest'] = 0
+        data['source'] = models.HW
         return insert_row(data)
     
     # not going to be delicate about this. just import all we can find.
@@ -119,6 +116,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
             }
         views['pdf'] = downloads or 0
         views['doi'] = doi
+        views['source'] = models.GA
         row = dict(zip(['period', 'date'], format_dt_pair(dt_pair)))
         row.update(views)
         return insert_row(row)

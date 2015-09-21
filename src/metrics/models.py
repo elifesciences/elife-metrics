@@ -32,7 +32,7 @@ class Metric(models.Model):
     article = models.ForeignKey(Article)
     date = models.CharField(max_length=10, blank=True, null=True, help_text="the date this metric is for in YYYY-MM-DD, YYYY-MM and YYYY formats or None for 'all time'")
     period = models.CharField(max_length=10, choices=metric_period_list())
-    source = models.CharField(max_length=2, choices=metric_source_list(), default=GA)
+    source = models.CharField(max_length=2, choices=metric_source_list())
     
     full = models.PositiveSmallIntegerField(help_text="article page views")
     abstract = models.PositiveSmallIntegerField(help_text="article abstract page views")
@@ -40,8 +40,19 @@ class Metric(models.Model):
     pdf = models.PositiveSmallIntegerField(help_text="pdf downloads")
 
     class Meta:
-        unique_together = ('article', 'date', 'period')
+        unique_together = ('article', 'date', 'period', 'source')
         ordering = ('date',)
+
+    def as_row(self):
+        return {
+            'full': self.full,
+            'abstract': self.abstract,
+            'digest': self.digest,
+            'pdf': self.pdf,
+            'source': self.source,
+            'period': self.period,
+            'date': self.date,
+        }
 
     def __unicode__(self):
         return '%s,%s,%s,%s' % (self.article, self.date, self.full, self.pdf)

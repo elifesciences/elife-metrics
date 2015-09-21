@@ -22,9 +22,11 @@ class Command(BaseCommand):
         
         LOG.info("importing daily stats")
         logic.import_ga_metrics('daily', from_date=n_days_ago, to_date=today)
+        logic.import_hw_metrics('daily', from_date=n_days_ago, to_date=today)
 
         LOG.info("import monthly stats")
         logic.import_ga_metrics('monthly', from_date=n_months_ago, to_date=today)
+        logic.import_hw_metrics('monthly', from_date=n_days_ago, to_date=today)
         
         self.stdout.write("...done\n")
         self.stdout.flush()
