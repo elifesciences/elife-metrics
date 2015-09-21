@@ -95,6 +95,7 @@ class TestAPI(BaseCase):
         
         expected_data = {
             doi: {
+                'daily': OrderedDict({}),
                 'monthly': OrderedDict({
                     '2015-08': {
                         'full': 525,
@@ -109,7 +110,6 @@ class TestAPI(BaseCase):
         resp = self.c.get(url)
         self.assertEqual(200, resp.status_code)
         data = resp.data
-        del data[doi]['daily'] # too many, not being tested
         self.assertEqual(expected_data, resp.data)
 
     def test_daily_import(self):
