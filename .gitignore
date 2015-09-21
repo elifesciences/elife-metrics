@@ -11,4 +11,5 @@ src/core/settings.py
 src/output
 analytics.dat
 elife_ga_metrics
+elife_hw_metrics
 src/collected-static
