@@ -19,11 +19,20 @@ def metric_period_list():
         (EVER, 'All time'),
     ]
 
-class GAMetric(models.Model):
+GA, HW = 'ga', 'hw'
+
+def metric_source_list():
+    return [
+        (GA, 'Google Analytics'),
+        (HW, 'Highwire'),
+    ]
+
+class Metric(models.Model):
     "daily article metrics as reported by Google Analytics"
     article = models.ForeignKey(Article)
     date = models.CharField(max_length=10, blank=True, null=True, help_text="the date this metric is for in YYYY-MM-DD, YYYY-MM and YYYY formats or None for 'all time'")
     period = models.CharField(max_length=10, choices=metric_period_list())
+    source = models.CharField(max_length=2, choices=metric_source_list(), default=GA)
     
     full = models.PositiveSmallIntegerField(help_text="article page views")
     abstract = models.PositiveSmallIntegerField(help_text="article abstract page views")
@@ -38,4 +47,4 @@ class GAMetric(models.Model):
         return '%s,%s,%s,%s' % (self.article, self.date, self.full, self.pdf)
 
     def __repr__(self):
-        return u'<GAMetric %s>' % self.__unicode__()
+        return u'<Metric %s>' % self.__unicode__()

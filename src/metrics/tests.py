@@ -35,12 +35,12 @@ class TestAPI(BaseCase):
 
     def test_monthly_import(self):
         self.assertEqual(0, models.Article.objects.count())
-        self.assertEqual(0, models.GAMetric.objects.count())
+        self.assertEqual(0, models.Metric.objects.count())
         month_to_import = datetime(year=2015, month=8, day=01)
         logic.import_ga_metrics('monthly', from_date=month_to_import, to_date=month_to_import)
         expected = 1649
         self.assertEqual(expected, models.Article.objects.count())
-        self.assertEqual(expected, models.GAMetric.objects.count())
+        self.assertEqual(expected, models.Metric.objects.count())
 
         doi = '10.7554/eLife.08007'
         

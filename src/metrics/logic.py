@@ -73,11 +73,11 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
             row['article'] = article_obj
             sd = subdict(row, ['article', 'date', 'period'])
             try:
-                models.GAMetric.objects.get(**sd)
+                models.Metric.objects.get(**sd)
                 LOG.debug('metric found for %r, skipping', sd)
                 # update here if necessary
-            except models.GAMetric.DoesNotExist:
-                obj = models.GAMetric(**row)
+            except models.Metric.DoesNotExist:
+                obj = models.Metric(**row)
                 obj.save()
                 LOG.info('created metric %r',obj)
 
@@ -89,8 +89,8 @@ from rest_framework import serializers as szr
 
 class MetricSerializer(szr.ModelSerializer):
     class Meta:
-        exclude = ('article', 'id', 'period')
-        model = models.GAMetric
+        exclude = ('article', 'id', 'period', 'source')
+        model = models.Metric
 
 
 #
@@ -98,7 +98,7 @@ class MetricSerializer(szr.ModelSerializer):
 #
 
 def daily(doi, from_date, to_date):
-    return models.GAMetric.objects \
+    return models.Metric.objects \
       .filter(article__doi__iexact=doi) \
       .filter(period=models.DAY) \
       .filter(date__gte=ymd(from_date), date__lte=ymd(to_date)) # does this even work with charfields??
@@ -125,7 +125,7 @@ def monthly(doi, from_date, to_date):
     # because we're not storing dates, but rather a representation of a date
     date_list = bulk.dt_month_range(from_date, to_date) # ll: [(2013-01-01, 2013-01-31), (2013-02-01, 2013-02-28), ...]
     date_list = [ymd(i[0])[:7] for i in date_list] # ll:  [2013-01, 2013-02, 2013-03]
-    return models.GAMetric.objects \
+    return models.Metric.objects \
       .filter(article__doi__iexact=doi) \
       .filter(period=models.MONTH) \
       .filter(date__in=date_list)
@@ -143,4 +143,3 @@ def group_monthly_results(results):
             results[key] = dict(item)
         return results    
     return grouper(MetricSerializer(results, many=True).data, lambda obj: obj['date'])
-    
