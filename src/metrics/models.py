@@ -34,10 +34,10 @@ class Metric(models.Model):
     period = models.CharField(max_length=10, choices=metric_period_list())
     source = models.CharField(max_length=2, choices=metric_source_list())
     
-    full = models.PositiveSmallIntegerField(help_text="article page views")
-    abstract = models.PositiveSmallIntegerField(help_text="article abstract page views")
-    digest = models.PositiveSmallIntegerField(help_text="article digest page views")
-    pdf = models.PositiveSmallIntegerField(help_text="pdf downloads")
+    full = models.PositiveIntegerField(help_text="article page views")
+    abstract = models.PositiveIntegerField(help_text="article abstract page views")
+    digest = models.PositiveIntegerField(help_text="article digest page views")
+    pdf = models.PositiveIntegerField(help_text="pdf downloads")
 
     class Meta:
         unique_together = ('article', 'date', 'period', 'source')
