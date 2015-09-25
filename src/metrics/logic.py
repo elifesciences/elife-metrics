@@ -104,8 +104,6 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         'monthly': bulk.monthly_metrics_between,
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
-
-    queue = []
     
     def create_row(queue, doi, dt_pair, views, downloads):
         "wrangles the data into a format suitable for `insert_row`"
@@ -123,6 +121,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         queue.append(row)
         #return insert_row(row)
 
+
     # ok, this is a bit hacky, but on very long runs (when we do a full import for example) the
     # kernel will kill the process for being a memory hog
     @transaction.atomic
@@ -134,6 +133,11 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
             queue = []
         return queue
 
+    # whatever mode we're in, ensure debug is off for import
+    old_setting = settings.DEBUG
+    settings.DEBUG = False
+
+    queue = []
     for dt_pair, metrics in results.items():
         downloads = metrics['downloads']
         views = metrics['views']
@@ -145,7 +149,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
 
     # commit any remaining
     commit_rows(queue, force=True)
-
+    settings.DEBUG = old_setting
 
 
 #
