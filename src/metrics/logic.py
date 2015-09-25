@@ -122,14 +122,16 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
 
     # ok, this is a bit hacky, but on very long runs (when we do a full import for example) the
     # kernel will kill the process for being a memory hog
-    @transaction.atomic
+    #@transaction.atomic
     def commit_rows(queue, force=False):
         "commits the objects in the queue every time it hits 1000 objects or is told otherwise"
         if len(queue) == 1000 or force:
             LOG.info("committing %s objects to db", len(queue))
-            map(insert_row, queue)
+            with transaction.atomic():
+                map(insert_row, queue)
             queue = []
             db.reset_queries()
+            # NOTE: this problem isn't solved, it's still leaking memory
             
         return queue
 
