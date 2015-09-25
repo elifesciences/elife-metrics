@@ -134,8 +134,9 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         return queue
 
     # whatever mode we're in, ensure debug is off for import
-    old_setting = settings.DEBUG
-    settings.DEBUG = False
+    if settings.DEBUG:
+        from django.db import connection
+        connection.use_debug_cursor = False
 
     queue = []
     for dt_pair, metrics in results.items():
@@ -149,7 +150,6 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
 
     # commit any remaining
     commit_rows(queue, force=True)
-    settings.DEBUG = old_setting
 
 
 #
