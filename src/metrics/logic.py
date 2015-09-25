@@ -85,7 +85,7 @@ def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
         map(create_hw_row, items)
 
 @transaction.atomic
-def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
+def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from inception"
     assert metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"'
     
@@ -104,7 +104,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
         'daily': bulk.daily_metrics_between,
         'monthly': bulk.monthly_metrics_between,
     }
-    results = f[metrics_type](table_id, from_date, to_date)
+    results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
     
     def create_row(doi, dt_pair, views, downloads):
         "wrangles the data into a format suitable for `insert_row`"
@@ -128,7 +128,6 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None):
         doi_list = set(views.keys()).union(downloads.keys())
         for doi in doi_list:
             create_row(doi, dt_pair, views.get(doi), downloads.get(doi))
-            
 
 
 

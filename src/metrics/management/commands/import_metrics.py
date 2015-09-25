@@ -14,6 +14,8 @@ class Command(BaseCommand):
         parser.add_argument('--days', nargs='?', type=int, default=2)
         # import the last two months by default
         parser.add_argument('--months', nargs='?', type=int, default=2)
+        # import only cached results
+        parser.add_argument('--only-cached', type=bool, default=True)
 
     def handle(self, *args, **options):
         today = datetime.now()
@@ -21,11 +23,11 @@ class Command(BaseCommand):
         n_months_ago = today - relativedelta(months=options['months'])
         
         LOG.info("importing daily stats")
-        logic.import_ga_metrics('daily', from_date=n_days_ago, to_date=today)
+        logic.import_ga_metrics('daily', from_date=n_days_ago, to_date=today, use_cached=True, use_only_cached=True)
         logic.import_hw_metrics('daily', from_date=n_days_ago, to_date=today)
 
         LOG.info("import monthly stats")
-        logic.import_ga_metrics('monthly', from_date=n_months_ago, to_date=today)
+        logic.import_ga_metrics('monthly', from_date=n_months_ago, to_date=today, use_cached=True, use_only_cached=True)
         logic.import_hw_metrics('monthly', from_date=n_days_ago, to_date=today)
         
         self.stdout.write("...done\n")
