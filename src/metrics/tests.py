@@ -193,10 +193,10 @@ class TestAPI(BaseCase):
                         'pdf': 1533,
                     },
                     '2015-09-12': { 
-                        'full': 21922,
-                        'abstract': 325,
-                        'digest': 114,
-                        'pdf': 1533,
+                        'full': 9528,
+                        'abstract': 110,
+                        'digest': 42,
+                        'pdf': 489,
                     }
                 }),
                 'monthly': OrderedDict({})
