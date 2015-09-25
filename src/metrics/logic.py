@@ -84,7 +84,6 @@ def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
     for dt, items in results.items():
         map(create_hw_row, items)
 
-@transaction.atomic
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from inception"
     assert metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"'
@@ -105,8 +104,10 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         'monthly': bulk.monthly_metrics_between,
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
+
+    queue = []
     
-    def create_row(doi, dt_pair, views, downloads):
+    def create_row(queue, doi, dt_pair, views, downloads):
         "wrangles the data into a format suitable for `insert_row`"
         if not views:
             views = {
@@ -119,7 +120,19 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         views['source'] = models.GA
         row = dict(zip(['period', 'date'], format_dt_pair(dt_pair)))
         row.update(views)
-        return insert_row(row)
+        queue.append(row)
+        #return insert_row(row)
+
+    # ok, this is a bit hacky, but on very long runs (when we do a full import for example) the
+    # kernel will kill the process for being a memory hog
+    @transaction.atomic
+    def commit_rows(queue, force=False):
+        "commits the objects in the queue every time it hits 1000 objects or is told otherwise"
+        if len(queue) == 1000 or force:
+            LOG.info("committing %s objects to db", len(queue))
+            map(insert_row, queue)
+            queue = []
+        return queue
 
     for dt_pair, metrics in results.items():
         downloads = metrics['downloads']
@@ -127,7 +140,11 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         
         doi_list = set(views.keys()).union(downloads.keys())
         for doi in doi_list:
-            create_row(doi, dt_pair, views.get(doi), downloads.get(doi))
+            create_row(queue, doi, dt_pair, views.get(doi), downloads.get(doi))
+            queue = commit_rows(queue)
+
+    # commit any remaining
+    commit_rows(queue, force=True)
 
 
 
