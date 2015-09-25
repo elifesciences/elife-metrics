@@ -7,7 +7,7 @@ from django.conf import settings
 import models
 from django.db import transaction
 from elife_ga_metrics.core import ymd
-
+from django import db
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -131,6 +131,8 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
             LOG.info("committing %s objects to db", len(queue))
             map(insert_row, queue)
             queue = []
+            db.reset_queries()
+            
         return queue
 
     # whatever mode we're in, ensure debug is off for import
