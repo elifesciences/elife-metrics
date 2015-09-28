@@ -208,3 +208,62 @@ class TestAPI(BaseCase):
         self.assertEqual(200, resp.status_code)
         self.assertEqual(expected_data, resp.data)
 
+
+class TestMultiSourceAPI(BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_mixed_source_data(self):
+        "data from multiple sources is served up correctly"        
+        from_date = datetime(year=2015, month=9, day=11)
+        to_date = from_date + timedelta(days=1)
+        logic.import_ga_metrics('daily', from_date, to_date)
+        logic.import_hw_metrics('daily', from_date, to_date)
+        doi = '10.7554/eLife.09560'
+        expected_data = {
+            models.GA: {
+                doi: {
+                    'daily': OrderedDict({
+                        '2015-09-11': {
+                            'full': 21922,
+                            'abstract': 325,
+                            'digest': 114,
+                            'pdf': 1533,
+                            },
+                        '2015-09-12': { 
+                            'full': 9528,
+                            'abstract': 110,
+                            'digest': 42,
+                            'pdf': 489,
+                        }
+                    }),
+                    'monthly': OrderedDict({}),
+                },
+            },
+            models.HW: {
+                doi: {
+                    'daily': OrderedDict({
+                        '2015-09-11': {
+                            'full': 39912,
+                            'abstract': 540,
+                            'digest': 0,
+                            'pdf': 4226,
+                        },
+                        '2015-09-12': {
+                            'full': 15800,
+                            'abstract': 144,
+                            'digest': 0,
+                            'pdf': 1132,
+                        },
+                    }),
+                    'monthly': OrderedDict({}),
+                },
+            },
+        }
+        url = reverse('api-article-metrics-mixed-source', kwargs={'doi': doi})
+        resp = self.c.get(url)
+        self.assertEqual(200, resp.status_code)
+        self.assertEqual(expected_data, resp.data)

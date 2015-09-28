@@ -19,3 +19,21 @@ def api_article_metrics(request, doi):
             'monthly': logic.group_monthly_results(logic.monthly_since_ever(doi)),
         }
     })
+
+@api_view(['GET'])
+def api_article_metrics_mixed_source(request, doi):
+    artobj = get_object_or_404(models.Article, doi=doi)
+    return Response({
+        models.GA: {
+            doi: {
+                'daily': logic.group_daily_by_date(logic.daily_last_n_days(doi, 30)),
+                'monthly': logic.group_monthly_results(logic.monthly_since_ever(doi)),
+            },
+        },
+        models.HW: {
+            doi: {
+                'daily': logic.group_daily_by_date(logic.daily_last_n_days(doi, 30, models.HW)),
+                'monthly': logic.group_monthly_results(logic.monthly_since_ever(doi, models.HW)),
+            },
+        }
+    })

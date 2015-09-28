@@ -170,9 +170,10 @@ class MetricSerializer(szr.ModelSerializer):
 #
 #
 
-def daily(doi, from_date, to_date):
+def daily(doi, from_date, to_date, source=models.GA):
     return models.Metric.objects \
       .filter(article__doi__iexact=doi) \
+      .filter(source=source) \
       .filter(period=models.DAY) \
       .filter(date__gte=ymd(from_date), date__lte=ymd(to_date)) # does this even work with charfields??
 
@@ -187,12 +188,12 @@ def group_daily_by_date(daily_results):
         return results    
     return grouper(MetricSerializer(daily_results, many=True).data, lambda obj: obj['date'])
 
-def daily_last_n_days(doi, days=30):
+def daily_last_n_days(doi, days=30, source=models.GA):
     yesterday = datetime.now() - timedelta(days=1)
     n_days_ago = datetime.now() - timedelta(days=days)
-    return daily(doi, n_days_ago, yesterday)
+    return daily(doi, n_days_ago, yesterday, source)
 
-def monthly(doi, from_date, to_date):
+def monthly(doi, from_date, to_date, source=models.GA):
     """returns monthly metrics for the given article for the month
     starting in `from_date` to the month ending in `to_date`"""
     # because we're not storing dates, but rather a representation of a date
@@ -200,12 +201,13 @@ def monthly(doi, from_date, to_date):
     date_list = [ymd(i[0])[:7] for i in date_list] # ll:  [2013-01, 2013-02, 2013-03]
     return models.Metric.objects \
       .filter(article__doi__iexact=doi) \
+      .filter(source=source) \
       .filter(period=models.MONTH) \
       .filter(date__in=date_list)
 
-def monthly_since_ever(doi):
+def monthly_since_ever(doi, source=models.GA):
     the_beginning = ga_metrics.core.VIEWS_INCEPTION
-    return monthly(doi, the_beginning, datetime.now())
+    return monthly(doi, the_beginning, datetime.now(), source)
 
 def group_monthly_results(results):
     def grouper(iterable, func):
