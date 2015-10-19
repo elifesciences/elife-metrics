@@ -14,15 +14,18 @@ class Command(BaseCommand):
         parser.add_argument('--days', nargs='?', type=int, default=2)
         # import the last two months by default
         parser.add_argument('--months', nargs='?', type=int, default=2)
+        
         # use cache files if they exist
-        parser.add_argument('--cached', nargs='?', type=bool, default=True)
+        parser.add_argument('--cached', dest='cached', action="store_true", default=False)
         # import *only* from cached results
-        parser.add_argument('--only-cached', nargs='?', type=bool, default=False)
+        parser.add_argument('--only-cached', dest='only_cached', action="store_true", default=False)
+        
         # ignore settings for months?
         # caching works a little too well for months. not a problem unless you
         # want the value to be updated each day. month values are not derived from
         # day values so caching needs to be off.
-        parser.add_argument('--ignore-caching-on-months', nargs='?', type=bool, default=False)
+        # UPDATE: problem is with argparse. this opt might not even be needed
+        #parser.add_argument('--ignore-caching-on-months', nargs='?', type=bool, default=False)
 
     def handle(self, *args, **options):
         today = datetime.now()
@@ -33,14 +36,17 @@ class Command(BaseCommand):
         
         from_date = n_days_ago
         to_date = today
+
+        # goddamn argparse and it's braindead bool casting
+        #print 'use cached? %r only cached? %r' % (use_cached, only_cached)
         
         LOG.info("importing daily stats")
         logic.import_ga_metrics('daily', from_date, to_date, use_cached, only_cached)
         logic.import_hw_metrics('daily', from_date, to_date)
 
         from_date = n_months_ago
-        if options['ignore_caching_on_months']:
-            use_cached = False
+        #if options['ignore_caching_on_months']:
+        #    use_cached = False
 
         LOG.info("import monthly stats")
         logic.import_ga_metrics('monthly', from_date, to_date, use_cached, only_cached)
