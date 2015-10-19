@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 from metrics import models, logic
 from datetime import datetime, timedelta
+from elife_ga_metrics.core import ymd
 
 class BaseCase(TestCase):
     def __init__(self, *args, **kwargs):
@@ -124,13 +125,19 @@ class TestAPI(BaseCase):
         self.assertEqual(expected, models.Metric.objects.count())
 
         doi = '10.7554/eLife.08007'
+
+        metrics = models.Metric.objects.get(article__doi=doi)
+        this_month = ymd(datetime.now() - timedelta(days=1))[:-3]
+        metrics.date = this_month
+        metrics.save()
         
         expected_data = {
             doi: {
                 'daily': OrderedDict({}),
                 'monthly': OrderedDict({
-                    '2015-08': {
-                        'full': 525,
+                    this_month: {
+                        #'full': 525,
+                        'full': 604, # introduction of POA as full text views
                         'abstract': 9,
                         'digest': 46,
                         'pdf': 129,
@@ -148,11 +155,19 @@ class TestAPI(BaseCase):
         "a very simple set of data returns the expected daily and monthly data in the expected structure"
         day_to_import = datetime(year=2015, month=9, day=11)
         logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import)
+
         doi = '10.7554/eLife.09560'
+
+        # hack.
+        metric = models.Metric.objects.get(article__doi=doi)
+        yesterday = ymd(datetime.now() - timedelta(days=1))
+        metric.date = yesterday
+        metric.save()
+        
         expected_data = {
             doi: {
                 'daily': OrderedDict({
-                    '2015-09-11': {
+                    yesterday: {
                         'full': 21922,
                         'abstract': 325,
                         'digest': 114,
@@ -173,6 +188,8 @@ class TestAPI(BaseCase):
                 #},
             },
         }
+        
+            
         url = reverse('api-article-metrics', kwargs={'doi': doi})
         resp = self.c.get(url)
         self.assertEqual(200, resp.status_code)
@@ -183,16 +200,26 @@ class TestAPI(BaseCase):
         to_date = from_date + timedelta(days=1)
         logic.import_ga_metrics('daily', from_date, to_date)
         doi = '10.7554/eLife.09560'
+
+        # hack. 
+        yesterday = ymd(datetime.now() - timedelta(days=1))
+        day_before = ymd(datetime.now() - timedelta(days=2))
+        m1, m2 = models.Metric.objects.filter(article__doi=doi)
+        m1.date = day_before
+        m2.date = yesterday
+        m1.save()
+        m2.save()
+        
         expected_data = {
             doi: {
                 'daily': OrderedDict({
-                    '2015-09-11': {
+                    day_before: {
                         'full': 21922,
                         'abstract': 325,
                         'digest': 114,
                         'pdf': 1533,
                     },
-                    '2015-09-12': { 
+                    yesterday: { 
                         'full': 9528,
                         'abstract': 110,
                         'digest': 42,
