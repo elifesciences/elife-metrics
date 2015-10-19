@@ -23,7 +23,9 @@ class TestGAImport(BaseCase):
         self.assertEqual(0, models.Article.objects.count())
         day_to_import = datetime(year=2015, month=9, day=11)
         logic.import_ga_metrics(from_date=day_to_import, to_date=day_to_import)
-        expected_article_count = 1090 # we know this day reveals this many articles
+        # we know this day reveals this many articles
+        #expected_article_count = 1090 # changed when we introduced POA articles
+        expected_article_count = 1119 
         self.assertEqual(expected_article_count, models.Article.objects.count())
 
     def test_partial_data_is_updated(self):
@@ -250,17 +252,34 @@ class TestMultiSourceAPI(BaseCase):
         logic.import_ga_metrics('daily', from_date, to_date)
         logic.import_hw_metrics('daily', from_date, to_date)
         doi = '10.7554/eLife.09560'
+
+
+        # hack. 
+        yesterday = ymd(datetime.now() - timedelta(days=1))
+        day_before = ymd(datetime.now() - timedelta(days=2))
+        m1, m2 = models.Metric.objects.filter(article__doi=doi, source=models.GA)
+        m1.date = day_before
+        m2.date = yesterday
+        m1.save()
+        m2.save()
+
+        m1, m2 = models.Metric.objects.filter(article__doi=doi, source=models.HW)
+        m1.date = day_before
+        m2.date = yesterday
+        m1.save()
+        m2.save()
+        
         expected_data = {
             models.GA: {
                 doi: {
                     'daily': OrderedDict({
-                        '2015-09-11': {
+                        day_before: {
                             'full': 21922,
                             'abstract': 325,
                             'digest': 114,
                             'pdf': 1533,
                             },
-                        '2015-09-12': { 
+                        yesterday: { 
                             'full': 9528,
                             'abstract': 110,
                             'digest': 42,
@@ -273,13 +292,13 @@ class TestMultiSourceAPI(BaseCase):
             models.HW: {
                 doi: {
                     'daily': OrderedDict({
-                        '2015-09-11': {
+                        day_before: {
                             'full': 39912,
                             'abstract': 540,
                             'digest': 0,
                             'pdf': 4226,
                         },
-                        '2015-09-12': {
+                        yesterday: {
                             'full': 15800,
                             'abstract': 144,
                             'digest': 0,
