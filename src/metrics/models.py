@@ -55,7 +55,7 @@ class Metric(models.Model):
         }
 
     def __unicode__(self):
-        return '%s,%s,%s,%s,%s' % (self.article, self.source, self.date, self.full, self.pdf)
+        return '%s,%s,%s,%s,%s,%s' % (self.article, self.date, self.source, self.full, self.pdf, self.digest)
 
     def __repr__(self):
         return u'<Metric %s>' % self.__unicode__()
