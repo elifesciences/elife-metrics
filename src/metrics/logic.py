@@ -2,7 +2,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 import elife_ga_metrics as ga_metrics
 from elife_hw_metrics import core as hw_metrics
-from elife_ga_metrics import bulk
+from elife_ga_metrics import bulk, utils
 from django.conf import settings
 import models
 from django.db import transaction
@@ -197,7 +197,7 @@ def monthly(doi, from_date, to_date, source=models.GA):
     """returns monthly metrics for the given article for the month
     starting in `from_date` to the month ending in `to_date`"""
     # because we're not storing dates, but rather a representation of a date
-    date_list = bulk.dt_month_range(from_date, to_date) # ll: [(2013-01-01, 2013-01-31), (2013-02-01, 2013-02-28), ...]
+    date_list = utils.dt_month_range(from_date, to_date) # ll: [(2013-01-01, 2013-01-31), (2013-02-01, 2013-02-28), ...]
     date_list = [ymd(i[0])[:7] for i in date_list] # ll:  [2013-01, 2013-02, 2013-03]
     return models.Metric.objects \
       .filter(article__doi__iexact=doi) \

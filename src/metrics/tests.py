@@ -201,11 +201,11 @@ class TestAPI(BaseCase):
         from_date = datetime(year=2015, month=9, day=11)
         to_date = from_date + timedelta(days=1)
         logic.import_ga_metrics('daily', from_date, to_date)
-        doi = '10.7554/eLife.09560'
+        doi = u'10.7554/eLife.09560'
 
         # hack. 
-        yesterday = ymd(datetime.now() - timedelta(days=1))
-        day_before = ymd(datetime.now() - timedelta(days=2))
+        yesterday = unicode(ymd(datetime.now() - timedelta(days=1)))
+        day_before = unicode(ymd(datetime.now() - timedelta(days=2)))
         m1, m2 = models.Metric.objects.filter(article__doi=doi)
         m1.date = day_before
         m2.date = yesterday
@@ -214,26 +214,25 @@ class TestAPI(BaseCase):
         
         expected_data = {
             doi: {
-                'daily': OrderedDict({
-                    day_before: {
+                'daily': OrderedDict([
+                    (day_before, {
                         'full': 21922,
                         'abstract': 325,
                         'digest': 114,
                         'pdf': 1533,
-                    },
-                    yesterday: { 
+                    }),
+                    (yesterday, { 
                         'full': 9528,
                         'abstract': 110,
                         'digest': 42,
                         'pdf': 489,
-                    }
-                }),
+                    })
+                ]),
                 'monthly': OrderedDict({})
             },
         }
         url = reverse('api-article-metrics', kwargs={'doi': doi})
         resp = self.c.get(url)
-        print 'got data',resp.data
         self.assertEqual(200, resp.status_code)
         self.assertEqual(expected_data, resp.data)
 
@@ -272,39 +271,39 @@ class TestMultiSourceAPI(BaseCase):
         expected_data = {
             models.GA: {
                 doi: {
-                    'daily': OrderedDict({
-                        day_before: {
+                    'daily': OrderedDict([
+                        (day_before, {
                             'full': 21922,
                             'abstract': 325,
                             'digest': 114,
                             'pdf': 1533,
-                            },
-                        yesterday: { 
+                        }),
+                        (yesterday, { 
                             'full': 9528,
                             'abstract': 110,
                             'digest': 42,
                             'pdf': 489,
-                        }
-                    }),
+                        })
+                    ]),
                     'monthly': OrderedDict({}),
                 },
             },
             models.HW: {
                 doi: {
-                    'daily': OrderedDict({
-                        day_before: {
+                    'daily': OrderedDict([
+                        (day_before, {
                             'full': 39912,
                             'abstract': 540,
                             'digest': 0,
                             'pdf': 4226,
-                        },
-                        yesterday: {
+                        }),
+                        (yesterday, {
                             'full': 15800,
                             'abstract': 144,
                             'digest': 0,
                             'pdf': 1132,
-                        },
-                    }),
+                        }),
+                    ]),
                     'monthly': OrderedDict({}),
                 },
             },
