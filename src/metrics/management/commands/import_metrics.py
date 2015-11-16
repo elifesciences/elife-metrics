@@ -1,3 +1,4 @@
+import argparse
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand, CommandError
@@ -5,6 +6,21 @@ from metrics import logic
 
 import logging
 LOG = logging.getLogger(__name__)
+
+def hw_or_ga(v):
+    pv = v.lower().strip()
+    if not pv in ['ga', 'hw']:
+        raise argparse.ArgumentTypeError("'--just-source' accepts only 'hw' or 'ga'" % v)
+    return pv
+
+def first(x):
+    try:
+        return x[0]
+    except KeyError:
+        return None
+
+def rest(x):
+    return x[1:]
 
 class Command(BaseCommand):
     help = 'imports all metrics from google analytics'
@@ -19,6 +35,8 @@ class Command(BaseCommand):
         parser.add_argument('--cached', dest='cached', action="store_true", default=False)
         # import *only* from cached results
         parser.add_argument('--only-cached', dest='only_cached', action="store_true", default=False)
+
+        parser.add_argument('--just-source', nargs='?', dest='just_source', type=hw_or_ga, default=None)
         
         # ignore settings for months?
         # caching works a little too well for months. not a problem unless you
@@ -37,20 +55,27 @@ class Command(BaseCommand):
         from_date = n_days_ago
         to_date = today
 
+        using_sources = ['hw', 'ga'] if not options['just_source'] else [options['just_source']]
+
         # goddamn argparse and it's braindead bool casting
         #print 'use cached? %r only cached? %r' % (use_cached, only_cached)
-        
-        LOG.info("importing daily stats")
-        logic.import_ga_metrics('daily', from_date, to_date, use_cached, only_cached)
-        logic.import_hw_metrics('daily', from_date, to_date)
+
+        sources = {
+            'ga': (logic.import_ga_metrics, 'daily', from_date, to_date, use_cached, only_cached),
+            'hw': (logic.import_hw_metrics, 'daily', from_date, to_date)
+        }        
+        LOG.info("importing daily stats for sources %s", ", ".join(using_sources))
+        [apply(first(row), rest(row)) for source, row in sources.items() if source in using_sources]
 
         from_date = n_months_ago
         #if options['ignore_caching_on_months']:
         #    use_cached = False
 
         LOG.info("import monthly stats")
-        logic.import_ga_metrics('monthly', from_date, to_date, use_cached, only_cached)
-        logic.import_hw_metrics('monthly', from_date, to_date)
-        
+        sources = {
+            'ga': (logic.import_ga_metrics, 'monthly', from_date, to_date, use_cached, only_cached),
+            'hw': (logic.import_hw_metrics, 'monthly', from_date, to_date)
+        }
+        [apply(first(row), rest(row)) for source, row in sources.items() if source in using_sources]
         self.stdout.write("...done\n")
         self.stdout.flush()
