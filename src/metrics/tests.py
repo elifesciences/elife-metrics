@@ -95,6 +95,11 @@ class TestHWImport(BaseCase):
         expected_article_count = 11
         self.assertEqual(expected_article_count, models.Article.objects.count())
 
+        #
+        # BREAKING. HW is discarding data older than ~90 days I suspect
+        # elife-hw-metrics doesn't support importing multiple csv files (yet)
+        #
+
         doi = '10.7554/eLife.02993'
         expected_data = {
             'abstract': 0,
