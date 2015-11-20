@@ -1,4 +1,4 @@
-# elife-metrics 
+# elife-metrics  
 
 A data store and API for accessing the article level metrics that power the 
 graphs on the elifesciences.org article metrics page.
