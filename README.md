@@ -5,6 +5,9 @@ graphs on the elifesciences.org article metrics page.
 
 ## installation
 
+    git clone https://github.com/elifesciences/elife-metrics
+    cd src/core
+    ln -s dev_settings.py settings.py
     ./install.sh
 
 ## usage (development)
