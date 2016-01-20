@@ -1,7 +1,9 @@
-# elife-metrics  
+# elife-metrics
 
 An effort by [eLife Sciences](http://elifesciences.org) to provide a data store 
 and API for accessing the article level metrics.
+
+[Github repo](https://github.com/elifesciences/elife-metrics/).
 
 API documentation can be found here:
 
@@ -16,9 +18,9 @@ For example, the [Homo Naledi](http://elifesciences.org/content/4/e09560) articl
 
 [code](https://github.com/elifesciences/elife-metrics/blob/develop/install.sh) 
 
-    $ git clone https://github.com/elifesciences/elife-metrics
-    $ cd elife-metrics
-    $ ./install.sh
+    git clone https://github.com/elifesciences/elife-metrics
+    cd elife-metrics
+    ./install.sh
 
 ## updating
 
