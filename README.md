@@ -16,7 +16,7 @@ For example, the [Homo Naledi](http://elifesciences.org/content/4/e09560) articl
 
 ## installation
 
-[code](https://github.com/elifesciences/elife-metrics/blob/develop/install.sh) 
+[code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh) 
 
     git clone https://github.com/elifesciences/elife-metrics
     cd elife-metrics
@@ -24,19 +24,19 @@ For example, the [Homo Naledi](http://elifesciences.org/content/4/e09560) articl
 
 ## updating
 
-[code](https://github.com/elifesciences/elife-metrics/blob/develop/install.sh)  
+[code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh)  
 
     ./install.sh
 
 ## testing 
 
-[code](https://github.com/elifesciences/elife-metrics/blob/develop/src/metrics/tests/)  
+[code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/tests/)  
 
     ./test.sh
 
 ## running
 
-[code](https://github.com/elifesciences/elife-metrics/blob/develop/manage.sh)
+[code](https://github.com/elifesciences/elife-metrics/blob/master/manage.sh)
 
     ./manage.sh runserver
     firefox http://127.0.0.1:8000/api/docs/
