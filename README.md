@@ -1,32 +1,61 @@
-# elife-metrics  
+# elife-metrics
 
-A data store and API for accessing the article level metrics that power the 
-graphs on the elifesciences.org article metrics page.
+An effort by [eLife Sciences](http://elifesciences.org) to provide a data store 
+and API for accessing the article level metrics.
+
+[Github repo](https://github.com/elifesciences/elife-metrics/).
+
+API documentation can be found here:
+
+* [code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/api.py)
+* [Swagger](https://metrics.elifesciences.org/api/docs/) (or your [local version](/api/docs/))
+
+For example, the [Homo Naledi](http://elifesciences.org/content/4/e09560) article:
+
+* [http://metrics.elifesciences.org/api/v1/article/hw,ga/10.7554/eLife.09560/](http://metrics.elifesciences.org/api/v1/article/hw,ga/10.7554/eLife.09560/)
 
 ## installation
 
+[code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh) 
+
     git clone https://github.com/elifesciences/elife-metrics
-    cd src/core
-    ln -s dev_settings.py settings.py
+    cd elife-metrics
     ./install.sh
 
-## usage (development)
+## updating
 
-Load the stats contained in the `elife-ga-metrics` repository.
-    
-    ./manage.sh import_metrics
-    
-Run the development server
+[code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh)  
+
+    ./install.sh
+
+## testing 
+
+[code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/tests/)  
+
+    ./test.sh
+
+## running
+
+[code](https://github.com/elifesciences/elife-metrics/blob/master/manage.sh)
 
     ./manage.sh runserver
-    
-Visit the Swagger documentation
-    
-    firefox http://127.0.0.1/api/docs/
+    firefox http://127.0.0.1:8000/api/docs/
+
+## importing metrics (development)
+
+[code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/management/commands/import_metrics.py)
+
+Load daily metrics for the last two days and monthly metrics for the last two months:
+
+    ./import-metrics.sh
+
+Load all the metrics you can:
+
+    ./import-all-metrics.sh
 
 ## Copyright & Licence
  
-Copyright 2015 eLife Sciences. Licensed under the [GPLv3](LICENCE.txt)
+Copyright 2016 eLife Sciences. Licensed under the [GPLv3](LICENCE.txt)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

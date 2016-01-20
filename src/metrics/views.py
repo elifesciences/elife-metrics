@@ -1,3 +1,5 @@
+from os.path import join
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404
 from annoying.decorators import render_to
 import logic, models
@@ -6,9 +8,15 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import serializers as szr
 
-@render_to('index.html')
+@render_to('metrics/index.html')
 def index(request):
-    return {}
+    return {
+        'readme': open(join(settings.PROJECT_ROOT, 'README.md'), 'r').read()
+    }
+
+#
+# API
+#
 
 @api_view(['GET'])
 def api_article_metrics(request, doi):

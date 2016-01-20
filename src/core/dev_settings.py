@@ -2,6 +2,7 @@ import os
 from os.path import join
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_ROOT = os.path.abspath(join(BASE_DIR, '..'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
@@ -23,7 +24,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
 STATIC_ROOT = os.path.join(BASE_DIR, '..', 'collected-static')
 
 STATICFILES_DIRS = (
-    #os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, "static"),
 )
 
 REST_FRAMEWORK = {
@@ -52,6 +53,7 @@ INSTALLED_APPS = (
 
     'rest_framework',
     'rest_framework_swagger',
+    'django_markdown2',
 
     'metrics',
 )
