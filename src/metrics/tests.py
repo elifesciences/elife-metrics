@@ -75,7 +75,11 @@ class TestHWImport(BaseCase):
         # 2015-11-20, HW stats can't be trusted. I don't know why there are suddenly fewer
         # articles on this day now that we have more data...
         #expected_article_count = 1631
-        expected_article_count = 1603
+
+        #expected_article_count = 1603
+        # 2016-02-16: aaaaand we're back to 1631
+        expected_article_count = 1631
+
         self.assertEqual(expected_article_count, models.Article.objects.count())
 
         doi = '10.7554/eLife.02993'
