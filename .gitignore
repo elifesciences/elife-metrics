@@ -13,3 +13,5 @@ analytics.dat
 elife_ga_metrics
 elife_hw_metrics
 src/collected-static
+xml/
+.coverage
