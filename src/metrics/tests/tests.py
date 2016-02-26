@@ -1,15 +1,11 @@
 from collections import OrderedDict
-from django.test import TestCase, Client
+from django.test import Client
 from django.core.urlresolvers import reverse
 from metrics import models, logic
 from datetime import datetime, timedelta
 from elife_ga_metrics.core import ymd
 
-class BaseCase(TestCase):
-    def __init__(self, *args, **kwargs):
-        super(BaseCase, self).__init__(*args, **kwargs)
-        self.maxDiff = None
-
+from base import BaseCase
 
 class TestGAImport(BaseCase):
     def setUp(self):
