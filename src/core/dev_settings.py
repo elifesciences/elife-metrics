@@ -20,8 +20,9 @@ GA_TABLE_ID = '82618489'
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
-MEDIA_ROOT = os.path.join(BASE_DIR, '..', 'media')
-STATIC_ROOT = os.path.join(BASE_DIR, '..', 'collected-static')
+# dont store these in the src directory
+MEDIA_ROOT = join(PROJECT_ROOT, 'media')
+STATIC_ROOT = join(PROJECT_ROOT, 'collected-static')
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
@@ -92,6 +93,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'core.wsgi.application'
 
+# Testing
+TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
+TEST_OUTPUT_DIR = 'xml'
 
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
@@ -116,3 +120,36 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': join(BASE_DIR, "app.log"),
+        },
+        'debug-console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    
+    'loggers': {
+        '': {
+            'handlers': ['debug-console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'publisher.management.commands.import_article': {
+            'level': 'INFO',
+            'handlers': ['debug-console'],
+        },
+        'django.request': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}

@@ -1,10 +1,10 @@
+coverage==4.0.3
 decorator==4.0.6
 Django==1.9.1
 django-annoying==0.8.5
 django-markdown2==0.2.1
-djangorestframework==3.3.2
 django-rest-swagger==0.3.4
-# removed the -e
+djangorestframework==3.3.2
 # http://stackoverflow.com/questions/16785337/package-is-installed-via-pip-in-wrong-src-directory-instead-of-site-packages
 git+https://github.com/elifesciences/elife-ga-metrics.git#egg=elife-ga-metrics
 git+https://github.com/elifesciences/elife-hw-metrics.git#egg=elife-hw-metrics
@@ -12,3 +12,4 @@ psycopg2==2.6.1
 pylint==1.5.4
 pylint-django==0.7.1
 python-dateutil==2.4.2
+unittest-xml-reporting==2.0.0

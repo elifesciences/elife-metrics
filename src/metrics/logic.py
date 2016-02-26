@@ -28,10 +28,10 @@ def format_dt_pair(dt_pair):
     if from_date == to_date:
         # daily, looks like 2015-01-01, 2015-01-01
         return models.DAY, from_date
-    if from_date[-2:] == '01' and to_date[-2:] in ['31', '30', '28']:
+    if from_date[-2:] == '01' and to_date[-2:] in ['31', '30', '29', '28']:
         # monthly, looks 2015-01-01, 2015-01-31
         return models.MONTH, from_date[:7]
-    raise ValueError("given dtpair %r but it doesn't look like a daily or monthly result!" % dt_pair)
+    raise ValueError("given dtpair %r but it doesn't look like a daily or monthly result!" % str(dt_pair))
 
 def insert_row(data):
     row = exsubdict(data, 'doi')
