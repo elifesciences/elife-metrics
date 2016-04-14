@@ -10,7 +10,7 @@ from os.path import join
 from datetime import datetime
 import ConfigParser as configparser
 
-PROJECT_NAME = 'metrics'
+PROJECT_NAME = 'elife-metrics'
 
 # Build paths inside the project like this: os.path.join(SRC_DIR, ...)
 SRC_DIR = os.path.dirname(os.path.dirname(__file__)) # ll: /path/to/app/src/
