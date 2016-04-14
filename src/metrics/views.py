@@ -11,7 +11,7 @@ from rest_framework import serializers as szr
 @render_to('metrics/index.html')
 def index(request):
     return {
-        'readme': open(join(settings.PROJECT_ROOT, 'README.md'), 'r').read()
+        'readme': open(join(settings.PROJECT_DIR, 'README.md'), 'r').read()
     }
 
 #
