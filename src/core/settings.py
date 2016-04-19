@@ -161,7 +161,7 @@ LOGGING = {
     
     'loggers': {
         '': {
-            'handlers': ['debug-console'],
+            'handlers': ['debug-console', 'file'],
             'level': 'INFO',
             'propagate': True,
         },
