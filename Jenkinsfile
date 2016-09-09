@@ -1,8 +1,16 @@
-// not exactly a library, but not dealing with deploy here
-elifeLibrary {
+elifePipeline {
     stage 'Checkout'
     checkout scm
+    def commit = elifeGitRevision()
 
     stage 'Project tests'
-    sh './jenkins.sh'
+    lock('elife-metrics--ci') {
+        builderDeployRevision 'elife-metrics--ci', commit
+        builderProjectTests 'elife-metrics--ci', '/srv/elife-metrics' 
+    }
+
+    elifeMainlineOnly {
+        stage 'Approval'
+        elifeGitMoveToBranch commit, 'approved'
+    }
 }
