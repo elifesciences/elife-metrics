@@ -1,7 +1,7 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 import elife_ga_metrics as ga_metrics
-from elife_hw_metrics import core as hw_metrics
+#from elife_hw_metrics import core as hw_metrics
 from elife_ga_metrics import bulk, utils
 from django.conf import settings
 import models
@@ -63,6 +63,7 @@ def insert_row(data):
     return metric
 
 
+'''
 @transaction.atomic
 def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
     "import metrics from Highwire between the two given dates or from inception"
@@ -83,6 +84,7 @@ def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
     results = hw_metrics.metrics_between(from_date, to_date, metrics_type)
     for dt, items in results.items():
         map(create_hw_row, items)
+'''
 
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from inception"
@@ -207,6 +209,7 @@ def monthly(doi, from_date, to_date, source=models.GA):
 
 def monthly_since_ever(doi, source=models.GA):
     #the_beginning = ga_metrics.core.VIEWS_INCEPTION
+    # BROKEN
     the_beginning = hw_metrics.INCEPTION
     return monthly(doi, the_beginning, datetime.now(), source)
 

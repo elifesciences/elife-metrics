@@ -7,7 +7,6 @@ example settings can be found in /path/to/lax/elife.cfg
 
 import os
 from os.path import join
-from datetime import datetime
 import ConfigParser as configparser
 
 PROJECT_NAME = 'elife-metrics'

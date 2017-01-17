@@ -1,12 +1,11 @@
 from os.path import join
 from django.conf import settings
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404
 from annoying.decorators import render_to
 import logic, models
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import serializers as szr
 
 @render_to('metrics/index.html')
 def index(request):
@@ -20,7 +19,7 @@ def index(request):
 
 @api_view(['GET'])
 def api_article_metrics(request, doi):
-    artobj = get_object_or_404(models.Article, doi=doi)
+    get_object_or_404(models.Article, doi=doi)
     return Response({
         doi: {
             'daily': logic.group_daily_by_date(logic.daily_last_n_days(doi, 30)),
@@ -30,7 +29,7 @@ def api_article_metrics(request, doi):
 
 @api_view(['GET'])
 def api_article_metrics_mixed_source(request, doi):
-    artobj = get_object_or_404(models.Article, doi=doi)
+    get_object_or_404(models.Article, doi=doi)
     return Response({
         models.GA: {
             doi: {

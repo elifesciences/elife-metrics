@@ -3,7 +3,7 @@ from django.test import Client
 from django.core.urlresolvers import reverse
 from metrics import models, logic
 from datetime import datetime, timedelta
-from elife_ga_metrics.core import ymd
+from metrics.elife_ga_metrics.utils import ymd
 
 from base import BaseCase
 
@@ -156,7 +156,6 @@ class TestAPI(BaseCase):
         url = reverse('api-article-metrics', kwargs={'doi': doi})
         resp = self.c.get(url)
         self.assertEqual(200, resp.status_code)
-        data = resp.data
         self.assertEqual(expected_data, resp.data)
 
     def test_daily_data(self):
