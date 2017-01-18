@@ -3,6 +3,7 @@ from os.path import join
 from base import BaseCase
 from datetime import datetime
 from metrics.elife_ga_metrics import core, utils
+from django.conf import settings
 
 class TestUtils(BaseCase):
     def setUp(self):
@@ -68,7 +69,7 @@ class TestUtils(BaseCase):
     def test_output_path_for_view_results(self):
         "the output path is correctly generated for views"
         response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json'), 'r'))
-        expected_path = join(self.test_output_dir, core.OUTPUT_SUBDIR, "views/2016-02-24.json")
+        expected_path = join(self.test_output_dir, settings.GA_OUTPUT_SUBDIR, "views/2016-02-24.json")
         path = core.output_path_from_results(response)
         self.assertEqual(path, expected_path)
 
@@ -76,7 +77,7 @@ class TestUtils(BaseCase):
         "the output path is correctly generated for downloads"
         response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json'), 'r'))
         response['query']['filters'] = 'ga:eventLabel' # downloads are counted as events
-        expected_path = join(self.test_output_dir, core.OUTPUT_SUBDIR, "downloads/2016-02-24.json")
+        expected_path = join(self.test_output_dir, settings.GA_OUTPUT_SUBDIR, "downloads/2016-02-24.json")
         path = core.output_path_from_results(response)
         self.assertEqual(path, expected_path)
 
@@ -86,7 +87,7 @@ class TestUtils(BaseCase):
         response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json'), 'r'))
         response['query']['start-date'] = today
         response['query']['end-date'] = today
-        expected_path = join(self.test_output_dir, core.OUTPUT_SUBDIR, "views/%s.json.partial" % today)
+        expected_path = join(self.test_output_dir, settings.GA_OUTPUT_SUBDIR, "views/%s.json.partial" % today)
         path = core.output_path_from_results(response)
         self.assertEqual(path, expected_path)
 
