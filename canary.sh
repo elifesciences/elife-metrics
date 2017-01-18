@@ -23,6 +23,4 @@ read -p "$*"
 pip-review --auto --pre # update everything
 
 # run the tests
-pylint -E ./src/publisher/** --load-plugins=pylint_django --disable=E1103
-./src/manage.py migrate
-./src/manage.py test src/
+. .test.sh
