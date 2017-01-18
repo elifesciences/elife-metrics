@@ -1,4 +1,4 @@
-"""generalised settings for the elife-metrics project. 
+"""generalised settings for the elife-metrics project.
 
 per-instance settings are in /path/to/app/app.cfg
 example settings can be found in /path/to/lax/elife.cfg
@@ -9,6 +9,7 @@ import os
 from os.path import join
 from datetime import datetime
 import ConfigParser as configparser
+from pythonjsonlogger import jsonlogger
 
 PROJECT_NAME = 'elife-metrics'
 
@@ -23,24 +24,34 @@ DYNCONFIG = configparser.SafeConfigParser(**{
 DYNCONFIG.read(join(PROJECT_DIR, CFG_NAME)) # ll: /path/to/lax/app.cfg
 
 def cfg(path, default=0xDEADBEEF):
+    lu = {'True': True, 'true': True, 'False': False, 'false': False} # cast any obvious booleans
     try:
-        return DYNCONFIG.get(*path.split('.'))
-    except configparser.NoOptionError: # given key in section hasn't been defined
+        val = DYNCONFIG.get(*path.split('.'))
+        return lu.get(val, val)
+    except (configparser.NoOptionError, configparser.NoSectionError): # given key in section hasn't been defined
         if default == 0xDEADBEEF:
-            raise ValueError("no value set for setting at %r" % path)
+            raise ValueError("no value/section set for setting at %r" % path)
         return default
+    except Exception as err:
+        print 'error on %r: %s' % (path, err)
+
+# used to  know how far to go back in metrics gathering
+INCEPTION = datetime(year=2012, month=12, day=1)
+
+GA_OUTPUT_SUBDIR = join(PROJECT_DIR, 'ga-output')
+
+GA_TABLE_ID = cfg('metrics.ga-table-id')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')
 
 DEBUG = cfg('general.debug')
+assert isinstance(DEBUG, bool), "'debug' must be either True or False as a boolean, not %r" % (DEBUG, )
 
 DEV, TEST, PROD = 'dev', 'test', 'prod'
 ENV = cfg('general.env', DEV)
 
-ALLOWED_HOSTS = cfg('general.allowed-hosts', '').split(',')
-
-GA_TABLE_ID = cfg('metrics.ga-table-id')
+ALLOWED_HOSTS = filter(None, cfg('general.allowed-hosts', '').split(','))
 
 # Application definition
 
@@ -52,14 +63,16 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'django_markdown2', # landing page is rendered markdown
+
     'rest_framework',
-    'rest_framework_swagger',
-    'django_markdown2',
+    'rest_framework_swagger', # gui for api
 
     'metrics',
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -67,7 +80,6 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
 )
 
 ROOT_URLCONF = 'core.urls'
@@ -141,36 +153,53 @@ SWAGGER_SETTINGS = {
 
 LOG_NAME = '%s.log' % PROJECT_NAME # ll: lax.log
 LOG_FILE = join(PROJECT_DIR, LOG_NAME) # ll: /path/to/lax/log/lax.log
-if ENV == PROD:
+if ENV != DEV:
     LOG_FILE = join('/var/log/', LOG_NAME) # ll: /var/log/lax.log
+
+ATTRS = ['asctime', 'created', 'levelname', 'message', 'filename', 'funcName', 'lineno', 'module', 'pathname']
+FORMAT_STR = ' '.join(map(lambda v: '%(' + v + ')s', ATTRS))
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+
+    'formatters': {
+        'json': {
+            '()': jsonlogger.JsonFormatter,
+            'format': FORMAT_STR,
+        },
+        'brief': {
+            'format': '%(levelname)s - %(message)s'
+        },
+    },
+
     'handlers': {
-        'file': {
+        'metrics.log': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': LOG_FILE,
+            'formatter': 'json',
         },
-        'debug-console': {
+
+        'stderr': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
+            'formatter': 'brief',
         },
     },
-    
+
     'loggers': {
         '': {
-            'handlers': ['debug-console', 'file'],
+            'handlers': ['stderr', 'metrics.log'],
             'level': 'INFO',
             'propagate': True,
         },
         'publisher.management.commands.import_article': {
             'level': 'INFO',
-            'handlers': ['debug-console'],
+            'handlers': ['stderr'],
         },
         'django.request': {
-            'handlers': ['file'],
+            'handlers': ['metrics.log'],
             'level': 'DEBUG',
             'propagate': True,
         },

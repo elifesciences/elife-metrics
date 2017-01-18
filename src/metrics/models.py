@@ -33,7 +33,7 @@ class Metric(models.Model):
     date = models.CharField(max_length=10, blank=True, null=True, help_text="the date this metric is for in YYYY-MM-DD, YYYY-MM and YYYY formats or None for 'all time'")
     period = models.CharField(max_length=10, choices=metric_period_list())
     source = models.CharField(max_length=2, choices=metric_source_list())
-    
+
     full = models.PositiveIntegerField(help_text="article page views")
     abstract = models.PositiveIntegerField(help_text="article abstract page views")
     digest = models.PositiveIntegerField(help_text="article digest page views")

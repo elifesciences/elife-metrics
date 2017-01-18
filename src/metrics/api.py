@@ -1,9 +1,11 @@
-from django.conf.urls import include, url
+from rest_framework_swagger.views import get_swagger_view
+from django.conf.urls import url
 import views
 import operator
+from functools import reduce
 
 urlpatterns_meta = [
-    url(r'docs/', include('rest_framework_swagger.urls')),
+    url(r'docs/', get_swagger_view(title='Article Store API')),
 ]
 
 urlpatterns_v1 = [

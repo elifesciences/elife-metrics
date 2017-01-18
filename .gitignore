@@ -3,14 +3,11 @@
 *.sqlite*
 *.orig
 *.log
-media/**
-collected-static/**
-elife-articles
+ga-output/
+media/
+collected-static/
 venv
-src/output
 analytics.dat
-elife_ga_metrics
-elife_hw_metrics
 src/collected-static
 xml/
 htmlcov/

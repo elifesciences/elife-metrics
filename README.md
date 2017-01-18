@@ -1,7 +1,7 @@
 # elife-metrics
 
 An effort by [eLife Sciences](http://elifesciences.org) to provide a data store 
-and API for accessing the article level metrics.
+and API for accessing article-level metrics.
 
 This project uses the [Python programming language](https://www.python.org/),
 the [Django web framework](https://www.djangoproject.com/) and a
@@ -14,9 +14,9 @@ API documentation can be found here:
 * [code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/api.py)
 * [Swagger](https://metrics.elifesciences.org/api/docs/) (or your [local version](/api/docs/))
 
-For example, the [Homo Naledi](http://elifesciences.org/content/4/e09560) article:
+For example, the [Homo Naledi](https://dx.doi.org/10.7554/eLife.09560) article:
 
-* [http://metrics.elifesciences.org/api/v1/article/hw,ga/10.7554/eLife.09560/](http://metrics.elifesciences.org/api/v1/article/hw,ga/10.7554/eLife.09560/)
+* [http://metrics.elifesciences.org/api/v1/article/ga/10.7554/eLife.09560/](http://metrics.elifesciences.org/api/v1/article/ga/10.7554/eLife.09560/)
 
 ## installation
 
