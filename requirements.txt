@@ -18,5 +18,6 @@ pylint==1.6.4
 pylint-django==0.7.2
 pyOpenSSL==16.2.0
 python-dateutil==2.6.0
+python-json-logger==0.1.5
 pytz==2016.10
 unittest-xml-reporting==2.1.0
