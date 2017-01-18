@@ -24,7 +24,7 @@ class DummyQuery(object):
     def execute(self):
         raise errors.HttpError(self.resp, self.content)
 
-class TestQueryGA(base.BaseCase):
+class TestQueryGA(base.SimpleBaseCase):
     def setUp(self):
         pass
 
