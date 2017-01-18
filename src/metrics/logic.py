@@ -210,7 +210,7 @@ def monthly(doi, from_date, to_date, source=models.GA):
 def monthly_since_ever(doi, source=models.GA):
     #the_beginning = ga_metrics.core.VIEWS_INCEPTION
     # BROKEN
-    the_beginning = hw_metrics.INCEPTION
+    the_beginning = settings.INCEPTION
     return monthly(doi, the_beginning, datetime.now(), source)
 
 def group_monthly_results(results):

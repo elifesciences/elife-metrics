@@ -8,12 +8,19 @@ example settings can be found in /path/to/lax/elife.cfg
 import os
 from os.path import join
 import ConfigParser as configparser
+from datetime import datetime
 
 PROJECT_NAME = 'elife-metrics'
+
+
+# used to  know how far to go back in metrics gathering
+INCEPTION = datetime(year=2012, month=12, day=1)
 
 # Build paths inside the project like this: os.path.join(SRC_DIR, ...)
 SRC_DIR = os.path.dirname(os.path.dirname(__file__)) # ll: /path/to/app/src/
 PROJECT_DIR = os.path.dirname(SRC_DIR)
+
+GA_OUTPUT_SUBDIR = join(SRC_DIR, 'ga-output')
 
 CFG_NAME = 'app.cfg'
 DYNCONFIG = configparser.SafeConfigParser(**{
