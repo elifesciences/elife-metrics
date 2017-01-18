@@ -1,5 +1,5 @@
 import base
-from metrics.elife_ga_metrics import core
+from metrics.ga_metrics import core
 from apiclient import errors
 
 import logging

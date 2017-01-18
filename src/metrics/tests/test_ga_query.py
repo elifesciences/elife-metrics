@@ -1,6 +1,6 @@
 import base
 from datetime import timedelta
-from metrics.elife_ga_metrics import core
+from metrics.ga_metrics import core
 from collections import Counter
 
 class TestQueryResults(base.SimpleBaseCase):

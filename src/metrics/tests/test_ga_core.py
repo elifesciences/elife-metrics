@@ -1,6 +1,6 @@
 import base
 from datetime import datetime, timedelta
-from metrics.elife_ga_metrics import core, elife_v1, elife_v2, elife_v3, utils
+from metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, utils
 
 class TestCore(base.SimpleBaseCase):
     def setUp(self):

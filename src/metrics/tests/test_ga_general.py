@@ -1,5 +1,5 @@
 import base
-from metrics.elife_ga_metrics import general, utils
+from metrics.ga_metrics import general, utils
 from datetime import datetime
 from collections import OrderedDict
 

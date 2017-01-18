@@ -3,7 +3,7 @@ from django.test import Client
 from django.core.urlresolvers import reverse
 from metrics import models, logic
 from datetime import datetime, timedelta
-from metrics.elife_ga_metrics.utils import ymd
+from metrics.ga_metrics.utils import ymd
 
 from base import BaseCase
 

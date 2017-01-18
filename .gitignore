@@ -6,12 +6,8 @@
 ga-output/
 media/
 collected-static/
-elife-articles
 venv
-src/output
 analytics.dat
-elife_ga_metrics
-elife_hw_metrics
 src/collected-static
 xml/
 htmlcov/

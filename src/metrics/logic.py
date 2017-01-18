@@ -1,12 +1,12 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
-import elife_ga_metrics as ga_metrics
-#from elife_hw_metrics import core as hw_metrics
-from elife_ga_metrics import bulk, utils
+import ga_metrics
+from ga_metrics import bulk, utils
+from ga_metrics.core import ymd
 from django.conf import settings
 import models
 from django.db import transaction
-from elife_ga_metrics.core import ymd
+
 from django import db
 import logging
 
