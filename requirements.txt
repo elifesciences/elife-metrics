@@ -11,7 +11,7 @@ google-api-python-client==1.6.1
 green==2.5.3
 kids.cache==0.0.4
 markdown2==2.3.2
-oauth2client==4.0.0
+oauth2client==3.0.0
 psycopg2==2.6.2
 pyflakes==1.5.0
 pylint==1.6.4
