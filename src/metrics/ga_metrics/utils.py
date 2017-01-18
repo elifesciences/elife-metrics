@@ -6,6 +6,11 @@ logging.basicConfig()
 LOG = logging.getLogger(__name__)
 LOG.level = logging.INFO
 
+def norm_table_id(table_id):
+    if str(table_id).startswith('ga:'):
+        return table_id
+    return "ga:%s" % str(int(table_id))
+
 def ymd(dt):
     "returns a yyyy-mm-dd version of the given datetime object"
     return dt.strftime("%Y-%m-%d")
