@@ -14,10 +14,10 @@ LOG = logging.getLogger(__name__)
 LOG.level = logging.DEBUG
 
 def subdict(d, kl):
-    return {k:v for k, v in d.items() if k in kl}
+    return {k: v for k, v in d.items() if k in kl}
 
 def exsubdict(d, kl):
-    return {k:v for k, v in d.items() if k not in kl}
+    return {k: v for k, v in d.items() if k not in kl}
 
 def format_dt_pair(dt_pair):
     """the database expects values in yyyy-mm or yyyy-mm-dd format.
@@ -35,10 +35,10 @@ def format_dt_pair(dt_pair):
 
 def insert_row(data):
     row = exsubdict(data, 'doi')
-    
+
     article_obj, created = models.Article.objects.get_or_create(doi=data['doi'])
     row['article'] = article_obj
-    
+
     try:
         # fetch the metric if it exists
         sd = subdict(row, ['article', 'date', 'period', 'source'])
@@ -50,7 +50,7 @@ def insert_row(data):
             LOG.debug('metric found and data is exact %r, skipping', sd)
         except models.Metric.DoesNotExist:
             # data has changed!
-            # this happens when importing partial daily/monthly stats            
+            # this happens when importing partial daily/monthly stats
             LOG.debug('metric found and data has changed from %r to %r. updating', metric.pdf, data['pdf'])
             [setattr(metric, attr, val) for attr, val in row.items()]
             metric.save()
@@ -79,7 +79,7 @@ def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
         data['digest'] = 0
         data['source'] = models.HW
         return insert_row(data)
-    
+
     # not going to be delicate about this. just import all we can find.
     results = hw_metrics.metrics_between(from_date, to_date, metrics_type)
     for dt, items in results.items():
@@ -89,7 +89,7 @@ def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from inception"
     assert metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"'
-    
+
     table_id = 'ga:%s' % settings.GA_TABLE_ID
     the_beginning = ga_metrics.core.VIEWS_INCEPTION
     yesterday = datetime.now() - timedelta(days=1)
@@ -106,7 +106,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         'monthly': bulk.monthly_metrics_between,
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
-    
+
     def create_row(doi, dt_pair, views, downloads):
         "wrangles the data into a format suitable for `insert_row`"
         if not views:
@@ -134,7 +134,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
             queue = []
             db.reset_queries()
             # NOTE: this problem isn't solved, it's still leaking memory
-            
+
         return queue
 
     # whatever mode we're in, ensure debug is off for import
@@ -145,7 +145,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
     for dt_pair, metrics in results.items():
         downloads = metrics['downloads']
         views = metrics['views']
-        
+
         doi_list = set(views.keys()).union(downloads.keys())
         for doi in doi_list:
             queue.append(create_row(doi, dt_pair, views.get(doi), downloads.get(doi)))
@@ -174,10 +174,10 @@ class MetricSerializer(szr.ModelSerializer):
 
 def daily(doi, from_date, to_date, source=models.GA):
     return models.Metric.objects \
-      .filter(article__doi__iexact=doi) \
-      .filter(source=source) \
-      .filter(period=models.DAY) \
-      .filter(date__gte=ymd(from_date), date__lte=ymd(to_date)) # does this even work with charfields??
+        .filter(article__doi__iexact=doi) \
+        .filter(source=source) \
+        .filter(period=models.DAY) \
+        .filter(date__gte=ymd(from_date), date__lte=ymd(to_date)) # does this even work with charfields??
 
 def group_daily_by_date(daily_results):
     # assume there is a single daily result, like for a specific doi
@@ -187,7 +187,7 @@ def group_daily_by_date(daily_results):
             key = func(item)
             del item['date']
             results[key] = dict(item)
-        return results    
+        return results
     return grouper(MetricSerializer(daily_results, many=True).data, lambda obj: obj['date'])
 
 def daily_last_n_days(doi, days=30, source=models.GA):
@@ -202,10 +202,10 @@ def monthly(doi, from_date, to_date, source=models.GA):
     date_list = utils.dt_month_range(from_date, to_date) # ll: [(2013-01-01, 2013-01-31), (2013-02-01, 2013-02-28), ...]
     date_list = [ymd(i[0])[:7] for i in date_list] # ll:  [2013-01, 2013-02, 2013-03]
     return models.Metric.objects \
-      .filter(article__doi__iexact=doi) \
-      .filter(source=source) \
-      .filter(period=models.MONTH) \
-      .filter(date__in=date_list)
+        .filter(article__doi__iexact=doi) \
+        .filter(source=source) \
+        .filter(period=models.MONTH) \
+        .filter(date__in=date_list)
 
 def monthly_since_ever(doi, source=models.GA):
     #the_beginning = ga_metrics.core.VIEWS_INCEPTION
@@ -220,5 +220,5 @@ def group_monthly_results(results):
             key = func(item)
             del item['date']
             results[key] = dict(item)
-        return results    
+        return results
     return grouper(MetricSerializer(results, many=True).data, lambda obj: obj['date'])

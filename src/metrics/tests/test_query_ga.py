@@ -7,7 +7,8 @@ import logging
 LOG = logging.getLogger("")
 LOG.level = logging.DEBUG
 
-class Object(object): pass
+class Object(object):
+    pass
 
 class DummyQuery(object):
     def __init__(self, raises):

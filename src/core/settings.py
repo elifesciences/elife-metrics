@@ -1,4 +1,4 @@
-"""generalised settings for the elife-metrics project. 
+"""generalised settings for the elife-metrics project.
 
 per-instance settings are in /path/to/app/app.cfg
 example settings can be found in /path/to/lax/elife.cfg
@@ -164,7 +164,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
         },
     },
-    
+
     'loggers': {
         '': {
             'handlers': ['debug-console', 'file'],

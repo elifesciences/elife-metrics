@@ -14,7 +14,7 @@ class GeneralTests(BaseCase):
         sept_2015 = datetime(year=2015, month=9, day=1)
         dtrange = utils.dt_month_range(sept_2015, sept_2015)
         from_date, to_date = dtrange[0]
-        
+
         resp = general.total_traffic_monthly(self.table_id, from_date, to_date)
         expected_resp = {'from_date': u'2015-09-01',
                          'to_date': u'2015-09-30',

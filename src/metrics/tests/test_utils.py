@@ -10,7 +10,7 @@ class TestUtils(BaseCase):
         os.system('mkdir ' + self.test_output_dir)
         os.environ['TESTING'] = "1"
         os.environ['TEST_OUTPUT_DIR'] = self.test_output_dir
-        
+
     def tearDown(self):
         os.system('rm -rf ' + self.test_output_dir)
         pass
@@ -37,15 +37,14 @@ class TestUtils(BaseCase):
         hard_cases = [None, [], {}, (), BaseCase]
         for case in hard_cases:
             self.assertRaises(ValueError, utils.deplumpen, case)
-            
-        
+
     def test_month_min_max(self):
         cases = [
-            ((2016,1,5),  (2016,1,1), (2016,1,31)),
-            ((2016,2,14), (2016,2,1), (2016,2,29)),
-            ((2016,3,19), (2016,3,1), (2016,3,31)),
-            ((2016,4,7),  (2016,4,1), (2016,4,30)),
-            ((2016,5,4),  (2016,5,1), (2016,5,31)),
+            ((2016, 1, 5), (2016, 1, 1), (2016, 1, 31)),
+            ((2016, 2, 14), (2016, 2, 1), (2016, 2, 29)),
+            ((2016, 3, 19), (2016, 3, 1), (2016, 3, 31)),
+            ((2016, 4, 7), (2016, 4, 1), (2016, 4, 30)),
+            ((2016, 5, 4), (2016, 5, 1), (2016, 5, 31)),
         ]
         for given_ymd, start_ymd, end_ymd in cases:
             actual_min_max = utils.month_min_max(datetime(*given_ymd))
@@ -94,7 +93,7 @@ class TestUtils(BaseCase):
     def test_output_path_for_unknown_results(self):
         "a helpful assertion error is raised if we're given results that can't be parsed"
         self.assertRaises(AssertionError, core.output_path_from_results, {})
-        
+
     # sanitise GA response
 
     def test_ga_response_sanitised(self):
@@ -102,7 +101,7 @@ class TestUtils(BaseCase):
         raw_response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json.raw'), 'r'))
         response = core.sanitize_ga_response(raw_response)
         for key in core.SANITISE_THESE:
-            self.assertTrue(not response.has_key(key))
+            self.assertTrue(key not in response)
 
     def test_ga_response_sanitised_when_written(self):
         "responses from GA have certain values scrubbed from them before being written to disk"
@@ -110,5 +109,4 @@ class TestUtils(BaseCase):
         output_path = core.write_results(raw_response, join(self.test_output_dir, 'foo.json'))
         response = json.load(open(output_path, 'r'))
         for key in core.SANITISE_THESE:
-            self.assertTrue(not response.has_key(key))
-
+            self.assertTrue(key not in response)

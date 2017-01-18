@@ -31,7 +31,7 @@ class TestCore(BaseCase):
             try:
                 self.assertEqual(expected_module, core.module_picker(dt, dt))
             except AssertionError:
-                print 'failed to find',expected_module,'for date starting',dt
+                print 'failed to find', expected_module, 'for date starting', dt
                 raise
 
     def test_module_picker_monthly(self):
@@ -46,7 +46,7 @@ class TestCore(BaseCase):
             (march, elife_v2),
 
             # in the month versionless are introduced, use v3
-            (may, elife_v3), 
+            (may, elife_v3),
             # after versionless, we use v3
             (june, elife_v3),
         ]
@@ -55,5 +55,5 @@ class TestCore(BaseCase):
             try:
                 self.assertEqual(expected_module, actual)
             except AssertionError:
-                print 'given:',dtpair,'expected:',expected_module,'got',actual
+                print 'given:', dtpair, 'expected:', expected_module, 'got', actual
                 raise

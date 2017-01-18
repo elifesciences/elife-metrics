@@ -23,7 +23,7 @@ class TestAllImportable(BaseCase):
         to_dt = datetime(year=2016, month=2, day=29)
         logic.import_ga_metrics('monthly', from_date=from_dt, to_date=to_dt)
         logic.import_ga_metrics('monthly', from_date=from_dt, to_date=to_dt)
-        
-        #for path in path_list:
+
+        # for path in path_list:
         #    logic.import
         #    self.assertTrue(False)
