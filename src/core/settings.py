@@ -20,7 +20,7 @@ INCEPTION = datetime(year=2012, month=12, day=1)
 SRC_DIR = os.path.dirname(os.path.dirname(__file__)) # ll: /path/to/app/src/
 PROJECT_DIR = os.path.dirname(SRC_DIR)
 
-GA_OUTPUT_SUBDIR = join(SRC_DIR, 'ga-output')
+GA_OUTPUT_SUBDIR = join(PROJECT_DIR, 'ga-output')
 
 CFG_NAME = 'app.cfg'
 DYNCONFIG = configparser.SafeConfigParser(**{

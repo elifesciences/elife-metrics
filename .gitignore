@@ -3,8 +3,9 @@
 *.sqlite*
 *.orig
 *.log
-media/**
-collected-static/**
+ga-output/
+media/
+collected-static/
 elife-articles
 venv
 src/output
