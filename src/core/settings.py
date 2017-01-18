@@ -51,7 +51,7 @@ assert isinstance(DEBUG, bool), "'debug' must be either True or False as a boole
 DEV, TEST, PROD = 'dev', 'test', 'prod'
 ENV = cfg('general.env', DEV)
 
-ALLOWED_HOSTS = cfg('general.allowed-hosts', '').split(',')
+ALLOWED_HOSTS = filter(None, cfg('general.allowed-hosts', '').split(','))
 
 # Application definition
 
