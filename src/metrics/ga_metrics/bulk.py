@@ -5,9 +5,6 @@ import core
 import utils
 from .core import ymd
 from datetime import datetime, timedelta
-#from googleapiclient.http import BatchHttpRequest
-#from googleapiclient import errors
-from pprint import pprint
 import logging
 from collections import OrderedDict
 
@@ -165,7 +162,9 @@ def article_metrics(table_id):
                                                     to_date,
                                                     use_cached, use_only_cached))}
 
+'''
 if __name__ == '__main__':
     "call this app like: GA_TABLE='ga:12345678' python bulk.py"
     assert 'GA_TABLE' in os.environ, "the environment variable 'GA_TABLE' not found. It looks like 'ga:12345678'"
     pprint(article_metrics(os.environ['GA_TABLE']))
+'''

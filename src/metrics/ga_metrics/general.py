@@ -1,6 +1,5 @@
 __description__ = "General purpose interesting metrics we can pull from GA"
 
-import sys
 import utils, core
 from .utils import ymd
 from collections import OrderedDict
@@ -46,8 +45,10 @@ def total_traffic_monthly(table_id, from_date=None, to_date=None):
 
 #####
 
+'''
 def main(args):
     pass
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+'''
