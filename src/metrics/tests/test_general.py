@@ -1,9 +1,9 @@
-from base import BaseCase
+import base
 from metrics.elife_ga_metrics import general, utils
 from datetime import datetime
 from collections import OrderedDict
 
-class GeneralTests(BaseCase):
+class GeneralTests(base.SimpleBaseCase):
     def setUp(self):
         pass
 

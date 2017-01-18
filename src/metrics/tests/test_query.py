@@ -1,9 +1,9 @@
-from base import BaseCase
+import base
 from datetime import timedelta
 from metrics.elife_ga_metrics import core
 from collections import Counter
 
-class TestQueryResults(BaseCase):
+class TestQueryResults(base.SimpleBaseCase):
     def setUp(self):
         pass
 

@@ -1,12 +1,13 @@
 import os, json
 from os.path import join
-from base import BaseCase
+import base
 from datetime import datetime
 from metrics.elife_ga_metrics import core, utils
 from django.conf import settings
 
-class TestUtils(BaseCase):
+class TestUtils(base.SimpleBaseCase):
     def setUp(self):
+        # TODO: switch to builtin temp dir
         self.test_output_dir = '/tmp/elife-ga-metrics/'
         os.system('mkdir ' + self.test_output_dir)
         os.environ['TESTING'] = "1"
@@ -35,7 +36,7 @@ class TestUtils(BaseCase):
         for given, expected in soft_cases:
             self.assertEqual(utils.deplumpen(given), expected)
 
-        hard_cases = [None, [], {}, (), BaseCase]
+        hard_cases = [None, [], {}, ()]
         for case in hard_cases:
             self.assertRaises(ValueError, utils.deplumpen, case)
 
