@@ -138,6 +138,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         return queue
 
     # whatever mode we're in, ensure debug is off for import
+    # TODO: does this even work???
     old_setting = settings.DEBUG
     settings.DEBUG = False
 

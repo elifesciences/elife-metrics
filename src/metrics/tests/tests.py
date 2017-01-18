@@ -21,7 +21,10 @@ class TestGAImport(BaseCase):
         logic.import_ga_metrics(from_date=day_to_import, to_date=day_to_import)
         # we know this day reveals this many articles
         # expected_article_count = 1090 # changed when we introduced POA articles
-        expected_article_count = 1119
+        #expected_article_count = 1119
+        expected_article_count = 1122 # ah - this day in history keeps getting more popular it seems.
+        # 2017-01-18: I've put the results of this day into the fixtures so that
+        # when it changes again in the future we can  see just what it changing
         self.assertEqual(expected_article_count, models.Article.objects.count())
 
     def test_partial_data_is_updated(self):
