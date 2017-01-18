@@ -17,6 +17,15 @@ class TestUtils(base.SimpleBaseCase):
         os.system('rm -rf ' + self.test_output_dir)
         pass
 
+    def test_norm_table_id(self):
+        cases = [
+            ('12345678', 'ga:12345678'),
+            (12345678, 'ga:12345678'),
+            ('ga:12345678', 'ga:12345678'),
+        ]
+        for given, expected in cases:
+            self.assertEqual(expected, utils.norm_table_id(given))
+
     def test_ymd(self):
         dt = datetime(year=1997, month=8, day=29, hour=6, minute=14) # UTC ;)
         self.assertEqual(core.ymd(dt), "1997-08-29")
