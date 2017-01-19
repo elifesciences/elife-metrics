@@ -3,6 +3,7 @@
 *.sqlite*
 *.orig
 *.log
+schema/
 ga-output/
 media/
 collected-static/
