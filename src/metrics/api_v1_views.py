@@ -1,5 +1,5 @@
 from django.shortcuts import get_object_or_404
-import logic, models
+import api_v1_logic as logic, models
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
