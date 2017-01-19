@@ -52,7 +52,7 @@ class TestAPI(BaseCase):
     def test_daily_data(self):
         "a very simple set of data returns the expected daily and monthly data in the expected structure"
         day_to_import = datetime(year=2015, month=9, day=11)
-        logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import)
+        logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import) #, use_cached=False, use_only_cached=False)
 
         doi = '10.7554/eLife.09560'
 

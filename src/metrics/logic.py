@@ -1,23 +1,16 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
 import ga_metrics
-from ga_metrics import bulk, utils
+from ga_metrics import bulk, utils as ga_utils
 from ga_metrics.core import ymd
 from django.conf import settings
 import models
 from django.db import transaction
-
+import utils
 from django import db
 import logging
 
 LOG = logging.getLogger(__name__)
-LOG.level = logging.DEBUG
-
-def subdict(d, kl):
-    return {k: v for k, v in d.items() if k in kl}
-
-def exsubdict(d, kl):
-    return {k: v for k, v in d.items() if k not in kl}
 
 def format_dt_pair(dt_pair):
     """the database expects values in yyyy-mm or yyyy-mm-dd format.
@@ -34,14 +27,14 @@ def format_dt_pair(dt_pair):
     raise ValueError("given dtpair %r but it doesn't look like a daily or monthly result!" % str(dt_pair))
 
 def insert_row(data):
-    row = exsubdict(data, 'doi')
+    row = utils.exsubdict(data, 'doi')
 
     article_obj, created = models.Article.objects.get_or_create(doi=data['doi'])
     row['article'] = article_obj
 
     try:
         # fetch the metric if it exists
-        sd = subdict(row, ['article', 'date', 'period', 'source'])
+        sd = utils.subdict(row, ['article', 'date', 'period', 'source'])
         metric = models.Metric.objects.get(**sd)
         try:
             # it exists!
@@ -62,28 +55,20 @@ def insert_row(data):
 
     return metric
 
-
 '''
-@transaction.atomic
-def import_hw_metrics(metrics_type='daily', from_date=None, to_date=None):
-    "import metrics from Highwire between the two given dates or from inception"
-    assert metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"'
-    if not from_date:
-        # HW metrics go back further than GA metrics
-        from_date = hw_metrics.INCEPTION
-    if not to_date:
-        to_date = datetime.now()
+# doesn't work! can't figure it out
+def insert_row(data):
+    create = update = True
 
-    def create_hw_row(data):
-        "wrangles the data into something that can be inserted directly"
-        data['digest'] = 0
-        data['source'] = models.HW
-        return insert_row(data)
+    doi = data['doi']
+    article_obj, a_created, a_updated = utils.create_or_update(models.Article, {'doi': doi}, [doi], create, update=False)
 
-    # not going to be delicate about this. just import all we can find.
-    results = hw_metrics.metrics_between(from_date, to_date, metrics_type)
-    for dt, items in results.items():
-        map(create_hw_row, items)
+    row = utils.exsubdict(data, ['doi'])
+    row['article'] = article_obj
+    key = utils.subdict(row, ['article', 'date', 'period', 'source'])
+    metric_obj, m_created, m_updated = utils.create_or_update(models.Metric, row, key, create, update)
+
+    return metric_obj
 '''
 
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
@@ -200,7 +185,7 @@ def monthly(doi, from_date, to_date, source=models.GA):
     """returns monthly metrics for the given article for the month
     starting in `from_date` to the month ending in `to_date`"""
     # because we're not storing dates, but rather a representation of a date
-    date_list = utils.dt_month_range(from_date, to_date) # ll: [(2013-01-01, 2013-01-31), (2013-02-01, 2013-02-28), ...]
+    date_list = ga_utils.dt_month_range(from_date, to_date) # ll: [(2013-01-01, 2013-01-31), (2013-02-01, 2013-02-28), ...]
     date_list = [ymd(i[0])[:7] for i in date_list] # ll:  [2013-01, 2013-02, 2013-03]
     return models.Metric.objects \
         .filter(article__doi__iexact=doi) \
