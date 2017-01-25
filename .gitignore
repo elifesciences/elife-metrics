@@ -7,9 +7,8 @@ schema/
 ga-output/
 media/
 collected-static/
-venv
+venv/
 analytics.dat
-src/collected-static
 xml/
 htmlcov/
 .coverage
