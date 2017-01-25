@@ -101,3 +101,14 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
     # commit any remaining
     commit_rows(queue, force=True)
     settings.DEBUG = old_setting
+
+#
+#
+#
+
+def insert_citation(data):
+    article_obj = first(create_or_update(models.Article, {'doi': data['doi']}, ['doi'], create=True, update=False))
+    row = utils.exsubdict(data, ['doi'])
+    row['article'] = article_obj
+    key = utils.subdict(row, ['article', 'source'])
+    return first(create_or_update(models.Citation, row, key, create=True, update=True, update_check=True))

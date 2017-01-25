@@ -2,6 +2,10 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+lmap = lambda func, *iterable: list(map(func, *iterable))
+lfilter = lambda func, *iterable: list(filter(func, *iterable))
+keys = lambda d: list(d.keys())
+
 def isint(v):
     try:
         int(v)
@@ -24,6 +28,9 @@ def nth(idx, x):
 
 def first(x):
     return nth(0, x)
+
+def rest(x):
+    return x[1:]
 
 def ensure(assertion, msg, *args):
     """intended as a convenient replacement for `assert` statements that
@@ -63,6 +70,7 @@ def create_or_update(Model, orig_data, key_list, create=True, update=True, updat
         # object exists, otherwise DoesNotExist would have been raised
 
         # test if objects needs updating
+        # requires a db fetch but may save a db update ...
         if update and update_check:
             try:
                 Model.objects.get(**data) # we could also inspect properties I suppose ...
@@ -73,6 +81,7 @@ def create_or_update(Model, orig_data, key_list, create=True, update=True, updat
                 pass
             finally:
                 checked = True
+
         if update:
             [setattr(inst, key, val) for key, val in data.items()]
             updated = True
