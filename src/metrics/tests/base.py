@@ -4,16 +4,27 @@ import unittest
 from metrics import utils, models, logic
 
 def insert_metrics(abbr_map):
+    "function to bypass scraping logic and insert metrics and citations directly into db"
     def wrangle(msid, data):
         citations = full = abstract = digest = pdf = 0
+        period = models.DAY
+        date = utils.utcnow()
+        
         if len(data) == 3:
             citations, pdf, full = data
+        elif len(data) == 4:
+            citations, pdf, full, period = data
         else:
             raise ValueError("cannot handle row of length %s" % len(data))
+
+        # format date
+        fn = utils.ym if period == models.MONTH else utils.ymd
+        date = fn(date)
+        
         metric = logic.insert_row({
             'doi': utils.msid2doi(msid),
-            'date': '2017-01-01',
-            'period': models.DAY,
+            'date': date, 
+            'period': period,
             'source': models.GA,
             'full': full,
             'abstract': abstract,

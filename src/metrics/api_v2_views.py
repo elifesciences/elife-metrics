@@ -57,7 +57,7 @@ def serialize_views_downloads(metric, total, sum_value, obj_list):
 
     def do(obj):
         return {
-            'period': obj.period,
+            'period': obj.date,
             'value': getattr(obj, attr)
         }
     return {

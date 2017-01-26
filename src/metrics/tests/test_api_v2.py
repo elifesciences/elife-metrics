@@ -3,6 +3,7 @@ from metrics import models
 from django.test import Client
 import base
 from django.core.urlresolvers import reverse
+from metrics.utils import ymd, ym, utcnow
 
 class ApiV2(base.BaseCase):
     def setUp(self):
@@ -67,8 +68,83 @@ class ApiV2(base.BaseCase):
         actual_response = resp.data
         self.assertEqual(expected_response, actual_response)
 
-    def test_views(self):
-        case = {
-            '1234': (0, 0, 1)
+    def test_daily_views(self):
+        cases = {
+            1234: (0, 0, 1)
         }
-        print case
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': ymd(utcnow()),
+                    'value': 1
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_daily_downloads(self):
+        cases = {
+            1234: (0, 1, 0)
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': ymd(),
+                    'value': 1
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'downloads'})
+        resp = self.c.get(url, {'by': models.DAY})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_monthly_views(self):
+        cases = {
+            1234: (0, 0, 1, models.MONTH)
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': ym(),
+                    'value': 1
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.MONTH})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_monthly_downloads(self):
+        cases = {
+            1234: (0, 1, 0, models.MONTH)
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': ym(),
+                    'value': 1
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'downloads'})
+        resp = self.c.get(url, {'by': models.MONTH})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+

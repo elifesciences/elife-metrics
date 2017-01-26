@@ -1,4 +1,7 @@
 import logging
+from datetime import datetime
+import dateutil
+import pytz
 
 LOG = logging.getLogger(__name__)
 
@@ -53,6 +56,54 @@ def subdict(d, kl):
 
 def exsubdict(d, kl):
     return {k: v for k, v in d.items() if k not in kl}
+
+def fmtdt(dt, fmt="%Y-%m-%d"):
+    if not dt:
+        dt = utcnow()
+    ensure(isinstance(dt, datetime), "datetime object expected, got %r" % type(dt))
+    return dt.strftime(fmt)
+
+def ymd(dt=None):
+    "returns a simple YYYY-MM-DD representation of a datetime object"
+    return fmtdt(dt)
+
+def ym(dt=None):
+    "returns a simple YYYY-MM representation of a datetime object"
+    return fmtdt(dt, "%Y-%m")
+    
+def todt(val):
+    "turn almost any formatted datetime string into a UTC datetime object"
+    if val is None:
+        return None
+    dt = val
+    if not isinstance(dt, datetime):
+        dt = dateutil.parser.parse(val, fuzzy=False)
+    dt.replace(microsecond=0) # not useful, never been useful, will never be useful.
+
+    if not dt.tzinfo:
+        # no timezone (naive), assume UTC and make it explicit
+        LOG.debug("encountered naive timestamp %r from %r. UTC assumed.", dt, val)
+        return pytz.utc.localize(dt)
+
+    else:
+        # ensure tz is UTC
+        if dt.tzinfo != pytz.utc:
+            LOG.debug("converting an aware dt that isn't in utc TO utc: %r", dt)
+            return dt.astimezone(pytz.utc)
+    return dt
+
+def utcnow():
+    "returns a UTC datetime stamp with a UTC timezone object attached"
+    # there is a datetime.utcnow(), but it doesn't attach a timezone object
+    return datetime.now(pytz.utc).replace(microsecond=0)
+
+'''
+def ymdhms(dt):
+    "returns an rfc3339 representation of a datetime object"
+    if dt:
+        dt = todt(dt) # convert to utc, etc
+        return rfc3339(dt, utc=True)
+'''
 
 #
 # django utils
