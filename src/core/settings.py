@@ -38,12 +38,14 @@ def cfg(path, default=0xDEADBEEF):
     except Exception as err:
         print 'error on %r: %s' % (path, err)
 
-# used to  know how far to go back in metrics gathering
-INCEPTION = datetime(year=2012, month=12, day=1)
+# used to know how far to go back in metrics gathering
+INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
+DOI_PREFIX = cfg('journal.doi-prefix')
 
 GA_OUTPUT_SUBDIR = join(PROJECT_DIR, 'ga-output')
+GA_TABLE_ID = cfg('ga.table-id')
 
-GA_TABLE_ID = cfg('metrics.ga-table-id')
+SCOPUS_KEY = cfg('scopus.api-key')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')
