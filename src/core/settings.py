@@ -10,6 +10,9 @@ from os.path import join
 from datetime import datetime
 import ConfigParser as configparser
 from pythonjsonlogger import jsonlogger
+import yaml
+from et3.render import render_item
+from et3.extract import path as p
 
 PROJECT_NAME = 'elife-metrics'
 
@@ -151,10 +154,42 @@ SWAGGER_SETTINGS = {
     'exclude_namespaces': ['proxied'], # swagger docs are broken, but this gives them the right namespace
 }
 
+
+#
+# API opts
+#
+
+SCHEMA_PATH = join(PROJECT_DIR, 'schema/api-raml/dist')
+SCHEMA_IDX = {
+    'metric': join(SCHEMA_PATH, 'model/metric.v1.json'),
+}
+API_PATH = join(SCHEMA_PATH, 'api.raml')
+
+def _load_api_raml(path):
+    # load the api.raml file, ignoring any "!include" commands
+    yaml.add_multi_constructor('', lambda *args: '[disabled]')
+    return yaml.load(open(path, 'r'))['traits']['paged']['queryParameters']
+
+API_OPTS = render_item({
+    'per_page': [p('per-page.default'), int],
+    'min_per_page': [p('per-page.minimum'), int],
+    'max_per_page': [p('per-page.maximum'), int],
+    'page_num': [p('page.default'), int],
+    'order_direction': [p('order.default')],
+}, _load_api_raml(API_PATH))
+
+
 LOG_NAME = '%s.log' % PROJECT_NAME # ll: lax.log
 LOG_FILE = join(PROJECT_DIR, LOG_NAME) # ll: /path/to/lax/log/lax.log
 if ENV != DEV:
     LOG_FILE = join('/var/log/', LOG_NAME) # ll: /var/log/lax.log
+
+# whereever our log files are, ensure they are writable before we do anything else.
+def writable(path):
+    os.system('touch ' + path)
+    # https://docs.python.org/2/library/os.html
+    assert os.access(path, os.W_OK), "file doesn't exist or isn't writable: %s" % path
+map(writable, [LOG_FILE])
 
 ATTRS = ['asctime', 'created', 'levelname', 'message', 'filename', 'funcName', 'lineno', 'module', 'pathname']
 FORMAT_STR = ' '.join(map(lambda v: '%(' + v + ')s', ATTRS))
