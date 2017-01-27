@@ -5,7 +5,7 @@ from django.conf import settings
 import models
 from django.db import transaction
 import utils
-from utils import first, create_or_update, ensure, flatten
+from utils import first, create_or_update, ensure, splitfilter
 from django import db
 import logging
 
@@ -115,7 +115,8 @@ def insert_citation(data):
 
 @transaction.atomic
 def import_scopus_citations():
-    from scopus.citations import search, extract, not_abstract
-    results = filter(not_abstract, flatten(map(extract, search())))
-    return map(insert_citation, results)
-
+    from scopus.citations import all_todays_entries
+    results = all_todays_entries()
+    good_eggs, bad_eggs = splitfilter(lambda e: 'bad' not in e, results)
+    LOG.error("refusing to insert bad entries: %s", bad_eggs)
+    return map(insert_citation, good_eggs)

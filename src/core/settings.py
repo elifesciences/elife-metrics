@@ -41,6 +41,7 @@ def cfg(path, default=0xDEADBEEF):
 # used to know how far to go back in metrics gathering
 INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
 DOI_PREFIX = cfg('journal.doi-prefix')
+USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
 
 OUTPUT_PATH = join(PROJECT_DIR, 'output')
 SCOPUS_OUTPUT_PATH = join(OUTPUT_PATH, 'scopus')
