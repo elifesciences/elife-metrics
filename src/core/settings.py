@@ -42,7 +42,11 @@ def cfg(path, default=0xDEADBEEF):
 INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
 DOI_PREFIX = cfg('journal.doi-prefix')
 
-GA_OUTPUT_SUBDIR = join(PROJECT_DIR, 'ga-output')
+OUTPUT_PATH = join(PROJECT_DIR, 'output')
+SCOPUS_OUTPUT_PATH = join(OUTPUT_PATH, 'scopus')
+
+# TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
+GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
 GA_TABLE_ID = cfg('ga.table-id')
 
 SCOPUS_KEY = cfg('scopus.api-key')
@@ -188,10 +192,11 @@ if ENV != DEV:
 
 # whereever our log files are, ensure they are writable before we do anything else.
 def writable(path):
+    os.system('mkdir -p %s' % os.path.dirname(path))
     os.system('touch ' + path)
     # https://docs.python.org/2/library/os.html
     assert os.access(path, os.W_OK), "file doesn't exist or isn't writable: %s" % path
-map(writable, [LOG_FILE])
+map(writable, [LOG_FILE, OUTPUT_PATH, SCOPUS_OUTPUT_PATH])
 
 ATTRS = ['asctime', 'created', 'levelname', 'message', 'filename', 'funcName', 'lineno', 'module', 'pathname']
 FORMAT_STR = ' '.join(map(lambda v: '%(' + v + ')s', ATTRS))

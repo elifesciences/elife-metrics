@@ -10,6 +10,11 @@ class Scopus(base.BaseCase):
         pass
 
     def test_scopus_request(self):
-        search_results = citations.search(settings.SCOPUS_KEY, settings.DOI_PREFIX)
-        #print search_results
-        self.assertTrue('opensearch:totalResults' in search_results['data'])
+        search_gen = citations.search(settings.SCOPUS_KEY, settings.DOI_PREFIX)
+        search_results = next(search_gen)
+        self.assertTrue('opensearch:totalResults' in search_results)
+        self.assertEqual(search_results['opensearch:startIndex'], '0')
+
+        search_results2 = next(search_gen)
+        self.assertTrue('opensearch:totalResults' in search_results)
+        self.assertEqual(search_results2['opensearch:startIndex'], '1')

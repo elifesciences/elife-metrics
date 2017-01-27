@@ -5,7 +5,7 @@ from django.conf import settings
 import models
 from django.db import transaction
 import utils
-from utils import first, create_or_update, ensure
+from utils import first, create_or_update, ensure, flatten
 from django import db
 import logging
 
@@ -111,4 +111,11 @@ def insert_citation(data):
     row = utils.exsubdict(data, ['doi'])
     row['article'] = article_obj
     key = utils.subdict(row, ['article', 'source'])
-    return first(create_or_update(models.Citation, row, key, create=True, update=True, update_check=True))
+    return first(create_or_update(models.Citation, row, key, create=True, update=True, update_check=False))
+
+@transaction.atomic
+def import_scopus_citations():
+    from scopus.citations import search, extract, not_abstract
+    results = filter(not_abstract, flatten(map(extract, search())))
+    return map(insert_citation, results)
+
