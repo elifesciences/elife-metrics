@@ -70,7 +70,7 @@ def ymd(dt=None):
 def ym(dt=None):
     "returns a simple YYYY-MM representation of a datetime object"
     return fmtdt(dt, "%Y-%m")
-    
+
 def todt(val):
     "turn almost any formatted datetime string into a UTC datetime object"
     if val is None:

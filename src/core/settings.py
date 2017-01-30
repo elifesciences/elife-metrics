@@ -41,9 +41,11 @@ def cfg(path, default=0xDEADBEEF):
 # used to  know how far to go back in metrics gathering
 INCEPTION = datetime(year=2012, month=12, day=1)
 
+DOI_PREFIX = '10.7554'
+
 GA_OUTPUT_SUBDIR = join(PROJECT_DIR, 'ga-output')
 
-GA_TABLE_ID = cfg('metrics.ga-table-id')
+GA_TABLE_ID = cfg('ga.table-id')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')

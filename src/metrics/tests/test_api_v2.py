@@ -147,4 +147,3 @@ class ApiV2(base.BaseCase):
         resp = self.c.get(url, {'by': models.MONTH})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
-
