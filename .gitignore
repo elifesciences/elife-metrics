@@ -13,3 +13,6 @@ xml/
 htmlcov/
 .coverage
 app.cfg
+sqlite.cfg
+psql.cfg
+output/

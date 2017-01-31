@@ -1,3 +1,4 @@
+from functools import wraps
 import logging
 from datetime import datetime
 import dateutil
@@ -8,6 +9,18 @@ LOG = logging.getLogger(__name__)
 lmap = lambda func, *iterable: list(map(func, *iterable))
 lfilter = lambda func, *iterable: list(filter(func, *iterable))
 keys = lambda d: list(d.keys())
+
+def complement(pred):
+    @wraps(pred)
+    def wrapper(*args, **kwargs):
+        return not pred(*args, **kwargs)
+    return wrapper
+
+def splitfilter(func, data):
+    return filter(func, data), filter(complement(func), data)
+
+def flatten(nested_list):
+    return [item for sublist in nested_list for item in sublist]
 
 def isint(v):
     try:
@@ -70,7 +83,7 @@ def ymd(dt=None):
 def ym(dt=None):
     "returns a simple YYYY-MM representation of a datetime object"
     return fmtdt(dt, "%Y-%m")
-    
+
 def todt(val):
     "turn almost any formatted datetime string into a UTC datetime object"
     if val is None:

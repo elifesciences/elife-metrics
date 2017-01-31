@@ -1,0 +1,166 @@
+{
+    "search-results": {
+        "opensearch:Query": {
+            "@searchTerms": "DOI(&amp;quot;10.7554/*&amp;quot;)", 
+            "@role": "request", 
+            "@startPage": "0"
+        }, 
+        "opensearch:itemsPerPage": "25", 
+        "opensearch:totalResults": "3592", 
+        "link": [
+            {
+                "@href": "http://api.elsevier.com/content/search/scopus?start=0&count=25&query=DOI%28%2210.7554%2F*%22%29&field=citedby-count", 
+                "@ref": "self", 
+                "@_fa": "true", 
+                "@type": "application/json"
+            }, 
+            {
+                "@href": "http://api.elsevier.com/content/search/scopus?start=0&count=25&query=DOI%28%2210.7554%2F*%22%29&field=citedby-count", 
+                "@ref": "first", 
+                "@_fa": "true", 
+                "@type": "application/json"
+            }, 
+            {
+                "@href": "http://api.elsevier.com/content/search/scopus?start=25&count=25&query=DOI%28%2210.7554%2F*%22%29&field=citedby-count", 
+                "@ref": "next", 
+                "@_fa": "true", 
+                "@type": "application/json"
+            }, 
+            {
+                "@href": "http://api.elsevier.com/content/search/scopus?start=3567&count=25&query=DOI%28%2210.7554%2F*%22%29&field=citedby-count", 
+                "@ref": "last", 
+                "@_fa": "true", 
+                "@type": "application/json"
+            }
+        ], 
+        "opensearch:startIndex": "0", 
+        "entry": [
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009455146", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009458376", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009380257", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009476965", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009431305", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009377538", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009360830", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009414478", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009347603", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009502139", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009477150", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009476461", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009414609", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009478191", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009476028", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009516978", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009487506", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009477015", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85008502021", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85008506408", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85008511950", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009484164", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85008514530", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85008431821", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }, 
+            {
+                "prism:url": "http://api.elsevier.com/content/abstract/scopus_id/85009469660", 
+                "@_fa": "true", 
+                "citedby-count": "0"
+            }
+        ]
+    }
+}
+

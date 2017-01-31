@@ -9,7 +9,7 @@ def insert_metrics(abbr_map):
         citations = full = abstract = digest = pdf = 0
         period = models.DAY
         date = utils.utcnow()
-        
+
         if len(data) == 3:
             citations, pdf, full = data
         elif len(data) == 4:
@@ -20,10 +20,10 @@ def insert_metrics(abbr_map):
         # format date
         fn = utils.ym if period == models.MONTH else utils.ymd
         date = fn(date)
-        
+
         metric = logic.insert_row({
             'doi': utils.msid2doi(msid),
-            'date': date, 
+            'date': date,
             'period': period,
             'source': models.GA,
             'full': full,
