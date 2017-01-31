@@ -193,11 +193,10 @@ if ENV != DEV:
 
 # whereever our log files are, ensure they are writable before we do anything else.
 def writable(path):
-    os.system('mkdir -p %s' % os.path.dirname(path))
     os.system('touch ' + path)
     # https://docs.python.org/2/library/os.html
     assert os.access(path, os.W_OK), "file doesn't exist or isn't writable: %s" % path
-map(writable, [LOG_FILE, OUTPUT_PATH, SCOPUS_OUTPUT_PATH])
+map(writable, [LOG_FILE])
 
 ATTRS = ['asctime', 'created', 'levelname', 'message', 'filename', 'funcName', 'lineno', 'module', 'pathname']
 FORMAT_STR = ' '.join(map(lambda v: '%(' + v + ')s', ATTRS))
