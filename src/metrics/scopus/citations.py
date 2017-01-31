@@ -53,40 +53,34 @@ def _search(api_key, doi_prefix, page=0, per_page=25):
 def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     """searches scopus, returning a generator that will iterate through each page
     of results until all pages have been consumed.
-
     results are cached and expire daily"""
+
     page = 0
     per_page = 25 # max per page
 
     data = _search(api_key, doi_prefix, page=page, per_page=per_page)
 
-    # generate some boring pagination helpers
-    # total_results = int(data['search-results']['opensearch:totalResults']) # ll: 3592
-    # total_pages = int(math.ceil(total_results / per_page)) # ll: 144
-
     yield data['search-results']
 
-    '''
-    # turns out their 'total results' is bs, making total pages unknown
-    start_page = page + 1 # we've already fetched the first page, start at second page
-    for page in range(start_page, total_pages + 400):
-        data = _search(api_key, doi_prefix, page=page, per_page=per_page)
-        yield data['search-results']
-    '''
+    # I think this is 'total pages'
+    # you can certainly query far far beyond 'totalResults / per_page'
+    total_pages = int(data['search-results']['opensearch:totalResults'])
 
     # I think we're capped at 10k/day ? can't find their docs on this
-    # eLife tends to hit 0 citations at about the 2.2k mark
+    # eLife tends to hit 0 citations at about the 2.5k mark
     max_pages = 5000
     try:
-        while True:
+        for page in range(page + 1, total_pages):
+            LOG.info("page %r", page)
+
             try:
                 if page == max_pages:
-                    raise GeneratorExit("hit max pages")
+                    raise GeneratorExit("hit max pages (%s)" % max_pages)
+
                 data = _search(api_key, doi_prefix, page=page, per_page=per_page)
                 yield data['search-results']
-                page += 1
-                LOG.info("page %r", page)
 
+                # exit early if we start hitting 0 results
                 fentry = data['search-results']['entry'][0]['citedby-count']
                 if int(fentry) == 0:
                     raise GeneratorExit("no more articles with citations")
@@ -94,6 +88,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 
             except requests.HTTPError as err:
                 raise GeneratorExit(str(err))
+
     except GeneratorExit:
         return
 
