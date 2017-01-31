@@ -1,9 +1,9 @@
 from django.db import models
 
 class Article(models.Model):
-    doi = models.CharField(max_length=255, help_text="article identifier")
-    pmid = models.PositiveIntegerField(blank=True, null=True)
-    pmcid = models.CharField(max_length=10, blank=True, null=True)
+    doi = models.CharField(max_length=255, unique=True, help_text="article identifier")
+    pmid = models.PositiveIntegerField(unique=True, blank=True, null=True)
+    pmcid = models.CharField(max_length=10, unique=True, blank=True, null=True)
 
     def __unicode__(self):
         return self.doi
