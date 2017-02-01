@@ -46,11 +46,11 @@ class PM(base.BaseCase):
         art = models.Article(**{
             'doi': '10.7554/eLife.09560',
             'pmid': None,
-            'pmcid': 'NOT-A-PMCID',
+            'pmcid': 'NOTAPMCID',
         })
         art.save()
         given = citations.resolve_pmcid(art)
-        expected = 'NOT-A-PMCID'
+        expected = 'NOTAPMCID'
         self.assertEqual(expected, given)
         models.Article.objects.get(pmcid=expected)
 
