@@ -42,8 +42,10 @@ def cfg(path, default=0xDEADBEEF):
 INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
 DOI_PREFIX = cfg('journal.doi-prefix')
 USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
+CONTACT_EMAIL = "it-admin@elifesciences.org"
 
 OUTPUT_PATH = join(PROJECT_DIR, 'output')
+PMC_OUTPUT_PATH = join(OUTPUT_PATH, 'pmc')
 SCOPUS_OUTPUT_PATH = join(OUTPUT_PATH, 'scopus')
 
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname

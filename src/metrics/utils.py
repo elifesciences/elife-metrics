@@ -2,6 +2,7 @@ from functools import wraps
 import logging
 from datetime import datetime
 import dateutil
+import dateutil.parser
 import pytz
 
 LOG = logging.getLogger(__name__)
@@ -9,6 +10,11 @@ LOG = logging.getLogger(__name__)
 lmap = lambda func, *iterable: list(map(func, *iterable))
 lfilter = lambda func, *iterable: list(filter(func, *iterable))
 keys = lambda d: list(d.keys())
+
+# http://stackoverflow.com/questions/3744451/is-this-how-you-paginate-or-is-there-a-better-algorithm
+def paginate(seq, rowlen):
+    for start in xrange(0, len(seq), rowlen):
+        yield seq[start:start + rowlen]
 
 def complement(pred):
     @wraps(pred)
