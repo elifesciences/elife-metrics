@@ -33,11 +33,19 @@ def _fetch(doi):
         'Accept': 'application/json'
     }
     url = "https://doi.crossref.org/servlet/getForwardLinks"
-    resp = requests.get(url, params=params, headers=headers)
-    resp.raise_for_status()
-    return resp.content # return bytes!
+    try:
+        resp = requests.get(url, params=params, headers=headers)
+        resp.raise_for_status()
+        return resp.content # return bytes!
+    except requests.HTTPError as err:
+        status_code = err.response.status_code
+        if status_code != 404:
+            LOG.error("error response attempting to fetch citation count from crossref for article %s: %s", doi, err)
 
 def parse(doi, xmlbytes):
+    if not xmlbytes:
+        # nothing to parse, carry on
+        return None
     dom = parseString(xmlbytes)
     body = dom.getElementsByTagName('body')[0]
     citations = body.getElementsByTagName('forward_link')

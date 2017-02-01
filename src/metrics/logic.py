@@ -133,4 +133,4 @@ def import_pmc_citations():
 def import_crossref_citations():
     from crossref.citations import citations_for_all_articles
     results = citations_for_all_articles()
-    return map(insert_citation, results)
+    return map(insert_citation, filter(None, results))
