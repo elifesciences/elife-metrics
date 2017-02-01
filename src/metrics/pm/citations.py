@@ -18,11 +18,12 @@ requests_cache.install_cache(**{
 })
 
 def norm_pmcid(pmcid):
-    if pmcid.lower().startswith('pmc'):
+    "returns the integer form of a pmc id, stripping any leading 'pmc' prefix."
+    if str(pmcid).lower().startswith('pmc'):
         return pmcid[3:]
-    return pmcid
+    return str(pmcid)
 
-MAX_PER_PAGE = 200
+MAX_PER_PAGE = 200 # we can actually go as high as ~800
 
 
 def _fetch_pmids(doi):
@@ -41,7 +42,6 @@ def _fetch_pmids(doi):
     resp.raise_for_status()
 
     data = resp.json()
-
     '''
     {
      "status": "ok",
@@ -63,7 +63,7 @@ def _fetch_pmids(doi):
     }
     '''
     ensure(data['status'] == 'ok', "response is not ok! %s" % data)
-    return subdict(data['records'], ['doi', 'pmid', 'pmcid'])
+    return subdict(data['records'][0], ['doi', 'pmid', 'pmcid'])
 
 def resolve_pmcid(artobj):
     pmcid = artobj.pmcid
@@ -79,31 +79,29 @@ def resolve_pmcid(artobj):
 def _fetch(pmcid_list):
     ensure(len(pmcid_list) <= MAX_PER_PAGE,
            "no more than %s can be processed per-request. requested: %s" % (MAX_PER_PAGE, len(pmcid_list)))
-
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
     headers = {
         'accept': 'application/json'
     }
     params = {
         'dbfrom': 'pubmed',
         'linkname': 'pmc_pmc_citedby',
-        'id': pmcid_list,
+        'id': lmap(norm_pmcid, pmcid_list),
         'tool': 'elife-metrics',
         'email': settings.CONTACT_EMAIL,
         'retmode': 'json'
     }
+    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
     resp = requests.get(url, params=params, headers=headers)
     # raise error if error
     resp.raise_for_status()
-    return resp
+    return resp.json()
 
 def fetch(pmcid_list):
-    pmcid_list = lmap(norm_pmcid, pmcid_list)
     results = []
     for page, sub_pmcid_list in enumerate(utils.paginate(pmcid_list, MAX_PER_PAGE)):
         LOG.info("page %s, %s per-page", page + 1, MAX_PER_PAGE)
-        resp = _fetch(sub_pmcid_list)
-        results.extend(resp.json()["linksets"])
+        data = _fetch(sub_pmcid_list)
+        results.extend(data["linksets"])
     return {
         'linksets': results
     }
