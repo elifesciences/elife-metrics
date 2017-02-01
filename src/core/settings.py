@@ -47,12 +47,16 @@ CONTACT_EMAIL = "it-admin@elifesciences.org"
 OUTPUT_PATH = join(PROJECT_DIR, 'output')
 PMC_OUTPUT_PATH = join(OUTPUT_PATH, 'pmc')
 SCOPUS_OUTPUT_PATH = join(OUTPUT_PATH, 'scopus')
+CROSSREF_OUTPUT_PATH = join(OUTPUT_PATH, 'crossref')
 
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
 GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
 GA_TABLE_ID = cfg('ga.table-id')
 
 SCOPUS_KEY = cfg('scopus.api-key')
+
+CROSSREF_USER = cfg('crossref.user')
+CROSSREF_PASS = cfg('crossref.pass')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')

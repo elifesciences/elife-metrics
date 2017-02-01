@@ -1,3 +1,4 @@
+from os.path import join
 import requests  # , math
 import logging
 import requests_cache
@@ -9,7 +10,7 @@ from metrics.utils import first, flatten
 LOG = logging.getLogger(__name__)
 
 requests_cache.install_cache(**{
-    'cache_name': settings.SCOPUS_OUTPUT_PATH,
+    'cache_name': join(settings.SCOPUS_OUTPUT_PATH, 'db'),
     'backend': 'sqlite',
     'fast_save': True,
     'extension': '.sqlite3',
