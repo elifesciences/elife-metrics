@@ -91,7 +91,14 @@ def article_metrics(request, id, metric):
         # paginate
         total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
         # serialize
-        return Response(serialize(total_results, sum_value, qpage, metric))
+        payload = serialize(total_results, sum_value, qpage, metric)
+        # respond
+        ctype_idx = {
+            'citations': 'application/vnd.elife.metric-citations+json',
+            'downloads': 'application/vnd.elife.metric-time-period+json',
+            'page-views': 'application/vnd.elife.metric-time-period+json',
+        }
+        return Response(payload, content_type=ctype_idx[metric])
 
     except AssertionError as err:
         print err

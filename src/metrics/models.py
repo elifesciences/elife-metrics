@@ -94,7 +94,7 @@ class Citation(models.Model):
     class Meta:
         # an article may only have one instance of a source
         unique_together = ('article', 'source')
-        ordering = ('source',)
+        ordering = ('-num',)
 
     def __unicode__(self):
         # ll: 10.7554/eLife.09560,crossref,33
