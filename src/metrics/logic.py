@@ -128,3 +128,9 @@ def import_pmc_citations():
     from pm.citations import citations_for_all_articles
     results = citations_for_all_articles()
     return map(partial(insert_citation, aid='pmcid'), results)
+
+@transaction.atomic
+def import_crossref_citations():
+    from crossref.citations import citations_for_all_articles
+    results = citations_for_all_articles()
+    return map(insert_citation, filter(None, results))

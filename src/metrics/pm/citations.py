@@ -1,3 +1,4 @@
+from os.path import join
 from metrics import models, utils
 from metrics.utils import ensure, lmap, subdict, first
 import requests
@@ -9,7 +10,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 requests_cache.install_cache(**{
-    'cache_name': settings.PMC_OUTPUT_PATH,
+    'cache_name': join(settings.PMC_OUTPUT_PATH, 'db'),
     'backend': 'sqlite',
     'fast_save': True,
     'extension': '.sqlite3',

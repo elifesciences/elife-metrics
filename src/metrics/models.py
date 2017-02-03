@@ -5,6 +5,9 @@ class Article(models.Model):
     pmid = models.PositiveIntegerField(unique=True, blank=True, null=True)
     pmcid = models.CharField(max_length=10, unique=True, blank=True, null=True)
 
+    class Meta:
+        ordering = ('-doi',)
+
     def __unicode__(self):
         return self.doi
 
