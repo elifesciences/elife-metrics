@@ -6,9 +6,10 @@ from django.conf import settings
 import models
 from django.db import transaction
 import utils
-from utils import first, create_or_update, ensure, splitfilter
+from utils import first, create_or_update, ensure, splitfilter, comp
 from django import db
 import logging
+import events
 
 LOG = logging.getLogger(__name__)
 
@@ -103,34 +104,53 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
     commit_rows(queue, force=True)
     settings.DEBUG = old_setting
 
+
 #
-#
+# citations
 #
 
 def insert_citation(data, aid='doi'):
-    # ll: article_obj = first(create_or_update(models.Article, {'doi': data['doi']}, ['doi'], create=True, update=False))
+    # ll: ... = first(create_or_update(models.Article, {'doi': data['doi']}, ['doi'], create=True, update=False))
     article_obj = first(create_or_update(models.Article, {aid: data[aid]}, [aid], create=True, update=False))
     row = utils.exsubdict(data, [aid])
     row['article'] = article_obj
     key = utils.subdict(row, ['article', 'source'])
-    return first(create_or_update(models.Citation, row, key, create=True, update=True, update_check=False))
+    return create_or_update(models.Citation, row, key, create=True, update=True, update_check=True)
 
-@transaction.atomic
+def countable(citation, created, updated):
+    "if the citation has been created or modified, return the object"
+    if created or updated:
+        return citation
+
 def import_scopus_citations():
     from scopus.citations import all_todays_entries
     results = all_todays_entries()
     good_eggs, bad_eggs = splitfilter(lambda e: 'bad' not in e, results)
     LOG.error("refusing to insert bad entries: %s", bad_eggs)
-    return map(insert_citation, good_eggs)
+    return map(comp(insert_citation, countable), good_eggs)
 
-@transaction.atomic
 def import_pmc_citations():
     from pm.citations import citations_for_all_articles
     results = citations_for_all_articles()
-    return map(partial(insert_citation, aid='pmcid'), results)
+    return map(comp(partial(insert_citation, aid='pmcid'), countable), results)
 
-@transaction.atomic
 def import_crossref_citations():
     from crossref.citations import citations_for_all_articles
     results = citations_for_all_articles()
-    return map(insert_citation, filter(None, results))
+    return map(comp(insert_citation, countable), filter(None, results))
+
+def do_atomically(fn):
+    with transaction.atomic():
+        fn()
+
+#
+#
+#
+
+def notify(obj_list):
+    "given a list of Citation or Metric objects, sends 'updated' events for each one"
+    # the output from the `import_*_citations` may contain None values if
+    # a citation wasn't created or updated.
+    lst = filter(None, obj_list)
+    # send events for all those that have changed
+    return len(map(events.notify, lst))
