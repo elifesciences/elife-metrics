@@ -94,9 +94,9 @@ def article_metrics(request, id, metric):
         payload = serialize(total_results, sum_value, qpage, metric)
         # respond
         ctype_idx = {
-            'citations': 'application/vnd.elife.metric-citations+json',
-            'downloads': 'application/vnd.elife.metric-time-period+json',
-            'page-views': 'application/vnd.elife.metric-time-period+json',
+            'citations': 'application/vnd.elife.metric-citations+json;version=1',
+            'downloads': 'application/vnd.elife.metric-time-period+json;version=1',
+            'page-views': 'application/vnd.elife.metric-time-period+json;version=1',
         }
         return Response(payload, content_type=ctype_idx[metric])
 
