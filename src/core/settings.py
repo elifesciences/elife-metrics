@@ -167,6 +167,12 @@ SWAGGER_SETTINGS = {
     'exclude_namespaces': ['proxied'], # swagger docs are broken, but this gives them the right namespace
 }
 
+EVENT_BUS = {
+    'region': cfg('bus.region'),
+    'subscriber': cfg('bus.subscriber'),
+    'name': cfg('bus.name'),
+    'env': cfg('bus.env')
+}
 
 #
 # API opts
