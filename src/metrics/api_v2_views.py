@@ -8,6 +8,11 @@ from et3.extract import path as p
 from utils import isint, ensure, exsubdict, lmap, msid2doi
 import api_v2_logic as logic
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
+
+import logging
+
+LOG = logging.getLogger(__name__)
 
 def request_args(request, **overrides):
     opts = {}
@@ -77,10 +82,10 @@ def serialize(total_results, sum_value, obj_list, metric):
 
 @api_view(['GET'])
 def article_metrics(request, id, metric):
-    get_object_or_404(models.Article, doi=msid2doi(id))
     try:
         # /metrics/article/12345/downloads?by=month
-        kwargs = request_args(request)
+        kwargs = request_args(request) # parse args first ...
+        get_object_or_404(models.Article, doi=msid2doi(id)) # ... then a db lookup
         idx = {
             'citations': logic.article_citations,
             'downloads': logic.article_downloads,
@@ -101,5 +106,8 @@ def article_metrics(request, id, metric):
         return Response(payload, content_type=ctype_idx[metric])
 
     except AssertionError as err:
-        print err
-        return 400 # client error
+        raise ValidationError(err) # 400, client error
+
+    except Exception as err:
+        LOG.exception("unhandled exception attempting to serve article mertrics: %s", err)
+        raise # 500, server error

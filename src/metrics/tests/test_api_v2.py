@@ -8,9 +8,17 @@ from metrics.utils import ymd, ym, utcnow
 class ApiV2(base.BaseCase):
     def setUp(self):
         self.c = Client()
+        self.metric_list = ['citations', 'downloads', 'page-views']
 
     def tearDown(self):
         pass
+
+    def test_non_int_page_param(self):
+        "a '?page=foo' type param results in a 400 error"
+        for metric in self.metric_list:
+            url = reverse('v2:alm', kwargs={'id': '9560', 'metric': metric})
+            resp = self.c.get(url, {'page': 'pants'})
+            self.assertEqual(resp.status_code, 400)
 
     def test_api(self):
         cases = {
