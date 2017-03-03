@@ -1,6 +1,6 @@
 import models
 import utils
-from utils import ensure, rest
+from utils import ensure, rest, lmap
 from django.db.models import Sum, F, Max
 
 def chop(q, page, per_page, order):
@@ -26,6 +26,19 @@ def chop(q, page, per_page, order):
         q = q[start:end]
 
     return total, q
+
+def pad_citations(serialized_citation_response):
+    cr = serialized_citation_response
+    known_sources = dict(models.source_choices()).keys()
+    missing_sources = set(known_sources) - set([cite['service'] for cite in cr])
+
+    def pad(source):
+        return {
+            'service': source,
+            'uri': '',
+            'citations': 0
+        }
+    return cr + lmap(pad, missing_sources)
 
 #
 #

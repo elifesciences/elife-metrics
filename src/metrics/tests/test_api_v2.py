@@ -52,6 +52,16 @@ class ApiV2(base.BaseCase):
                 'service': models.CROSSREF,
                 'uri': 'asdf',
                 'citations': 23
+            },
+            {
+                'service': models.SCOPUS,
+                'uri': '',
+                'citations': 0
+            },
+            {
+                'service': models.PUBMED,
+                'uri': '',
+                'citations': 0
             }
         ]
         url = reverse('v2:alm', kwargs={'id': 5678, 'metric': 'citations'})
@@ -67,14 +77,30 @@ class ApiV2(base.BaseCase):
         self.assertEqual(resp.status_code, 404)
 
     def test_citations_missing_citations(self):
-        "a request for an article that exists but has no citations returns an empty response"
+        "a request for an article that exists but has no citations returns a list of citation providers with a count of zero"
         base.insert_metrics({'1234': (0, 0, 0)})
         url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 200)
-        expected_response = []
+        expected_response = [
+            {
+                'service': models.CROSSREF,
+                'uri': '',
+                'citations': 0
+            },
+            {
+                'service': models.PUBMED,
+                'uri': '',
+                'citations': 0
+            },
+            {
+                'service': models.SCOPUS,
+                'uri': '',
+                'citations': 0
+            }
+        ]
         actual_response = resp.data
-        self.assertEqual(expected_response, actual_response)
+        self.assertCountEqual(expected_response, actual_response)
 
     def test_daily_views(self):
         cases = {

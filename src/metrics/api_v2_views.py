@@ -97,6 +97,10 @@ def article_metrics(request, id, metric):
         total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
         # serialize
         payload = serialize(total_results, sum_value, qpage, metric)
+
+        # citations have to return zeroes for any missing sources
+        payload = logic.pad_citations(payload) if metric == 'citations' else payload
+
         # respond
         ctype_idx = {
             'citations': 'application/vnd.elife.metric-citations+json;version=1',
