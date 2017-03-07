@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
-from metrics import logic, utils, models
+from metrics import logic, models
 
 import logging
 LOG = logging.getLogger(__name__)
@@ -17,7 +17,7 @@ def hw_or_ga(v):
 def first(x):
     try:
         return x[0]
-    except KeyError:
+    except (TypeError, KeyError):
         return None
 
 def rest(x):
@@ -56,9 +56,13 @@ class Command(BaseCommand):
 
         # print 'use cached? %r only cached? %r' % (use_cached, only_cached)
 
+        GA_DAILY, GA_MONTHLY = 'ga-daily', 'ga-monthly'
+
         # this determines the order the sources will be called in
         using_sources = [
-            models.GA,
+            # models.GA,
+            GA_DAILY,
+            GA_MONTHLY,
             models.CROSSREF,
             models.SCOPUS,
             models.PUBMED
@@ -69,18 +73,16 @@ class Command(BaseCommand):
         # date ranges and caching arguments don't matter to citations right now
         # caching is feasible, but only crossref supports querying citations by date range
         sources = {
-            models.GA: [
-                (logic.import_ga_metrics, 'daily', from_date, to_date, use_cached, only_cached),
-                (logic.import_ga_metrics, 'monthly', n_months_ago, to_date, use_cached, only_cached),
-            ],
+            GA_DAILY: (logic.import_ga_metrics, 'daily', from_date, to_date, use_cached, only_cached),
+            GA_MONTHLY: (logic.import_ga_metrics, 'monthly', n_months_ago, to_date, use_cached, only_cached),
             models.CROSSREF: (logic.import_crossref_citations,),
             models.SCOPUS: (logic.import_scopus_citations,),
             models.PUBMED: (logic.import_pmc_citations,),
         }
 
         LOG.info("importing metrics for sources %s", ", ".join(using_sources))
-        callables = utils.flatten([sources[src] for src in using_sources])
-        [first(row)(*rest(row)) for source, row in callables]
+
+        [first(row)(*rest(row)) for key, row in sources.items() if key in using_sources]
 
         self.stdout.write("...done\n")
         self.stdout.flush()
