@@ -61,7 +61,7 @@ class Command(BaseCommand):
             models.GA,
             models.CROSSREF,
             models.SCOPUS,
-            models.PMC
+            models.PUBMED
         ]
         # ... I know. parallelization would be nice.
 
@@ -75,7 +75,7 @@ class Command(BaseCommand):
             ],
             models.CROSSREF: (logic.import_crossref_citations,),
             models.SCOPUS: (logic.import_scopus_citations,),
-            models.PMC: (logic.import_pmc_citations,),
+            models.PUBMED: (logic.import_pmc_citations,),
         }
 
         LOG.info("importing metrics for sources %s", ", ".join(using_sources))
