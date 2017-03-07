@@ -139,10 +139,6 @@ def import_crossref_citations():
     results = citations_for_all_articles()
     return map(comp(insert_citation, countable), filter(None, results))
 
-def do_atomically(fn):
-    with transaction.atomic():
-        fn()
-
 #
 #
 #
