@@ -1,3 +1,4 @@
+import time
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
@@ -82,7 +83,19 @@ class Command(BaseCommand):
 
         LOG.info("importing metrics for sources %s", ", ".join(using_sources))
 
-        [first(row)(*rest(row)) for key, row in sources.items() if key in using_sources]
+        try:
+            for source, row in sources.items():
+                if source in using_sources:
+                    try:
+                        first(row)(*rest(row))
+                    except KeyboardInterrupt:
+                        print 'ctrl-c caught.'
+                        print 'use ctrl-c again to abort immediately'
+                        time.sleep(2)
+        except KeyboardInterrupt:
+            print 'caught second ctrl-c'
+            print 'quitting'
+            exit(1)
 
         self.stdout.write("...done\n")
         self.stdout.flush()
