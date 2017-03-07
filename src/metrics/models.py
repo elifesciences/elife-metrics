@@ -5,6 +5,9 @@ class Article(models.Model):
     pmid = models.PositiveIntegerField(unique=True, blank=True, null=True)
     pmcid = models.CharField(max_length=10, unique=True, blank=True, null=True)
 
+    class Meta:
+        ordering = ('-doi',)
+
     def __unicode__(self):
         return self.doi
 
@@ -82,11 +85,19 @@ def source_choices():
         (PUBMED, 'PubMed Central'),
     ]
 
+
+class CitationManager(models.Manager):
+    def get_queryset(self):
+        "always join with the article table"
+        return super(CitationManager, self).get_queryset().select_related('article')
+
 class Citation(models.Model):
     article = models.ForeignKey(Article)
     num = models.PositiveIntegerField()
     source = models.CharField(max_length=10, choices=source_choices()) # scopus, crossref, pubmed, etc
     source_id = models.CharField(max_length=255) # a link back to this article for given source
+
+    objects = CitationManager()
 
     class Meta:
         # an article may only have one instance of a source

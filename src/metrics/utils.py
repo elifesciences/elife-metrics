@@ -11,6 +11,15 @@ lmap = lambda func, *iterable: list(map(func, *iterable))
 lfilter = lambda func, *iterable: list(filter(func, *iterable))
 keys = lambda d: list(d.keys())
 
+def comp(*fns):
+    "composes functions LEFT to RIGHT"
+    def _comp(*args, **kwargs):
+        res = fns[0](*args, **kwargs)
+        for fn in fns[1:]:
+            res = fn(res)
+        return res
+    return _comp
+
 # http://stackoverflow.com/questions/3744451/is-this-how-you-paginate-or-is-there-a-better-algorithm
 def paginate(seq, rowlen):
     for start in xrange(0, len(seq), rowlen):
