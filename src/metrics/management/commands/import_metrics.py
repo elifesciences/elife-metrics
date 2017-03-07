@@ -1,4 +1,5 @@
 import time
+from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
@@ -59,39 +60,26 @@ class Command(BaseCommand):
 
         GA_DAILY, GA_MONTHLY = 'ga-daily', 'ga-monthly'
 
-        # this determines the order the sources will be called in
-        using_sources = [
-            # models.GA,
-            GA_DAILY,
-            GA_MONTHLY,
-            models.CROSSREF,
-            models.SCOPUS,
-            models.PUBMED
-        ]
-        # ... I know. parallelization would be nice.
-
         # the mapping of sources and how to call them.
         # date ranges and caching arguments don't matter to citations right now
         # caching is feasible, but only crossref supports querying citations by date range
-        sources = {
-            GA_DAILY: (logic.import_ga_metrics, 'daily', from_date, to_date, use_cached, only_cached),
-            GA_MONTHLY: (logic.import_ga_metrics, 'monthly', n_months_ago, to_date, use_cached, only_cached),
-            models.CROSSREF: (logic.import_crossref_citations,),
-            models.SCOPUS: (logic.import_scopus_citations,),
-            models.PUBMED: (logic.import_pmc_citations,),
-        }
-
-        LOG.info("importing metrics for sources %s", ", ".join(using_sources))
+        sources = OrderedDict([
+            (GA_DAILY, (logic.import_ga_metrics, 'daily', from_date, to_date, use_cached, only_cached)),
+            (GA_MONTHLY, (logic.import_ga_metrics, 'monthly', n_months_ago, to_date, use_cached, only_cached)),
+            (models.CROSSREF, (logic.import_crossref_citations,)),
+            (models.SCOPUS, (logic.import_scopus_citations,)),
+            (models.PUBMED, (logic.import_pmc_citations,)),
+        ])
 
         try:
             for source, row in sources.items():
-                if source in using_sources:
-                    try:
-                        first(row)(*rest(row))
-                    except KeyboardInterrupt:
-                        print 'ctrl-c caught.'
-                        print 'use ctrl-c again to abort immediately'
-                        time.sleep(2)
+                try:
+                    first(row)(*rest(row))
+                except KeyboardInterrupt:
+                    print 'ctrl-c caught.'
+                    print 'use ctrl-c again to abort immediately'
+                    time.sleep(2)
+
         except KeyboardInterrupt:
             print 'caught second ctrl-c'
             print 'quitting'
