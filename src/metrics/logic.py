@@ -117,8 +117,9 @@ def insert_citation(data, aid='doi'):
     key = utils.subdict(row, ['article', 'source'])
     return create_or_update(models.Citation, row, key, create=True, update=True, update_check=True)
 
-def countable(citation, created, updated):
+def countable(triple):
     "if the citation has been created or modified, return the object"
+    citation, created, updated = triple
     if created or updated:
         return citation
 

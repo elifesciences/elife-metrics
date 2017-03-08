@@ -13,6 +13,7 @@ google-api-python-client==1.6.1
 green==2.5.3
 kids.cache==0.0.4
 markdown2==2.3.2
+mock==2.0.0
 newrelic==2.78.0.57
 oauth2client==3.0.0
 psycopg2==2.6.2

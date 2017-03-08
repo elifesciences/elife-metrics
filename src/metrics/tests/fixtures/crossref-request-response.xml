@@ -1,0 +1,1596 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<crossref_result version="2.0" xmlns="http://www.crossref.org/qrschema/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.crossref.org/qrschema/2.0 http://www.crossref.org/qrschema/crossref_query_output2.0.xsd">
+ <query_result>
+  <head>
+   <email_address>none</email_address>
+   <doi_batch_id>none</doi_batch_id>
+  </head>
+  <body>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2041-9015</issn>
+     <journal_title>Papers from the Institute of Archaeology</journal_title>
+     <article_title>“What’s in a Name?” The Taxonomy &amp; Phylogeny of Early Homo</article_title>
+     <volume>25</volume>
+     <issue>2</issue>
+     <item_number item_number_type="article-number">12</item_number>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.5334/pia.499</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="electronic">978-3-319-16999-6</isbn>
+     <volume_title>Encyclopedia of Evolutionary Psychological Science</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Scott A.</given_name>
+       <surname>Williams</surname>
+      </contributor>
+     </contributors>
+     <first_page>1</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <component_number>Chapter 3423-1</component_number>
+     <doi type="book_content">10.1007/978-3-319-16999-6_3423-1</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>Comment on “Deliberate body disposal by hominins in the Dinaledi Chamber, Cradle of Humankind, South Africa?” [J. Hum. Evol. 96 (2016) 145–148]</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>P.H.G.M.</given_name>
+       <surname>Dirks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>L.R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>J.</given_name>
+       <surname>Hawks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>P.S.</given_name>
+       <surname>Randolph-Quinney</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>L.R.</given_name>
+       <surname>Backwell</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>E.M.</given_name>
+       <surname>Roberts</surname>
+      </contributor>
+     </contributors>
+     <volume>96</volume>
+     <first_page>149</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.04.007</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">2332-8940</issn>
+     <issn type="electronic">2332-8959</issn>
+     <journal_title>Temperature</journal_title>
+     <journal_abbreviation>Temperature</journal_abbreviation>
+     <article_title>The cock, the Academy, and the best scientific journal in the world</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Andrej A</given_name>
+       <surname>Romanovsky</surname>
+      </contributor>
+     </contributors>
+     <volume>2</volume>
+     <issue>4</issue>
+     <first_page>435</first_page>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1080/23328940.2015.1113097</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <issn type="print">1574-3489</issn>
+     <issn type="electronic">1574-3497</issn>
+     <isbn type="print">978-1-4939-3644-1</isbn>
+     <isbn type="electronic">978-1-4939-3646-5</isbn>
+     <series_title>Developments in Primatology: Progress and Prospects</series_title>
+     <volume_title>The Evolution of the Primate Hand</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Erik</given_name>
+       <surname>Trinkaus</surname>
+      </contributor>
+     </contributors>
+     <first_page>545</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <component_number>Chapter 19</component_number>
+     <doi type="book_content">10.1007/978-1-4939-3646-5_19</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>Skull diversity in the Homo lineage and the relative position of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Lauren</given_name>
+       <surname>Schroeder</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jill E.</given_name>
+       <surname>Scott</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Heather M.</given_name>
+       <surname>Garvin</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Myra F.</given_name>
+       <surname>Laird</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Mana</given_name>
+       <surname>Dembo</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Davorka</given_name>
+       <surname>Radovčić</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Darryl J.</given_name>
+       <surname>de Ruiter</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Rebecca R.</given_name>
+       <surname>Ackermann</surname>
+      </contributor>
+     </contributors>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.09.014</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>The upper limb of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Elen M.</given_name>
+       <surname>Feuerriegel</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>David J.</given_name>
+       <surname>Green</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Christopher S.</given_name>
+       <surname>Walker</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Peter</given_name>
+       <surname>Schmid</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>John</given_name>
+       <surname>Hawks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Steven E.</given_name>
+       <surname>Churchill</surname>
+      </contributor>
+     </contributors>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.09.013</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2050-084X</issn>
+     <journal_title>eLife</journal_title>
+     <article_title>The many mysteries ofHomo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Chris</given_name>
+       <surname>Stringer</surname>
+      </contributor>
+     </contributors>
+     <volume>4</volume>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.7554/eLife.10627</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00928674</issn>
+     <journal_title>Cell</journal_title>
+     <journal_abbreviation>Cell</journal_abbreviation>
+     <article_title>Matters of Size</article_title>
+     <volume>163</volume>
+     <issue>5</issue>
+     <first_page>1043</first_page>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.cell.2015.11.014</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0038-2353</issn>
+     <issn type="electronic">1996-7489</issn>
+     <journal_title>South African Journal of Science</journal_title>
+     <journal_abbreviation>S. Afr. J. Sci</journal_abbreviation>
+     <article_title>The possibility of lichen growth on bones of Homo naledi: Were they exposed to light?</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>J. Francis</given_name>
+       <surname>Thackeray</surname>
+      </contributor>
+     </contributors>
+     <volume>Volume 112</volume>
+     <issue>Number 7/8</issue>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.17159/sajs.2016/a0167</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0038-2353</issn>
+     <issn type="electronic">1996-7489</issn>
+     <journal_title>South African Journal of Science</journal_title>
+     <journal_abbreviation>S. Afr. J. Sci</journal_abbreviation>
+     <article_title>Multimodal spatial mapping and visualisation of Dinaledi Chamber and Rising Star Cave</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Ashley</given_name>
+       <surname>Kruger</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Patrick</given_name>
+       <surname>Randolph-Quinney</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Marina</given_name>
+       <surname>Elliott</surname>
+      </contributor>
+     </contributors>
+     <volume>Volume 112</volume>
+     <issue>Number 1/2</issue>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.17159/sajs.2016/20160032</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00029483</issn>
+     <journal_title>American Journal of Physical Anthropology</journal_title>
+     <journal_abbreviation>Am. J. Phys. Anthropol.</journal_abbreviation>
+     <article_title>The apportionment of tooth size and its implications in Australopithecus sediba
+ versus other Plio-pleistocene and recent African hominins</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Joel D.</given_name>
+       <surname>Irish</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Brian E.</given_name>
+       <surname>Hemphill</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Darryl J.</given_name>
+       <surname>de Ruiter</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+     </contributors>
+     <volume>161</volume>
+     <issue>3</issue>
+     <first_page>398</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1002/ajpa.23039</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0962-8436</issn>
+     <issn type="electronic">1471-2970</issn>
+     <journal_title>Philosophical Transactions of the Royal Society B: Biological Sciences</journal_title>
+     <journal_abbreviation>Phil. Trans. R. Soc. B</journal_abbreviation>
+     <article_title>Bayesian phylogenetic estimation of fossil ages</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Alexei J.</given_name>
+       <surname>Drummond</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Tanja</given_name>
+       <surname>Stadler</surname>
+      </contributor>
+     </contributors>
+     <volume>371</volume>
+     <issue>1699</issue>
+     <first_page>20150129</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1098/rstb.2015.0129</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00027294</issn>
+     <journal_title>American Anthropologist</journal_title>
+     <journal_abbreviation>American Anthropologist</journal_abbreviation>
+     <article_title>Biological Anthropology in 2015: Open Access, Biocultural Interactions, and Social Change</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Cathy</given_name>
+       <surname>Willermet</surname>
+      </contributor>
+     </contributors>
+     <volume>118</volume>
+     <issue>2</issue>
+     <first_page>317</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1111/aman.12529</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2041-1723</issn>
+     <journal_title>Nature Communications</journal_title>
+     <journal_abbreviation>Nat Comms</journal_abbreviation>
+     <article_title>The hand of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Tracy L.</given_name>
+       <surname>Kivell</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Andrew S.</given_name>
+       <surname>Deane</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Matthew W.</given_name>
+       <surname>Tocheri</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Caley M.</given_name>
+       <surname>Orr</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Peter</given_name>
+       <surname>Schmid</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>John</given_name>
+       <surname>Hawks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Steven E.</given_name>
+       <surname>Churchill</surname>
+      </contributor>
+     </contributors>
+     <volume>6</volume>
+     <first_page>8431</first_page>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/ncomms9431</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2054-5703</issn>
+     <journal_title>Royal Society Open Science</journal_title>
+     <journal_abbreviation>R. Soc. open sci.</journal_abbreviation>
+     <article_title>New genetic and morphological evidence suggests a single hoaxer created ‘Piltdown man’</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Isabelle</given_name>
+       <surname>De Groote</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Linus Girdland</given_name>
+       <surname>Flink</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Rizwaan</given_name>
+       <surname>Abbas</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Silvia M.</given_name>
+       <surname>Bello</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lucia</given_name>
+       <surname>Burgia</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Laura Tabitha</given_name>
+       <surname>Buck</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Christopher</given_name>
+       <surname>Dean</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Alison</given_name>
+       <surname>Freyne</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Thomas</given_name>
+       <surname>Higham</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Chris G.</given_name>
+       <surname>Jones</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Robert</given_name>
+       <surname>Kruszynski</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Adrian</given_name>
+       <surname>Lister</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Simon A.</given_name>
+       <surname>Parfitt</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Matthew M.</given_name>
+       <surname>Skinner</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Karolyn</given_name>
+       <surname>Shindler</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Chris B.</given_name>
+       <surname>Stringer</surname>
+      </contributor>
+     </contributors>
+     <volume>3</volume>
+     <issue>8</issue>
+     <first_page>160328</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1098/rsos.160328</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">16310683</issn>
+     <journal_title>Comptes Rendus Palevol</journal_title>
+     <journal_abbreviation>Comptes Rendus Palevol</journal_abbreviation>
+     <article_title>Morphological correlates of the first metacarpal proximal articular surface with manipulative capabilities in apes, humans and South African early hominins</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Damiano</given_name>
+       <surname>Marchi</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Daniel J.</given_name>
+       <surname>Proctor</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Emma</given_name>
+       <surname>Huston</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Christina L.</given_name>
+       <surname>Nicholas</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Florian</given_name>
+       <surname>Fischer</surname>
+      </contributor>
+     </contributors>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.crpv.2016.09.002</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>The thigh and leg of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Damiano</given_name>
+       <surname>Marchi</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Christopher S.</given_name>
+       <surname>Walker</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Pianpian</given_name>
+       <surname>Wei</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Trenton W.</given_name>
+       <surname>Holliday</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Steven E.</given_name>
+       <surname>Churchill</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jeremy M.</given_name>
+       <surname>DeSilva</surname>
+      </contributor>
+     </contributors>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.09.005</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0962-8436</issn>
+     <issn type="electronic">1471-2970</issn>
+     <journal_title>Philosophical Transactions of the Royal Society B: Biological Sciences</journal_title>
+     <journal_abbreviation>Phil. Trans. R. Soc. B</journal_abbreviation>
+     <article_title>The evolution of body size and shape in the human career</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>William L.</given_name>
+       <surname>Jungers</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Mark</given_name>
+       <surname>Grabowski</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Kevin G.</given_name>
+       <surname>Hatala</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Brian G.</given_name>
+       <surname>Richmond</surname>
+      </contributor>
+     </contributors>
+     <volume>371</volume>
+     <issue>1698</issue>
+     <first_page>20150247</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1098/rstb.2015.0247</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">978-3-319-41584-0</isbn>
+     <isbn type="electronic">978-3-319-41585-7</isbn>
+     <volume_title>The Science of Human Evolution</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>John H.</given_name>
+       <surname>Langdon</surname>
+      </contributor>
+     </contributors>
+     <first_page>75</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <component_number>Chapter 10</component_number>
+     <doi type="book_content">10.1007/978-3-319-41585-7_10</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">23520094</issn>
+     <journal_title>Geoderma Regional</journal_title>
+     <journal_abbreviation>Geoderma Regional</journal_abbreviation>
+     <article_title>Palaeosol nomenclature and classification for South Africa: A new perspective</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Peter N.</given_name>
+       <surname>Eze</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Theophilus K.</given_name>
+       <surname>Udeigwe</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Obiageli P.</given_name>
+       <surname>Umeugochukwu</surname>
+      </contributor>
+     </contributors>
+     <volume>7</volume>
+     <issue>3</issue>
+     <first_page>323</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.geodrs.2016.06.004</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">9780128004265</isbn>
+     <volume_title>Encyclopedia of Evolutionary Biology</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>L.T.</given_name>
+       <surname>Buck</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>C.B.</given_name>
+       <surname>Stringer</surname>
+      </contributor>
+     </contributors>
+     <first_page>225</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="book_content">10.1016/B978-0-12-800049-6.00288-2</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0962-8436</issn>
+     <issn type="electronic">1471-2970</issn>
+     <journal_title>Philosophical Transactions of the Royal Society B: Biological Sciences</journal_title>
+     <journal_abbreviation>Phil. Trans. R. Soc. B</journal_abbreviation>
+     <article_title>Evidence in hand: recent discoveries and the early evolution of human manual manipulation</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Tracy L.</given_name>
+       <surname>Kivell</surname>
+      </contributor>
+     </contributors>
+     <volume>370</volume>
+     <issue>1682</issue>
+     <first_page>20150105</first_page>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1098/rstb.2015.0105</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">9780128093573</isbn>
+     <volume_title>Investigating Seafloors and Oceans</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Antony</given_name>
+       <surname>Joseph</surname>
+      </contributor>
+     </contributors>
+     <first_page>209</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="book_content">10.1016/B978-0-12-809357-3.00004-7</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="electronic">9781119308058</isbn>
+     <isbn type="print">9780470673911</isbn>
+     <volume_title>50 Great Myths of Human Evolution</volume_title>
+     <first_page>258</first_page>
+     <year>2016</year>
+     <publication_type />
+     <doi type="book_content">10.1002/9781119308058.refs</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">978-3-319-41584-0</isbn>
+     <isbn type="electronic">978-3-319-41585-7</isbn>
+     <volume_title>The Science of Human Evolution</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>John H.</given_name>
+       <surname>Langdon</surname>
+      </contributor>
+     </contributors>
+     <first_page>123</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <component_number>Chapter 16</component_number>
+     <doi type="book_content">10.1007/978-3-319-41585-7_16</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">9780128019665</isbn>
+     <volume_title>Biological Distance Analysis</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>M.A.</given_name>
+       <surname>Pilloud</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>H.J.H.</given_name>
+       <surname>Edgar</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>R.</given_name>
+       <surname>George</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>G.R.</given_name>
+       <surname>Scott</surname>
+      </contributor>
+     </contributors>
+     <first_page>109</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="book_content">10.1016/B978-0-12-801966-5.00006-8</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0962-8436</issn>
+     <issn type="electronic">1471-2970</issn>
+     <journal_title>Philosophical Transactions of the Royal Society B: Biological Sciences</journal_title>
+     <journal_abbreviation>Phil. Trans. R. Soc. B</journal_abbreviation>
+     <article_title>Morphological variation inHomo erectusand the origins of developmental plasticity</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Susan C.</given_name>
+       <surname>Antón</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Hannah G.</given_name>
+       <surname>Taboada</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Emily R.</given_name>
+       <surname>Middleton</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Christopher W.</given_name>
+       <surname>Rainwater</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Andrea B.</given_name>
+       <surname>Taylor</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Trudy R.</given_name>
+       <surname>Turner</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jean E.</given_name>
+       <surname>Turnquist</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Karen J.</given_name>
+       <surname>Weinstein</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Scott A.</given_name>
+       <surname>Williams</surname>
+      </contributor>
+     </contributors>
+     <volume>371</volume>
+     <issue>1698</issue>
+     <first_page>20150236</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1098/rstb.2015.0236</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00218782</issn>
+     <journal_title>Journal of Anatomy</journal_title>
+     <journal_abbreviation>J. Anat.</journal_abbreviation>
+     <article_title>A review of trabecular bone functional adaptation: what have we learned from trabecular analyses in extant hominoids and what can we apply to fossils?</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Tracy L.</given_name>
+       <surname>Kivell</surname>
+      </contributor>
+     </contributors>
+     <volume>228</volume>
+     <issue>4</issue>
+     <first_page>569</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1111/joa.12446</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>The vertebrae and ribs of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Scott A.</given_name>
+       <surname>Williams</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Daniel</given_name>
+       <surname>García-Martínez</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Markus</given_name>
+       <surname>Bastir</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Marc R.</given_name>
+       <surname>Meyer</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Shahed</given_name>
+       <surname>Nalla</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>John</given_name>
+       <surname>Hawks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Peter</given_name>
+       <surname>Schmid</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Steven E.</given_name>
+       <surname>Churchill</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+     </contributors>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.11.003</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2167-8359</issn>
+     <journal_title>PeerJ</journal_title>
+     <article_title>Metacarpal torsion in apes, humans, and earlyAustralopithecus:implications for manipulatory abilities</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Michelle S.M.</given_name>
+       <surname>Drapeau</surname>
+      </contributor>
+     </contributors>
+     <volume>3</volume>
+     <first_page>e1311</first_page>
+     <item_number item_number_type="article-number">e1311</item_number>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.7717/peerj.1311</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">16310683</issn>
+     <journal_title>Comptes Rendus Palevol</journal_title>
+     <journal_abbreviation>Comptes Rendus Palevol</journal_abbreviation>
+     <article_title>The first Indo-French Prehistorical Mission in Siwaliks and the discovery of anthropic activities at 2.6 million years</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Anne</given_name>
+       <surname>Dambricourt Malassé</surname>
+      </contributor>
+     </contributors>
+     <volume>15</volume>
+     <issue>3-4</issue>
+     <first_page>281</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.crpv.2015.12.001</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">978-3-319-41584-0</isbn>
+     <isbn type="electronic">978-3-319-41585-7</isbn>
+     <volume_title>The Science of Human Evolution</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>John H.</given_name>
+       <surname>Langdon</surname>
+      </contributor>
+     </contributors>
+     <first_page>67</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <component_number>Chapter 9</component_number>
+     <doi type="book_content">10.1007/978-3-319-41585-7_9</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">9780128040966</isbn>
+     <volume_title>Evolution of Nervous Systems</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>E.K.</given_name>
+       <surname>Boyle</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>B.</given_name>
+       <surname>Wood</surname>
+      </contributor>
+     </contributors>
+     <first_page>19</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="book_content">10.1016/B978-0-12-804042-3.00102-0</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">9780124201903</isbn>
+     <volume_title>On Human Nature</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>D.</given_name>
+       <surname>Lordkipanidze</surname>
+      </contributor>
+     </contributors>
+     <first_page>45</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="book_content">10.1016/B978-0-12-420190-3.00003-X</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2041-1723</issn>
+     <journal_title>Nature Communications</journal_title>
+     <journal_abbreviation>Nat Comms</journal_abbreviation>
+     <article_title>The foot of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>W. E. H.</given_name>
+       <surname>Harcourt-Smith</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Z.</given_name>
+       <surname>Throckmorton</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>K. A.</given_name>
+       <surname>Congdon</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>B.</given_name>
+       <surname>Zipfel</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>A. S.</given_name>
+       <surname>Deane</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>M. S. M.</given_name>
+       <surname>Drapeau</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>S. E.</given_name>
+       <surname>Churchill</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>L. R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>J. M.</given_name>
+       <surname>DeSilva</surname>
+      </contributor>
+     </contributors>
+     <volume>6</volume>
+     <first_page>8432</first_page>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1038/ncomms9432</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0038-2353</issn>
+     <issn type="electronic">1996-7489</issn>
+     <journal_title>South African Journal of Science</journal_title>
+     <journal_abbreviation>S. Afr. J. Sci</journal_abbreviation>
+     <article_title>Estimating the age and affinities of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>J. Francis</given_name>
+       <surname>Thackeray</surname>
+      </contributor>
+     </contributors>
+     <volume>Volume 111</volume>
+     <issue>Number 11/12</issue>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.17159/sajs.2015/a0124</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0038-2353</issn>
+     <issn type="electronic">1996-7489</issn>
+     <journal_title>South African Journal of Science</journal_title>
+     <journal_abbreviation>S. Afr. J. Sci</journal_abbreviation>
+     <article_title>A hominin first rib discovered at the Sterkfontein Caves, South Africa</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Gaokgatlhee</given_name>
+       <surname>Tawan</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Daniel</given_name>
+       <surname>García-Martínez</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Jennifer</given_name>
+       <surname>Eyre</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Markus</given_name>
+       <surname>Bastir</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Lee</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Peter</given_name>
+       <surname>Schmid</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Shahed</given_name>
+       <surname>Nalla</surname>
+      </contributor>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Scott A.</given_name>
+       <surname>Williams</surname>
+      </contributor>
+     </contributors>
+     <volume>Volume 112</volume>
+     <issue>Number 5/6</issue>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.17159/sajs.2016/20150278</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00029483</issn>
+     <journal_title>American Journal of Physical Anthropology</journal_title>
+     <journal_abbreviation>Am. J. Phys. Anthropol.</journal_abbreviation>
+     <article_title>Hominin taxic diversity: Fact or fantasy?</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Bernard</given_name>
+       <surname>Wood</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Eve</given_name>
+       <surname>K. Boyle</surname>
+      </contributor>
+     </contributors>
+     <volume>159</volume>
+     <first_page>37</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1002/ajpa.22902</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">9780128040966</isbn>
+     <volume_title>Evolution of Nervous Systems</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>S.</given_name>
+       <surname>Mayer</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>A.R.</given_name>
+       <surname>Kriegstein</surname>
+      </contributor>
+     </contributors>
+     <first_page>59</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="book_content">10.1016/B978-0-12-804042-3.00077-4</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">05912385</issn>
+     <journal_title>Zygon®</journal_title>
+     <journal_abbreviation>Zygon®</journal_abbreviation>
+     <article_title>SCIENCE AND RELIGION IN THE UNITED KINGDOM: A PERSONAL VIEW ON THE CONTEMPORARY SCENE</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Christopher</given_name>
+       <surname>Southgate</surname>
+      </contributor>
+     </contributors>
+     <volume>51</volume>
+     <issue>2</issue>
+     <first_page>361</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1111/zygo.12248</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>The skull of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Myra F.</given_name>
+       <surname>Laird</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lauren</given_name>
+       <surname>Schroeder</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Heather M.</given_name>
+       <surname>Garvin</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jill E.</given_name>
+       <surname>Scott</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Mana</given_name>
+       <surname>Dembo</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Davorka</given_name>
+       <surname>Radovčić</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Charles M.</given_name>
+       <surname>Musiba</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Rebecca R.</given_name>
+       <surname>Ackermann</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Peter</given_name>
+       <surname>Schmid</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>John</given_name>
+       <surname>Hawks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Darryl J.</given_name>
+       <surname>de Ruiter</surname>
+      </contributor>
+     </contributors>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.09.009</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>Deliberate body disposal by hominins in the Dinaledi Chamber, Cradle of Humankind, South Africa?</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Aurore</given_name>
+       <surname>Val</surname>
+      </contributor>
+     </contributors>
+     <volume>96</volume>
+     <first_page>145</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.02.004</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>Further morphological evidence on South African earliest Homo lower postcanine dentition: Enamel thickness and enamel dentine junction</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Lei</given_name>
+       <surname>Pan</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jean</given_name>
+       <surname>Dumoncel</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Frikkie</given_name>
+       <surname>de Beer</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jakobus</given_name>
+       <surname>Hoffman</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>John Francis</given_name>
+       <surname>Thackeray</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Benjamin</given_name>
+       <surname>Duployer</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Christophe</given_name>
+       <surname>Tenailleau</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>José</given_name>
+       <surname>Braga</surname>
+      </contributor>
+     </contributors>
+     <volume>96</volume>
+     <first_page>82</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.05.003</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0035-919X</issn>
+     <issn type="electronic">2154-0098</issn>
+     <journal_title>Transactions of the Royal Society of South Africa</journal_title>
+     <journal_abbreviation>Transactions of the Royal Society of South Africa</journal_abbreviation>
+     <article_title>The impact of a date for understanding the importance ofHomo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>John</given_name>
+       <surname>Hawks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+     </contributors>
+     <volume>71</volume>
+     <issue>2</issue>
+     <first_page>125</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1080/0035919X.2016.1178186</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>The evolutionary relationships and age of Homo naledi: An assessment using dated Bayesian phylogenetic methods</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Mana</given_name>
+       <surname>Dembo</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Davorka</given_name>
+       <surname>Radovčić</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Heather M.</given_name>
+       <surname>Garvin</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Myra F.</given_name>
+       <surname>Laird</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lauren</given_name>
+       <surname>Schroeder</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jill E.</given_name>
+       <surname>Scott</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Juliet</given_name>
+       <surname>Brophy</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Rebecca R.</given_name>
+       <surname>Ackermann</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Chares M.</given_name>
+       <surname>Musiba</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Darryl J.</given_name>
+       <surname>de Ruiter</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Arne Ø.</given_name>
+       <surname>Mooers</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Mark</given_name>
+       <surname>Collard</surname>
+      </contributor>
+     </contributors>
+     <volume>97</volume>
+     <first_page>17</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.04.008</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">0038-2353</issn>
+     <issn type="electronic">1996-7489</issn>
+     <journal_title>South African Journal of Science</journal_title>
+     <journal_abbreviation>S. Afr. J. Sci</journal_abbreviation>
+     <article_title>The mournful ape: Conflating expression and meaning in the mortuary behaviour of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Patrick S.</given_name>
+       <surname>Randolph-Quinney</surname>
+      </contributor>
+     </contributors>
+     <volume>Volume 111</volume>
+     <issue>Number 11/12</issue>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.17159/sajs.2015/a0131</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>OH-65: The earliest evidence for right-handedness in the fossil record</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>David W.</given_name>
+       <surname>Frayer</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Ronald J.</given_name>
+       <surname>Clarke</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Ivana</given_name>
+       <surname>Fiore</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Robert J.</given_name>
+       <surname>Blumenschine</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Alejandro</given_name>
+       <surname>Pérez-Pérez</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Laura M.</given_name>
+       <surname>Martinez</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Ferran</given_name>
+       <surname>Estebaranz</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Ralph</given_name>
+       <surname>Holloway</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Luca</given_name>
+       <surname>Bondioli</surname>
+      </contributor>
+     </contributors>
+     <volume>100</volume>
+     <first_page>65</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.07.002</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">16310683</issn>
+     <journal_title>Comptes Rendus Palevol</journal_title>
+     <journal_abbreviation>Comptes Rendus Palevol</journal_abbreviation>
+     <article_title>The principles and practice of human evolution research: Are we asking questions that can be answered?</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Richard J.</given_name>
+       <surname>Smith</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Bernard</given_name>
+       <surname>Wood</surname>
+      </contributor>
+     </contributors>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.crpv.2016.11.005</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <book_cite fl_count="0">
+     <isbn type="print">9780124201903</isbn>
+     <volume_title>On Human Nature</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>B.</given_name>
+       <surname>Wood</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>E.</given_name>
+       <surname>Boyle</surname>
+      </contributor>
+     </contributors>
+     <first_page>17</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="book_content">10.1016/B978-0-12-420190-3.00002-8</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">19328486</issn>
+     <journal_title>The Anatomical Record</journal_title>
+     <journal_abbreviation>Anat. Rec.</journal_abbreviation>
+     <article_title>In Vivo 3D Analysis of Thoracic Kinematics: Changes in Size and Shape During Breathing and Their Implications for Respiratory Function in Recent Humans and Fossil Hominins</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Markus</given_name>
+       <surname>Bastir</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Daniel</given_name>
+       <surname>García-Martínez</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Nicole</given_name>
+       <surname>Torres-Tamayo</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Juan Alberto</given_name>
+       <surname>Sanchis-Gimeno</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Paul</given_name>
+       <surname>O'Higgins</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Cristina</given_name>
+       <surname>Utrilla</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Isabel</given_name>
+       <surname>Torres Sánchez</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Francisco</given_name>
+       <surname>García Río</surname>
+      </contributor>
+     </contributors>
+     <volume>300</volume>
+     <issue>2</issue>
+     <first_page>255</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1002/ar.23503</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">00029483</issn>
+     <journal_title>American Journal of Physical Anthropology</journal_title>
+     <journal_abbreviation>Am J Phys Anthropol</journal_abbreviation>
+     <article_title>What does variation in primate behavior mean?</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Karen B.</given_name>
+       <surname>Strier</surname>
+      </contributor>
+     </contributors>
+     <volume>162</volume>
+     <first_page>4</first_page>
+     <year>2017</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1002/ajpa.23143</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560">
+    <journal_cite fl_count="0">
+     <issn type="print">16310683</issn>
+     <journal_title>Comptes Rendus Palevol</journal_title>
+     <journal_abbreviation>Comptes Rendus Palevol</journal_abbreviation>
+     <article_title>Adaptation to bipedal gait and fifth metatarsal structural properties in Australopithecus, Paranthropus, and Homo</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Mark R.</given_name>
+       <surname>Dowdeswell</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Tea</given_name>
+       <surname>Jashashvili</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Biren A.</given_name>
+       <surname>Patel</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Renaud</given_name>
+       <surname>Lebrun</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Randall L.</given_name>
+       <surname>Susman</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>David</given_name>
+       <surname>Lordkipanidze</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Kristian J.</given_name>
+       <surname>Carlson</surname>
+      </contributor>
+     </contributors>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.crpv.2016.10.003</doi>
+    </journal_cite>
+   </forward_link>
+  </body>
+ </query_result>
+</crossref_result>
+

@@ -36,7 +36,7 @@ def _fetch(doi):
     try:
         resp = requests.get(url, params=params, headers=headers)
         resp.raise_for_status()
-        return resp.content # return bytes!
+        return resp.content
     except requests.HTTPError as err:
         status_code = err.response.status_code
         if status_code != 404:
