@@ -137,7 +137,7 @@ def count_for_msid(msid):
     return count_for_obj(models.Article.objects.get(doi=utils.msid2doi(msid)))
 
 def count_for_qs(qs):
-    return parse_results(fetch([resolve_pmcid(art) for art in qs if art.pmcid]))
+    return parse_results(fetch(lmap(resolve_pmcid, qs)))
 
 #
 #
