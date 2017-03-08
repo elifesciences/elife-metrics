@@ -1,6 +1,28 @@
-from metrics import models, logic
+import mock
+from os.path import join
+from metrics import models, logic, utils
 from datetime import datetime
 from base import BaseCase
+
+class One(BaseCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_import_crossref_citations(self):
+        # crossref requires an article to exist before we scrape it
+        utils.create_or_update(models.Article, {'doi': '10.7554/eLife.09560'}, ['doi'])
+        self.assertEqual(models.Article.objects.count(), 1)
+        self.assertEqual(models.Citation.objects.count(), 0)
+
+        crossref_response = open(join(self.fixture_dir, "crossref-request-response.xml"), 'r').read()
+        expected_citations = 53
+        with mock.patch('metrics.crossref.citations._fetch', return_value=crossref_response):
+            logic.import_crossref_citations()
+            self.assertEqual(models.Citation.objects.count(), 1)
+            self.assertEqual(models.Citation.objects.get(source=models.CROSSREF).num, expected_citations)
 
 class TestGAImport(BaseCase):
     def setUp(self):

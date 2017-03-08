@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from os.path import join
 import requests
 import requests_cache
@@ -17,7 +18,7 @@ requests_cache.install_cache(**{
     'fast_save': True,
     'extension': '.sqlite3',
     # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
-    'expire_after': timedelta(hours=24 * 7)
+    'expire_after': timedelta(hours=24 * settings.CROSSREF_CACHE_EXPIRY)
 })
 
 def _fetch(doi):
@@ -27,7 +28,9 @@ def _fetch(doi):
         'pwd': settings.CROSSREF_PASS,
         'doi': doi,
         'startDate': utils.ymd(settings.INCEPTION),
-        'endDate': utils.ymd(utils.utcnow() + timedelta(days=1)),
+        # this value must be relatively static to avoid cache misses every day as endDate changes
+        # this gives us the first of next month. on that day, we'll get misses despite caching expiry
+        'endDate': utils.ymd(utils.utcnow() + relativedelta(months=1, day=1)),
     }
     headers = {
         'Accept': 'application/json'
@@ -36,7 +39,7 @@ def _fetch(doi):
     try:
         resp = requests.get(url, params=params, headers=headers)
         resp.raise_for_status()
-        return resp.content # return bytes!
+        return resp.content
     except requests.HTTPError as err:
         status_code = err.response.status_code
         if status_code != 404:

@@ -58,6 +58,9 @@ SCOPUS_KEY = cfg('scopus.api-key')
 CROSSREF_USER = cfg('crossref.user')
 CROSSREF_PASS = cfg('crossref.pass')
 
+# time in days before the cached requests expires
+PMC_CACHE_EXPIRY = CROSSREF_CACHE_EXPIRY = SCOPUS_CACHE_EXPIRY = 2 # days
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')
 

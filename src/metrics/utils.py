@@ -20,6 +20,15 @@ def comp(*fns):
         return res
     return _comp
 
+'''
+def eargs(fn):
+    "expand-args. allows composing funcs that require multiple arguments"
+    @wraps(fn)
+    def wrapper(args):
+        return fn(*args)
+    return wrapper
+'''
+
 # http://stackoverflow.com/questions/3744451/is-this-how-you-paginate-or-is-there-a-better-algorithm
 def paginate(seq, rowlen):
     for start in xrange(0, len(seq), rowlen):

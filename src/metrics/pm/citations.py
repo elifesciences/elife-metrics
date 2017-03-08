@@ -15,7 +15,7 @@ requests_cache.install_cache(**{
     'fast_save': True,
     'extension': '.sqlite3',
     # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
-    'expire_after': timedelta(hours=24 * 7)
+    'expire_after': timedelta(hours=24 * settings.PMC_CACHE_EXPIRY)
 })
 
 def norm_pmcid(pmcid):
@@ -137,7 +137,7 @@ def count_for_msid(msid):
     return count_for_obj(models.Article.objects.get(doi=utils.msid2doi(msid)))
 
 def count_for_qs(qs):
-    return parse_results(fetch([resolve_pmcid(art) for art in qs if art.pmcid]))
+    return parse_results(fetch(lmap(resolve_pmcid, qs)))
 
 #
 #

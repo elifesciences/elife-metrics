@@ -15,7 +15,7 @@ requests_cache.install_cache(**{
     'fast_save': True,
     'extension': '.sqlite3',
     # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
-    'expire_after': timedelta(hours=24 * 7)
+    'expire_after': timedelta(hours=24 * settings.SCOPUS_CACHE_EXPIRY)
 })
 
 
