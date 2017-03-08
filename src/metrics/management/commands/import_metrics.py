@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 except KeyboardInterrupt:
                     print 'ctrl-c caught.'
                     print 'use ctrl-c again to abort immediately'
-                    time.sleep(2)
+                    time.sleep(1)
 
         except KeyboardInterrupt:
             print 'caught second ctrl-c'
