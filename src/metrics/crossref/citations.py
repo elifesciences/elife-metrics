@@ -1,3 +1,4 @@
+from dateutil.relativedelta import relativedelta
 from os.path import join
 import requests
 import requests_cache
@@ -27,7 +28,9 @@ def _fetch(doi):
         'pwd': settings.CROSSREF_PASS,
         'doi': doi,
         'startDate': utils.ymd(settings.INCEPTION),
-        'endDate': utils.ymd(utils.utcnow() + timedelta(days=1)),
+        # this value must be relatively static to avoid cache misses every day as endDate changes
+        # this gives us the first of next month. on that day, we'll get misses despite caching expiry
+        'endDate': utils.ymd(utils.utcnow() + relativedelta(months=1, day=1)),
     }
     headers = {
         'Accept': 'application/json'

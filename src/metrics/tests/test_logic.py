@@ -14,7 +14,7 @@ class One(BaseCase):
     def test_import_crossref_citations(self):
         # crossref requires an article to exist before we scrape it
         utils.create_or_update(models.Article, {'doi': '10.7554/eLife.09560'}, ['doi'])
-        self.assertEqual(models.Article.objects.count(), 1)        
+        self.assertEqual(models.Article.objects.count(), 1)
         self.assertEqual(models.Citation.objects.count(), 0)
 
         crossref_response = open(join(self.fixture_dir, "crossref-request-response.xml"), 'r').read()
