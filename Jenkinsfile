@@ -9,10 +9,12 @@ elifePipeline {
         builderProjectTests 'elife-metrics--ci', '/srv/elife-metrics' 
     }
 
-    stage 'Deploy on end2end'
+    stage 'End2end tests'
     lock('elife-metrics--end2end') {
-        builderDeployRevision 'elife-metrics--end2end', commit
-        builderSmokeTests 'elife-metrics--end2end', '/srv/elife-metrics'
+        elifeEnd2EndTest({
+            builderDeployRevision 'elife-metrics--end2end', commit
+            builderSmokeTests 'elife-metrics--end2end', '/srv/elife-metrics'
+        }, 'metrics')
     }
 
     elifeMainlineOnly {
