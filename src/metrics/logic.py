@@ -6,7 +6,7 @@ from django.conf import settings
 import models
 from django.db import transaction
 import utils
-from utils import first, create_or_update, ensure, splitfilter, comp
+from utils import first, create_or_update, ensure, comp
 from django import db
 import logging
 import events
@@ -124,11 +124,9 @@ def countable(triple):
         return citation
 
 def import_scopus_citations():
-    from scopus.citations import all_todays_entries
-    results = all_todays_entries()
-    good_eggs, bad_eggs = splitfilter(lambda e: 'bad' not in e, results)
-    LOG.error("refusing to insert bad entries: %s", bad_eggs)
-    return map(comp(insert_citation, countable), good_eggs)
+    from scopus.citations import runner
+    add, discard = insert_citation, lambda citation_data: LOG.error("refusing to insert bad entry: %s", citation_data)
+    return runner(add, discard)
 
 def import_pmc_citations():
     from pm.citations import citations_for_all_articles

@@ -87,6 +87,8 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework_swagger', # gui for api
 
+    'django_rq',
+
     'metrics',
 )
 
@@ -217,6 +219,35 @@ API_OPTS = render_item({
     'order_direction': [p('order.default')],
 }, _load_api_raml(API_PATH))
 
+#
+# RQ
+#
+
+RQ_QUEUES = {
+    'default': {
+        'HOST': 'localhost',
+        'PORT': 6379,
+        'DB': 0,
+        #'PASSWORD': 'some-password',
+        'DEFAULT_TIMEOUT': 360,
+    },
+
+    #'high': {
+    #    'URL': os.getenv('REDISTOGO_URL', 'redis://localhost:6379/0'), # If you're on Heroku
+    #    'DEFAULT_TIMEOUT': 500,
+    #},
+    #'low': {
+    #    'HOST': 'localhost',
+    #    'PORT': 6379,
+    #    'DB': 0,
+    #}
+}
+
+# RQ_EXCEPTION_HANDLERS = ['path.to.my.handler'] # If you need custom exception handlers
+
+#
+# logging
+#
 
 LOG_NAME = '%s.log' % PROJECT_NAME # ll: lax.log
 LOG_FILE = join(PROJECT_DIR, LOG_NAME) # ll: /path/to/lax/log/lax.log

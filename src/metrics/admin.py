@@ -1,3 +1,10 @@
-#from django.contrib import admin
+from django.contrib import admin
+from metrics import models
 
-# Register your models here.
+registrar = [
+    (models.Article,),
+    (models.Metric,),
+    (models.Citation,),
+]
+
+[admin.site.register(*row) for row in registrar]

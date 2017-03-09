@@ -4,8 +4,10 @@ import logging
 import requests_cache
 from django.conf import settings
 from datetime import timedelta
-from metrics import models # good idea reaching back?
-from metrics.utils import first, flatten
+from metrics import models # remove this dependency
+from metrics.utils import first, comp
+import django_rq
+from functools32 import partial, wraps
 
 LOG = logging.getLogger(__name__)
 
@@ -23,6 +25,24 @@ def clear_cache():
     requests_cache.clear()
 
 
+def is_abstract(entry):
+    # ll 10.7554/eLife.22757.001
+    return len(entry['doi'].split('.')) == 4
+
+def not_abstract(entry):
+    return not is_abstract(entry)
+
+def handler(citation_data):
+    if 'bad' in citation_data:
+        LOG.warning("not handling citation %r", citation_data)
+        return
+    from metrics import logic
+    logic.insert_citation(citation_data)
+
+#
+#
+#
+
 def _search(api_key, doi_prefix, page=0, per_page=25):
     "searches scopus"
     params = {
@@ -34,7 +54,7 @@ def _search(api_key, doi_prefix, page=0, per_page=25):
         'count': per_page,
         'sort': 'citedby-count',
     }
-    LOG.info('calling scopus with params: %s', params)
+    LOG.debug('calling scopus with params: %s', params)
     headers = {
         'Accept': 'application/json',
         'X-ELS-APIKey': api_key,
@@ -69,10 +89,10 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 
     # I think we're capped at 10k/day ? can't find their docs on this
     # eLife tends to hit 0 citations at about the 2.5k mark
-    max_pages = 5000
+    max_pages = 10
     try:
         for page in range(page + 1, total_pages):
-            LOG.info("page %r", page)
+            LOG.debug("page %r", page)
 
             try:
                 if page == max_pages:
@@ -85,7 +105,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
                 fentry = data['search-results']['entry'][0]['citedby-count']
                 if int(fentry) == 0:
                     raise GeneratorExit("no more articles with citations")
-                LOG.info("fentry: %r", fentry)
+                LOG.debug("fentry: %r", fentry)
 
             except requests.HTTPError as err:
                 raise GeneratorExit(str(err))
@@ -93,7 +113,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     except GeneratorExit:
         return
 
-def _extract(search_result_entry):
+def extract(search_result_entry):
     "ingests a single search result from scopus"
     data = search_result_entry
     citedby_link = first(filter(lambda d: d["@ref"] == "scopus-citedby", data['link']))
@@ -108,26 +128,34 @@ def _extract(search_result_entry):
         LOG.error("key error for: %s", search_result_entry)
         return {'bad': search_result_entry}
 
-def extract(search_result):
+#
+#
+#
+    
+def qmap(fn, lst):
+    "returns an rq.Queue object populated with jobs from applying fn to lst"
+    q = django_rq.get_queue()
+    if isinstance(lst, rq.Queue):
+        # create a dependant job on the result of an existing job
+        [q.enqueue(fn, job, depends_on=job) for job in lst]
+    else:
+        [q.enqueue(fn, x) for x in lst]
+        return q
+
+def extract_entries(search_result):
     "extracts citation counts from a page of search results from scopus"
-    return map(_extract, search_result['entry'])
+    extracted_entries = qmap(extract, search_result['entry'])
+    return qmap(handler, extracted_entries)
 
 def all_entries(search_result_list):
     "returns a list of 'entries', citation information for articles from a list of search result pages"
-    return flatten(map(extract, search_result_list))
-
-def is_abstract(entry):
-    # ll 10.7554/eLife.22757.001
-    return len(entry['doi'].split('.')) == 4
-
-def not_abstract(entry):
-    return not is_abstract(entry)
+    return qmap(extract_entries, search_result_list)
 
 #
 #
 #
 
-def all_todays_entries():
-    "convenience"
-    # return filter(not_abstract, all_entries(list(search())))
-    return all_entries(list(search()))
+def runner(insert_func, discard_func):
+    "called by the core app with the means to handle any data that is extracted"
+    return all_entries(search())
+
