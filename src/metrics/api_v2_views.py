@@ -113,5 +113,5 @@ def article_metrics(request, id, metric):
         raise ValidationError(err) # 400, client error
 
     except Exception as err:
-        LOG.exception("unhandled exception attempting to serve article mertrics: %s", err)
+        LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
         raise # 500, server error
