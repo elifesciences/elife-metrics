@@ -6,6 +6,7 @@ from django.conf import settings
 from datetime import timedelta
 from metrics import models # good idea reaching back?
 from metrics.utils import first, flatten
+from pprint import pformat
 
 LOG = logging.getLogger(__name__)
 
@@ -96,16 +97,19 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 def _extract(search_result_entry):
     "ingests a single search result from scopus"
     data = search_result_entry
-    citedby_link = first(filter(lambda d: d["@ref"] == "scopus-citedby", data['link']))
     try:
+        citedby_link = first(filter(lambda d: d["@ref"] == "scopus-citedby", data['link']))
         return {
             'doi': data['prism:doi'],
             'num': int(data['citedby-count']),
             'source': models.SCOPUS,
             'source_id': citedby_link['@href']
         }
-    except KeyError:
-        LOG.error("key error for: %s", search_result_entry)
+    # except KeyError:
+    #    LOG.error("key error for: %s", search_result_entry)
+    #    return {'bad': search_result_entry}
+    except Exception as err:
+        LOG.exception("unhandled error %r for: %s" % (err, pformat(search_result_entry)))
         return {'bad': search_result_entry}
 
 def extract(search_result):
