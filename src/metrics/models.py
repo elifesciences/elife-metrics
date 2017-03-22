@@ -1,7 +1,25 @@
 from django.db import models
+from django.conf import settings
+from django.core.exceptions import ValidationError
+
+from django.dispatch import receiver
+from django.db.models.signals import pre_save
+
+@receiver(pre_save)
+def pre_save_handler(sender, instance, *args, **kwargs):
+    # validate everything before save.
+    instance.full_clean()
+
+def validate_doi(val):
+    "validates given value is not just any doi, but a known doi"
+    known_doi_prefix_list = [settings.DOI_PREFIX]
+    for prefix in known_doi_prefix_list:
+        if str(val).startswith(prefix):
+            return
+    raise ValidationError('%r has an unknown doi prefix. known prefixes: %r' % (val, known_doi_prefix_list))
 
 class Article(models.Model):
-    doi = models.CharField(max_length=255, unique=True, help_text="article identifier")
+    doi = models.CharField(max_length=255, unique=True, help_text="article identifier", validators=[validate_doi])
     pmid = models.PositiveIntegerField(unique=True, blank=True, null=True)
     pmcid = models.CharField(max_length=10, unique=True, blank=True, null=True)
 

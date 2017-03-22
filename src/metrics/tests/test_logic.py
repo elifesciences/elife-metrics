@@ -55,6 +55,7 @@ class TestGAImport(BaseCase):
             'period': 'day',
             'date': '2001-01-01',
             'doi': '10.7554/DUMMY',
+            'source': models.GA,
         }
         logic.insert_row(ds1)
         self.assertEqual(1, models.Article.objects.count())
@@ -70,6 +71,7 @@ class TestGAImport(BaseCase):
             'period': 'day',
             'date': '2001-01-01',
             'doi': '10.7554/DUMMY',
+            'source': models.GA,
         }
         logic.insert_row(expected_update)
         self.assertEqual(1, models.Metric.objects.count())
