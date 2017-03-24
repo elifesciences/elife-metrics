@@ -1,12 +1,17 @@
-import os
+import os, json
 from django.test import TestCase as DjangoTestCase
 import unittest
 from metrics import utils, models, logic
 
+def resp_json(resp):
+    # json.loads(resp.bytes.decode('utf-8')) # python3
+    return json.loads(resp.content.decode('utf-8')) # resp.json() fails with header issues
+
 def insert_metrics(abbr_map):
     "function to bypass scraping logic and insert metrics and citations directly into db"
     def wrangle(msid, data):
-        citations = full = abstract = digest = pdf = 0
+        full = abstract = digest = pdf = 0
+        citations = [0]
         period = models.DAY
         date = utils.utcnow()
 
@@ -31,13 +36,23 @@ def insert_metrics(abbr_map):
             'digest': digest,
             'pdf': pdf
         })
-        citation = logic.insert_citation({
-            'doi': utils.msid2doi(msid),
-            'source': models.CROSSREF,
-            'num': citations,
-            'source_id': 'asdf'
-        })
-        return metric, citation
+
+        if isinstance(citations, int):
+            citations = [citations]
+
+        citations = zip(citations, [models.CROSSREF, models.SCOPUS, models.PUBMED])
+        # ll: [(1, 'crossref')]
+        # ll: [(1, 'crossref'), (1, 'scopus')]
+        # ll: [(1, 'crossref'), (1, 'scopus'), (1, 'pubmed')]
+        citation_objs = []
+        for citation_count, source in citations:
+            citation_objs.append(logic.insert_citation({
+                'doi': utils.msid2doi(msid),
+                'source': source,
+                'num': citation_count,
+                'source_id': 'asdf'
+            }))
+        return metric, citation_objs
     return [wrangle(msid, data) for msid, data in abbr_map.items()]
 
 class SimpleBaseCase(unittest.TestCase):
@@ -51,6 +66,10 @@ class BaseCase(SimpleBaseCase, DjangoTestCase):
     # https://docs.djangoproject.com/en/1.10/topics/testing/tools/#django.test.TestCase
     pass
 
+
+#
+#
+#
 
 class BaseLogic(BaseCase):
     def test_insert_metrics(self):
@@ -72,3 +91,15 @@ class BaseLogic(BaseCase):
 
             models.Metric.objects.get(article__doi=doi, pdf=downloads, full=views)
             models.Citation.objects.get(article__doi=doi, num=citations)
+
+    def test_insert_metrics_many_citations(self):
+        cases = {
+            # msid, citations, downloads, views
+            '1234': ([1, 2, 3], 0, 0),
+            '5678': ([4, 5, 6], 0, 0),
+        }
+        insert_metrics(cases)
+        self.assertEqual(models.Article.objects.count(), len(cases.keys()))
+        self.assertEqual(models.Metric.objects.count(), len(cases.keys()))
+
+        self.assertEqual(models.Citation.objects.count(), len(cases.keys()) * 3)

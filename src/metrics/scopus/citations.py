@@ -86,7 +86,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
                 fentry = data['search-results']['entry'][0]['citedby-count']
                 if int(fentry) == 0:
                     raise GeneratorExit("no more articles with citations")
-                LOG.info("fentry: %r", fentry)
+                LOG.debug("fentry: %r", fentry)
 
             except requests.HTTPError as err:
                 raise GeneratorExit(str(err))
