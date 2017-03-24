@@ -13,6 +13,77 @@ class ApiV2(base.BaseCase):
     def tearDown(self):
         pass
 
+    def test_order_param_on_citations(self):
+        "the '?order=' parameter affecting result ordering"
+        cases = {
+            # msid, citations, downloads, views
+            # crossref, scopus, pubmed
+            '1234': ([
+                2, # crossref
+                3, # scopus
+                1, # pubmed
+            ], 0, 0),
+        }
+        base.insert_metrics(cases)
+
+        expected_response = [
+            {
+                'service': models.PUBMED,
+                'uri': 'asdf',
+                'citations': 1
+            },
+            {
+                'service': models.CROSSREF,
+                'uri': 'asdf',
+                'citations': 2
+            },
+            {
+                'service': models.SCOPUS,
+                'uri': 'asdf',
+                'citations': 3
+            },
+
+        ]
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
+        resp = self.c.get(url, {'order': 'asc'})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(base.resp_json(resp), expected_response)
+
+    def test_order_param_on_citations_rev(self):
+        "the '?order=' parameter affecting result ordering"
+        cases = {
+            # msid, citations, downloads, views
+            # crossref, scopus, pubmed
+            '1234': ([
+                2, # crossref
+                3, # scopus
+                1, # pubmed
+            ], 0, 0),
+        }
+        base.insert_metrics(cases)
+
+        expected_response = [
+            {
+                'service': models.SCOPUS,
+                'uri': 'asdf',
+                'citations': 3
+            },
+            {
+                'service': models.CROSSREF,
+                'uri': 'asdf',
+                'citations': 2
+            },
+            {
+                'service': models.PUBMED,
+                'uri': 'asdf',
+                'citations': 1
+            },
+        ]
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
+        resp = self.c.get(url, {'order': 'desc'})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(base.resp_json(resp), expected_response)
+
     def test_non_int_page_param(self):
         "a '?page=foo' type param results in a 400 error"
         for metric in self.metric_list:

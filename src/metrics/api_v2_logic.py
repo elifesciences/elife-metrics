@@ -14,7 +14,7 @@ def chop(q, page, per_page, order):
     order_by = order_by_idx[q.model]
 
     # switch directions if descending (default ASC)
-    if order is 'DESC':
+    if order == 'DESC':
         order_by = '-' + order_by
 
     q = q.order_by(order_by)
