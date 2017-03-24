@@ -69,6 +69,7 @@ def _fetch_pmids(doi):
 def resolve_pmcid(artobj):
     pmcid = artobj.pmcid
     if pmcid:
+        LOG.debug("no pmcid fetch necessary")
         return pmcid
     data = _fetch_pmids(artobj.doi)
     return first(utils.create_or_update(models.Article, data, ['doi'], create=False, update=True)).pmcid
@@ -122,11 +123,21 @@ def parse_results(results):
             #'links': cited_by # PMC ids of articles linking to this one
         }
     data = results['linksets']
-    return map(parse, data)
+    data = map(parse, data)
+
+    def good_row(row):
+        # need to figure our where these are sneaking in
+        return row['pmcid'] != 'PMC0'
+
+    data = filter(good_row, data)
+    return data
+
+#
+#
+#
 
 def count_for_obj(art):
     if not art.pmcid:
-        # TODO:
         raise ValueError("art has no pmcid")
     return parse_results(fetch([art.pmcid]))
 
@@ -136,12 +147,12 @@ def count_for_doi(doi):
 def count_for_msid(msid):
     return count_for_obj(models.Article.objects.get(doi=utils.msid2doi(msid)))
 
+#
+#
+#
+
 def count_for_qs(qs):
     return parse_results(fetch(lmap(resolve_pmcid, qs)))
-
-#
-#
-#
 
 def citations_for_all_articles():
     return count_for_qs(models.Article.objects.all())
