@@ -5,7 +5,7 @@ import requests_cache
 from django.conf import settings
 from datetime import timedelta
 from metrics import models # good idea reaching back?
-from metrics.utils import first, flatten
+from metrics.utils import first, flatten, lmap
 from pprint import pformat
 
 LOG = logging.getLogger(__name__)
@@ -98,7 +98,7 @@ def _extract(search_result_entry):
     "ingests a single search result from scopus"
     data = search_result_entry
     try:
-        citedby_link = first(filter(lambda d: d["@ref"] == "scopus-citedby", data['link']))
+        citedby_link = first([d for d in data['link'] if d["@ref"] == "scopus-citedby"])
         return {
             'doi': data['prism:doi'],
             'num': int(data['citedby-count']),
@@ -114,11 +114,11 @@ def _extract(search_result_entry):
 
 def extract(search_result):
     "extracts citation counts from a page of search results from scopus"
-    return map(_extract, search_result['entry'])
+    return lmap(_extract, search_result['entry'])
 
 def all_entries(search_result_list):
     "returns a list of 'entries', citation information for articles from a list of search result pages"
-    return flatten(map(extract, search_result_list))
+    return flatten(lmap(extract, search_result_list))
 
 def is_abstract(entry):
     # ll 10.7554/eLife.22757.001

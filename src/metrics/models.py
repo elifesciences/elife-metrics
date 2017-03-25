@@ -26,7 +26,7 @@ class Article(models.Model):
     class Meta:
         ordering = ('-doi',)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.doi
 
     def __repr__(self):
@@ -84,11 +84,11 @@ class Metric(models.Model):
             'date': self.date,
         }
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s,%s,%s,%s,%s,%s' % (self.article, self.date, self.source, self.full, self.pdf, self.digest)
 
     def __repr__(self):
-        return u'<Metric %s>' % self.__unicode__()
+        return '<Metric %s>' % self
 
 #
 #
@@ -122,7 +122,7 @@ class Citation(models.Model):
         unique_together = ('article', 'source')
         ordering = ('-num',)
 
-    def __unicode__(self):
+    def __str__(self):
         # ll: 10.7554/eLife.09560,crossref,33
         return '%s,%s,%s' % (self.article, self.source, self.num)
 

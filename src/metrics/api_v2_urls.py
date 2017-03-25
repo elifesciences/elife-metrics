@@ -1,5 +1,5 @@
 from django.conf.urls import url
-import api_v2_views as views
+from . import api_v2_views as views
 
 urlpatterns = [
     # article-level metrics

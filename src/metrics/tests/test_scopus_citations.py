@@ -1,4 +1,4 @@
-import base
+from . import base
 from metrics.scopus import citations
 from django.conf import settings
 

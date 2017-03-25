@@ -1,7 +1,7 @@
 import json
 from metrics import models
 from django.test import Client
-import base
+from . import base
 from django.core.urlresolvers import reverse
 from metrics.utils import ymd, ym, utcnow
 

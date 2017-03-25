@@ -9,7 +9,7 @@ essentially the same as elife_v2 BUT the version suffix is now optional.
 """
 
 # we can reuse these functions
-import elife_v1
+from . import elife_v1
 # these seemingly unused imports are actually used
 from .elife_v1 import group_results
 import re

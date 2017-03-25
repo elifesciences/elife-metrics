@@ -5,8 +5,8 @@ from django.conf import settings
 from rest_framework.decorators import api_view
 from et3.render import render_item
 from et3.extract import path as p
-from utils import isint, ensure, exsubdict, lmap, msid2doi
-import api_v2_logic as logic
+from .utils import isint, ensure, exsubdict, lmap, msid2doi
+from . import api_v2_logic as logic
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 
@@ -38,9 +38,9 @@ def request_args(request, **overrides):
     desc = {
         'page': [p('page', opts['page_num']), ispositiveint],
         'per_page': [p('per-page', opts['per_page']), ispositiveint, inrange(opts['min_per_page'], opts['max_per_page'])],
-        'order': [p('order', opts['order_direction']), string.upper, isin(['ASC', 'DESC'])],
+        'order': [p('order', opts['order_direction']), string.ascii_uppercase, isin(['ASC', 'DESC'])],
 
-        'period': [p('by', 'day'), string.lower, isin(['day', 'month'])],
+        'period': [p('by', 'day'), string.ascii_lowercase, isin(['day', 'month'])],
     }
     return render_item(desc, request.GET)
 

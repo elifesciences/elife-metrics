@@ -31,7 +31,7 @@ def eargs(fn):
 
 # http://stackoverflow.com/questions/3744451/is-this-how-you-paginate-or-is-there-a-better-algorithm
 def paginate(seq, rowlen):
-    for start in xrange(0, len(seq), rowlen):
+    for start in range(0, len(seq), rowlen):
         yield seq[start:start + rowlen]
 
 def complement(pred):
@@ -41,7 +41,7 @@ def complement(pred):
     return wrapper
 
 def splitfilter(func, data):
-    return filter(func, data), filter(complement(func), data)
+    return lfilter(func, data), lfilter(complement(func), data)
 
 def flatten(nested_list):
     return [item for sublist in nested_list for item in sublist]

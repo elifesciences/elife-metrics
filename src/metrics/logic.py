@@ -1,15 +1,15 @@
 from functools import partial
 from datetime import datetime, timedelta
-import ga_metrics
-from ga_metrics import bulk
+from . import ga_metrics
+from .ga_metrics import bulk
 from django.conf import settings
-import models
+from . import models
 from django.db import transaction
-import utils
-from utils import first, create_or_update, ensure, splitfilter, comp
+from . import utils
+from .utils import first, create_or_update, ensure, splitfilter, comp, lmap
 from django import db
 import logging
-import events
+from . import events
 
 LOG = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         views['pdf'] = downloads or 0
         views['doi'] = doi
         views['source'] = models.GA
-        row = dict(zip(['period', 'date'], format_dt_pair(dt_pair)))
+        row = dict(list(zip(['period', 'date'], format_dt_pair(dt_pair))))
         row.update(views)
         return row
 
@@ -78,7 +78,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         if len(queue) == 1000 or force:
             LOG.info("committing %s objects to db", len(queue))
             with transaction.atomic():
-                map(insert_row, queue)
+                lmap(insert_row, queue)
             queue = []
             db.reset_queries()
             # NOTE: this problem isn't solved, it's still leaking memory
@@ -95,7 +95,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         downloads = metrics['downloads']
         views = metrics['views']
 
-        doi_list = set(views.keys()).union(downloads.keys())
+        doi_list = set(list(views.keys())).union(list(downloads.keys()))
         for doi in doi_list:
             queue.append(create_row(doi, dt_pair, views.get(doi), downloads.get(doi)))
             queue = commit_rows(queue)
@@ -124,21 +124,21 @@ def countable(triple):
         return citation
 
 def import_scopus_citations():
-    from scopus.citations import all_todays_entries
+    from .scopus.citations import all_todays_entries
     results = all_todays_entries()
     good_eggs, bad_eggs = splitfilter(lambda e: 'bad' not in e, results)
     LOG.error("refusing to insert bad entries: %s", bad_eggs)
-    return map(comp(insert_citation, countable), good_eggs)
+    return lmap(comp(insert_citation, countable), good_eggs)
 
 def import_pmc_citations():
-    from pm.citations import citations_for_all_articles
+    from .pm.citations import citations_for_all_articles
     results = citations_for_all_articles()
-    return map(comp(partial(insert_citation, aid='pmcid'), countable), results)
+    return lmap(comp(partial(insert_citation, aid='pmcid'), countable), results)
 
 def import_crossref_citations():
-    from crossref.citations import citations_for_all_articles
+    from .crossref.citations import citations_for_all_articles
     results = citations_for_all_articles()
-    return map(comp(insert_citation, countable), filter(None, results))
+    return lmap(comp(insert_citation, countable), filter(None, results))
 
 #
 #
@@ -150,4 +150,4 @@ def notify(obj_list):
     # a citation wasn't created or updated.
     lst = filter(None, obj_list)
     # send events for all those that have changed
-    return len(map(events.notify, lst))
+    return len(lmap(events.notify, lst))

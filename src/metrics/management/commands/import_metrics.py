@@ -76,13 +76,13 @@ class Command(BaseCommand):
                 try:
                     first(row)(*rest(row))
                 except KeyboardInterrupt:
-                    print 'ctrl-c caught.'
-                    print 'use ctrl-c again to abort immediately'
+                    print('ctrl-c caught.')
+                    print('use ctrl-c again to abort immediately')
                     time.sleep(1)
 
         except KeyboardInterrupt:
-            print 'caught second ctrl-c'
-            print 'quitting'
+            print('caught second ctrl-c')
+            print('quitting')
             exit(1)
 
         self.stdout.write("...done\n")

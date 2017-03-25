@@ -40,7 +40,7 @@ def insert_metrics(abbr_map):
         if isinstance(citations, int):
             citations = [citations]
 
-        citations = zip(citations, [models.CROSSREF, models.SCOPUS, models.PUBMED])
+        citations = list(zip(citations, [models.CROSSREF, models.SCOPUS, models.PUBMED]))
         # ll: [(1, 'crossref')]
         # ll: [(1, 'crossref'), (1, 'scopus')]
         # ll: [(1, 'crossref'), (1, 'scopus'), (1, 'pubmed')]

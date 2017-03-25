@@ -1,6 +1,6 @@
-import models
-import utils
-from utils import ensure, rest, lmap
+from . import models
+from . import utils
+from .utils import ensure, rest, lmap
 from django.db.models import Sum, F, Max
 
 def chop(q, page, per_page, order):
@@ -29,7 +29,7 @@ def chop(q, page, per_page, order):
 
 def pad_citations(serialized_citation_response):
     cr = serialized_citation_response
-    known_sources = dict(models.source_choices()).keys()
+    known_sources = list(dict(models.source_choices()).keys())
     missing_sources = set(known_sources) - set([cite['service'] for cite in cr])
 
     def pad(source):

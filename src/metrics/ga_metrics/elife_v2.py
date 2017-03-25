@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # we can reuse these functions
-import elife_v1
+from . import elife_v1
 from .elife_v1 import group_results
 import re
 import logging

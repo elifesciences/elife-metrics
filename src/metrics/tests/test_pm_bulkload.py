@@ -1,6 +1,6 @@
 from django.conf import settings
 from metrics.pm import bulkload_pmids
-import base
+from . import base
 from metrics import models
 from os.path import join
 

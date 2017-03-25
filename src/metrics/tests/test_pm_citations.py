@@ -1,4 +1,4 @@
-import base
+from . import base
 from metrics.pm import citations
 from metrics import models
 
@@ -60,8 +60,6 @@ class PM(base.BaseCase):
             self.assertTrue(toplevel in given)
         expected = 1 # one result
         self.assertTrue(expected, len(given['linksets']))
-
-        print 'given', given
 
         result = given['linksets'][0]
         self.assertTrue('linksetdbs' in result)

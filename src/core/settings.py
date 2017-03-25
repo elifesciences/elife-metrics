@@ -8,7 +8,7 @@ example settings can be found in /path/to/lax/elife.cfg
 import os
 from os.path import join
 from datetime import datetime
-import ConfigParser as configparser
+import configparser
 from pythonjsonlogger import jsonlogger
 import yaml
 from et3.render import render_item
@@ -36,7 +36,7 @@ def cfg(path, default=0xDEADBEEF):
             raise ValueError("no value/section set for setting at %r" % path)
         return default
     except Exception as err:
-        print 'error on %r: %s' % (path, err)
+        print(('error on %r: %s' % (path, err)))
 
 # used to know how far to go back in metrics gathering
 INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
@@ -232,10 +232,10 @@ def writable(path):
     os.system('touch ' + path)
     # https://docs.python.org/2/library/os.html
     assert os.access(path, os.W_OK), "file doesn't exist or isn't writable: %s" % path
-map(writable, [LOG_FILE])
+list(map(writable, [LOG_FILE]))
 
 ATTRS = ['asctime', 'created', 'levelname', 'message', 'filename', 'funcName', 'lineno', 'module', 'pathname']
-FORMAT_STR = ' '.join(map(lambda v: '%(' + v + ')s', ATTRS))
+FORMAT_STR = ' '.join(['%(' + v + ')s' for v in ATTRS])
 
 LOGGING = {
     'version': 1,

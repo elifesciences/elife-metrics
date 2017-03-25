@@ -11,8 +11,9 @@ __author__ = [
 import re
 from collections import Counter
 from datetime import datetime
-import utils
+from . import utils
 from .utils import ymd
+from ..utils import lmap
 import logging
 from functools import reduce
 
@@ -47,7 +48,7 @@ def event_counts(row_list):
     def parse(row):
         label, count = row
         return label.split('::')[0], int(count)
-    return dict(map(parse, row_list))
+    return dict(lmap(parse, row_list))
 
 #
 # views handling
@@ -156,7 +157,7 @@ def group_results(triplet_list):
         a.update(b)
         return a
 
-    return {utils.enplumpen(art): reduce(update, group) for art, group in article_groups.items()}
+    return {utils.enplumpen(art): reduce(update, group) for art, group in list(article_groups.items())}
 
 def path_counts(path_count_pairs):
     """takes raw path data from GA and groups by article, returning a

@@ -1,6 +1,6 @@
 from os.path import join
 from metrics import models, utils
-from metrics.utils import ensure, lmap, subdict, first
+from metrics.utils import ensure, lmap, subdict, first, lfilter
 import requests
 import requests_cache
 from datetime import timedelta
@@ -123,13 +123,13 @@ def parse_results(results):
             #'links': cited_by # PMC ids of articles linking to this one
         }
     data = results['linksets']
-    data = map(parse, data)
+    data = lmap(parse, data)
 
     def good_row(row):
         # need to figure our where these are sneaking in
         return row['pmcid'] != 'PMC0'
 
-    data = filter(good_row, data)
+    data = lfilter(good_row, data)
     return data
 
 #

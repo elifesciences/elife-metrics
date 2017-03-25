@@ -25,7 +25,7 @@ import logging
 from django.conf import settings
 
 
-import elife_v1, elife_v2, elife_v3
+from . import elife_v1, elife_v2, elife_v3
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)
@@ -325,8 +325,8 @@ def main(table_id):
     # use cache if available. use cache exclusively if the client-secrets.json file not found
     #use_cached, use_only_cached = True, not os.path.exists('client-secrets.json')
     use_cached, use_only_cached = True, not oauth_secrets()
-    print 'cached?', use_cached
-    print 'only cached?', use_only_cached
+    print(('cached?', use_cached))
+    print(('only cached?', use_only_cached))
     #use_cached = use_only_cached = False
     return article_metrics(table_id, from_date, to_date, use_cached, use_only_cached)
 

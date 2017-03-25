@@ -1,4 +1,4 @@
-import base
+from . import base
 from django.core.urlresolvers import reverse
 from django.test import Client
 

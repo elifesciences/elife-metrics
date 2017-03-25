@@ -1,4 +1,4 @@
-import base
+from . import base
 from datetime import datetime, timedelta
 from metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, utils
 
@@ -31,7 +31,7 @@ class TestCore(base.SimpleBaseCase):
             try:
                 self.assertEqual(expected_module, core.module_picker(dt, dt))
             except AssertionError:
-                print 'failed to find', expected_module, 'for date starting', dt
+                print(('failed to find', expected_module, 'for date starting', dt))
                 raise
 
     def test_module_picker_monthly(self):
@@ -55,5 +55,5 @@ class TestCore(base.SimpleBaseCase):
             try:
                 self.assertEqual(expected_module, actual)
             except AssertionError:
-                print 'given:', dtpair, 'expected:', expected_module, 'got', actual
+                print(('given:', dtpair, 'expected:', expected_module, 'got', actual))
                 raise

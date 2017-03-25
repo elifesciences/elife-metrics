@@ -1,4 +1,4 @@
-import base
+from . import base
 from metrics.ga_metrics import core
 from apiclient import errors
 
