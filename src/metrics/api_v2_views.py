@@ -2,7 +2,8 @@ from metrics import models
 from django.shortcuts import get_object_or_404
 import string
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import StaticHTMLRenderer
 from et3.render import render_item
 from et3.extract import path as p
 from utils import isint, ensure, exsubdict, lmap, msid2doi
@@ -79,6 +80,11 @@ def serialize(total_results, sum_value, obj_list, metric):
 #
 #
 #
+
+@api_view(['GET'])
+@renderer_classes((StaticHTMLRenderer,))
+def ping(request):
+    return Response('pong', content_type='text/plain; charset=UTF-8', headers={'Cache-Control': 'must-revalidate, no-cache, no-store, private'})
 
 @api_view(['GET'])
 def article_metrics(request, id, metric):
