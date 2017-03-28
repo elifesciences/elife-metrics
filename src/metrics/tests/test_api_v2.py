@@ -3,7 +3,6 @@ from metrics import models
 from django.test import Client
 import base
 from django.core.urlresolvers import reverse
-from metrics.utils import ymd, ym, utcnow
 
 class ApiV2(base.BaseCase):
     def setUp(self):
@@ -183,7 +182,7 @@ class ApiV2(base.BaseCase):
             'totalValue': 1,
             'periods': [
                 {
-                    'period': ymd(utcnow()),
+                    'period': '2001-01-01',
                     'value': 1
                 }
             ]
@@ -203,7 +202,7 @@ class ApiV2(base.BaseCase):
             'totalValue': 1,
             'periods': [
                 {
-                    'period': ymd(),
+                    'period': '2001-01-01',
                     'value': 1
                 }
             ]
@@ -223,7 +222,7 @@ class ApiV2(base.BaseCase):
             'totalValue': 1,
             'periods': [
                 {
-                    'period': ym(),
+                    'period': '2001-01',
                     'value': 1
                 }
             ]
@@ -243,7 +242,7 @@ class ApiV2(base.BaseCase):
             'totalValue': 1,
             'periods': [
                 {
-                    'period': ym(),
+                    'period': '2001-01',
                     'value': 1
                 }
             ]
