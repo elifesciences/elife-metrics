@@ -24,6 +24,11 @@ def insert_metrics(abbr_list):
         else:
             raise ValueError("cannot handle row of length %s" % len(data))
 
+        # allows us to pass in a triple for better testing
+        if isinstance(full, int):
+            full = [full, abstract, digest]
+        full, abstract, digest = full
+
         # format date
         fn = utils.ym if period == models.MONTH else utils.ymd
         date = fn(date)
