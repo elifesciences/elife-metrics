@@ -48,7 +48,6 @@ class ApiV2(base.BaseCase):
                 'uri': 'asdf',
                 'citations': 3
             },
-
         ]
         url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
         resp = self.c.get(url, {'order': 'asc'})
@@ -191,6 +190,27 @@ class ApiV2(base.BaseCase):
                 {
                     'period': '2001-01-01',
                     'value': 1
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_daily_views2(self):
+        "all three of full, abstract and digest daily views are counted"
+        cases = {
+            1234: (0, 0, (1, 2, 3))
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 6,
+            'periods': [
+                {
+                    'period': '2001-01-01',
+                    'value': 6
                 }
             ]
         }

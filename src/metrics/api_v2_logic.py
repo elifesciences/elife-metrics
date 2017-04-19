@@ -60,7 +60,7 @@ def article_stats(msid, period):
         .filter(source=models.GA) \
         .filter(period=period)
     sums = qobj.aggregate(
-        views=Sum(F('full') + F('abstract')),
+        views=Sum(F('full') + F('abstract') + F('digest')),
         downloads=Sum('pdf'))
     return sums['views'] or 0, sums['downloads'] or 0, qobj
 
