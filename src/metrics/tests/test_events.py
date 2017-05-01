@@ -8,6 +8,24 @@ class One(base.TransactionBaseCase):
         pass
 
     @override_settings(DEBUG=False) # bypass notify() shortcircuit
+    def test_new_metric_sends_article_update(self):
+        self.msid = 1234
+        cases = {
+            # msid, citations, downloads, views
+            self.msid: (0, 1, 1), # 1 download, 1 view
+        }
+        expected_event = json.dumps({
+            "type": "metrics",
+            "contentType": "article",
+            "id": self.msid,
+            "metric": "views-downloads"
+        })
+        mock = Mock()
+        with patch('metrics.events.event_bus_conn', return_value=mock):
+            base.insert_metrics(cases)
+            mock.publish.assert_called_once_with(Message=expected_event)
+
+    @override_settings(DEBUG=False) # bypass notify() shortcircuit
     def test_new_citation_sends_article_update(self):
         self.msid = 1234
         cases = {
