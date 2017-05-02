@@ -1,5 +1,5 @@
 import os, json
-from django.test import TestCase as DjangoTestCase
+from django.test import TestCase as DjangoTestCase, TransactionTestCase
 import unittest
 from metrics import utils, models, logic
 from datetime import timedelta, datetime
@@ -81,6 +81,8 @@ class BaseCase(SimpleBaseCase, DjangoTestCase):
     # https://docs.djangoproject.com/en/1.10/topics/testing/tools/#django.test.TestCase
     pass
 
+class TransactionBaseCase(SimpleBaseCase, TransactionTestCase):
+    pass
 
 #
 #

@@ -7,7 +7,6 @@ import models
 from django.db import transaction
 import utils
 from utils import first, create_or_update, ensure, splitfilter, comp
-from django import db
 import logging
 import events
 
@@ -27,12 +26,36 @@ def format_dt_pair(dt_pair):
         return models.MONTH, from_date[:7]
     raise ValueError("given dtpair %r but it doesn't look like a daily or monthly result!" % str(dt_pair))
 
-def insert_row(data):
+#
+#
+#
+
+def notify(obj):
+    if not transaction.get_autocommit():
+        # we're inside a managed transaction.
+        # send the notification only after successful commit
+        transaction.on_commit(partial(events.notify, obj))
+    else:
+        events.notify(obj)
+
+def _insert_row(data):
     article_obj = first(create_or_update(models.Article, {'doi': data['doi']}, ['doi'], create=True, update=False))
     row = utils.exsubdict(data, ['doi'])
     row['article'] = article_obj
     key = utils.subdict(row, ['article', 'date', 'period', 'source'])
-    return first(create_or_update(models.Metric, row, key, create=True, update=True, update_check=True))
+    obj = first(create_or_update(models.Metric, row, key, create=True, update=True, update_check=True))
+    notify(obj)
+    return obj
+
+@transaction.atomic
+def insert_row(data):
+    """inserts a metric into the database within a transaction. DO NOT USE if you are inserting many
+    metrics. use `insert_many_rows` or your performance will suffer greatly"""
+    return _insert_row(data)
+
+@transaction.atomic
+def insert_many_rows(data_list):
+    return map(_insert_row, data_list)
 
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from inception"
@@ -55,7 +78,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
 
-    def create_row(doi, dt_pair, views, downloads):
+    def create_row(doi, period, views, downloads):
         "wrangles the data into a format suitable for `insert_row`"
         if not views:
             views = {
@@ -66,44 +89,18 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         views['pdf'] = downloads or 0
         views['doi'] = doi
         views['source'] = models.GA
-        row = dict(zip(['period', 'date'], format_dt_pair(dt_pair)))
+        row = dict(zip(['period', 'date'], format_dt_pair(period)))
         row.update(views)
         return row
 
-    # ok, this is a bit hacky, but on very long runs (when we do a full import for example) the
-    # kernel will kill the process for being a memory hog
-    #@transaction.atomic
-    def commit_rows(queue, force=False):
-        "commits the objects in the queue every time it hits 1000 objects or is told otherwise"
-        if len(queue) == 1000 or force:
-            LOG.info("committing %s objects to db", len(queue))
-            with transaction.atomic():
-                map(insert_row, queue)
-            queue = []
-            db.reset_queries()
-            # NOTE: this problem isn't solved, it's still leaking memory
-
-        return queue
-
-    # whatever mode we're in, ensure debug is off for import
-    # TODO: does this even work???
-    old_setting = settings.DEBUG
-    settings.DEBUG = False
-
-    queue = []
-    for dt_pair, metrics in results.items():
-        downloads = metrics['downloads']
-        views = metrics['views']
-
+    for period, metrics in results.items():
+        views, downloads = metrics['views'], metrics['downloads']
+        # there is often a disjoint between articles that have been viewed and those downloaded within a period
+        # what we do is create a record for *all* articles seen, even if their views or downloads may not exist
         doi_list = set(views.keys()).union(downloads.keys())
-        for doi in doi_list:
-            queue.append(create_row(doi, dt_pair, views.get(doi), downloads.get(doi)))
-            queue = commit_rows(queue)
-
-    # commit any remaining
-    commit_rows(queue, force=True)
-    settings.DEBUG = old_setting
-
+        row_list = [create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
+        # insert the rows in batches of 1000
+        map(insert_many_rows, utils.partition(row_list, 1000))
 
 #
 # citations
@@ -115,7 +112,10 @@ def insert_citation(data, aid='doi'):
     row = utils.exsubdict(data, [aid])
     row['article'] = article_obj
     key = utils.subdict(row, ['article', 'source'])
-    return create_or_update(models.Citation, row, key, create=True, update=True, update_check=True)
+    res = create_or_update(models.Citation, row, key, create=True, update=True, update_check=True)
+    obj = res[0]
+    notify(obj)
+    return res
 
 def countable(triple):
     "if the citation has been created or modified, return the object"
@@ -139,15 +139,3 @@ def import_crossref_citations():
     from crossref.citations import citations_for_all_articles
     results = citations_for_all_articles()
     return map(comp(insert_citation, countable), filter(None, results))
-
-#
-#
-#
-
-def notify(obj_list):
-    "given a list of Citation or Metric objects, sends 'updated' events for each one"
-    # the output from the `import_*_citations` may contain None values if
-    # a citation wasn't created or updated.
-    lst = filter(None, obj_list)
-    # send events for all those that have changed
-    return len(map(events.notify, lst))

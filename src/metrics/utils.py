@@ -82,7 +82,7 @@ def doi2msid(doi):
     "doi to manuscript id used in EJP"
     prefix = '10.7554/eLife.'
     ensure(doi.startswith(prefix), "this doesn't look like an eLife doi: %s" % prefix)
-    return doi[len(prefix):].lstrip('0')
+    return int(doi[len(prefix):].lstrip('0'))
 
 def msid2doi(msid):
     assert isint(msid), "given msid must be an integer: %r" % msid
@@ -193,3 +193,14 @@ def create_or_update(Model, orig_data, key_list, create=True, update=True, updat
     # it is possible to neither create nor update.
     # in this case if the model cannot be found then None is returned: (None, False, False)
     return (inst, created, updated)
+
+# http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
+def partition(seq, size):
+    res = []
+    for el in seq:
+        res.append(el)
+        if len(res) == size:
+            yield res
+            res = []
+    if res:
+        yield res
