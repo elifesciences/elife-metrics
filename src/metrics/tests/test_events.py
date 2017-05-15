@@ -1,7 +1,7 @@
 import json
 import base
 from mock import patch, Mock
-from metrics import models, logic, utils
+from metrics import models, logic
 from django.test import override_settings
 
 class One(base.TransactionBaseCase):
@@ -16,7 +16,7 @@ class One(base.TransactionBaseCase):
             'abstract': 0,
             'digest': 0,
             'pdf': 0,
-            'doi': utils.msid2doi(self.msid),
+            'doi': '10.7554/eLife.01234',
             'source': models.GA,
             'period': models.DAY,
             'date': '2001-01-01'
@@ -24,7 +24,7 @@ class One(base.TransactionBaseCase):
         expected_event = json.dumps({
             "type": "metrics",
             "contentType": "article",
-            "id": self.msid,
+            "id": "01234",
             "metric": "views-downloads"
         })
         mock = Mock()
@@ -36,7 +36,7 @@ class One(base.TransactionBaseCase):
     def test_new_citation_sends_article_update(self):
         self.msid = 1234
         citation_data = {
-            'doi': utils.msid2doi(self.msid),
+            'doi': '10.7554/eLife.01234',
             'num': 1,
             'source': models.CROSSREF,
             'source_id': 'pants-party'
@@ -44,7 +44,7 @@ class One(base.TransactionBaseCase):
         expected_event = json.dumps({
             "type": "metrics",
             "contentType": "article",
-            "id": self.msid,
+            "id": "01234",
             "metric": "citations"
         })
         mock = Mock()
