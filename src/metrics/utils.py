@@ -78,11 +78,15 @@ def ensure(assertion, msg, *args):
     if not assertion:
         raise AssertionError(msg % args)
 
-def doi2msid(doi):
-    "doi to manuscript id used in EJP"
+def doi2articleid(doi):
+    "doi to article id sent by Lax"
     prefix = '10.7554/eLife.'
     ensure(doi.startswith(prefix), "this doesn't look like an eLife doi: %s" % prefix)
-    return int(doi[len(prefix):].lstrip('0'))
+    return doi[len(prefix):]
+
+def doi2msid(doi):
+    "doi to manuscript id used in EJP"
+    return int(doi2articleid(doi).lstrip('0'))
 
 def msid2doi(msid):
     assert isint(msid), "given msid must be an integer: %r" % msid

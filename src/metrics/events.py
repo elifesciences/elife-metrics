@@ -34,7 +34,7 @@ def notify(obj, **overrides):
         msg = {
             "type": "metrics",
             "contentType": "article",
-            "id": utils.doi2msid(obj.article.doi),
+            "id": utils.doi2articleid(obj.article.doi),
             "metric": "citations" if isinstance(obj, models.Citation) else "views-downloads"
         }
         msg_json = json.dumps(msg)
