@@ -30,6 +30,7 @@ class One(base.TransactionBaseCase):
         mock = Mock()
         with patch('metrics.events.event_bus_conn', return_value=mock):
             logic.insert_row(view_data)
+            logic.recently_updated_article_notifications()
             mock.publish.assert_called_once_with(Message=expected_event)
 
     @override_settings(DEBUG=False) # bypass notify() shortcircuit
@@ -50,4 +51,5 @@ class One(base.TransactionBaseCase):
         mock = Mock()
         with patch('metrics.events.event_bus_conn', return_value=mock):
             logic.insert_citation(citation_data)
+            logic.recently_updated_article_notifications()
             mock.publish.assert_called_once_with(Message=expected_event)

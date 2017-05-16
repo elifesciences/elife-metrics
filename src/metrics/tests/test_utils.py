@@ -88,10 +88,6 @@ class TestUtils(base.BaseCase):
         for string, expected in cases:
             self.assertEqual(utils.todt(string), expected)
 
-    def test_doi_to_article_id_for_events(self):
-        self.assertEqual(utils.doi2articleid('10.7554/eLife.00003'), '00003')
-        self.assertEqual(utils.doi2articleid('10.7554/eLife.10627'), '10627')
-
     def test_msid_to_doi(self):
         self.assertEqual(utils.msid2doi(3), '10.7554/eLife.00003')
         self.assertEqual(utils.msid2doi(10627), '10.7554/eLife.10627')

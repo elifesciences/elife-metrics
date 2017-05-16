@@ -80,6 +80,8 @@ class Command(BaseCommand):
                     print 'use ctrl-c again to abort immediately'
                     time.sleep(1)
 
+            logic.recently_updated_article_notifications()
+
         except KeyboardInterrupt:
             print 'caught second ctrl-c'
             print 'quitting'
