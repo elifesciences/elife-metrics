@@ -34,17 +34,17 @@ class ApiV2(base.BaseCase):
 
         expected_response = [
             {
-                'service': models.PUBMED,
+                'service': models.PUBMED_LABEL,
                 'uri': 'asdf',
                 'citations': 1
             },
             {
-                'service': models.CROSSREF,
+                'service': models.CROSSREF_LABEL,
                 'uri': 'asdf',
                 'citations': 2
             },
             {
-                'service': models.SCOPUS,
+                'service': models.SCOPUS_LABEL,
                 'uri': 'asdf',
                 'citations': 3
             },
@@ -69,17 +69,17 @@ class ApiV2(base.BaseCase):
 
         expected_response = [
             {
-                'service': models.SCOPUS,
+                'service': models.SCOPUS_LABEL,
                 'uri': 'asdf',
                 'citations': 3
             },
             {
-                'service': models.CROSSREF,
+                'service': models.CROSSREF_LABEL,
                 'uri': 'asdf',
                 'citations': 2
             },
             {
-                'service': models.PUBMED,
+                'service': models.PUBMED_LABEL,
                 'uri': 'asdf',
                 'citations': 1
             },
@@ -125,17 +125,17 @@ class ApiV2(base.BaseCase):
 
         expected_response = [
             {
-                'service': models.CROSSREF,
+                'service': models.CROSSREF_LABEL,
                 'uri': 'asdf',
                 'citations': 23
             },
             {
-                'service': models.SCOPUS,
+                'service': models.PUBMED_LABEL,
                 'uri': '',
                 'citations': 0
             },
             {
-                'service': models.PUBMED,
+                'service': models.SCOPUS_LABEL,
                 'uri': '',
                 'citations': 0
             }
@@ -160,17 +160,17 @@ class ApiV2(base.BaseCase):
         self.assertEqual(resp.status_code, 200)
         expected_response = [
             {
-                'service': models.CROSSREF,
+                'service': models.CROSSREF_LABEL,
                 'uri': '',
                 'citations': 0
             },
             {
-                'service': models.PUBMED,
+                'service': models.PUBMED_LABEL,
                 'uri': '',
                 'citations': 0
             },
             {
-                'service': models.SCOPUS,
+                'service': models.SCOPUS_LABEL,
                 'uri': '',
                 'citations': 0
             }
