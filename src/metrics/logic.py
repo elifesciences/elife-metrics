@@ -48,19 +48,20 @@ def recently_updated_articles():
     return models.Article.objects.filter(recent_citations | recent_views_downloads).distinct()
 '''
 
-def recently_updated_citations():
+def recently_updated_citations(td):
     "all articles whose associated metrics/citations have been updated in the last hour"
-    since = utils.utcnow() - timedelta(hours=2)
+    since = utils.utcnow() - td
     return models.Citation.objects.filter(datetime_record_updated__gte=since)
 
-def recently_updated_metrics():
-    since = utils.utcnow() - timedelta(hours=2)
+def recently_updated_metrics(td):
+    since = utils.utcnow() - td
     return models.Metric.objects.filter(datetime_record_updated__gte=since)
 
-def recently_updated_article_notifications():
+def recently_updated_article_notifications(**kwargs):
     "send notifications about all articles recently updated"
-    map(notify, recently_updated_citations())
-    map(notify, recently_updated_metrics())
+    td = timedelta(**kwargs)
+    map(notify, recently_updated_citations(td))
+    map(notify, recently_updated_metrics(td))
 
 #
 #
