@@ -52,7 +52,7 @@ def request_args(request, **overrides):
 def serialize_citations(obj_list):
     def do(obj):
         return {
-            'service': obj.source,
+            'service': obj.source_label(),
             'uri': obj.source_id,
             'citations': obj.num
         }

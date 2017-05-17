@@ -98,15 +98,11 @@ class Metric(models.Model):
 #
 #
 
-CROSSREF, PUBMED, SCOPUS = 'crossref', 'pubmed', 'scopus'
+SOURCES = CROSSREF, PUBMED, SCOPUS = 'crossref', 'pubmed', 'scopus'
+SOURCE_LABELS = CROSSREF_LABEL, PUBMED_LABEL, SCOPUS_LABEL = 'Crossref', 'Pubmed Central', 'Scopus'
 
-def source_choices():
-    return [
-        (SCOPUS, "Elsevier's Scopus"),
-        (CROSSREF, 'Crossref'),
-        (PUBMED, 'PubMed Central'),
-    ]
-
+SOURCE_CHOICES = zip(SOURCES, SOURCE_LABELS)
+SOURCE_CHOICES_IDX = dict(SOURCE_CHOICES)
 
 class CitationManager(models.Manager):
     def get_queryset(self):
@@ -116,13 +112,16 @@ class CitationManager(models.Manager):
 class Citation(models.Model):
     article = ForeignKey(Article)
     num = PositiveIntegerField()
-    source = CharField(max_length=10, choices=source_choices()) # scopus, crossref, pubmed, etc
+    source = CharField(max_length=10, choices=SOURCE_CHOICES) # scopus, crossref, pubmed, etc
     source_id = CharField(max_length=255) # a link back to this article for given source
 
     datetime_record_created = DateTimeField(auto_now_add=True)
     datetime_record_updated = DateTimeField(auto_now=True)
 
     objects = CitationManager()
+
+    def source_label(self):
+        return SOURCE_CHOICES_IDX.get(self.source)
 
     class Meta:
         # an article may only have one instance of a source

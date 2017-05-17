@@ -29,8 +29,9 @@ def chop(q, page, per_page, order):
 
 def pad_citations(serialized_citation_response):
     cr = serialized_citation_response
-    known_sources = dict(models.source_choices()).keys()
-    missing_sources = set(known_sources) - set([cite['service'] for cite in cr])
+    # TODO: bug here. pads will have the order of
+    # models.SOURCE_LABELS (alphabetical, asc) and not what the user specified
+    missing_sources = set(models.SOURCE_LABELS) - set([cite['service'] for cite in cr])
 
     def pad(source):
         return {
