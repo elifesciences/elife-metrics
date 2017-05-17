@@ -15,6 +15,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='citation',
             name='source',
-            field=models.CharField(choices=[(b'crossref', b'Crossref'), (b'pubmed', b'Pubmed Central'), (b'scopus', b'Scopus')], max_length=10),
+            field=models.CharField(choices=[(b'crossref', b'Crossref'), (b'pubmed', b'PubMed Central'), (b'scopus', b'Scopus')], max_length=10),
         ),
     ]

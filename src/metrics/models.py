@@ -99,7 +99,7 @@ class Metric(models.Model):
 #
 
 SOURCES = CROSSREF, PUBMED, SCOPUS = 'crossref', 'pubmed', 'scopus'
-SOURCE_LABELS = CROSSREF_LABEL, PUBMED_LABEL, SCOPUS_LABEL = 'Crossref', 'Pubmed Central', 'Scopus'
+SOURCE_LABELS = CROSSREF_LABEL, PUBMED_LABEL, SCOPUS_LABEL = 'Crossref', 'PubMed Central', 'Scopus'
 
 SOURCE_CHOICES = zip(SOURCES, SOURCE_LABELS)
 SOURCE_CHOICES_IDX = dict(SOURCE_CHOICES)
