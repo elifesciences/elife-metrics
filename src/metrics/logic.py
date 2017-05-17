@@ -5,6 +5,7 @@ from ga_metrics import bulk
 from django.conf import settings
 import models
 from django.db import transaction
+#from django.db.models import Q
 import utils
 from utils import first, create_or_update, ensure, splitfilter, comp
 import logging
@@ -38,14 +39,40 @@ def notify(obj):
     else:
         events.notify(obj)
 
+'''
+def recently_updated_articles():
+    "all articles whose associated metrics/citations have been updated in the last hour"
+    since = utils.utcnow() - timedelta(hours=2)
+    recent_citations = Q(citation__datetime_record_updated__gte=since)
+    recent_views_downloads = Q(metric__datetime_record_updated__gte=since)
+    return models.Article.objects.filter(recent_citations | recent_views_downloads).distinct()
+'''
+
+def recently_updated_citations(td):
+    "all articles whose associated metrics/citations have been updated in the last hour"
+    since = utils.utcnow() - td
+    return models.Citation.objects.filter(datetime_record_updated__gte=since)
+
+def recently_updated_metrics(td):
+    since = utils.utcnow() - td
+    return models.Metric.objects.filter(datetime_record_updated__gte=since)
+
+def recently_updated_article_notifications(**kwargs):
+    "send notifications about all articles recently updated"
+    td = timedelta(**kwargs)
+    map(notify, recently_updated_citations(td))
+    map(notify, recently_updated_metrics(td))
+
+#
+#
+#
+
 def _insert_row(data):
     article_obj = first(create_or_update(models.Article, {'doi': data['doi']}, ['doi'], create=True, update=False))
     row = utils.exsubdict(data, ['doi'])
     row['article'] = article_obj
     key = utils.subdict(row, ['article', 'date', 'period', 'source'])
-    obj = first(create_or_update(models.Metric, row, key, create=True, update=True, update_check=True))
-    notify(obj)
-    return obj
+    return first(create_or_update(models.Metric, row, key, create=True, update=True, update_check=True))
 
 @transaction.atomic
 def insert_row(data):
@@ -112,10 +139,7 @@ def insert_citation(data, aid='doi'):
     row = utils.exsubdict(data, [aid])
     row['article'] = article_obj
     key = utils.subdict(row, ['article', 'source'])
-    res = create_or_update(models.Citation, row, key, create=True, update=True, update_check=True)
-    obj = res[0]
-    notify(obj)
-    return res
+    return create_or_update(models.Citation, row, key, create=True, update=True, update_check=True)
 
 def countable(triple):
     "if the citation has been created or modified, return the object"

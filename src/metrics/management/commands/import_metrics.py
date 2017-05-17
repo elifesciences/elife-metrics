@@ -1,4 +1,4 @@
-import time
+import time, math
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -72,13 +72,26 @@ class Command(BaseCommand):
         ])
 
         try:
+            start_time = time.time() # seconds since epoch
             for source, row in sources.items():
                 try:
-                    first(row)(*rest(row))
+                    fn, args = first(row), rest(row)
+                    fn(*args)
                 except KeyboardInterrupt:
-                    print 'ctrl-c caught.'
+                    print 'ctrl-c caught, skipping rest of %s' % source
                     print 'use ctrl-c again to abort immediately'
                     time.sleep(1)
+
+                except BaseException as err:
+                    LOG.exception("unhandled error in source %s: %s", source, err)
+                    continue
+
+            end_time = time.time()
+
+            elapsed_seconds = end_time - start_time
+            LOG.info("time elapsed: %s minutes" % elapsed_seconds * 60)
+            elapsed_hours = math.ceil(elapsed_seconds / 3600)
+            logic.recently_updated_article_notifications(hours=elapsed_hours)
 
         except KeyboardInterrupt:
             print 'caught second ctrl-c'
