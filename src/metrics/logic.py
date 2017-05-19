@@ -67,6 +67,20 @@ def recently_updated_article_notifications(**kwargs):
 #
 #
 
+def create_row(doi, period, views, downloads):
+    "wrangles the data into a format suitable for `insert_row`"
+    views = views or {
+        'full': 0,
+        'abstract': 0,
+        'digest': 0,
+    }
+    views['pdf'] = downloads or 0
+    views['doi'] = doi
+    views['source'] = models.GA
+    row = dict(zip(['period', 'date'], format_dt_pair(period)))
+    row.update(views)
+    return row
+
 def _insert_row(data):
     article_obj = first(create_or_update(models.Article, {'doi': data['doi']}, ['doi'], create=True, update=False))
     row = utils.exsubdict(data, ['doi'])
@@ -105,28 +119,13 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
 
-    def create_row(doi, period, views, downloads):
-        "wrangles the data into a format suitable for `insert_row`"
-        if not views:
-            views = {
-                'full': 0,
-                'abstract': 0,
-                'digest': 0,
-            }
-        views['pdf'] = downloads or 0
-        views['doi'] = doi
-        views['source'] = models.GA
-        row = dict(zip(['period', 'date'], format_dt_pair(period)))
-        row.update(views)
-        return row
-
     for period, metrics in results.items():
         views, downloads = metrics['views'], metrics['downloads']
         # there is often a disjoint between articles that have been viewed and those downloaded within a period
         # what we do is create a record for *all* articles seen, even if their views or downloads may not exist
         doi_list = set(views.keys()).union(downloads.keys())
         row_list = [create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
-        # insert the rows in batches of 1000
+        # insert rows in batches of 1000
         map(insert_many_rows, utils.partition(row_list, 1000))
 
 #
