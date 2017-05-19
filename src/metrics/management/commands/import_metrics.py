@@ -98,5 +98,11 @@ class Command(BaseCommand):
             print 'quitting'
             exit(1)
 
+        except BaseException as err:
+            msg = "unhandled exception calling the import-metrics command."
+            LOG.exception(msg) # capture a stacktrace
+            LOG.critical(msg) # we can't recover, this command must exit
+            exit(1)
+
         self.stdout.write("...done\n")
         self.stdout.flush()
