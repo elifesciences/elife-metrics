@@ -85,7 +85,9 @@ def doi2msid(doi):
     "doi to manuscript id used in EJP"
     prefix = '10.7554/eLife.'
     ensure(doi.startswith(prefix), "this doesn't look like an eLife doi: %s" % prefix)
-    return int(doi[len(prefix):].lstrip('0'))
+    stripped = doi[len(prefix):].lstrip('0')
+    # handles dois like: 10.7554/eLife.09560.001
+    return int(stripped.split('.')[0])
 
 def msid2doi(msid):
     assert isint(msid), "given msid must be an integer: %r" % msid
