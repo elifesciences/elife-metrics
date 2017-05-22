@@ -165,6 +165,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = join(PROJECT_DIR, 'media')
 STATIC_ROOT = join(PROJECT_DIR, 'collected-static')
 
+DUMP_PATH = os.path.join('/tmp/', PROJECT_NAME)
+
 STATICFILES_DIRS = (
     os.path.join(SRC_DIR, "static"),
 )
@@ -227,12 +229,14 @@ LOG_FILE = join(PROJECT_DIR, LOG_NAME) # ll: /path/to/lax/log/lax.log
 if ENV != DEV:
     LOG_FILE = join('/var/log/', LOG_NAME) # ll: /var/log/lax.log
 
+DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log')
+
 # whereever our log files are, ensure they are writable before we do anything else.
 def writable(path):
     os.system('touch ' + path)
     # https://docs.python.org/2/library/os.html
     assert os.access(path, os.W_OK), "file doesn't exist or isn't writable: %s" % path
-map(writable, [LOG_FILE])
+map(writable, [LOG_FILE, DEBUG_LOG_FILE])
 
 ATTRS = ['asctime', 'created', 'levelname', 'message', 'filename', 'funcName', 'lineno', 'module', 'pathname']
 FORMAT_STR = ' '.join(map(lambda v: '%(' + v + ')s', ATTRS))
@@ -259,6 +263,14 @@ LOGGING = {
             'formatter': 'json',
         },
 
+        # entries here are meant
+        'debugger.log': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': DEBUG_LOG_FILE,
+            'formatter': 'json',
+        },
+
         'stderr': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -271,6 +283,10 @@ LOGGING = {
             'handlers': ['stderr', 'metrics.log'],
             'level': 'INFO',
             'propagate': True,
+        },
+        'debugger': {
+            'level': 'INFO',
+            'handlers': ['debugger.log', 'stderr'],
         },
         'publisher.management.commands.import_article': {
             'level': 'INFO',

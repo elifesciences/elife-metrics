@@ -55,13 +55,11 @@ class PM(base.BaseCase):
         models.Article.objects.get(pmcid=expected)
 
     def test_citation_fetch(self):
-        given = citations._fetch([self.pmcid])
+        given = citations.fetch([self.pmcid]).json()
         for toplevel in ['header', 'linksets']:
             self.assertTrue(toplevel in given)
         expected = 1 # one result
         self.assertTrue(expected, len(given['linksets']))
-
-        print 'given', given
 
         result = given['linksets'][0]
         self.assertTrue('linksetdbs' in result)
