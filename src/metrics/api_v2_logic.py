@@ -45,32 +45,36 @@ def pad_citations(serialized_citation_response):
 #
 #
 
-def article_citations(msid, period=None):
+def article_citations(msid, period=None, source=None):
     # all citations belonging to given article
     # where number of citations > 0
     qobj = models.Citation.objects \
         .filter(article__doi__iexact=utils.msid2doi(msid)) \
         .filter(num__gt=0)
+    # NICETOHAVE: not supported, but absolutely do-able
+    # if source:
+    #    qobj = qobj.filter(source=source)
     sums = qobj.aggregate(Max('num'))
     return sums['num__max'] or 0, qobj
 
-def article_stats(msid, period):
+def article_stats(msid, period, source):
     ensure(period in [models.MONTH, models.DAY], "unknown period %r" % period)
+    ensure(source in models.KNOWN_METRIC_SOURCES, "unknown source %r" % source)
     qobj = models.Metric.objects \
         .filter(article__doi__iexact=utils.msid2doi(msid)) \
-        .filter(source=models.GA) \
+        .filter(source=source) \
         .filter(period=period)
     sums = qobj.aggregate(
         views=Sum(F('full') + F('abstract') + F('digest')),
         downloads=Sum('pdf'))
     return sums['views'] or 0, sums['downloads'] or 0, qobj
 
-def article_downloads(msid, period):
+def article_downloads(msid, period, source):
     # convenience
-    total_downloads, qobj = rest(article_stats(msid, period))
+    total_downloads, qobj = rest(article_stats(msid, period, source))
     return total_downloads, qobj
 
-def article_views(msid, period):
+def article_views(msid, period, source):
     # convenience
-    total_views, _, qobj = article_stats(msid, period)
+    total_views, _, qobj = article_stats(msid, period, source)
     return total_views, qobj

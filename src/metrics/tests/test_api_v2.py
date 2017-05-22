@@ -4,6 +4,7 @@ from django.test import Client
 import base
 from django.core.urlresolvers import reverse
 
+
 class ApiV2(base.BaseCase):
     def setUp(self):
         self.c = Client()
@@ -189,7 +190,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01-01',
-                    'value': 1
+                    'value': 1,
+                    'source': 'ga',
                 }
             ]
         }
@@ -210,7 +212,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01-01',
-                    'value': 6
+                    'value': 6,
+                    'source': 'ga',
                 }
             ]
         }
@@ -230,7 +233,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01-01',
-                    'value': 1
+                    'value': 1,
+                    'source': 'ga'
                 }
             ]
         }
@@ -250,7 +254,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01',
-                    'value': 1
+                    'value': 1,
+                    'source': 'ga'
                 }
             ]
         }
@@ -270,7 +275,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01',
-                    'value': 1
+                    'value': 1,
+                    'source': 'ga'
                 }
             ]
         }

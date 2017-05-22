@@ -42,6 +42,8 @@ def request_args(request, **overrides):
         'order': [p('order', opts['order_direction']), string.upper, isin(['ASC', 'DESC'])],
 
         'period': [p('by', 'day'), string.lower, isin(['day', 'month'])],
+
+        'source': [models.GA] # todo
     }
     return render_item(desc, request.GET)
 
@@ -64,7 +66,8 @@ def serialize_views_downloads(metric, total, sum_value, obj_list):
     def do(obj):
         return {
             'period': obj.date,
-            'value': getattr(obj, attr)
+            'value': getattr(obj, attr),
+            'source': obj.source_label()
         }
     return {
         'totalPeriods': total,
@@ -93,9 +96,9 @@ def article_metrics(request, id, metric):
             'page-views': logic.article_views,
         }
         # fetch our results
-        sum_value, qobj = idx[metric](id, kwargs['period'])
+        sum_value, qobj = idx[metric](id, kwargs['period'], kwargs['source'])
         # paginate
-        total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
+        total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period', 'source']))
         # serialize
         payload = serialize(total_results, sum_value, qpage, metric)
 
