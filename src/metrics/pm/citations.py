@@ -9,8 +9,6 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-DLOG = logging.getLogger('debugger')
-
 requests_cache.install_cache(**{
     'cache_name': join(settings.PMC_OUTPUT_PATH, 'db'),
     'backend': 'sqlite',

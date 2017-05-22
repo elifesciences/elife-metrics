@@ -38,3 +38,7 @@ class One(base.BaseCase):
         # at time of writing, a single line of json is written to a file for uncaught network errors
         log_contents = json.load(open(expected_path, 'r'))
         self.assertEqual(log_contents['id'], opid)
+
+    def test_non2xx_response_written(self):
+        "contents of error response is written to a file. contents of request is written"
+        self.fail()
