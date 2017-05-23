@@ -1,3 +1,5 @@
+import os, json
+import tempfile, shutil
 from functools import wraps
 import logging
 from datetime import datetime
@@ -69,6 +71,13 @@ def nth(idx, x):
 def first(x):
     return nth(0, x)
 
+def second(x):
+    return nth(1, x)
+
+def firstnn(x):
+    "given sequential `x`, returns the first non-nil value"
+    return first(lfilter(None, x))
+
 def rest(x):
     return x[1:]
 
@@ -85,7 +94,9 @@ def doi2msid(doi):
     "doi to manuscript id used in EJP"
     prefix = '10.7554/eLife.'
     ensure(doi.startswith(prefix), "this doesn't look like an eLife doi: %s" % prefix)
-    return int(doi[len(prefix):].lstrip('0'))
+    stripped = doi[len(prefix):].lstrip('0')
+    # handles dois like: 10.7554/eLife.09560.001
+    return int(stripped.split('.')[0])
 
 def msid2doi(msid):
     assert isint(msid), "given msid must be an integer: %r" % msid
@@ -102,6 +113,9 @@ def fmtdt(dt, fmt="%Y-%m-%d"):
         dt = utcnow()
     ensure(isinstance(dt, datetime), "datetime object expected, got %r" % type(dt))
     return dt.strftime(fmt)
+
+def ymdhms(dt=None):
+    return fmtdt(dt, "%Y-%m-%d-%H-%M-%S")
 
 def ymd(dt=None):
     "returns a simple YYYY-MM-DD representation of a datetime object"
@@ -207,3 +221,33 @@ def partition(seq, size):
             res = []
     if res:
         yield res
+
+def lossy_json_dumps(obj, **kwargs):
+    "drop-in for json.dumps that handles unserialisable objects."
+    def _handler(obj):
+        if hasattr(obj, 'isoformat'):
+            return ymdhms(obj)
+        else:
+            LOG.debug('Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj)))
+            return '[unserialisable %s object]: %s' % (type(obj), str(obj))
+    return json.dumps(obj, default=_handler, **kwargs)
+
+def mkdirs(path):
+    os.system('mkdir -p %s' % path)
+    return os.path.exists(path)
+
+def tempdir():
+    # usage: tempdir, killer = tempdir(); killer()
+    name = tempfile.mkdtemp()
+    return (name, lambda: shutil.rmtree(name))
+
+# modified from:
+# http://stackoverflow.com/questions/9323749/python-check-if-one-dictionary-is-a-subset-of-another-larger-dictionary
+def partial_match(patn, real):
+    """does real dict match pattern?"""
+    for pkey, pvalue in patn.items():
+        if isinstance(pvalue, dict):
+            partial_match(pvalue, real[pkey]) # recurse
+        else:
+            ensure(real[pkey] == pvalue, "%s != %s" % (real[pkey], pvalue))
+    return True
