@@ -43,7 +43,7 @@ def request_args(request, **overrides):
 
         'period': [p('by', 'day'), string.lower, isin(['day', 'month'])],
 
-        'source': [models.GA] # todo
+        'source': [p('source', models.GA), string.lower, isin(models.KNOWN_METRIC_SOURCES)],
     }
     return render_item(desc, request.GET)
 

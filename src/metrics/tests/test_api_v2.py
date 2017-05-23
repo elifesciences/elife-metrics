@@ -4,8 +4,7 @@ from django.test import Client
 import base
 from django.core.urlresolvers import reverse
 
-
-class ApiV2(base.BaseCase):
+class One(base.BaseCase):
     def setUp(self):
         self.c = Client()
         self.metric_list = ['citations', 'downloads', 'page-views']
@@ -95,6 +94,13 @@ class ApiV2(base.BaseCase):
         for metric in self.metric_list:
             url = reverse('v2:alm', kwargs={'id': '9560', 'metric': metric})
             resp = self.c.get(url, {'page': 'pants'})
+            self.assertEqual(resp.status_code, 400)
+
+    def test_unknown_source_param(self):
+        "an unknown 'source' param results in a 400 error"
+        for metric in self.metric_list:
+            url = reverse('v2:alm', kwargs={'id': '9560', 'metric': metric})
+            resp = self.c.get(url, {'source': 'pants'})
             self.assertEqual(resp.status_code, 400)
 
     def test_api(self):
@@ -191,7 +197,7 @@ class ApiV2(base.BaseCase):
                 {
                     'period': '2001-01-01',
                     'value': 1,
-                    'source': 'ga',
+                    'source': models.GA_LABEL,
                 }
             ]
         }
@@ -213,7 +219,7 @@ class ApiV2(base.BaseCase):
                 {
                     'period': '2001-01-01',
                     'value': 6,
-                    'source': 'ga',
+                    'source': models.GA_LABEL,
                 }
             ]
         }
@@ -234,7 +240,7 @@ class ApiV2(base.BaseCase):
                 {
                     'period': '2001-01-01',
                     'value': 1,
-                    'source': 'ga'
+                    'source': models.GA_LABEL
                 }
             ]
         }
@@ -255,7 +261,7 @@ class ApiV2(base.BaseCase):
                 {
                     'period': '2001-01',
                     'value': 1,
-                    'source': 'ga'
+                    'source': models.GA_LABEL
                 }
             ]
         }
@@ -276,11 +282,62 @@ class ApiV2(base.BaseCase):
                 {
                     'period': '2001-01',
                     'value': 1,
-                    'source': 'ga'
+                    'source': models.GA_LABEL,
                 }
             ]
         }
         url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'downloads'})
         resp = self.c.get(url, {'by': models.MONTH})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+class Two(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_daily_hw_views(self):
+        "daily results returned for highwire data"
+        cases = {
+            1234: (0, 0, 1, models.DAY, models.HW)
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': '2001-01-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY, 'source': models.HW})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_monthly_hw_views(self):
+        "monthly results returned for highwire data"
+        cases = {
+            1234: (0, 0, 1, models.MONTH, models.HW)
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': '2001-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.MONTH, 'source': models.HW})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)

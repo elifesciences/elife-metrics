@@ -47,10 +47,7 @@ KNOWN_METRIC_SOURCES = GA, HW = 'ga', 'hw'
 KNOWN_METRIC_SOURCE_LABELS = GA_LABEL, HW_LABEL = 'Google Analytics', 'HighWire'
 
 def metric_source_list():
-    return [
-        (GA, GA_LABEL),
-        (HW, HW_LABEL),
-    ]
+    return zip(KNOWN_METRIC_SOURCES, KNOWN_METRIC_SOURCE_LABELS)
 
 class Metric(models.Model):
     article = ForeignKey(Article)
@@ -75,7 +72,7 @@ class Metric(models.Model):
         return self.abstract + self.full + self.digest
 
     def source_label(self):
-        return 'highwire' if self.source == HW else 'ga'
+        return HW_LABEL if self.source == HW else GA_LABEL
 
     class Meta:
         unique_together = ('article', 'date', 'period', 'source')

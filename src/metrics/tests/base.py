@@ -1,5 +1,7 @@
+import StringIO
 import os, json
 from django.test import TestCase as DjangoTestCase, TransactionTestCase
+from django.core.management import call_command as call_dj_command
 import unittest
 from metrics import utils, models, logic
 from datetime import timedelta, datetime
@@ -16,11 +18,14 @@ def insert_metrics(abbr_list):
         full = abstract = digest = pdf = 0
         citations = [0]
         period = models.DAY
+        source = models.GA
 
         if len(data) == 3:
             citations, pdf, full = data
         elif len(data) == 4:
             citations, pdf, full, period = data
+        elif len(data) == 5:
+            citations, pdf, full, period, source = data
         else:
             raise ValueError("cannot handle row of length %s" % len(data))
 
@@ -37,7 +42,7 @@ def insert_metrics(abbr_list):
             'doi': utils.msid2doi(msid),
             'date': date,
             'period': period,
-            'source': models.GA,
+            'source': source,
             'full': full,
             'abstract': abstract,
             'digest': digest,
@@ -69,6 +74,19 @@ def insert_metrics(abbr_list):
     for msid, data in abbr_list:
         date += timedelta(days=1)
         wrangle(msid, data, date)
+
+def call_command(*args, **kwargs):
+    stdout = StringIO.StringIO()
+    try:
+        kwargs['stdout'] = stdout
+        call_dj_command(*args, **kwargs)
+    except SystemExit as err:
+        return err.code, stdout.getvalue()
+    raise AssertionError("command should *always* throw a systemexit()")
+
+#
+#
+#
 
 class SimpleBaseCase(unittest.TestCase):
     "use this base if you don't need database wrangling"
