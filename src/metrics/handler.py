@@ -38,6 +38,7 @@ def requests_get(*args, **kwargs):
         'id': id
     }
     try:
+        # TODO: opportunity here for recovery from certain errors
         resp = requests.get(*args, **kwargs)
         resp.raise_for_status()
         return resp
@@ -83,7 +84,7 @@ def requests_get(*args, **kwargs):
         raise
 
 
-def capture(fn):
+def capture_parse_error(fn):
     """wrapper around a parse function that captures any errors to a special log for debugger.
     first argument to decorated function *must* be the data that is being parsed."""
     def wrap(data, *args, **kwargs):
@@ -100,6 +101,6 @@ def capture(fn):
             fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
             ctx['log'] = fname
             LOG.exception("unhandled error", extra=ctx)
-            raise
+            return {'bad': data}
 
     return wrap

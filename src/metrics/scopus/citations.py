@@ -4,9 +4,8 @@ import logging
 import requests_cache
 from django.conf import settings
 from datetime import timedelta
-from metrics import models # good idea reaching back?
+from metrics import models, handler
 from metrics.utils import first, flatten
-from pprint import pformat
 
 LOG = logging.getLogger(__name__)
 
@@ -24,8 +23,8 @@ def clear_cache():
     requests_cache.clear()
 
 
-def _search(api_key, doi_prefix, page=0, per_page=25):
-    "searches scopus"
+def fetch_page(api_key, doi_prefix, page=0, per_page=25):
+    "fetches a page of scopus search results"
     params = {
         'query': 'DOI("%s/*")' % doi_prefix,
         #'query': 'DOI("10.7554/eLife.00471")',
@@ -44,13 +43,8 @@ def _search(api_key, doi_prefix, page=0, per_page=25):
     # https://dev.elsevier.com/tecdoc_cited_by_in_scopus.html
     # http://api.elsevier.com/documentation/SCOPUSSearchAPI.wadl
     url = "http://api.elsevier.com/content/search/scopus"
-    response = requests.get(url, params=params, headers=headers)
-    # throw an exception if we get a non-2xx response
-    # http://docs.python-requests.org/en/master/user/quickstart/#response-status-codes
-    response.raise_for_status()
-
-    # deserialize their json
-    return response.json()
+    resp = handler.requests_get(url, params=params, headers=headers)
+    return resp.json()
 
 def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     """searches scopus, returning a generator that will iterate through each page
@@ -60,7 +54,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     page = 0
     per_page = 25 # max per page
 
-    data = _search(api_key, doi_prefix, page=page, per_page=per_page)
+    data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page)
 
     yield data['search-results']
 
@@ -79,7 +73,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
                 if page == max_pages:
                     raise GeneratorExit("hit max pages (%s)" % max_pages)
 
-                data = _search(api_key, doi_prefix, page=page, per_page=per_page)
+                data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page)
                 yield data['search-results']
 
                 # exit early if we start hitting 0 results
@@ -94,31 +88,24 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     except GeneratorExit:
         return
 
-def _extract(search_result_entry):
-    "ingests a single search result from scopus"
-    data = search_result_entry
-    try:
-        citedby_link = first(filter(lambda d: d["@ref"] == "scopus-citedby", data['link']))
-        return {
-            'doi': data['prism:doi'],
-            'num': int(data['citedby-count']),
-            'source': models.SCOPUS,
-            'source_id': citedby_link['@href']
-        }
-    # except KeyError:
-    #    LOG.error("key error for: %s", search_result_entry)
-    #    return {'bad': search_result_entry}
-    except Exception as err:
-        LOG.exception("unhandled error %r for: %s" % (err, pformat(search_result_entry)))
-        return {'bad': search_result_entry}
+@handler.capture_parse_error
+def parse_entry(entry):
+    "parses a single search result from scopus"
+    citedby_link = first(filter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
+    return {
+        'doi': entry['prism:doi'],
+        'num': int(entry['citedby-count']),
+        'source': models.SCOPUS,
+        'source_id': citedby_link['@href']
+    }
 
-def extract(search_result):
-    "extracts citation counts from a page of search results from scopus"
-    return map(_extract, search_result['entry'])
+def parse_results(search_result):
+    "parses citation counts from a page of search results from scopus"
+    return map(parse_entry, search_result['entry'])
 
 def all_entries(search_result_list):
     "returns a list of 'entries', citation information for articles from a list of search result pages"
-    return flatten(map(extract, search_result_list))
+    return flatten(map(parse_entry, search_result_list))
 
 def is_abstract(entry):
     # ll 10.7554/eLife.22757.001

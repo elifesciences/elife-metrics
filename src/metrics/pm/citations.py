@@ -96,7 +96,7 @@ def fetch(pmcid_list):
     }
     return handler.requests_get(PM_URL, params=params, headers=headers)
 
-@handler.capture
+@handler.capture_parse_error
 def parse_result(result):
     if 'linksetdbs' in result:
         cited_by = result['linksetdbs'][0]['links']
