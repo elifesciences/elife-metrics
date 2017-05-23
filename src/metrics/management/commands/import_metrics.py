@@ -3,7 +3,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
-from metrics import logic, models
+from metrics import logic, models, utils
 
 import logging
 LOG = logging.getLogger(__name__)
@@ -15,12 +15,6 @@ def hw_or_ga(v):
         raise argparse.ArgumentTypeError("'--just-source' accepts only 'hw' or 'ga'" % v)
     return pv
 '''
-
-def first(x):
-    try:
-        return x[0]
-    except (TypeError, KeyError):
-        return None
 
 def rest(x):
     return x[1:]
@@ -43,6 +37,8 @@ class Command(BaseCommand):
         # import *only* from cached results, don't try to fetch from remote
         parser.add_argument('--only-cached', dest='only_cached', action="store_true", default=False)
 
+        parser.add_argument('--dry-run', action="store_true", default=False)
+
         # citations
         # ...
 
@@ -55,6 +51,8 @@ class Command(BaseCommand):
 
         from_date = n_days_ago
         to_date = today
+
+        dry_run = options['dry_run']
 
         # print 'use cached? %r only cached? %r' % (use_cached, only_cached)
 
@@ -73,9 +71,13 @@ class Command(BaseCommand):
 
         try:
             start_time = time.time() # seconds since epoch
+
+            if dry_run:
+                sources = {}
+
             for source, row in sources.items():
                 try:
-                    fn, args = first(row), rest(row)
+                    fn, args = utils.first(row), rest(row)
                     fn(*args)
                 except KeyboardInterrupt:
                     print 'ctrl-c caught, skipping rest of %s' % source
@@ -98,5 +100,4 @@ class Command(BaseCommand):
             print 'quitting'
             exit(1)
 
-        self.stdout.write("...done\n")
-        self.stdout.flush()
+        exit(0)
