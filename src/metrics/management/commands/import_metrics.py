@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from metrics import logic, models
 
 import logging
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger('debugger')
 
 '''
 def hw_or_ga(v):
