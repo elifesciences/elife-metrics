@@ -1,6 +1,5 @@
 from dateutil.relativedelta import relativedelta
 from os.path import join
-import requests
 import requests_cache
 from metrics import models, utils, handler
 from django.conf import settings
@@ -35,14 +34,10 @@ def fetch(doi):
         'Accept': 'application/json'
     }
     url = "https://doi.crossref.org/servlet/getForwardLinks"
-    try:
-        resp = handler.requests_get(url, params=params, headers=headers)
-        return resp.content # xml
-
-    except requests.HTTPError as err:
-        status_code = err.response.status_code
-        if status_code != 404:
-            LOG.error("error response attempting to fetch citation count from crossref for article %s: %s", doi, err)
+    resp = handler.requests_get(url, params=params, headers=headers, opts={
+        404: handler.IGNORE, # these happen often for articles with 0 citations
+    })
+    return resp.content if resp else None
 
 @handler.capture_parse_error
 def parse(xmlbytes, doi):

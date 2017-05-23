@@ -1,11 +1,21 @@
+from datetime import timedelta
 from os.path import join
 from django.conf import settings
 import inspect
 import uuid
 from metrics import utils
 from metrics.utils import ensure
-import requests
+import requests, requests_cache
 import logging
+
+requests_cache.install_cache(**{
+    'cache_name': join(settings.OUTPUT_PATH, 'db'),
+    'backend': 'sqlite',
+    'fast_save': True,
+    'extension': '.sqlite3',
+    # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
+    'expire_after': timedelta(hours=24 * settings.CACHE_EXPIRY)
+})
 
 LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
 
@@ -32,11 +42,46 @@ def writefile(id, content, fname):
 class NoneObj(object):
     pass
 
+def ignore_handler(id, err):
+    "does absolutely nothing"
+    pass
+
+def logit_handler(id, err):
+    "writes a comprehensive log entry to a file"
+    # err ll: {'request': <PreparedRequest [GET]>, 'response': <Response [404]>}
+    payload = {
+        'request': err.request.__dict__,
+        'response': err.response.__dict__
+    }
+    fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
+    body = err.response.content
+    fname2 = writefile(id, body, 'body')
+    ctx = {
+        'id': id,
+        'logged': [fname, fname2],
+    }
+    LOG.warn("non-2xx response %s" % err, extra=ctx)
+
+def raise_handler(id, err):
+    "logs the error and then raises it again to be handled by the calling function"
+    logit_handler(id, err)
+    raise err
+
+RAISE, IGNORE, LOGIT = 'raise', 'ignore', 'log'
+HANDLERS = {
+    RAISE: raise_handler,
+    IGNORE: ignore_handler,
+    LOGIT: logit_handler
+}
+DEFAULT_HANDLER = raise_handler
+
 def requests_get(*args, **kwargs):
     id = kwargs.pop('opid', opid())
     ctx = {
         'id': id
     }
+    handler_opts = kwargs.pop('opts', {})
+
     try:
         # TODO: opportunity here for recovery from certain errors
         resp = requests.get(*args, **kwargs)
@@ -45,17 +90,15 @@ def requests_get(*args, **kwargs):
 
     except requests.HTTPError as err:
         # non 2xx response
-        # err ll: {'request': <PreparedRequest [GET]>, 'response': <Response [404]>}
-        payload = {
-            'request': err.request.__dict__,
-            'response': err.response.__dict__
-        }
-        fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
-        body = err.response.content
-        fname2 = writefile(id, body, 'body')
-        ctx['logged'] = [fname, fname2]
-        LOG.warn("non-2xx response %s" % err, extra=ctx)
-        raise
+        LOG.warn("error response attempting to fetch remote resource: %s" % err, extra=ctx)
+
+        # these can be handled by passing in an 'opts' kwarg ll:
+        # {404: handler.LOGIT}
+        status_code = err.response.status_code
+        code = handler_opts.get(status_code)
+        # supports custom handlers like {404: lambda id, err: print(id, err)}
+        fn = code if callable(code) else HANDLERS.get(code, DEFAULT_HANDLER)
+        fn(id, err)
 
     # handle more fine-grained errors here:
     # http://docs.python-requests.org/en/master/_modules/requests/exceptions/
