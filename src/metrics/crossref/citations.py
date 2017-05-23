@@ -1,23 +1,11 @@
 from dateutil.relativedelta import relativedelta
-from os.path import join
-import requests_cache
 from metrics import models, utils, handler
 from django.conf import settings
-from datetime import timedelta
 import logging
 
 from xml.dom.minidom import parseString
 
 LOG = logging.getLogger(__name__)
-
-requests_cache.install_cache(**{
-    'cache_name': join(settings.CROSSREF_OUTPUT_PATH, 'db'),
-    'backend': 'sqlite',
-    'fast_save': True,
-    'extension': '.sqlite3',
-    # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
-    'expire_after': timedelta(hours=24 * settings.CROSSREF_CACHE_EXPIRY)
-})
 
 def fetch(doi):
     LOG.info("fetching crossref citations for %s" % doi)

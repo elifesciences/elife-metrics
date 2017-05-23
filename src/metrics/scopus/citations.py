@@ -1,27 +1,10 @@
-from os.path import join
-import requests  # , math
+import requests
 import logging
-import requests_cache
 from django.conf import settings
-from datetime import timedelta
 from metrics import models, handler
 from metrics.utils import first, flatten
 
 LOG = logging.getLogger(__name__)
-
-requests_cache.install_cache(**{
-    'cache_name': join(settings.SCOPUS_OUTPUT_PATH, 'db'),
-    'backend': 'sqlite',
-    'fast_save': True,
-    'extension': '.sqlite3',
-    # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
-    'expire_after': timedelta(hours=24 * settings.SCOPUS_CACHE_EXPIRY)
-})
-
-
-def clear_cache():
-    requests_cache.clear()
-
 
 def fetch_page(api_key, doi_prefix, page=0, per_page=25):
     "fetches a page of scopus search results"

@@ -17,6 +17,9 @@ requests_cache.install_cache(**{
     'expire_after': timedelta(hours=24 * settings.CACHE_EXPIRY)
 })
 
+def clear_cache():
+    requests_cache.clear()
+
 LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
 
 def opid(nom=''):

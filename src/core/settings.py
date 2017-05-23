@@ -45,9 +45,6 @@ USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
 CONTACT_EMAIL = "it-admin@elifesciences.org"
 
 OUTPUT_PATH = join(PROJECT_DIR, 'output')
-PMC_OUTPUT_PATH = join(OUTPUT_PATH, 'pmc')
-SCOPUS_OUTPUT_PATH = join(OUTPUT_PATH, 'scopus')
-CROSSREF_OUTPUT_PATH = join(OUTPUT_PATH, 'crossref')
 
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
 GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
@@ -59,7 +56,7 @@ CROSSREF_USER = cfg('crossref.user')
 CROSSREF_PASS = cfg('crossref.pass')
 
 # time in days before the cached requests expires
-CACHE_EXPIRY = PMC_CACHE_EXPIRY = CROSSREF_CACHE_EXPIRY = SCOPUS_CACHE_EXPIRY = 2 # days
+CACHE_EXPIRY = 2 # days
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')

@@ -1,22 +1,10 @@
-from os.path import join
 from metrics import models, utils, handler
 from metrics.utils import ensure, lmap, subdict, first
 import requests
-import requests_cache
-from datetime import timedelta
 from django.conf import settings
 import logging
 
 LOG = logging.getLogger(__name__)
-
-requests_cache.install_cache(**{
-    'cache_name': join(settings.PMC_OUTPUT_PATH, 'db'),
-    'backend': 'sqlite',
-    'fast_save': True,
-    'extension': '.sqlite3',
-    # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
-    'expire_after': timedelta(hours=24 * settings.PMC_CACHE_EXPIRY)
-})
 
 def norm_pmcid(pmcid):
     "returns the integer form of a pmc id, stripping any leading 'pmc' prefix."
