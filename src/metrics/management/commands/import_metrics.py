@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from metrics import logic, models, utils
 
 import logging
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger('debugger')
 
 '''
 def hw_or_ga(v):
@@ -96,8 +96,14 @@ class Command(BaseCommand):
             logic.recently_updated_article_notifications(hours=elapsed_hours)
 
         except KeyboardInterrupt:
-            print 'caught second ctrl-c'
+            print 'caught ctrl-c'
             print 'quitting'
+            exit(1)
+
+        except BaseException as err:
+            msg = "unhandled exception calling the import-metrics command."
+            LOG.exception(msg) # capture a stacktrace
+            LOG.critical(msg) # we can't recover, this command must exit
             exit(1)
 
         exit(0)

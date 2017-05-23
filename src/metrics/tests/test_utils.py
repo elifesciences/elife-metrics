@@ -88,6 +88,14 @@ class TestUtils(base.BaseCase):
         for string, expected in cases:
             self.assertEqual(utils.todt(string), expected)
 
+    def test_doi_to_msid(self):
+        cases = [
+            ('10.7554/eLife.09560', 9560),
+            ('10.7554/eLife.09560.001', 9560),
+        ]
+        for given, expected in cases:
+            self.assertEqual(utils.doi2msid(given), expected)
+
     def test_msid_to_doi(self):
         self.assertEqual(utils.msid2doi(3), '10.7554/eLife.00003')
         self.assertEqual(utils.msid2doi(10627), '10.7554/eLife.10627')

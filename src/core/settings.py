@@ -45,9 +45,6 @@ USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
 CONTACT_EMAIL = "it-admin@elifesciences.org"
 
 OUTPUT_PATH = join(PROJECT_DIR, 'output')
-PMC_OUTPUT_PATH = join(OUTPUT_PATH, 'pmc')
-SCOPUS_OUTPUT_PATH = join(OUTPUT_PATH, 'scopus')
-CROSSREF_OUTPUT_PATH = join(OUTPUT_PATH, 'crossref')
 
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
 GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
@@ -59,7 +56,7 @@ CROSSREF_USER = cfg('crossref.user')
 CROSSREF_PASS = cfg('crossref.pass')
 
 # time in days before the cached requests expires
-PMC_CACHE_EXPIRY = CROSSREF_CACHE_EXPIRY = SCOPUS_CACHE_EXPIRY = 2 # days
+CACHE_EXPIRY = 2 # days
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')
@@ -165,6 +162,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = join(PROJECT_DIR, 'media')
 STATIC_ROOT = join(PROJECT_DIR, 'collected-static')
 
+DUMP_PATH = os.path.join('/tmp/', PROJECT_NAME)
+
 STATICFILES_DIRS = (
     os.path.join(SRC_DIR, "static"),
 )
@@ -227,12 +226,14 @@ LOG_FILE = join(PROJECT_DIR, LOG_NAME) # ll: /path/to/lax/log/lax.log
 if ENV != DEV:
     LOG_FILE = join('/var/log/', LOG_NAME) # ll: /var/log/lax.log
 
+DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log')
+
 # whereever our log files are, ensure they are writable before we do anything else.
 def writable(path):
     os.system('touch ' + path)
     # https://docs.python.org/2/library/os.html
     assert os.access(path, os.W_OK), "file doesn't exist or isn't writable: %s" % path
-map(writable, [LOG_FILE])
+map(writable, [LOG_FILE, DEBUG_LOG_FILE])
 
 ATTRS = ['asctime', 'created', 'levelname', 'message', 'filename', 'funcName', 'lineno', 'module', 'pathname']
 FORMAT_STR = ' '.join(map(lambda v: '%(' + v + ')s', ATTRS))
@@ -259,6 +260,14 @@ LOGGING = {
             'formatter': 'json',
         },
 
+        # entries here are meant
+        'debugger.log': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': DEBUG_LOG_FILE,
+            'formatter': 'json',
+        },
+
         'stderr': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -271,6 +280,10 @@ LOGGING = {
             'handlers': ['stderr', 'metrics.log'],
             'level': 'INFO',
             'propagate': True,
+        },
+        'debugger': {
+            'level': 'INFO',
+            'handlers': ['debugger.log', 'stderr'],
         },
         'publisher.management.commands.import_article': {
             'level': 'INFO',
