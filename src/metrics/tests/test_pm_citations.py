@@ -1,8 +1,11 @@
+from os.path import join
+import json
+import responses
 import base
 from metrics.pm import citations
 from metrics import models
 
-class PM(base.BaseCase):
+class One(base.BaseCase):
     def setUp(self):
         self.doi = '10.7554/eLife.09560'
         self.pmid = '26354291'
@@ -64,3 +67,44 @@ class PM(base.BaseCase):
         result = given['linksets'][0]
         self.assertTrue('linksetdbs' in result)
         self.assertTrue(len(result['linksetdbs'][0]['links']) >= 12)
+
+    @responses.activate
+    def test_citations_fetch_all(self):
+        art = models.Article(**{
+            'doi': self.doi,
+            'pmid': self.pmid,
+            'pmcid': self.pmcid
+        })
+        art.save()
+
+        fixture = join(self.fixture_dir, 'pm-citation-request-response-09560.json')
+        expected_body_content = json.load(open(fixture, 'r'))
+
+        responses.add(responses.GET, citations.PM_URL, **{
+            'json': expected_body_content,
+            'status': 200,
+            'content_type': 'application/json'})
+
+        citations.citations_for_all_articles()
+
+    @responses.activate
+    def test_count_for_blah(self):
+        art = models.Article(**{
+            'doi': self.doi,
+            'pmid': self.pmid,
+            'pmcid': self.pmcid
+        })
+        art.save()
+
+        msid = 9560
+
+        fixture = join(self.fixture_dir, 'pm-citation-request-response-09560.json')
+        expected_body_content = json.load(open(fixture, 'r'))
+
+        responses.add(responses.GET, citations.PM_URL, **{
+            'json': expected_body_content,
+            'status': 200,
+            'content_type': 'application/json'})
+
+        citations.count_for_msid(msid)
+        citations.count_for_doi(self.doi)

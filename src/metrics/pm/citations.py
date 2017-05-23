@@ -78,6 +78,8 @@ def resolve_pmcid(artobj):
 #
 #
 
+PM_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
+
 def fetch(pmcid_list):
     ensure(len(pmcid_list) <= MAX_PER_PAGE,
            "no more than %s can be processed per-request. requested: %s" % (MAX_PER_PAGE, len(pmcid_list)))
@@ -92,8 +94,7 @@ def fetch(pmcid_list):
         'email': settings.CONTACT_EMAIL,
         'retmode': 'json'
     }
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
-    return handler.requests_get(url, params=params, headers=headers)
+    return handler.requests_get(PM_URL, params=params, headers=headers)
 
 @handler.capture
 def parse_result(result):
@@ -101,7 +102,7 @@ def parse_result(result):
         cited_by = result['linksetdbs'][0]['links']
     else:
         cited_by = []
-    pmcid = 'PMC' + str(result['ids'][0]) # there can be more than one ??
+    pmcid = 'PMC' + str(result['ids'][0]) # there can be more than one
     return {
         'pmcid': pmcid,
         'source': models.PUBMED,
@@ -123,10 +124,10 @@ def fetch_parse(pmcid_list):
 
         resp = fetch(sub_pmcid_list)
         result = resp.json()["linksets"]
-        parsed_result = parse_result(result)
-
-        results.extend(parsed_result)
-    return results
+        # result is a list of maps. add all maps returned to a single list ...
+        results.extend(result)
+    # ... to be parsed all at once.
+    return map(parse_result, results)
 
 def process_results(results):
     "post process the parsed results"
@@ -139,13 +140,12 @@ def process_results(results):
     return data
 
 #
-#
+# results for individual articles
+# request overhead is low
 #
 
 def count_for_obj(art):
-    if not art.pmcid:
-        raise ValueError("art has no pmcid")
-    return process_results(fetch_parse([art.pmcid]))
+    return process_results(fetch_parse([resolve_pmcid(art)]))
 
 def count_for_doi(doi):
     return count_for_obj(models.Article.objects.get(doi=doi))
@@ -154,7 +154,8 @@ def count_for_msid(msid):
     return count_for_obj(models.Article.objects.get(doi=utils.msid2doi(msid)))
 
 #
-#
+# results for many articles
+# request overhead is HIGH if pmcids haven't been loaded
 #
 
 def count_for_qs(qs):
