@@ -94,7 +94,7 @@ class Command(BaseCommand):
             logic.recently_updated_article_notifications(hours=elapsed_hours)
 
         except KeyboardInterrupt:
-            print 'caught second ctrl-c'
+            print 'caught ctrl-c'
             print 'quitting'
             exit(1)
 
