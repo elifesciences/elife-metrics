@@ -67,7 +67,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     max_pages = 5000
     try:
         for page in range(page + 1, total_pages):
-            LOG.info("page %r", page)
+            LOG.debug("page %r", page)
 
             try:
                 if page == max_pages:
@@ -80,7 +80,6 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
                 fentry = data['search-results']['entry'][0]['citedby-count']
                 if int(fentry) == 0:
                     raise GeneratorExit("no more articles with citations")
-                LOG.debug("fentry: %r", fentry)
 
             except requests.HTTPError as err:
                 raise GeneratorExit(str(err))
