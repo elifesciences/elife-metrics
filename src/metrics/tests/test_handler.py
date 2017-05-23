@@ -1,3 +1,4 @@
+import responses
 from mock import patch
 import requests
 import os
@@ -39,6 +40,27 @@ class One(base.BaseCase):
         log_contents = json.load(open(expected_path, 'r'))
         self.assertEqual(log_contents['id'], opid)
 
+    @responses.activate
     def test_non2xx_response_written(self):
         "contents of error response is written to a file. contents of request is written"
-        self.fail()
+
+        opid = handler.opid()
+        bad_url = 'http://example.org'
+        expected_body_content = 'pants'
+
+        responses.add(responses.GET, bad_url, **{
+            'body': expected_body_content,
+            'status': 404,
+            'content_type': 'text/plain'})
+
+        # non 2xx response
+        self.assertRaises(requests.exceptions.HTTPError, handler.requests_get, bad_url, opid=opid)
+
+        # a file exists with the details
+        expected_path = join(settings.DUMP_PATH, opid, 'log')
+        self.assertTrue(os.path.isfile(expected_path))
+
+        # a file exists with the body content
+        expected_path = join(settings.DUMP_PATH, opid, 'body')
+        self.assertTrue(os.path.isfile(expected_path))
+        self.assertEqual(open(expected_path, 'r').read(), expected_body_content)

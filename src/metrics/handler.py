@@ -18,12 +18,12 @@ def fqfn(fn):
     mod = inspect.getmodule(fn)
     return '.'.join([mod.__name__, fn.__name__])
 
-def writefile(id, content):
+def writefile(id, content, fname):
     path = join(settings.DUMP_PATH, id)
     ensure(utils.mkdirs(path), "failed to create path %s" % path)
-    fname = join(path, 'log') # ll: /tmp/elife-metrics/pmc-asdfasdfasdf-482309849230/log
-    open(fname, 'w').write(content)
-    return fname
+    path = join(path, fname) # ll: /tmp/elife-metrics/pmc-asdfasdfasdf-482309849230/log
+    open(path, 'w').write(content)
+    return path
 
 #
 #
@@ -49,8 +49,10 @@ def requests_get(*args, **kwargs):
             'request': err.request.__dict__,
             'response': err.response.__dict__
         }
-        fname = writefile(id, utils.lossy_json_dumps(payload))
-        ctx['logged'] = fname
+        fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
+        body = err.response.content
+        fname2 = writefile(id, body, 'body')
+        ctx['logged'] = [fname, fname2]
         LOG.warn("non-2xx response %s" % err, extra=ctx)
         raise
 
@@ -71,7 +73,7 @@ def requests_get(*args, **kwargs):
             'request': (data.get('request') or NoneObj()).__dict__,
             'response': (data.get('response') or NoneObj()).__dict__,
         }
-        fname = writefile(id, utils.lossy_json_dumps(payload))
+        fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
         ctx['logged'] = fname
         LOG.exception("unhandled network exception fetching request: %s" % err, extra=ctx)
         raise
@@ -95,7 +97,7 @@ def capture(fn):
 
         except BaseException:
             payload = {'data': data, 'args': args, 'kwargs': kwargs}
-            fname = writefile(id, utils.lossy_json_dumps(payload))
+            fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
             ctx['log'] = fname
             LOG.exception("unhandled error", extra=ctx)
             raise
