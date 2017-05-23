@@ -19,7 +19,7 @@ class One(BaseCase):
 
         crossref_response = open(join(self.fixture_dir, "crossref-request-response.xml"), 'r').read()
         expected_citations = 53
-        with mock.patch('metrics.crossref.citations._fetch', return_value=crossref_response):
+        with mock.patch('metrics.crossref.citations.fetch', return_value=crossref_response):
             logic.import_crossref_citations()
             self.assertEqual(models.Citation.objects.count(), 1)
             self.assertEqual(models.Citation.objects.get(source=models.CROSSREF).num, expected_citations)

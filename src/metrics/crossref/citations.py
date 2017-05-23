@@ -2,8 +2,7 @@ from dateutil.relativedelta import relativedelta
 from os.path import join
 import requests
 import requests_cache
-from metrics import utils
-from metrics import models
+from metrics import models, utils, handler
 from django.conf import settings
 from datetime import timedelta
 import logging
@@ -21,7 +20,7 @@ requests_cache.install_cache(**{
     'expire_after': timedelta(hours=24 * settings.CROSSREF_CACHE_EXPIRY)
 })
 
-def _fetch(doi):
+def fetch(doi):
     LOG.info("fetching crossref citations for %s" % doi)
     params = {
         'usr': settings.CROSSREF_USER,
@@ -37,22 +36,22 @@ def _fetch(doi):
     }
     url = "https://doi.crossref.org/servlet/getForwardLinks"
     try:
-        resp = requests.get(url, params=params, headers=headers)
-        resp.raise_for_status()
-        return resp.content
+        resp = handler.requests_get(url, params=params, headers=headers)
+        return resp.content # xml
+
     except requests.HTTPError as err:
         status_code = err.response.status_code
         if status_code != 404:
             LOG.error("error response attempting to fetch citation count from crossref for article %s: %s", doi, err)
 
-def parse(doi, xmlbytes):
+@handler.capture_parse_error
+def parse(xmlbytes, doi):
     if not xmlbytes:
         # nothing to parse, carry on
         return None
     dom = parseString(xmlbytes)
     body = dom.getElementsByTagName('body')[0]
     citations = body.getElementsByTagName('forward_link')
-    #doi = citations[0].getAttribute('doi')
     return {
         'doi': doi,
         'num': len(citations),
@@ -61,7 +60,7 @@ def parse(doi, xmlbytes):
     }
 
 def count_for_doi(doi):
-    return parse(doi, _fetch(doi))
+    return parse(fetch(doi), doi)
 
 def count_for_msid(msid):
     return count_for_doi(utils.msid2doi(msid))
