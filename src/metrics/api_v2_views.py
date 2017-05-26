@@ -15,6 +15,11 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+def string_lower(x):
+    if not x:
+        return x
+    return string.lower(x)
+
 def request_args(request, **overrides):
     opts = {}
     opts.update(settings.API_OPTS)
@@ -30,8 +35,11 @@ def request_args(request, **overrides):
             return v
         return fn
 
-    def isin(lst):
+    def isin(seq, allow_none=False):
         def fn(val):
+            lst = list(seq)
+            if allow_none:
+                lst.append(None)
             ensure(val in lst, "value %r is not in %r" % (val, lst))
             return val
         return fn
@@ -43,7 +51,7 @@ def request_args(request, **overrides):
 
         'period': [p('by', 'day'), string.lower, isin(['day', 'month'])],
 
-        'source': [p('source', models.GA), string.lower, isin(models.KNOWN_METRIC_SOURCES)],
+        'source': [p('source', None), string_lower, isin(models.KNOWN_METRIC_SOURCES, allow_none=True)],
     }
     return render_item(desc, request.GET)
 

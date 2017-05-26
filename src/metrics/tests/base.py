@@ -35,8 +35,8 @@ def insert_metrics(abbr_list):
         full, abstract, digest = full
 
         # format date
-        fn = utils.ym if period == models.MONTH else utils.ymd
-        date = fn(date)
+        fmtfn = utils.ym if period == models.MONTH else utils.ymd
+        date = fmtfn(date)
 
         metric = logic.insert_row({
             'doi': utils.msid2doi(msid),
@@ -66,14 +66,17 @@ def insert_metrics(abbr_list):
             }))
         return metric, citation_objs
 
-    # abbr_list has to be a list of [(msid, (citations, pdf, full)), ...]
+    # abbr_list has to be a list of [(msid, (citations, pdf, full,...)), ...]
     if isinstance(abbr_list, dict):
         abbr_list = abbr_list.items()
 
-    date = BASE_DATE - timedelta(days=len(abbr_list))
+    date = BASE_DATE - timedelta(days=0) # not sure if BASE_DATE is mutable ...
+    res = []
+    labels = 'views-downloads', 'citations'
     for msid, data in abbr_list:
+        res.append(dict(zip(labels, wrangle(msid, data, date))))
         date += timedelta(days=1)
-        wrangle(msid, data, date)
+    return res
 
 def call_command(*args, **kwargs):
     stdout = StringIO.StringIO()

@@ -3,21 +3,11 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
-from metrics import logic, models, utils
+from metrics import logic, models
+from metrics.utils import first, rest
 
 import logging
 LOG = logging.getLogger('debugger')
-
-'''
-def hw_or_ga(v):
-    pv = v.lower().strip()
-    if not pv in ['ga', 'hw']:
-        raise argparse.ArgumentTypeError("'--just-source' accepts only 'hw' or 'ga'" % v)
-    return pv
-'''
-
-def rest(x):
-    return x[1:]
 
 class Command(BaseCommand):
     help = 'imports all metrics from google analytics'
@@ -77,7 +67,7 @@ class Command(BaseCommand):
 
             for source, row in sources.items():
                 try:
-                    fn, args = utils.first(row), rest(row)
+                    fn, args = first(row), rest(row)
                     fn(*args)
                 except KeyboardInterrupt:
                     print 'ctrl-c caught, skipping rest of %s' % source

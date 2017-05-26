@@ -341,3 +341,98 @@ class Two(base.BaseCase):
         resp = self.c.get(url, {'by': models.MONTH, 'source': models.HW})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
+
+class Three(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_both_metrics_returned(self):
+        "daily results returned include both google and highwire data"
+        cases = [
+            (1234, (0, 0, 1, models.DAY, models.HW)),
+            (1234, (0, 0, 1, models.DAY, models.GA))
+        ]
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 2,
+            'totalValue': 2,
+            'periods': [
+                {
+                    'period': '2001-01-02',
+                    'value': 1,
+                    'source': models.GA_LABEL,
+                },
+                {
+                    'period': '2001-01-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                },
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_single_daily_metric_returned_no_overlap(self):
+        "in cases where there is an overlap between sources in a daily period, one source will be preferred"
+        cases = [
+            (1234, (0, 0, 1, models.DAY, models.HW)),
+            (1234, (0, 0, 1, models.DAY, models.GA))
+        ]
+        base.insert_metrics(cases)
+
+        # give all metrics the same date
+        models.Metric.objects.all().update(date='2001-01-01')
+        self.assertEqual(models.Metric.objects.count(), 2)
+
+        # in this case, the default is to prefer HW
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': '2001-01-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                },
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY})
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_monthly_metrics_returned_no_overlap(self):
+        "in cases where there is an overlap between sources in a monthly period, one source will be preferred"
+        cases = [
+            (1234, (0, 0, 1, models.MONTH, models.HW)),
+            (1234, (0, 0, 1, models.MONTH, models.GA))
+        ]
+        base.insert_metrics(cases)
+
+        # give all metrics the same date
+        models.Metric.objects.all().update(date='2001-01')
+        self.assertEqual(models.Metric.objects.count(), 2)
+
+        # in this case, the default is to prefer HW
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': '2001-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                },
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.MONTH})
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)

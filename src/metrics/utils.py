@@ -114,6 +114,10 @@ def fmtdt(dt, fmt="%Y-%m-%d"):
     ensure(isinstance(dt, datetime), "datetime object expected, got %r" % type(dt))
     return dt.strftime(fmt)
 
+def ymdstr2ym(ymd):
+    "given yyyy-mm-dd returns yyyy-mm"
+    return ymd[:7]
+
 def ymdhms(dt=None):
     return fmtdt(dt, "%Y-%m-%d-%H-%M-%S")
 
