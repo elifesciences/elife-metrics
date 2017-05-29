@@ -51,11 +51,11 @@ def recently_updated_articles():
 def recently_updated_citations(td):
     "all articles whose associated metrics/citations have been updated in the last hour"
     since = utils.utcnow() - td
-    return models.Citation.objects.filter(datetime_record_updated__gte=since)
+    return models.Citation.objects.filter(datetime_record_updated__gte=since).order_by('-article__doi')
 
 def recently_updated_metrics(td):
     since = utils.utcnow() - td
-    return models.Metric.objects.filter(datetime_record_updated__gte=since)
+    return models.Metric.objects.filter(datetime_record_updated__gte=since).order_by('-article__doi')
 
 def recently_updated_article_notifications(**kwargs):
     "send notifications about all articles recently updated"
