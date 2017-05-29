@@ -1,3 +1,4 @@
+from unittest import skip
 import responses
 from mock import patch
 import requests
@@ -7,6 +8,8 @@ from os.path import join
 from django.conf import settings
 from metrics import handler, utils
 from . import base
+
+from requests.exceptions import Timeout
 
 class One(base.BaseCase):
     def setUp(self):
@@ -67,3 +70,21 @@ class One(base.BaseCase):
             expected_path = join(settings.DUMP_PATH, opid, 'body')
             self.assertTrue(os.path.isfile(expected_path))
             self.assertEqual(open(expected_path, 'r').read(), expected_body_content)
+
+    @skip("can't replicate this scenario. responses mocks the retry functionality away and I can't/won't dig deep enough into python's urllib3 to find where the `max_retries` is handled")
+    @responses.activate
+    def test_network_connection_error_retry(self):
+        "a connection is attempted three times before failing"
+        kaboom = Timeout("tick tick tick BOOOOOOM")
+
+        some_url = 'https://example.org'
+        responses.add(responses.GET, some_url, **{
+            'body': kaboom,
+            'content_type': 'text/plain'})
+
+        # we expect it to eventually die
+        self.assertRaises(Timeout, handler.requests_get, some_url)
+        
+        # after dying three previous times
+        print responses.calls.__dict__
+        self.assertEqual(len(responses.calls), 3)

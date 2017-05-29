@@ -25,7 +25,7 @@ def fetch_page(api_key, doi_prefix, page=0, per_page=25):
     }
     # https://dev.elsevier.com/tecdoc_cited_by_in_scopus.html
     # http://api.elsevier.com/documentation/SCOPUSSearchAPI.wadl
-    url = "http://api.elsevier.com/content/search/scopus"
+    url = "https://api.elsevier.com/content/search/scopus"
     resp = handler.requests_get(url, params=params, headers=headers)
     return resp.json()
 
