@@ -407,7 +407,6 @@ class Three(base.BaseCase):
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
 
-
     def test_no_overlaps(self):
         "in cases where there is an overlap between sources in a daily period, one source will be preferred"
         cases = [
@@ -418,7 +417,7 @@ class Three(base.BaseCase):
 
         # give all metrics the same date
         models.Metric.objects.all().update(date='2000-12-31')
-    
+
         # add a later metric for GA
         cases = [
             (1234, (0, 0, 1, models.DAY, models.GA)) # 2000-01-01
@@ -426,7 +425,7 @@ class Three(base.BaseCase):
         base.insert_metrics(cases)
 
         self.assertEqual(models.Metric.objects.count(), 3)
-        
+
         # in this case, the default is to prefer HW
         expected_response = {
             'totalPeriods': 2,

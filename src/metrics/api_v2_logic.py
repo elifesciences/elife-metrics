@@ -68,6 +68,41 @@ def hw_terminator(msid, period):
         .order_by('-date')
     return getattr(first(qobj), 'date', None)
 
+# temporary.
+def gabeforeafter(msid, period, term):
+    #term = hw_terminator(msid)
+    if not term:
+        xxx = {'views': None, 'dls': None}
+        return xxx, xxx
+
+    qobj = models.Metric.objects \
+      .filter(article__doi__iexact=utils.msid2doi(msid)) \
+      .filter(period=period) \
+      .filter(source=models.GA)
+
+    before = qobj.filter(date__lte=term)
+    sums = before.aggregate(
+        views=Sum(F('full') + F('abstract') + F('digest')),
+        downloads=Sum('pdf'))
+
+    before = {
+        'views': sums['views'] or 0,
+        'dls': sums['downloads'] or 0
+    }
+
+    after = qobj.exclude(date__lte=term)
+    sums = after.aggregate(
+        views=Sum(F('full') + F('abstract') + F('digest')),
+        downloads=Sum('pdf'))
+
+    after = {
+        'views': sums['views'] or 0,
+        'dls': sums['downloads'] or 0
+    }
+
+    return before, after
+
+
 def prefer_hw(qobj, msid, period, source):
     """
     elife-metrics has two sources of Metric objects, 'hw' and 'ga'.
@@ -88,9 +123,9 @@ def prefer_hw(qobj, msid, period, source):
         # a specific source has been requested, no hacking required
         return qobj
 
-    # if msid > somemsid
-    # optimisation. we don't capture published dates, but we can say that all
-    # articles with an msid > something have no hw data and can be skipped
+    if msid > 14383:
+        # 14383 was the last article to have hw stats
+        return qobj
 
     hwt = hw_terminator(msid, period)
     if not hwt:
@@ -100,7 +135,7 @@ def prefer_hw(qobj, msid, period, source):
     # exclude all GA data before HW data
     return qobj.exclude(Q(source=models.GA) & Q(date__lte=hwt))
 
-def article_stats(msid, period, source):
+def article_stats(msid, period, source, prefer_hw_metrics=True):
     ensure(period in [models.MONTH, models.DAY], "unknown period %r" % period)
     qobj = models.Metric.objects \
         .filter(article__doi__iexact=utils.msid2doi(msid)) \
@@ -110,7 +145,9 @@ def article_stats(msid, period, source):
         ensure(source in models.KNOWN_METRIC_SOURCES, "unknown source %r" % source)
         qobj = qobj.filter(source=source)
 
-    qobj = prefer_hw(qobj, msid, period, source)
+    if prefer_hw_metrics:
+        # exclude overlapping GA results
+        qobj = prefer_hw(qobj, msid, period, source)
 
     sums = qobj.aggregate(
         views=Sum(F('full') + F('abstract') + F('digest')),
