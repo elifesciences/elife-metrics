@@ -50,7 +50,7 @@ class One(base.BaseCase):
         "contents of error response is written to a file. contents of request is written"
 
         opid = handler.opid()
-        bad_url = 'http://example.org'
+        bad_url = 'http://elifesciences.org'
         expected_body_content = 'pants'
 
         responses.add(responses.GET, bad_url, **{

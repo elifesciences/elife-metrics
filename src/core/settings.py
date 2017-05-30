@@ -282,7 +282,7 @@ LOGGING = {
             'propagate': True,
         },
         'debugger': {
-            'level': 'INFO',
+            'level': 'WARN',
             'handlers': ['debugger.log', 'stderr'],
         },
         'publisher.management.commands.import_article': {

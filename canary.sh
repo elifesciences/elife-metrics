@@ -22,5 +22,7 @@ echo "[any key to continue ...]"
 read -p "$*"
 pip-review --auto --pre # update everything
 
+pip freeze > new-requirements.txt
+
 # run the tests
 . .test.sh
