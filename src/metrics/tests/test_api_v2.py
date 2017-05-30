@@ -4,7 +4,7 @@ from django.test import Client
 import base
 from django.core.urlresolvers import reverse
 
-class ApiV2(base.BaseCase):
+class One(base.BaseCase):
     def setUp(self):
         self.c = Client()
         self.metric_list = ['citations', 'downloads', 'page-views']
@@ -94,6 +94,13 @@ class ApiV2(base.BaseCase):
         for metric in self.metric_list:
             url = reverse('v2:alm', kwargs={'id': '9560', 'metric': metric})
             resp = self.c.get(url, {'page': 'pants'})
+            self.assertEqual(resp.status_code, 400)
+
+    def test_unknown_source_param(self):
+        "an unknown 'source' param results in a 400 error"
+        for metric in self.metric_list:
+            url = reverse('v2:alm', kwargs={'id': '9560', 'metric': metric})
+            resp = self.c.get(url, {'source': 'pants'})
             self.assertEqual(resp.status_code, 400)
 
     def test_api(self):
@@ -189,7 +196,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01-01',
-                    'value': 1
+                    'value': 1,
+                    'source': models.GA_LABEL,
                 }
             ]
         }
@@ -210,7 +218,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01-01',
-                    'value': 6
+                    'value': 6,
+                    'source': models.GA_LABEL,
                 }
             ]
         }
@@ -230,7 +239,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01-01',
-                    'value': 1
+                    'value': 1,
+                    'source': models.GA_LABEL
                 }
             ]
         }
@@ -250,7 +260,8 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01',
-                    'value': 1
+                    'value': 1,
+                    'source': models.GA_LABEL
                 }
             ]
         }
@@ -270,11 +281,201 @@ class ApiV2(base.BaseCase):
             'periods': [
                 {
                     'period': '2001-01',
-                    'value': 1
+                    'value': 1,
+                    'source': models.GA_LABEL,
                 }
             ]
         }
         url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'downloads'})
         resp = self.c.get(url, {'by': models.MONTH})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+class Two(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_daily_hw_views(self):
+        "daily results returned for highwire data"
+        cases = {
+            1234: (0, 0, 1, models.DAY, models.HW)
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': '2001-01-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY, 'source': models.HW})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_monthly_hw_views(self):
+        "monthly results returned for highwire data"
+        cases = {
+            1234: (0, 0, 1, models.MONTH, models.HW)
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': '2001-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.MONTH, 'source': models.HW})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+class Three(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_both_metrics_returned(self):
+        "daily results returned include both google and highwire data"
+        cases = [
+            (1234, (0, 0, 1, models.DAY, models.HW)),
+            (1234, (0, 0, 1, models.DAY, models.GA))
+        ]
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 2,
+            'totalValue': 2,
+            'periods': [
+                {
+                    'period': '2001-01-02',
+                    'value': 1,
+                    'source': models.GA_LABEL,
+                },
+                {
+                    'period': '2001-01-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                },
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_single_daily_metric_returned_no_overlap(self):
+        "in cases where there is an overlap between sources in a daily period, one source will be preferred"
+        cases = [
+            (1234, (0, 0, 1, models.DAY, models.HW)),
+            (1234, (0, 0, 1, models.DAY, models.GA))
+        ]
+        base.insert_metrics(cases)
+
+        # give all metrics the same date
+        models.Metric.objects.all().update(date='2001-01-01')
+        self.assertEqual(models.Metric.objects.count(), 2)
+
+        # in this case, the default is to prefer HW
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': '2001-01-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                },
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY})
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_no_overlaps(self):
+        "in cases where there is an overlap between sources in a daily period, one source will be preferred"
+        cases = [
+            (1234, (0, 0, 1, models.DAY, models.HW)),
+            (1234, (0, 0, 1, models.DAY, models.GA))
+        ]
+        base.insert_metrics(cases)
+
+        # give all metrics the same date
+        models.Metric.objects.all().update(date='2000-12-31')
+
+        # add a later metric for GA
+        cases = [
+            (1234, (0, 0, 1, models.DAY, models.GA)) # 2000-01-01
+        ]
+        base.insert_metrics(cases)
+
+        self.assertEqual(models.Metric.objects.count(), 3)
+
+        # in this case, the default is to prefer HW
+        expected_response = {
+            'totalPeriods': 2,
+            'totalValue': 2,
+            'periods': [
+                {
+                    'period': '2001-01-01',
+                    'value': 1,
+                    'source': models.GA_LABEL,
+                },
+                {
+                    'period': '2000-12-31',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                },
+
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY})
+
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_monthly_metrics_returned_no_overlap(self):
+        "in cases where there is an overlap between sources in a monthly period, one source will be preferred"
+        cases = [
+            (1234, (0, 0, 1, models.MONTH, models.HW)),
+            (1234, (0, 0, 1, models.MONTH, models.GA))
+        ]
+        base.insert_metrics(cases)
+
+        # give all metrics the same date
+        models.Metric.objects.all().update(date='2001-01')
+        self.assertEqual(models.Metric.objects.count(), 2)
+
+        # in this case, the default is to prefer HW
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 1,
+            'periods': [
+                {
+                    'period': '2001-01',
+                    'value': 1,
+                    'source': models.HW_LABEL,
+                },
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.MONTH})
+
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)

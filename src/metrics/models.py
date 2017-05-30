@@ -43,13 +43,11 @@ def metric_period_list():
         (EVER, 'All time'),
     ]
 
-GA, HW = 'ga', 'hw'
+KNOWN_METRIC_SOURCES = GA, HW = 'ga', 'hw'
+KNOWN_METRIC_SOURCE_LABELS = GA_LABEL, HW_LABEL = 'Google Analytics', 'HighWire'
 
 def metric_source_list():
-    return [
-        (GA, 'Google Analytics'),
-        (HW, 'Highwire'),
-    ]
+    return zip(KNOWN_METRIC_SOURCES, KNOWN_METRIC_SOURCE_LABELS)
 
 class Metric(models.Model):
     article = ForeignKey(Article)
@@ -72,6 +70,9 @@ class Metric(models.Model):
     @property
     def views(self):
         return self.abstract + self.full + self.digest
+
+    def source_label(self):
+        return HW_LABEL if self.source == HW else GA_LABEL
 
     class Meta:
         unique_together = ('article', 'date', 'period', 'source')

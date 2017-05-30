@@ -226,7 +226,7 @@ LOG_FILE = join(PROJECT_DIR, LOG_NAME) # ll: /path/to/lax/log/lax.log
 if ENV != DEV:
     LOG_FILE = join('/var/log/', LOG_NAME) # ll: /var/log/lax.log
 
-DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log')
+DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log') # ll: /srv/elife-metrics/debugme.log
 
 # whereever our log files are, ensure they are writable before we do anything else.
 def writable(path):

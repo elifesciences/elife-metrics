@@ -15,6 +15,11 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+def string_lower(x):
+    if not x:
+        return x
+    return string.lower(x)
+
 def request_args(request, **overrides):
     opts = {}
     opts.update(settings.API_OPTS)
@@ -30,8 +35,11 @@ def request_args(request, **overrides):
             return v
         return fn
 
-    def isin(lst):
+    def isin(seq, allow_none=False):
         def fn(val):
+            lst = list(seq)
+            if allow_none:
+                lst.append(None)
             ensure(val in lst, "value %r is not in %r" % (val, lst))
             return val
         return fn
@@ -42,6 +50,8 @@ def request_args(request, **overrides):
         'order': [p('order', opts['order_direction']), string.upper, isin(['ASC', 'DESC'])],
 
         'period': [p('by', 'day'), string.lower, isin(['day', 'month'])],
+
+        'source': [p('source', None), string_lower, isin(models.KNOWN_METRIC_SOURCES, allow_none=True)],
     }
     return render_item(desc, request.GET)
 
@@ -64,7 +74,8 @@ def serialize_views_downloads(metric, total, sum_value, obj_list):
     def do(obj):
         return {
             'period': obj.date,
-            'value': getattr(obj, attr)
+            'value': getattr(obj, attr),
+            'source': obj.source_label()
         }
     return {
         'totalPeriods': total,
@@ -93,9 +104,9 @@ def article_metrics(request, id, metric):
             'page-views': logic.article_views,
         }
         # fetch our results
-        sum_value, qobj = idx[metric](id, kwargs['period'])
+        sum_value, qobj = idx[metric](id, kwargs['period'], kwargs['source'])
         # paginate
-        total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
+        total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period', 'source']))
         # serialize
         payload = serialize(total_results, sum_value, qpage, metric)
 

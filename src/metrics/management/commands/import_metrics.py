@@ -4,26 +4,10 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from metrics import logic, models
+from metrics.utils import first, rest
 
 import logging
 LOG = logging.getLogger('debugger')
-
-'''
-def hw_or_ga(v):
-    pv = v.lower().strip()
-    if not pv in ['ga', 'hw']:
-        raise argparse.ArgumentTypeError("'--just-source' accepts only 'hw' or 'ga'" % v)
-    return pv
-'''
-
-def first(x):
-    try:
-        return x[0]
-    except (TypeError, KeyError):
-        return None
-
-def rest(x):
-    return x[1:]
 
 class Command(BaseCommand):
     help = 'imports all metrics from google analytics'
@@ -43,6 +27,8 @@ class Command(BaseCommand):
         # import *only* from cached results, don't try to fetch from remote
         parser.add_argument('--only-cached', dest='only_cached', action="store_true", default=False)
 
+        parser.add_argument('--dry-run', action="store_true", default=False)
+
         # citations
         # ...
 
@@ -55,6 +41,8 @@ class Command(BaseCommand):
 
         from_date = n_days_ago
         to_date = today
+
+        dry_run = options['dry_run']
 
         # print 'use cached? %r only cached? %r' % (use_cached, only_cached)
 
@@ -73,6 +61,10 @@ class Command(BaseCommand):
 
         try:
             start_time = time.time() # seconds since epoch
+
+            if dry_run:
+                sources = {}
+
             for source, row in sources.items():
                 try:
                     fn, args = first(row), rest(row)
@@ -104,5 +96,4 @@ class Command(BaseCommand):
             LOG.critical(msg) # we can't recover, this command must exit
             exit(1)
 
-        self.stdout.write("...done\n")
-        self.stdout.flush()
+        exit(0)
