@@ -1,3 +1,4 @@
+import time
 import os, json
 import tempfile, shutil
 from functools import wraps
@@ -251,3 +252,27 @@ def partial_match(patn, real):
         else:
             ensure(real[pkey] == pvalue, "%s != %s" % (real[pkey], pvalue))
     return True
+
+#
+#
+#
+
+# don't use if we ever go concurrent
+# http://blog.gregburek.com/2011/12/05/Rate-limiting-with-decorators/
+# https://stackoverflow.com/questions/667508/whats-a-good-rate-limiting-algorithm/667706#667706
+def simple_rate_limiter(maxPerSecond):
+    minInterval = 1.0 / float(maxPerSecond)
+
+    def decorate(func):
+        lastTimeCalled = [0.0]
+
+        def rateLimitedFunction(*args, **kargs):
+            elapsed = time.clock() - lastTimeCalled[0]
+            leftToWait = minInterval - elapsed
+            if leftToWait > 0:
+                time.sleep(leftToWait)
+            ret = func(*args, **kargs)
+            lastTimeCalled[0] = time.clock()
+            return ret
+        return rateLimitedFunction
+    return decorate

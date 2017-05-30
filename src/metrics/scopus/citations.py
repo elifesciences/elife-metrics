@@ -2,10 +2,15 @@ import requests
 import logging
 from django.conf import settings
 from metrics import models, handler
-from metrics.utils import first, flatten
+from metrics.utils import first, flatten, simple_rate_limiter
 
 LOG = logging.getLogger(__name__)
 
+URL = "https://api.elsevier.com/content/search/scopus"
+
+MAX_PER_SECOND = 3
+
+@simple_rate_limiter(MAX_PER_SECOND) # no more than this per second
 def fetch_page(api_key, doi_prefix, page=0, per_page=25):
     "fetches a page of scopus search results"
     params = {
@@ -25,9 +30,7 @@ def fetch_page(api_key, doi_prefix, page=0, per_page=25):
     }
     # https://dev.elsevier.com/tecdoc_cited_by_in_scopus.html
     # http://api.elsevier.com/documentation/SCOPUSSearchAPI.wadl
-    url = "https://api.elsevier.com/content/search/scopus"
-    resp = handler.requests_get(url, params=params, headers=headers)
-    return resp.json()
+    return handler.requests_get(URL, params=params, headers=headers)
 
 def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     """searches scopus, returning a generator that will iterate through each page
@@ -37,7 +40,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     page = 0
     per_page = 25 # max per page
 
-    data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page)
+    data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page).json()
 
     yield data['search-results']
 
@@ -56,7 +59,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
                 if page == max_pages:
                     raise GeneratorExit("hit max pages (%s)" % max_pages)
 
-                data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page)
+                data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page).json()
                 yield data['search-results']
 
                 # exit early if we start hitting 0 results
