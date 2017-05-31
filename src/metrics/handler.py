@@ -78,6 +78,8 @@ HANDLERS = {
 }
 DEFAULT_HANDLER = raise_handler
 
+MAX_RETRIES = 3
+
 def requests_get(*args, **kwargs):
     id = kwargs.pop('opid', opid())
     ctx = {
@@ -85,9 +87,20 @@ def requests_get(*args, **kwargs):
     }
     handler_opts = kwargs.pop('opts', {})
 
+    # set any defaults for requests here
+    default_kwargs = {
+        'timeout': (3.05, 9), # connect time out, read timeout
+    }
+    default_kwargs.update(kwargs)
+    kwargs = default_kwargs
+
     try:
-        # TODO: opportunity here for recovery from certain errors
-        resp = requests.get(*args, **kwargs)
+        # http://docs.python-requests.org/en/master/api/#request-sessions
+        session = requests.Session()
+        adaptor = requests.adapters.HTTPAdapter(max_retries=MAX_RETRIES)
+        session.mount('https://', adaptor)
+
+        resp = session.get(*args, **kwargs)
         resp.raise_for_status()
         return resp
 

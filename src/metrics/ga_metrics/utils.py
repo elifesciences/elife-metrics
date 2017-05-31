@@ -78,7 +78,7 @@ def deplumpen(artid):
         # TODO: consider turning this into a hard failure
         LOG.error("unable to deplump %r", artid)
         return artid
-    except:
+    except BaseException:
         msg = "unhandled exception attempting to parse given value %r" % str(artid)
         LOG.error(msg)
         raise ValueError(msg)
