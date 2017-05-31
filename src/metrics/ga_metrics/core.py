@@ -11,12 +11,10 @@ __author__ = [
 from os.path import join
 import os, json, time, random
 from datetime import datetime, timedelta
-#from googleapiclient.errors import HttpError
 from googleapiclient import errors
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
 from oauth2client.service_account import ServiceAccountCredentials
-#from oauth2client import file as oauth_file
 from httplib2 import Http
 from .utils import ymd, firstof, month_min_max
 from kids.cache import cache
@@ -25,7 +23,7 @@ import logging
 from django.conf import settings
 
 
-import elife_v1, elife_v2, elife_v3
+import elife_v1, elife_v2, elife_v3, elife_v4
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)
@@ -54,6 +52,9 @@ SITE_SWITCH = datetime(year=2016, month=2, day=9)
 # https://github.com/elifesciences/elife-website/commit/446408019f7ec999adc6c9a80e8fa28966a42304
 VERSIONLESS_URLS = datetime(year=2016, month=5, day=5)
 VERSIONLESS_URLS_MONTH = month_min_max(VERSIONLESS_URLS)
+
+# when we first started using 2.0 urls
+SITE_SWITCH_v2 = datetime(year=2017, month=6, day=1)
 
 #
 # utils
@@ -223,6 +224,9 @@ def module_picker(from_date, to_date):
     "determine which module we should be using for scraping this date range"
     daily = from_date == to_date
     if daily:
+        if from_date >= SITE_SWITCH_v2:
+            return elife_v4
+
         if from_date > VERSIONLESS_URLS:
             return elife_v3
 
@@ -231,6 +235,9 @@ def module_picker(from_date, to_date):
 
     # monthly/arbitrary range
     else:
+        if from_date >= SITE_SWITCH_v2:
+            return elife_v4
+
         if (from_date, to_date) == VERSIONLESS_URLS_MONTH:
             # business rule: if the given from-to dates represent a
             # monthly date range and that date range is the same year+month
