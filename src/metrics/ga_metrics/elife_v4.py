@@ -25,7 +25,7 @@ event_counts = elife_v1.event_counts
 def path_counts_query(table_id, from_date, to_date):
     # use the v1 query as a template
     new_query = elife_v1.path_counts_query(table_id, from_date, to_date)
-    new_query['filters'] = r'ga:pagePath=~^/articles/[0-9]{1,5}$'
+    new_query['filters'] = r'ga:pagePath=~^/articles/[0-9]+$'
     return new_query
 
 REGEX = r"/articles/(?P<artid>\d+)$"
