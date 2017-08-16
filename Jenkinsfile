@@ -24,6 +24,13 @@ elifePipeline {
             )
         }
 
+        stage 'Deploy on continuumtest', {
+            lock('elife-metrics--continuumtest') {
+                builderDeployRevision 'elife-metrics--continuumtest', commit
+                builderSmokeTests 'elife-metrics--continuumtest', '/srv/elife-metrics'
+            }
+        }
+
         stage 'Approval', {
             elifeGitMoveToBranch commit, 'approved'
         }
