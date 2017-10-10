@@ -1,3 +1,5 @@
+import yaml
+from collections import OrderedDict
 import time
 import os, json
 import tempfile, shutil
@@ -22,6 +24,21 @@ def comp(*fns):
             res = fn(res)
         return res
     return _comp
+
+def yaml_loads(stream):
+    loader_class = yaml.Loader
+    object_pairs_hook=OrderedDict
+    # pylint: disable=too-many-ancestors
+    class OrderedLoader(loader_class):
+        pass
+
+    def construct_mapping(loader, node):
+        loader.flatten_mapping(node)
+        return object_pairs_hook(loader.construct_pairs(node))
+    OrderedLoader.add_constructor(
+        yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+        construct_mapping)
+    return yaml.load(stream, OrderedLoader)
 
 '''
 def eargs(fn):
@@ -82,25 +99,25 @@ def firstnn(x):
 def rest(x):
     return x[1:]
 
-def ensure(assertion, msg, *args):
+def ensure(assertion, msg, Klass=AssertionError):
     """intended as a convenient replacement for `assert` statements that
     get compiled away with -O flags"""
     if not assertion:
-        raise AssertionError(msg % args)
+        raise Klass(msg)
 
 def pad_msid(msid):
     return str(int(msid)).zfill(5)
 
 def doi2msid(doi):
     "doi to manuscript id used in EJP"
-    prefix = '10.7554/eLife.'
-    ensure(doi.startswith(prefix), "this doesn't look like an eLife doi: %s" % prefix)
+    prefix = '10.7554/elife.'
+    ensure(doi.lower().startswith(prefix), "this doesn't look like an eLife doi: %s" % doi)
     stripped = doi[len(prefix):].lstrip('0')
     # handles dois like: 10.7554/eLife.09560.001
     return int(stripped.split('.')[0])
 
 def msid2doi(msid):
-    assert isint(msid), "given msid must be an integer: %r" % msid
+    ensure(isint(msid), "given msid must be an integer: %r" % msid)
     return '10.7554/eLife.%05d' % int(msid)
 
 def subdict(d, kl):
