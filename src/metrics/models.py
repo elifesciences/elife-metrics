@@ -134,3 +134,28 @@ class Citation(models.Model):
 
     def __repr__(self):
         return '<Citation %s>' % self
+
+#
+#
+# 
+
+class Page(models.Model):
+    name = CharField(max_length=100, unique=True)
+    pattern = CharField(max_length=255, help_text="regex used to generate GA queries")
+
+    def __unicode__(self):
+        return self.name
+
+    def __repr__(self):
+        return '<ContentType %s %r>' % (self.name, self.pattern)
+    
+class Path:
+    page = ForeignKey(Page)
+    path = CharField(max_length=255, help_text="fully resolved path using linked pattern.") # long enough?
+    count = PositiveIntegerField(help_text="total sessions since ever")
+
+    def __unicode__(self):
+        return self.path
+
+    def __repr__(self):
+        return '<Path %r %s>' % (self.path, self.count)

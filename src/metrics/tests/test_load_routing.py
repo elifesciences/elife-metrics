@@ -1,5 +1,5 @@
 import base
-from metrics import load_routing
+from metrics import load_routing, models
 
 class One(base.BaseCase):
     def setUp(self):
@@ -60,3 +60,7 @@ article-type:
         
         self.assertEqual(expected, load_routing.loads(fixture))
 
+    def test_pattern_loaded_into_db(self):
+        ctypes = load_routing.loads(self.fixture)
+        map(load_routing.insert, ctypes)
+        self.assertEqual(len(ctypes), models.Page.objects.count())

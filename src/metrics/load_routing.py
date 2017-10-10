@@ -1,6 +1,6 @@
 import re
 from StringIO import StringIO
-import utils
+import utils, models
 from utils import ensure
 
 def parse(name, body):
@@ -60,3 +60,11 @@ def loads(string):
 
 def load(path):
     return loads(open(path, 'r').read())
+
+
+#
+#
+#
+
+def insert(row):
+    return utils.create_or_update(models.Page, row, ['name'])
