@@ -15,6 +15,13 @@ about-people:
          _controller: AppBundle:About:people
          type: ''
 
+article-ris:
+    path: /articles/{id}.ris
+    defaults:
+         _controller: AppBundle:Articles:ris
+    requirements:
+        id: '[a-z0-9-]+'
+
 collection:
     path: /collections/{id}/{slug}
     defaults:
@@ -30,8 +37,9 @@ collection:
 
     def test_load(self):
         expected = [
-            {'name': 'about-peer-review', 'pattern': 'ga:pagePath=~^/about/peer-review$'},
+            {'name': 'about-peer-review', 'pattern': 'ga:pagePath=~^/about/peer\-review$'},
             {'name': 'about-people', 'pattern': 'ga:pagePath=~^/about/people/.+$'},
+            {'name': 'article-ris', 'pattern': 'ga:pagePath=~^/articles/[a-z0-9-]+\.ris$'},
             {'name': 'collection', 'pattern': 'ga:pagePath=~^/collections/[a-z0-9-]+/.+$'}
         ]
         self.assertEqual(expected, load_routing.loads(self.fixture))

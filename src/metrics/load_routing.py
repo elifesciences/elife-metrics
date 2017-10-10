@@ -7,6 +7,12 @@ def parse(name, body):
     retval = {'name': name, 'pattern': body['path']}
     path = body['path']
 
+    # the path becomes a regular expression.
+    # certain cases need to be escaped while we're still dealing with simple placeholders
+    # re.escape is overkill
+    escaped = r'([.-])'
+    path = re.sub(escaped, r'\\\1', path) # foo.bar => foo\.bar and foo-bar => foo\-bar
+
     if '{' in path:
         # path contains placeholders
         # replace placeholders with regular expressions
@@ -23,7 +29,8 @@ def parse(name, body):
 
     pattern = "^%s$" % path
     ga_pattern = "ga:pagePath=~" + pattern
-    
+
+    # TODO: shift this into an 'explode' type function
     if len(pattern) > 128 and '|' in pattern:
         # this regex is too damn long. in some cases we can explode patterns
         # in this case, we're looking for patterns like '/(foo|bar|baz|bup)/' to explode
@@ -33,7 +40,6 @@ def parse(name, body):
         if not match:
             raise ValueError("failed to reduce size of regular expression. GA will refuse to run this query: %s" % ga_pattern)
         
-        subs = []
         match = match.group()
         subs = match.strip('()').split('|') # explode
         subs = map(lambda sub: ga_pattern.replace(match, sub), subs)
@@ -51,3 +57,6 @@ def loads(string):
     raw = utils.yaml_loads(StringIO(string))
     ensure(isinstance(raw, dict), "dictionary expected after deserialising", ValueError)
     return [parse(name, rest) for name, rest in raw.items()]
+
+def load(path):
+    return loads(open(path, 'r').read())
