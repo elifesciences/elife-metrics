@@ -207,6 +207,8 @@ SCHEMA_IDX = {
 }
 API_PATH = join(SCHEMA_PATH, 'api.raml')
 
+JOURNAL_ROUTES = join(PROJECT_DIR, 'schema/journal/routing.yml')
+
 def _load_api_raml(path):
     # load the api.raml file, ignoring any "!include" commands
     yaml.add_multi_constructor('', lambda *args: '[disabled]')
