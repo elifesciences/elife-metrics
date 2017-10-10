@@ -3,7 +3,7 @@ set -e
 
 sha=024702b4130f3d2e8209a1801c9a594d655a8a03
 url="https://raw.githubusercontent.com/elifesciences/journal/$sha/app/config/routing.yml"
-schema_path="./schema/api-raml/journal"
+schema_path="./schema/journal"
 
 mkdir -p "$schema_path"
 
