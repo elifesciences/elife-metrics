@@ -55,6 +55,8 @@ SCOPUS_KEY = cfg('scopus.api-key')
 CROSSREF_USER = cfg('crossref.user')
 CROSSREF_PASS = cfg('crossref.pass')
 
+TWOPOINTZERO_START = datetime(year=2017, month=1, day=1) # TODO: fix + stupid name
+
 # time in days before the cached requests expires
 CACHE_EXPIRY = 2 # days
 

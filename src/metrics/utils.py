@@ -27,7 +27,7 @@ def comp(*fns):
 
 def yaml_loads(stream):
     loader_class = yaml.Loader
-    object_pairs_hook=OrderedDict
+    object_pairs_hook = OrderedDict
     # pylint: disable=too-many-ancestors
     class OrderedLoader(loader_class):
         pass
@@ -113,6 +113,9 @@ def doi2msid(doi):
     prefix = '10.7554/elife.'
     ensure(doi.lower().startswith(prefix), "this doesn't look like an eLife doi: %s" % doi)
     stripped = doi[len(prefix):].lstrip('0')
+    if not stripped:
+        # some joker has given us 10.7554/eLife.00000
+        stripped = '0' # lucky non-article '0'
     # handles dois like: 10.7554/eLife.09560.001
     return int(stripped.split('.')[0])
 

@@ -137,7 +137,7 @@ class Citation(models.Model):
 
 #
 #
-# 
+#
 
 class Page(models.Model):
     name = CharField(max_length=100, unique=True)
@@ -148,8 +148,8 @@ class Page(models.Model):
 
     def __repr__(self):
         return '<ContentType %s %r>' % (self.name, self.pattern)
-    
-class Path:
+
+class Path(models.Model):
     page = ForeignKey(Page)
     path = CharField(max_length=255, help_text="fully resolved path using linked pattern.") # long enough?
     count = PositiveIntegerField(help_text="total sessions since ever")

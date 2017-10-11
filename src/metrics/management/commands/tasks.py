@@ -9,7 +9,7 @@ LOG = logging.getLogger('debugger')
 def ga_journal_routes():
     "converts the journal routes into GA queries"
     print json.dumps(load_routing.load(settings.JOURNAL_ROUTES), indent=4)
-    
+
 
 TASKS = {
     'ga-journal-routes': ga_journal_routes

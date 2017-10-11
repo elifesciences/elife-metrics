@@ -39,7 +39,7 @@ def parse(name, body):
         match = next(matches)
         if not match:
             raise ValueError("failed to reduce size of regular expression. GA will refuse to run this query: %s" % ga_pattern)
-        
+
         match = match.group()
         subs = match.strip('()').split('|') # explode
         subs = map(lambda sub: ga_pattern.replace(match, sub), subs)
@@ -49,7 +49,7 @@ def parse(name, body):
 
         # make a super long expression
         ga_pattern = ",".join(subs)
-    
+
     retval['pattern'] = ga_pattern
     return retval
 
@@ -66,5 +66,44 @@ def load(path):
 #
 #
 
+def ga_regex(pattern):
+    return pattern.startswith('ga:pagePath=~')
+
 def insert(row):
+    ensure(ga_regex(row['pattern']), "regular expression doesn't look like something we can give to google.", ValueError)
     return utils.create_or_update(models.Page, row, ['name'])
+
+#
+#
+#
+
+from ga_metrics import core, utils as ga_utils
+from datetime import datetime
+from django.conf import settings
+
+def populate(page):
+    table_id = ga_utils.norm_table_id(settings.GA_TABLE_ID)
+    from_date, to_date = settings.TWOPOINTZERO_START, datetime.now()
+
+    query_map = {
+        'ids': table_id,
+        'max_results': 10000, # 10,000 is the max GA will ever return
+        'start_date': utils.ymd(from_date),
+        'end_date': utils.ymd(to_date),
+        'metrics': 'ga:sessions', # less flattering, more accurate
+        'dimensions': 'ga:pagePath',
+        'sort': 'ga:pagePath',
+        'filters': page.pattern,
+    }
+    results = core.query_ga(query_map)
+
+    def insert_path(row):
+        path, count = row
+        row = {
+            'page': page,
+            'path': path,
+            'count': count
+        }
+        return utils.create_or_update(models.Path, row, ['page', 'path'])
+
+    return map(insert_path, results['rows'])
