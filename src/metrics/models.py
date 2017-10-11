@@ -141,7 +141,7 @@ class Citation(models.Model):
 
 class Page(models.Model):
     name = CharField(max_length=100, unique=True)
-    pattern = CharField(max_length=255, help_text="regex used to generate GA queries")
+    pattern = CharField(max_length=500, help_text="regex used to generate GA queries")
 
     def __unicode__(self):
         return self.name

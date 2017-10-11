@@ -1,3 +1,5 @@
+import json
+from os.path import join
 import base
 from mock import patch
 from metrics import load_routing, models
@@ -99,3 +101,26 @@ article-type:
         self.assertEqual(views.page, page)
         self.assertEqual(views.path, '/about/peer-review')
         self.assertEqual(views.count, 440)
+
+    def test_call_ga2(self):
+        "call GA with something a little more complex"
+        fixture = '''
+article-type:
+    path: /articles/{type}
+    defaults:
+         _controller: AppBundle:ArticleTypes:list
+    requirements:
+        type: '(correction|editorial|feature|insight|research-advance|research-article|retraction|registered-report|replication-study|scientific-correspondence|short-report|tools-resources)'
+        '''
+        route = load_routing.loads(fixture)[0]
+        page = load_routing.insert(route)[0]
+
+        ga_fixture = json.load(open(join(self.fixture_dir, 'ga-ctype', 'exploded-fixture.json'), 'r'))
+        with patch('metrics.ga_metrics.core.query_ga', return_value=ga_fixture):
+            load_routing.populate(page)
+        self.assertEqual(models.Path.objects.all().count(), 10)
+
+        expected = ga_fixture['rows']
+        for path, path_count in expected:
+            # will fail if doesn't exist
+            models.Path.objects.get(page=page, path=path, count=path_count)

@@ -3,6 +3,10 @@ from StringIO import StringIO
 import utils, models
 from utils import ensure
 
+from ga_metrics import core, utils as ga_utils
+from datetime import datetime
+from django.conf import settings
+
 def parse(name, body):
     retval = {'name': name, 'pattern': body['path']}
     path = body['path']
@@ -76,10 +80,6 @@ def insert(row):
 #
 #
 #
-
-from ga_metrics import core, utils as ga_utils
-from datetime import datetime
-from django.conf import settings
 
 def populate(page):
     table_id = ga_utils.norm_table_id(settings.GA_TABLE_ID)
