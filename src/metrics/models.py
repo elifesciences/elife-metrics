@@ -151,7 +151,7 @@ class Page(models.Model):
 
 class Path(models.Model):
     page = ForeignKey(Page)
-    path = CharField(max_length=255, help_text="fully resolved path using linked pattern.") # long enough?
+    path = CharField(max_length=500, help_text="fully resolved path using linked pattern.") # long enough?
     count = PositiveIntegerField(help_text="total sessions since ever")
 
     def __unicode__(self):
