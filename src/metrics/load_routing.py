@@ -2,7 +2,7 @@ import re
 from StringIO import StringIO
 import utils, models
 from utils import ensure, first
-
+from utils import atomic
 from ga_metrics import core, utils as ga_utils
 from datetime import datetime
 from django.conf import settings
@@ -58,7 +58,10 @@ def parse(name, body):
     return retval
 
 def excluded(name, rest):
-    return rest['path'].startswith('/articles/')
+    path = rest['path']
+    return path.startswith('/articles/') \
+        or path.startswith('/lookup/doi/') \
+        or path.startswith('/download/')
 
 def loads(string):
     raw = utils.yaml_loads(StringIO(string))
@@ -80,7 +83,8 @@ def insert(page_route):
     ensure(ga_regex(page_route['pattern']), "regular expression doesn't look like something we can give to google.", ValueError)
     return utils.create_or_update(models.Page, page_route, ['name'])
 
-def insert_all(page_route_list):
+@atomic
+def insert_all(page_route_list, dry_run=False):
     return map(first, map(insert, page_route_list))
 
 #
@@ -114,5 +118,6 @@ def update_page_counts(page):
 
     return map(insert_path, results.get('rows', []))
 
-def update_all_page_counts():
+@atomic
+def update_all_page_counts(dry_run=False):
     return map(update_page_counts, models.Page.objects.all())

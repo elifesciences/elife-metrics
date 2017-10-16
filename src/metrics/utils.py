@@ -296,3 +296,30 @@ def simple_rate_limiter(maxPerSecond):
             return ret
         return rateLimitedFunction
     return decorate
+
+#
+#
+#
+
+# copied directly from lax
+from django.db import transaction, IntegrityError
+def atomic(fn):
+    def wrapper(*args, **kwargs):
+        result, rollback_key = None, 'dry run rollback'
+        # NOTE: dry_run must always be passed as keyword parameter (dry_run=True)
+        dry_run = kwargs.pop('dry_run', False)
+        try:
+            with transaction.atomic():
+                result = fn(*args, **kwargs)
+                if dry_run:
+                    # `transaction.rollback()` doesn't work here because the `transaction.atomic()`
+                    # block is expecting to do all the work and only rollback on exceptions
+                    raise IntegrityError(rollback_key)
+                return result
+        except IntegrityError as err:
+            message = err.args[0]
+            if dry_run and message == rollback_key:
+                return result
+            # this was some other IntegrityError
+            raise
+    return wrapper
