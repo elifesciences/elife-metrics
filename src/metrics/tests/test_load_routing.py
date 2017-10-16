@@ -125,3 +125,24 @@ article-type:
         for path, path_count in expected:
             # will fail if doesn't exist
             models.Path.objects.get(page=page, path=path, count=path_count)
+
+class Two(base.BaseCase):
+    def test_norm_path(self):
+        cases = [
+            ('/foo', '/foo'),
+            ('/foo/bar', '/foo/bar'),
+            ('/foo/bar?blah=blah', '/foo/bar'),
+            ('/foo/bar#blahblah', '/foo/bar'),
+            ('/foo/bar#blahblah?blah=blah', '/foo/bar'),
+
+            ('/FOO/bar', '/foo/bar'),
+            ('/fOo/bAr', '/foo/bar'),
+
+            # actual cases
+
+            ('/inside-elife/e832444e/innovation-understanding-the-demand-for-reproducible-research-articles#utm_source=newsletter&utm_medium=email&utm_campaign=RE_newsletter_08_2017',
+             '/inside-elife/e832444e/innovation-understanding-the-demand-for-reproducible-research-articles'),
+            ('/InsIde-elife', '/inside-elife'),
+        ]
+        for given, expected in cases:
+            self.assertEqual(expected, load_routing.norm_path(given))

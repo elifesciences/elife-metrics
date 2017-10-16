@@ -3,27 +3,11 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
-from metrics import logic, models
+from metrics import logic, models, load_routing
+from metrics.utils import first, rest
 
 import logging
 LOG = logging.getLogger('debugger')
-
-'''
-def hw_or_ga(v):
-    pv = v.lower().strip()
-    if not pv in ['ga', 'hw']:
-        raise argparse.ArgumentTypeError("'--just-source' accepts only 'hw' or 'ga'" % v)
-    return pv
-'''
-
-def first(x):
-    try:
-        return x[0]
-    except (TypeError, KeyError):
-        return None
-
-def rest(x):
-    return x[1:]
 
 class Command(BaseCommand):
     help = 'imports all metrics from google analytics'
@@ -69,6 +53,7 @@ class Command(BaseCommand):
             (models.CROSSREF, (logic.import_crossref_citations,)),
             (models.SCOPUS, (logic.import_scopus_citations,)),
             (models.PUBMED, (logic.import_pmc_citations,)),
+            (models.PAGE, (load_routing.update_all_page_counts,)),
         ])
 
         try:

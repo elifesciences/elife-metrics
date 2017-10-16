@@ -3,6 +3,9 @@ from django.test import TestCase as DjangoTestCase, TransactionTestCase
 import unittest
 from metrics import utils, models, logic
 from datetime import timedelta, datetime
+from django.core.management import call_command as dj_call_command
+from StringIO import StringIO
+
 
 BASE_DATE = datetime(year=2001, month=1, day=1)
 
@@ -69,6 +72,15 @@ def insert_metrics(abbr_list):
     for msid, data in abbr_list:
         date += timedelta(days=1)
         wrangle(msid, data, date)
+
+def call_command(*args, **kwargs):
+    stdout = StringIO()
+    try:
+        kwargs['stdout'] = stdout
+        dj_call_command(*args, **kwargs)
+    except SystemExit as err:
+        return err.code, stdout.getvalue()
+    raise AssertionError("management scripts should always throw a systemexit()")
 
 class SimpleBaseCase(unittest.TestCase):
     "use this base if you don't need database wrangling"

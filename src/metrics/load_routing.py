@@ -3,10 +3,11 @@ from StringIO import StringIO
 import utils, models
 from utils import ensure, first
 from utils import atomic
-from ga_metrics import core, utils as ga_utils
+from ga_metrics import core as ga_core, utils as ga_utils
 from datetime import datetime
 from django.conf import settings
 from collections import Counter
+from functools import reduce
 
 def parse(name, body):
     retval = {'name': name, 'pattern': body['path']}
@@ -92,6 +93,27 @@ def insert_all(page_route_list, dry_run=False):
 #
 #
 
+def norm_path(path):
+    "takes a path given to us by GA and normalises it for counting"
+    anchor_pos = path.find('#')
+    if anchor_pos > -1:
+        path = path[:anchor_pos]
+
+    param_pos = path.find('?')
+    if param_pos > -1:
+        path = path[:param_pos]
+
+    path = path.lower()
+
+    return path
+
+def norm_row(row):
+    path, count = row
+    return {
+        'path': norm_path(path),
+        'count': Counter(count=int(count))
+    }
+
 def update_page_counts(page):
     table_id = ga_utils.norm_table_id(settings.GA_TABLE_ID)
     from_date, to_date = settings.TWOPOINTZERO_START, datetime.now()
@@ -106,24 +128,10 @@ def update_page_counts(page):
         'sort': 'ga:pagePath',
         'filters': page.pattern,
     }
-    results = core.query_ga(query_map)
-
-    results = results.get('rows', [])
-
-    def norm_path(row):
-        path, count = row
-        param_pos = path.find('?')
-        if param_pos > -1:
-            path = path[:param_pos]
-        count = int(count)
-        return {
-            'page': page,
-            'path': path,
-            'count': Counter(count=count)
-        }
+    results = ga_core.query_ga(query_map)
 
     # post-process the result, do stuff we couldn't do in GA
-    results = map(norm_path, results)
+    results = map(norm_row, results.get('rows', []))
 
     # after normalising the path, we're going to have duplicate paths
     grouped_results = utils.group(results, lambda m: m['path'])
@@ -137,6 +145,7 @@ def update_page_counts(page):
 
     def insert_path(row):
         row['count'] = sum(row['count'].values()) # tally the results
+        row['page'] = page
         return utils.create_or_update(models.Path, row, ['page', 'path'])
 
     return map(insert_path, results)

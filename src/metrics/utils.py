@@ -44,7 +44,7 @@ def group(lst, keyfn):
     grps = {}
     for x in lst:
         # would this work?
-        #grps.get(keyfn(x), []).append(x)            
+        #grps.get(keyfn(x), []).append(x)
         key = keyfn(x)
         grp = grps.get(key, [])
         grp.append(x)

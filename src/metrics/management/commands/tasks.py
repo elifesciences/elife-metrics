@@ -6,22 +6,17 @@ from metrics import load_routing
 import logging
 LOG = logging.getLogger('debugger')
 
-def print_journal_routes():
+def print_journal_routes(stdout):
     "converts the journal routes into GA queries"
-    print json.dumps(load_routing.load(settings.JOURNAL_ROUTES), indent=4)
+    stdout.write(json.dumps(load_routing.load(settings.JOURNAL_ROUTES), indent=4))
 
-def load_journal_routes():
+def load_journal_routes(stdout):
     "load the journal routes from the schema directory and create Page objects"
     load_routing.insert_all(load_routing.load(settings.JOURNAL_ROUTES))
-
-def update_page_metrics():
-    "query GA for page view counts for all known pages"
-    load_routing.update_all_page_counts()
 
 TASKS = {
     'journal-routes': print_journal_routes,
     'load-journal-routes': load_journal_routes,
-    'update-page-metrics': update_page_metrics
 }
 
 class Command(BaseCommand):
@@ -32,7 +27,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            TASKS[options['task']]()
+            TASKS[options['task']](self.stdout)
+
         except KeyboardInterrupt:
-            print "caught"
             exit(1)
+
+        except BaseException as err:
+            LOG.warn("unhandled exception executing task: %s", err)
+            exit(1)
+
+        finally:
+            self.stdout.flush()
+
+        exit(0)

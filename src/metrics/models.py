@@ -139,6 +139,8 @@ class Citation(models.Model):
 #
 #
 
+PAGE = 'page'
+
 class Page(models.Model):
     name = CharField(max_length=100, unique=True)
     pattern = CharField(max_length=500, help_text="regex used to generate GA queries")
