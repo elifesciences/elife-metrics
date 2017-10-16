@@ -19,7 +19,7 @@ def update_page_metrics():
     load_routing.update_all_page_counts()
 
 TASKS = {
-    'journal-routes': ga_journal_routes,
+    'journal-routes': print_journal_routes,
     'load-journal-routes': load_journal_routes,
     'update-page-metrics': update_page_metrics
 }
