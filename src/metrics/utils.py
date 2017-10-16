@@ -28,7 +28,7 @@ def comp(*fns):
 def yaml_loads(stream):
     loader_class = yaml.Loader
     object_pairs_hook = OrderedDict
-    # pylint: disable=too-many-ancestors
+
     class OrderedLoader(loader_class):
         pass
 
