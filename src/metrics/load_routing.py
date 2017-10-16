@@ -1,7 +1,7 @@
 import re
 from StringIO import StringIO
 import utils, models
-from utils import ensure
+from utils import ensure, first
 
 from ga_metrics import core, utils as ga_utils
 from datetime import datetime
@@ -57,10 +57,13 @@ def parse(name, body):
     retval['pattern'] = ga_pattern
     return retval
 
+def excluded(name, rest):
+    return rest['path'].startswith('/articles/')
+
 def loads(string):
     raw = utils.yaml_loads(StringIO(string))
     ensure(isinstance(raw, dict), "dictionary expected after deserialising", ValueError)
-    return [parse(name, rest) for name, rest in raw.items()]
+    return [parse(name, rest) for name, rest in raw.items() if not excluded(name, rest)]
 
 def load(path):
     return loads(open(path, 'r').read())
@@ -73,15 +76,18 @@ def load(path):
 def ga_regex(pattern):
     return pattern.startswith('ga:pagePath=~')
 
-def insert(row):
-    ensure(ga_regex(row['pattern']), "regular expression doesn't look like something we can give to google.", ValueError)
-    return utils.create_or_update(models.Page, row, ['name'])
+def insert(page_route):
+    ensure(ga_regex(page_route['pattern']), "regular expression doesn't look like something we can give to google.", ValueError)
+    return utils.create_or_update(models.Page, page_route, ['name'])
+
+def insert_all(page_route_list):
+    return map(first, map(insert, page_route_list))
 
 #
 #
 #
 
-def populate(page):
+def update_page_counts(page):
     table_id = ga_utils.norm_table_id(settings.GA_TABLE_ID)
     from_date, to_date = settings.TWOPOINTZERO_START, datetime.now()
 
@@ -106,4 +112,7 @@ def populate(page):
         }
         return utils.create_or_update(models.Path, row, ['page', 'path'])
 
-    return map(insert_path, results['rows'])
+    return map(insert_path, results.get('rows', []))
+
+def update_all_page_counts():
+    return map(update_page_counts, models.Page.objects.all())

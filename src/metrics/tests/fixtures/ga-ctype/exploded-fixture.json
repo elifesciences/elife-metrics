@@ -1,0 +1,88 @@
+{
+  "kind": "analytics#gaData",
+  "rows": [
+    [
+      "/foo/correction",
+      "90"
+    ],
+    [
+      "/foo/editorial",
+      "71"
+    ],
+    [
+      "/foo/feature",
+      "321"
+    ],
+    [
+      "/foo/insight",
+      "161"
+    ],
+    [
+      "/foo/registered-report",
+      "38"
+    ],
+    [
+      "/foo/replication-study",
+      "32"
+    ],
+    [
+      "/foo/research-advance",
+      "435"
+    ],
+    [
+      "/foo/research-article",
+      "8183"
+    ],
+    [
+      "/foo/short-report",
+      "1287"
+    ],
+    [
+      "/foo/tools-resources",
+      "363"
+    ]
+  ],
+  "containsSampledData": false,
+  "profileInfo": {
+    "webPropertyId": "UA-48379231-2",
+    "internalWebPropertyId": "79882125",
+    "tableId": "ga:82618489",
+    "profileId": "82618489",
+    "profileName": "All Web Site Data",
+    "accountId": "48379231"
+  },
+  "itemsPerPage": 10000,
+  "totalsForAllResults": {
+    "ga:sessions": "10981"
+  },
+  "columnHeaders": [
+    {
+      "dataType": "STRING",
+      "columnType": "DIMENSION",
+      "name": "ga:pagePath"
+    },
+    {
+      "dataType": "INTEGER",
+      "columnType": "METRIC",
+      "name": "ga:sessions"
+    }
+  ],
+  "query": {
+    "sort": [
+      "ga:pagePath"
+    ],
+    "max-results": 10000,
+    "dimensions": "ga:pagePath",
+    "start-date": "2017-01-01",
+    "start-index": 1,
+    "ids": "ga:82618489",
+    "metrics": [
+      "ga:sessions"
+    ],
+    "filters": "ga:pagePath=~^/foo/correction$,ga:pagePath=~^/foo/editorial$,ga:pagePath=~^/foo/feature$,ga:pagePath=~^/foo/insight$,ga:pagePath=~^/foo/research-advance$,ga:pagePath=~^/foo/research-article$,ga:pagePath=~^/foo/retraction$,ga:pagePath=~^/foo/registered-report$,ga:pagePath=~^/foo/replication-study$,ga:pagePath=~^/foo/scientific-correspondence$,ga:pagePath=~^/foo/short-report$,ga:pagePath=~^/foo/tools-resources$",
+    "end-date": "2017-10-11"
+  },
+  "totalResults": 10,
+  "id": "https://www.googleapis.com/analytics/v3/data/ga?ids=ga:82618489&dimensions=ga:pagePath&metrics=ga:sessions&sort=ga:pagePath&filters=ga:pagePath%3D~%5E/foo/correction$,ga:pagePath%3D~%5E/foo/editorial$,ga:pagePath%3D~%5E/foo/feature$,ga:pagePath%3D~%5E/foo/insight$,ga:pagePath%3D~%5E/foo/research-advance$,ga:pagePath%3D~%5E/foo/research-article$,ga:pagePath%3D~%5E/foo/retraction$,ga:pagePath%3D~%5E/foo/registered-report$,ga:pagePath%3D~%5E/foo/replication-study$,ga:pagePath%3D~%5E/foo/scientific-correspondence$,ga:pagePath%3D~%5E/foo/short-report$,ga:pagePath%3D~%5E/foo/tools-resources$&start-date=2017-01-01&end-date=2017-10-11&max-results=10000",
+  "selfLink": "https://www.googleapis.com/analytics/v3/data/ga?ids=ga:82618489&dimensions=ga:pagePath&metrics=ga:sessions&sort=ga:pagePath&filters=ga:pagePath%3D~%5E/foo/correction$,ga:pagePath%3D~%5E/foo/editorial$,ga:pagePath%3D~%5E/foo/feature$,ga:pagePath%3D~%5E/foo/insight$,ga:pagePath%3D~%5E/foo/research-advance$,ga:pagePath%3D~%5E/foo/research-article$,ga:pagePath%3D~%5E/foo/retraction$,ga:pagePath%3D~%5E/foo/registered-report$,ga:pagePath%3D~%5E/foo/replication-study$,ga:pagePath%3D~%5E/foo/scientific-correspondence$,ga:pagePath%3D~%5E/foo/short-report$,ga:pagePath%3D~%5E/foo/tools-resources$&start-date=2017-01-01&end-date=2017-10-11&max-results=10000"
+}
