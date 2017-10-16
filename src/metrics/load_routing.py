@@ -6,6 +6,7 @@ from utils import atomic
 from ga_metrics import core, utils as ga_utils
 from datetime import datetime
 from django.conf import settings
+from collections import Counter
 
 def parse(name, body):
     retval = {'name': name, 'pattern': body['path']}
@@ -107,16 +108,38 @@ def update_page_counts(page):
     }
     results = core.query_ga(query_map)
 
-    def insert_path(row):
+    results = results.get('rows', [])
+
+    def norm_path(row):
         path, count = row
-        row = {
+        param_pos = path.find('?')
+        if param_pos > -1:
+            path = path[:param_pos]
+        count = int(count)
+        return {
             'page': page,
             'path': path,
-            'count': count
+            'count': Counter(count=count)
         }
+
+    # post-process the result, do stuff we couldn't do in GA
+    results = map(norm_path, results)
+
+    # after normalising the path, we're going to have duplicate paths
+    grouped_results = utils.group(results, lambda m: m['path'])
+
+    def aggregate_paths(a, b):
+        a.update(b)
+        return a
+
+    # these groups of results then need to be aggregated into a single result
+    results = map(lambda vals: reduce(aggregate_paths, vals), grouped_results.values())
+
+    def insert_path(row):
+        row['count'] = sum(row['count'].values()) # tally the results
         return utils.create_or_update(models.Path, row, ['page', 'path'])
 
-    return map(insert_path, results.get('rows', []))
+    return map(insert_path, results)
 
 @atomic
 def update_all_page_counts(dry_run=False):

@@ -40,6 +40,17 @@ def yaml_loads(stream):
         construct_mapping)
     return yaml.load(stream, OrderedLoader)
 
+def group(lst, keyfn):
+    grps = {}
+    for x in lst:
+        # would this work?
+        #grps.get(keyfn(x), []).append(x)            
+        key = keyfn(x)
+        grp = grps.get(key, [])
+        grp.append(x)
+        grps[key] = grp
+    return grps
+
 '''
 def eargs(fn):
     "expand-args. allows composing funcs that require multiple arguments"
