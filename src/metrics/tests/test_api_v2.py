@@ -1,5 +1,5 @@
 import json
-from metrics import models
+from metrics import models, load_routing
 from django.test import Client
 import base
 from django.core.urlresolvers import reverse
@@ -278,3 +278,21 @@ class ApiV2(base.BaseCase):
         resp = self.c.get(url, {'by': models.MONTH})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
+
+    #
+
+    def test_page_views(self):
+        path = '/about'
+        
+        pageobj = load_routing.insert({'name': 'about', 'pattern': 'ga:pagePath=~^/about$'})[0]
+        models.Path(page=pageobj, path=path, count=1).save()
+        
+        url = reverse('v2:page-views', kwargs={'path': path})
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        
+        expected_resp = {
+            'path': path,
+            'views': 1
+        }
+        self.assertEqual(resp.data, expected_resp)

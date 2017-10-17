@@ -1,4 +1,4 @@
-from metrics import models
+from metrics import models, load_routing
 from django.shortcuts import get_object_or_404
 import string
 from django.conf import settings
@@ -82,6 +82,16 @@ def serialize(total_results, sum_value, obj_list, metric):
 #
 
 @api_view(['GET'])
+@renderer_classes((StaticHTMLRenderer,))
+def ping(request):
+    "Returns a constant response for monitoring. Never to be cached."
+    return Response('pong', content_type='text/plain; charset=UTF-8', headers={'Cache-Control': 'must-revalidate, no-cache, no-store, private'})
+
+#
+#
+#
+
+@api_view(['GET'])
 def article_metrics(request, id, metric):
     try:
         # /metrics/article/12345/downloads?by=month
@@ -117,8 +127,21 @@ def article_metrics(request, id, metric):
         LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
         raise # 500, server error
 
+#
+#
+#
+
 @api_view(['GET'])
-@renderer_classes((StaticHTMLRenderer,))
-def ping(request):
-    "Returns a constant response for monitoring. Never to be cached."
-    return Response('pong', content_type='text/plain; charset=UTF-8', headers={'Cache-Control': 'must-revalidate, no-cache, no-store, private'})
+def page_views(request, path):
+    try:
+        path = load_routing.norm_path(path)
+        pathobj = get_object_or_404(models.Path, path=path)
+        response = {
+            'path': pathobj.path,
+            'views': pathobj.count
+        }
+        return Response(response)
+
+    except BaseException as err:
+        LOG.exception("unhandled exception attempting to serve page metrics: %s", err)
+        raise # 500, server error
