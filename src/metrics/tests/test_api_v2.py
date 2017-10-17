@@ -287,8 +287,8 @@ class ApiV2(base.BaseCase):
         pageobj = load_routing.insert({'name': 'about', 'pattern': 'ga:pagePath=~^/about$'})[0]
         models.Path(page=pageobj, path=path, count=1).save()
         
-        url = reverse('v2:page-views', kwargs={'path': path})
-        resp = self.c.get(url)
+        url = reverse('v2:page-views')
+        resp = self.c.get(url, {'path': path})
         self.assertEqual(resp.status_code, 200)
         
         expected_resp = {

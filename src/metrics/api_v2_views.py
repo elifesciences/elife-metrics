@@ -132,15 +132,20 @@ def article_metrics(request, id, metric):
 #
 
 @api_view(['GET'])
-def page_views(request, path):
+def page_views(request):
     try:
+        ensure('path' in request.query_params, "'path' is a required query parameter")
+        path = request.query_params.get('path')
         path = load_routing.norm_path(path)
         pathobj = get_object_or_404(models.Path, path=path)
         response = {
             'path': pathobj.path,
             'views': pathobj.count
         }
-        return Response(response)
+        return Response(response, content_type='application/vnd.elife.metric-pageviews+json;version=1')
+
+    except AssertionError as err:
+        raise ValidationError(err) # 400, client error
 
     except BaseException as err:
         LOG.exception("unhandled exception attempting to serve page metrics: %s", err)
