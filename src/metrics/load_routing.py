@@ -1,7 +1,7 @@
 import re
 from StringIO import StringIO
 import utils, models
-from utils import ensure, first
+from utils import ensure, first, lfiltermap
 from utils import atomic
 from ga_metrics import core as ga_core, utils as ga_utils
 from datetime import datetime
@@ -102,16 +102,24 @@ def norm_path(path):
     param_pos = path.find('?')
     if param_pos > -1:
         path = path[:param_pos]
-
     path = path.lower()
+
+    # return None immediately if any unsupported chars are detected
+    regex = r"[^\w^\-/\.]+"
+    matches = re.finditer(regex, path)
+    if next(matches, None):
+        return None
 
     return path
 
 def norm_row(row):
     path, count = row
+    path, count = norm_path(path), Counter(count=int(count))
+    if not path:
+        return None # bad path. will get excluded
     return {
-        'path': norm_path(path),
-        'count': Counter(count=int(count))
+        'path': path,
+        'count': count
     }
 
 def update_page_counts(page):
@@ -131,7 +139,7 @@ def update_page_counts(page):
     results = ga_core.query_ga(query_map)
 
     # post-process the result, do stuff we couldn't do in GA
-    results = map(norm_row, results.get('rows', []))
+    results = lfiltermap(norm_row, results.get('rows', []))
 
     # after normalising the path, we're going to have duplicate paths
     grouped_results = utils.group(results, lambda m: m['path'])

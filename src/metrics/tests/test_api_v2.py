@@ -3,6 +3,9 @@ from metrics import models, load_routing
 from django.test import Client
 import base
 from django.core.urlresolvers import reverse
+from django.core.management import call_command
+from os.path import join
+from django.conf import settings
 
 class ApiV2(base.BaseCase):
     def setUp(self):
@@ -283,16 +286,32 @@ class ApiV2(base.BaseCase):
 
     def test_page_views(self):
         path = '/about'
-        
+
         pageobj = load_routing.insert({'name': 'about', 'pattern': 'ga:pagePath=~^/about$'})[0]
         models.Path(page=pageobj, path=path, count=1).save()
-        
+
         url = reverse('v2:page-views')
         resp = self.c.get(url, {'path': path})
         self.assertEqual(resp.status_code, 200)
-        
+
         expected_resp = {
             'path': path,
             'views': 1
         }
         self.assertEqual(resp.data, expected_resp)
+
+class Two(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+        call_command('loaddata', join(settings.SRC_DIR, 'metrics/tests/fixtures/page-views-2017-10-16.json'))
+
+    def test_all_page_views(self):
+        url = reverse('v2:page-views')
+        for pathobj in models.Path.objects.all():
+            resp = self.c.get(url, {'path': pathobj.path})
+            self.assertEqual(resp.status_code, 200, "path %r == %s" % (pathobj, resp.status_code))
+            expected_resp = {
+                'path': pathobj.path,
+                'views': pathobj.count
+            }
+            self.assertEqual(resp.data, expected_resp)

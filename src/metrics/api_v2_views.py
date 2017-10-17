@@ -136,7 +136,11 @@ def page_views(request):
     try:
         ensure('path' in request.query_params, "'path' is a required query parameter")
         path = request.query_params.get('path')
-        path = load_routing.norm_path(path)
+        ensure(load_routing.norm_path(path), "'path' parameter contains invalid characters")
+
+        # we use the path given to us as-is. we don't transform it!
+        # if it contains whitespace or uppercase characters, etc, it will fail with a 404
+
         pathobj = get_object_or_404(models.Path, path=path)
         response = {
             'path': pathobj.path,

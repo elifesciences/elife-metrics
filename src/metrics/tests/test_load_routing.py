@@ -122,9 +122,17 @@ article-type:
         self.assertEqual(models.Path.objects.all().count(), 10)
 
         expected = ga_fixture['rows']
+
+        # I've added two bad paths to the fixture. I expect them to be absent
+        self.assertEqual(models.Path.objects.count() + 2, len(expected))
+
         for path, path_count in expected:
             # will fail if doesn't exist
-            models.Path.objects.get(page=page, path=path, count=path_count)
+            if load_routing.norm_path(path):
+                models.Path.objects.get(page=page, path=path, count=path_count)
+            else:
+                # I've added two bad paths to the fixture. I expect them to be absent
+                self.assertRaises(models.Path.DoesNotExist, models.Path.objects.get, page=page, path=path, count=path_count)
 
 class Two(base.BaseCase):
     def test_norm_path(self):
@@ -146,3 +154,16 @@ class Two(base.BaseCase):
         ]
         for given, expected in cases:
             self.assertEqual(expected, load_routing.norm_path(given))
+
+    def test_bad_paths(self):
+        "bad paths that are considered unparseable will return 'None'"
+        hopeless_cases = [
+            '/about/people/early-careerEva Maria Novoa, Ph.D. | Group Leader - Epitranscriptomics and RNA Dynamics',
+            '/archive/2016/07Redirected to excluded URL: http://elifesciences.org/archive/2016/july',
+            '/inside-elife/a9b9f95a/2017-travel-grants-for-early-career-researchers-now-open-for-applications target=_blank',
+            '/events/7e1591c9/ecrwednesday-webinar-refreshing-approaches-to-researcher-evaluationhttps:/elifesciences.org/events/7e1591c9/ecrwednesday-webinar-refreshing-approaches-to-researcher-evaluation'
+            '/inside-elife/1b245a01/http://www.wycokck.org/InternetDept.aspx',
+            "/inside-elife/e832444e/innovation@elifesciences.org",
+        ]
+        for case in hopeless_cases:
+            self.assertEqual(load_routing.norm_path(case), None)

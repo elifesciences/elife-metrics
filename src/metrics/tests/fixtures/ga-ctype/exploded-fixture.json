@@ -40,6 +40,18 @@
     [
       "/foo/tools-resources",
       "363"
+    ],
+    
+    
+    
+    
+    [
+      "/foo/tools-resources)",
+      "0"
+    ],
+    [
+      "/foo/tools-resources|",
+      "0"
     ]
   ],
   "containsSampledData": false,

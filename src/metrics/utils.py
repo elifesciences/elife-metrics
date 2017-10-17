@@ -16,6 +16,8 @@ lmap = lambda func, *iterable: list(map(func, *iterable))
 lfilter = lambda func, *iterable: list(filter(func, *iterable))
 keys = lambda d: list(d.keys())
 
+lfiltermap = lambda func, *iterable: lfilter(None, lmap(func, *iterable))
+
 def comp(*fns):
     "composes functions LEFT to RIGHT"
     def _comp(*args, **kwargs):
