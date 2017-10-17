@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         # all
-        #parser.add_argument('--just-source', nargs='?', dest='just_source', type=hw_or_ga, default=None)
+        parser.add_argument('--only-target', nargs='?', choices=[models.PAGE], default=None)
 
         # views+downloads
         # import the last two days by default
@@ -40,6 +40,8 @@ class Command(BaseCommand):
         from_date = n_days_ago
         to_date = today
 
+        only_target = options['only_target']
+
         # print 'use cached? %r only cached? %r' % (use_cached, only_cached)
 
         GA_DAILY, GA_MONTHLY = 'ga-daily', 'ga-monthly'
@@ -55,6 +57,9 @@ class Command(BaseCommand):
             (models.PUBMED, (logic.import_pmc_citations,)),
             (models.PAGE, (load_routing.update_all_page_counts,)),
         ])
+
+        if only_target:
+            sources = {only_target: sources[only_target]}
 
         try:
             start_time = time.time() # seconds since epoch
