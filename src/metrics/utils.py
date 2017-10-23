@@ -197,12 +197,14 @@ def ymdhms(dt):
 # django utils
 #
 
-def create_or_update(Model, orig_data, key_list, create=True, update=True, update_check=False, commit=True, **overrides):
+def create_or_update(Model, orig_data, key_list=None, create=True, update=True, update_check=False, commit=True, **overrides):
     inst = None
     created = updated = checked = False
     data = {}
     data.update(orig_data)
     data.update(overrides)
+    if not key_list:
+        key_list = orig_data.keys()
     try:
         # try and find an entry of Model using the key fields in the given data
         inst = Model.objects.get(**subdict(data, key_list))
