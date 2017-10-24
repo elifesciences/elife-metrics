@@ -38,13 +38,23 @@ collection:
     def tearDown(self):
         pass
 
+    def test_exclusions(self):
+        cases = [
+            ('/about/peer-review', False),
+            ('/about/people/{type}', False),
+            ('/articles/{id}.ris', True),
+            ('/collections/{id}/{slug}', False)
+        ]
+        for given, expected in cases:
+            self.assertEqual(expected, load_routing.excluded(given))
+
     def test_load(self):
         expected = [
-            {'name': 'about-peer-review', 'pattern': 'ga:pagePath=~^/about/peer\-review$'},
-            {'name': 'about-people', 'pattern': 'ga:pagePath=~^/about/people/.+$'},
+            {'frames': [{'pattern': '^/about/peer\\-review$', 'ends': None, 'starts': '2017-01-01'}], 'name': 'about-peer-review', 'examples': []},
+            {'frames': [{'pattern': '^/about/people/.+$', 'ends': None, 'starts': '2017-01-01'}], 'name': 'about-people', 'examples': []},
             # excluded
-            #{'name': 'article-ris', 'pattern': 'ga:pagePath=~^/articles/[a-z0-9-]+\.ris$'},
-            {'name': 'collection', 'pattern': 'ga:pagePath=~^/collections/[a-z0-9-]+/.+$'},
+            #{'frames': [{'pattern': '^/articles/[a-z0-9-]+\\.ris$', 'ends': None, 'starts': '2017-01-01'}], 'name': 'article-ris', 'examples': []},
+            {'frames': [{'pattern': '^/collections/[a-z0-9-]+/.+$', 'ends': None, 'starts': '2017-01-01'}], 'name': 'collection', 'examples': []}
         ]
         self.assertEqual(expected, load_routing.load_journal_route_string(self.fixture))
 

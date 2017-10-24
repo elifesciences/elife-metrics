@@ -11,18 +11,25 @@ from urlparse import urlparse
 
 LOG = logging.getLogger(__name__)
 
+JOURNAL_INCEPTION = '2017-01-01'
+
+def path_to_regex(path):
+    return "^%s$" % path
+
+def frame(pattern, starts=None, ends=None):
+    return {
+        'pattern': pattern,
+        'starts': starts,
+        'ends': ends
+    }
+
+
 #
 # journal routing
 #
 
 def parse(name, body):
     "each route in the journal routing file contains the canonical 'page' and a *current* path"
-    retval = {
-        'page': name,
-        'pattern': body['path'],
-        'starts': '2017-01-01',
-        'ends': None
-    }
     path = body['path']
 
     # the path becomes a regular expression.
@@ -45,25 +52,23 @@ def parse(name, body):
             replacement = requirements.get(match.groups()[0], match_anything)
             path = path.replace(match.group(), replacement)
 
-    pattern = "^%s$" % path
-    retval['pattern'] = pattern
+    retval = {'name': name, 'frames': [], 'examples': []}
+    retval['frames'] = [frame(path_to_regex(path), JOURNAL_INCEPTION)]
     return retval
 
-def excluded(name, rest):
-    path = rest['path']
+def excluded(path):
     exclusions = [
         '/articles',
         '/lookup/doi',
         '/download',
         '/ping'
     ]
-    exclusions = []
     return any(map(lambda exc: path.startswith(exc), exclusions))
 
 def load_journal_route_string(string):
     raw = utils.yaml_loads(StringIO(string))
     ensure(isinstance(raw, dict), "dictionary expected after deserialising", ValueError)
-    return [parse(name, rest) for name, rest in raw.items() if not excluded(name, rest)]
+    return [parse(name, rest) for name, rest in raw.items() if not excluded(rest['path'])]
 
 @cache
 def load_journal_route_file(path):
@@ -74,7 +79,6 @@ def load_journal_route_file(path):
 #
 
 def resolve(path):
-    "fully resolve any path"
     if path.startswith('http'):
         return None
     url = "https://elifesciences.org" + path
@@ -84,6 +88,7 @@ def resolve(path):
     return urlparse(url).path
 
 def load_nginx_redirect_string(stringblob):
+    "fully resolve any path - this will do ~2k+ requests to the elifesciences website"
     cache_file = settings.JOURNAL_REDIRECTS + '.json'
     if os.path.exists(settings.JOURNAL_REDIRECTS + '.json'):
         return json.load(open(cache_file, 'r'))
@@ -112,7 +117,6 @@ def synthetic_events():
         ('inside-elife-article-syn', {'path': '/inside-elife/{id}'}),
     ]
     return [parse(name, body) for name, body in synthetic]
-'''
 
 def route_path(path):
     if not path:
@@ -125,36 +129,35 @@ def route_path(path):
         if re.match(route['pattern'], path):
             return route
 
-'''
 def old_paths_without_a_new_route():
     redirects = load_nginx_redirect_file(settings.JOURNAL_REDIRECTS)
     for old_path, new_path in redirects.items():
         if new_path['resolved'] and not route_path(new_path['resolved']):
             print json.dumps({'old': old_path, 'new': new_path['resolved']})
 
-def path_to_regex(path):
-    return "^%s$" % path
 '''
-
-def route(pattern, starts=None, ends=None):
-    return {
-        'pattern': pattern,
-        'starts': starts,
-        'ends': ends
-    }
 
 def routing_table():
     "generates a route table with examples"
     routes = load_journal_route_file(settings.JOURNAL_ROUTES)
-    routes = dict([(r['page'], {'examples': [], 'frames': [route(r['pattern'], '2017-01-01')]}) for r in routes])
-
     redirects = load_nginx_redirect_file(settings.JOURNAL_REDIRECTS)
-    for old_path, new_path in redirects.items():
-        resolves_to = route_path(new_path['resolved'])
-        if resolves_to:
-            routes[resolves_to['page']]['examples'].append(old_path)
 
-    return routes
+    route_idx = {r['name']: r for r in routes}
+
+    def _route_path(path):
+        for route in routes:
+            # at this point, we have just the one frame
+            pattern = route['frames'][0]['pattern']
+            if re.match(pattern, path):
+                return route
+
+    for old_path, redirect in redirects.items():
+        if redirect['resolved']:
+            resolves_to = _route_path(redirect['resolved']) # 'resolved' is the new path that the old path now resolves to
+            if resolves_to:
+                route_idx[resolves_to['name']]['examples'].append(old_path)
+
+    return route_idx
 
 def dump_routing_table():
     "write the route table to disk"
