@@ -8,15 +8,27 @@ LOG = logging.getLogger('debugger')
 
 def print_journal_routes(stdout):
     "converts the journal routes into GA queries"
-    stdout.write(json.dumps(load_routing.load(settings.JOURNAL_ROUTES), indent=4))
+    stdout.write(json.dumps(load_routing.load_journal_route_file(settings.JOURNAL_ROUTES), indent=4))
+
+def print_journal_redirects(stdout):
+    stdout.write(json.dumps(load_routing.load_nginx_redirect_file(settings.JOURNAL_REDIRECTS), indent=4))
 
 def load_journal_routes(stdout):
     "load the journal routes from the schema directory and create Page objects"
     load_routing.insert_all(load_routing.load(settings.JOURNAL_ROUTES))
 
+def missing_routes(stdout):
+    stdout.write(json.dumps(load_routing.old_paths_without_a_new_route()))
+
+def final(stdout):
+    stdout.write(json.dumps(load_routing.dump_routing_table(), indent=4))
+
 TASKS = {
     'journal-routes': print_journal_routes,
+    'journal-redirects': print_journal_redirects,
     'load-journal-routes': load_journal_routes,
+    'missing-routes': missing_routes,
+    'final': final,
 }
 
 class Command(BaseCommand):
@@ -33,7 +45,7 @@ class Command(BaseCommand):
             exit(1)
 
         except BaseException as err:
-            LOG.warn("unhandled exception executing task: %s", err)
+            LOG.exception("unhandled exception executing task: %s", err)
             exit(1)
 
         finally:

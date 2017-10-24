@@ -46,7 +46,7 @@ collection:
             #{'name': 'article-ris', 'pattern': 'ga:pagePath=~^/articles/[a-z0-9-]+\.ris$'},
             {'name': 'collection', 'pattern': 'ga:pagePath=~^/collections/[a-z0-9-]+/.+$'},
         ]
-        self.assertEqual(expected, load_routing.loads(self.fixture))
+        self.assertEqual(expected, load_routing.load_journal_route_string(self.fixture))
 
     def test_long_pattern(self):
         "patterns longer than 128 chars are exploded"

@@ -1,16 +1,28 @@
+import os, json
+import requests
 import re
 from StringIO import StringIO
-import utils, models
-from utils import ensure, first, lfiltermap
-from utils import atomic
-from ga_metrics import core as ga_core, utils as ga_utils
-from datetime import datetime
+import utils
+from utils import ensure, lfiltermap
 from django.conf import settings
-from collections import Counter
-from functools import reduce
+from kids.cache import cache
+import logging
+from urlparse import urlparse
+
+LOG = logging.getLogger(__name__)
+
+#
+# journal routing
+#
 
 def parse(name, body):
-    retval = {'name': name, 'pattern': body['path']}
+    "each route in the journal routing file contains the canonical 'page' and a *current* path"
+    retval = {
+        'page': name,
+        'pattern': body['path'],
+        'starts': '2017-01-01',
+        'ends': None
+    }
     path = body['path']
 
     # the path becomes a regular expression.
@@ -34,130 +46,118 @@ def parse(name, body):
             path = path.replace(match.group(), replacement)
 
     pattern = "^%s$" % path
-    ga_pattern = "ga:pagePath=~" + pattern
-
-    # TODO: shift this into an 'explode' type function
-    if len(pattern) > 128 and '|' in pattern:
-        # this regex is too damn long. in some cases we can explode patterns
-        # in this case, we're looking for patterns like '/(foo|bar|baz|bup)/' to explode
-        regex2 = r"\([()\w|-]+\)" # regex matching regex
-        matches = re.finditer(regex2, pattern)
-        match = next(matches)
-        if not match:
-            raise ValueError("failed to reduce size of regular expression. GA will refuse to run this query: %s" % ga_pattern)
-
-        match = match.group()
-        subs = match.strip('()').split('|') # explode
-        subs = map(lambda sub: ga_pattern.replace(match, sub), subs)
-
-        # final check nothing is huge
-        map(lambda sub: ensure(len(sub) <= 128, "GA requires a pattern 128 characters or less: %s" % sub), subs)
-
-        # make a super long expression
-        ga_pattern = ",".join(subs)
-
-    retval['pattern'] = ga_pattern
+    retval['pattern'] = pattern
     return retval
 
 def excluded(name, rest):
     path = rest['path']
-    return path.startswith('/articles/') \
-        or path.startswith('/lookup/doi/') \
-        or path.startswith('/download/')
+    exclusions = [
+        '/articles',
+        '/lookup/doi',
+        '/download',
+        '/ping'
+    ]
+    exclusions = []
+    return any(map(lambda exc: path.startswith(exc), exclusions))
 
-def loads(string):
+def load_journal_route_string(string):
     raw = utils.yaml_loads(StringIO(string))
     ensure(isinstance(raw, dict), "dictionary expected after deserialising", ValueError)
     return [parse(name, rest) for name, rest in raw.items() if not excluded(name, rest)]
 
-def load(path):
-    return loads(open(path, 'r').read())
-
-
-#
-#
-#
-
-def ga_regex(pattern):
-    return pattern.startswith('ga:pagePath=~')
-
-def insert(page_route):
-    ensure(ga_regex(page_route['pattern']), "regular expression doesn't look like something we can give to google.", ValueError)
-    return utils.create_or_update(models.Page, page_route, ['name'])
-
-@atomic
-def insert_all(page_route_list, dry_run=False):
-    return map(first, map(insert, page_route_list))
+@cache
+def load_journal_route_file(path):
+    return load_journal_route_string(open(path, 'r').read())
 
 #
+# old journal redirects
 #
-#
 
-def norm_path(path):
-    "takes a path given to us by GA and normalises it for counting"
-    anchor_pos = path.find('#')
-    if anchor_pos > -1:
-        path = path[:anchor_pos]
-
-    param_pos = path.find('?')
-    if param_pos > -1:
-        path = path[:param_pos]
-    path = path.lower()
-
-    # return None immediately if any unsupported chars are detected
-    regex = r"[^\w^\-/\.]+"
-    matches = re.finditer(regex, path)
-    if next(matches, None):
+def resolve(path):
+    "fully resolve any path"
+    if path.startswith('http'):
         return None
+    url = "https://elifesciences.org" + path
+    LOG.info("resolving %s" % url)
+    resp = requests.head(url, allow_redirects=True)
+    url = resp.url
+    return urlparse(url).path
 
-    return path
+def load_nginx_redirect_string(stringblob):
+    cache_file = settings.JOURNAL_REDIRECTS + '.json'
+    if os.path.exists(settings.JOURNAL_REDIRECTS + '.json'):
+        return json.load(open(cache_file, 'r'))
 
-def norm_row(row):
-    path, count = row
-    path, count = norm_path(path), Counter(count=int(count))
+    def parse_line(string):
+        string = string.strip()
+        if not (string.startswith("'") and string.endswith(";")):
+            return
+        bits = string.split("' '")
+        if len(bits) > 2:
+            raise ValueError("unhandled redirect: %s" % string)
+        return (bits[0].strip("'"), bits[1].strip("';"))
+
+    redirects = dict(lfiltermap(parse_line, stringblob.splitlines()))
+    redirects = {old: {'new': new, 'resolved': resolve(new)} for old, new in redirects.items()}
+    return redirects
+
+def load_nginx_redirect_file(path):
+    return load_nginx_redirect_string(open(path, 'r').read())
+
+'''
+def synthetic_events():
+    synthetic = [
+        ('about-people-syn', {'path': '/about/people'}),
+        ('event-syn', {'path': '/events/{id}'}),
+        ('inside-elife-article-syn', {'path': '/inside-elife/{id}'}),
+    ]
+    return [parse(name, body) for name, body in synthetic]
+'''
+
+def route_path(path):
     if not path:
-        return None # bad path. will get excluded
+        return
+
+    routes = load_journal_route_file(settings.JOURNAL_ROUTES)
+    # routes.extend(synthetic_events())
+
+    for route in routes:
+        if re.match(route['pattern'], path):
+            return route
+
+'''
+def old_paths_without_a_new_route():
+    redirects = load_nginx_redirect_file(settings.JOURNAL_REDIRECTS)
+    for old_path, new_path in redirects.items():
+        if new_path['resolved'] and not route_path(new_path['resolved']):
+            print json.dumps({'old': old_path, 'new': new_path['resolved']})
+
+def path_to_regex(path):
+    return "^%s$" % path
+'''
+
+def route(pattern, starts=None, ends=None):
     return {
-        'path': path,
-        'count': count
+        'pattern': pattern,
+        'starts': starts,
+        'ends': ends
     }
 
-def update_page_counts(page):
-    table_id = ga_utils.norm_table_id(settings.GA_TABLE_ID)
-    from_date, to_date = settings.TWOPOINTZERO_START, datetime.now()
+def routing_table():
+    "generates a route table with examples"
+    routes = load_journal_route_file(settings.JOURNAL_ROUTES)
+    routes = dict([(r['page'], {'examples': [], 'frames': [route(r['pattern'], '2017-01-01')]}) for r in routes])
 
-    query_map = {
-        'ids': table_id,
-        'max_results': 10000, # 10,000 is the max GA will ever return
-        'start_date': utils.ymd(from_date),
-        'end_date': utils.ymd(to_date),
-        'metrics': 'ga:sessions', # less flattering, more accurate
-        'dimensions': 'ga:pagePath',
-        'sort': 'ga:pagePath',
-        'filters': page.pattern,
-    }
-    results = ga_core.query_ga(query_map)
+    redirects = load_nginx_redirect_file(settings.JOURNAL_REDIRECTS)
+    for old_path, new_path in redirects.items():
+        resolves_to = route_path(new_path['resolved'])
+        if resolves_to:
+            routes[resolves_to['page']]['examples'].append(old_path)
 
-    # post-process the result, do stuff we couldn't do in GA
-    results = lfiltermap(norm_row, results.get('rows', []))
+    return routes
 
-    # after normalising the path, we're going to have duplicate paths
-    grouped_results = utils.group(results, lambda m: m['path'])
-
-    def aggregate_paths(a, b):
-        a.update(b)
-        return a
-
-    # these groups of results then need to be aggregated into a single result
-    results = map(lambda vals: reduce(aggregate_paths, vals), grouped_results.values())
-
-    def insert_path(row):
-        row['count'] = sum(row['count'].values()) # tally the results
-        row['page'] = page
-        return utils.create_or_update(models.Path, row, ['page', 'path'])
-
-    return map(insert_path, results)
-
-@atomic
-def update_all_page_counts(dry_run=False):
-    return map(update_page_counts, models.Page.objects.all())
+def dump_routing_table():
+    "write the route table to disk"
+    path = settings.ROUTE_TABLE
+    json.dump(routing_table(), open(path, 'w'), indent=4)
+    return path
