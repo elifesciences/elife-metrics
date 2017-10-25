@@ -5,7 +5,7 @@ from StringIO import StringIO
 import utils
 from utils import ensure, lfiltermap
 from django.conf import settings
-from kids.cache import cache
+#from kids.cache import cache
 import logging
 from urlparse import urlparse
 
@@ -22,6 +22,41 @@ def frame(pattern, starts=None, ends=None):
         'starts': starts,
         'ends': ends
     }
+
+
+def explode_ga_pattern(pattern):
+    ga_pattern = "ga:pagePath=~" + pattern
+
+    # TODO: shift this into an 'explode' type function
+    if len(pattern) > 128 and '|' in pattern:
+        # this regex is too damn long. in some cases we can explode patterns
+        # in this case, we're looking for patterns like '/(foo|bar|baz|bup)/' to explode
+        regex2 = r"\([()\w|-]+\)" # regex matching regex
+        matches = re.finditer(regex2, pattern)
+        match = next(matches, None)
+        if  match:
+            match = match.group()
+            subs = match.strip('()').split('|') # explode
+            subs = map(lambda sub: ga_pattern.replace(match, sub), subs)
+
+            # final check nothing is huge
+            map(lambda sub: ensure(len(sub) <= 128, "GA requires a pattern 128 characters or less: %s" % sub), subs)
+
+            # make a super long expression
+            ga_pattern = ",".join(subs)
+
+        elif '$|^' in pattern:
+            bits = pattern.split('|')
+            subs = map(lambda bit: "ga:pagePath=~" + bit, bits)
+            ga_pattern = ",".join(subs)
+
+        else:
+            raise ValueError("failed to reduce size of regular expression. GA will refuse to run this query: %s" % ga_pattern)
+
+    ensure(len(ga_pattern) <= 4096, "%s\nexpression too large by %s bytes" % (ga_pattern, (len(ga_pattern) - 4096)))
+        
+    return ga_pattern
+
 
 
 #
@@ -70,7 +105,6 @@ def load_journal_route_string(string):
     ensure(isinstance(raw, dict), "dictionary expected after deserialising", ValueError)
     return [parse(name, rest) for name, rest in raw.items() if not excluded(rest['path'])]
 
-@cache
 def load_journal_route_file(path):
     return load_journal_route_string(open(path, 'r').read())
 
@@ -137,9 +171,14 @@ def old_paths_without_a_new_route():
 
 '''
 
+def load_custom_route_file(path):
+    if os.path.exists(path):
+        return json.load(open(path, 'r'))
+
 def routing_table():
     "generates a route table with examples"
     routes = load_journal_route_file(settings.JOURNAL_ROUTES)
+    custom_routes = load_custom_route_file(settings.CUSTOM_ROUTES)
     redirects = load_nginx_redirect_file(settings.JOURNAL_REDIRECTS)
 
     route_idx = {r['name']: r for r in routes}
@@ -157,7 +196,24 @@ def routing_table():
             if resolves_to:
                 route_idx[resolves_to['name']]['examples'].append(old_path)
 
+    # add custom routes
+    route_idx = utils.merge(route_idx, custom_routes)
+
+    def gaify(frame):
+        frame['ga_pattern'] = explode_ga_pattern(frame['pattern'])
+        return frame
+    
+    # generate regex for GA
+    for name, route in route_idx.items():
+        route_idx[name]['frames'] = map(gaify, route['frames'])
+        
     return route_idx
+
+'''
+def gen_overrides():
+    route_idx = routing_table()
+    return {key: {'frames': [frame("|".join(map(path_to_regex, val['examples'])), None, '2017-01-01')]} for key, val in route_idx.items()}
+'''
 
 def dump_routing_table():
     "write the route table to disk"

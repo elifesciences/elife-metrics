@@ -1,21 +1,17 @@
 {
-    "resources": {
-        "frames": [
-            {
-                "pattern": "^/resources$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "resources", 
-        "examples": []
-    }, 
     "community": {
         "frames": [
             {
                 "pattern": "^/community$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/community$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/careers$|^/elife-news/early-careers$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/careers$|^/elife-news/early-careers$", 
+                "starts": null
             }
         ], 
         "name": "community", 
@@ -24,22 +20,12 @@
             "/elife-news/early-careers"
         ]
     }, 
-    "article-version": {
-        "frames": [
-            {
-                "pattern": "^/articles/[a-z0-9-]+v[1-9][0-9]*$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "article-version", 
-        "examples": []
-    }, 
     "about-people": {
         "frames": [
             {
                 "pattern": "^/about/people/.+$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/about/people/.+$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -51,21 +37,11 @@
             {
                 "pattern": "^/about/openness$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/about/openness$", 
                 "starts": "2017-01-01"
             }
         ], 
         "name": "about-openness", 
-        "examples": []
-    }, 
-    "download": {
-        "frames": [
-            {
-                "pattern": "^/download/.+/.+$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "download", 
         "examples": []
     }, 
     "home": {
@@ -73,7 +49,14 @@
             {
                 "pattern": "^/$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/articles$|^/upcoming$|^/browse$|^/the-journal/articles$|^/the-journal/in-press$|^/the-journal$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/articles$|^/upcoming$|^/browse$|^/the-journal/articles$|^/the-journal/in-press$|^/the-journal$", 
+                "starts": null
             }
         ], 
         "name": "home", 
@@ -91,6 +74,7 @@
             {
                 "pattern": "^/log\\-out$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/log\\-out$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -102,21 +86,23 @@
             {
                 "pattern": "^/for\\-the\\-press$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/for\\-the\\-press$", 
                 "starts": "2017-01-01"
             }
         ], 
         "name": "press-packs", 
         "examples": []
     }, 
-    "archive": {
+    "event": {
         "frames": [
             {
-                "pattern": "^/archive$", 
+                "pattern": "^/events/[a-z0-9-]+/.+$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/events/[a-z0-9-]+/.+$", 
                 "starts": "2017-01-01"
             }
         ], 
-        "name": "archive", 
+        "name": "event", 
         "examples": []
     }, 
     "subject": {
@@ -124,7 +110,14 @@
             {
                 "pattern": "^/subjects/[a-z0-9-]+$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/subjects/[a-z0-9-]+$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/category/[a-z-]+$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/category/[a-z-]+$", 
+                "starts": null
             }
         ], 
         "name": "subject", 
@@ -151,21 +144,11 @@
             {
                 "pattern": "^/rss/recent\\.xml$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/rss/recent\\.xml$", 
                 "starts": "2017-01-01"
             }
         ], 
         "name": "rss-recent", 
-        "examples": []
-    }, 
-    "article-bibtex": {
-        "frames": [
-            {
-                "pattern": "^/articles/[a-z0-9-]+\\.bib$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "article-bibtex", 
         "examples": []
     }, 
     "interviews": {
@@ -173,6 +156,7 @@
             {
                 "pattern": "^/interviews$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/interviews$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -184,7 +168,14 @@
             {
                 "pattern": "^/alerts$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/alerts$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/alerts-and-feeds$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/alerts-and-feeds$", 
+                "starts": null
             }
         ], 
         "name": "alerts", 
@@ -192,23 +183,19 @@
             "/alerts-and-feeds"
         ]
     }, 
-    "ping": {
-        "frames": [
-            {
-                "pattern": "^/ping$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "ping", 
-        "examples": []
-    }, 
     "labs-post": {
         "frames": [
             {
                 "pattern": "^/labs/[a-z0-9-]+/.+$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/labs/[a-z0-9-]+/.+$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/elife-news/introducing-our-new-experiment-lens-writer$|^/elife-news/introducing-lens-writer$|^/elife-news/writing-scholarly-documents-manuscripts$|^/elife-news/international-image-interoperability-framework-iiif-science-publishers$|^/elife-news/toward-publishing-reproducible-computation-binder$|^/elife-news/composing-reproducible-manuscripts-using-r-markdown$|^/elife-news/elife-labs-what-manuscripts$|^/elife-news/authoring-online-lens-writer$|^/elife-news/elife-labs-presenting-proteopedia-sharing-macromolecule-concepts-online$|^/elife-news/colab-instant-messaging-scientists$|^/elife-news/hack-cambridge-recurse-entries-explore-knowledge-direct-scichat$|^/elife-news/what-is-manuscripts$|^/elife-news/proteopedia-sharing-macromolecule-concepts-online$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/elife-news/introducing-our-new-experiment-lens-writer$,ga:pagePath=~^/elife-news/introducing-lens-writer$,ga:pagePath=~^/elife-news/writing-scholarly-documents-manuscripts$,ga:pagePath=~^/elife-news/international-image-interoperability-framework-iiif-science-publishers$,ga:pagePath=~^/elife-news/toward-publishing-reproducible-computation-binder$,ga:pagePath=~^/elife-news/composing-reproducible-manuscripts-using-r-markdown$,ga:pagePath=~^/elife-news/elife-labs-what-manuscripts$,ga:pagePath=~^/elife-news/authoring-online-lens-writer$,ga:pagePath=~^/elife-news/elife-labs-presenting-proteopedia-sharing-macromolecule-concepts-online$,ga:pagePath=~^/elife-news/colab-instant-messaging-scientists$,ga:pagePath=~^/elife-news/hack-cambridge-recurse-entries-explore-knowledge-direct-scichat$,ga:pagePath=~^/elife-news/what-is-manuscripts$,ga:pagePath=~^/elife-news/proteopedia-sharing-macromolecule-concepts-online$", 
+                "starts": null
             }
         ], 
         "name": "labs-post", 
@@ -228,15 +215,16 @@
             "/elife-news/proteopedia-sharing-macromolecule-concepts-online"
         ]
     }, 
-    "event": {
+    "archive": {
         "frames": [
             {
-                "pattern": "^/events/[a-z0-9-]+/.+$", 
+                "pattern": "^/archive$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/archive$", 
                 "starts": "2017-01-01"
             }
         ], 
-        "name": "event", 
+        "name": "archive", 
         "examples": []
     }, 
     "annual-reports": {
@@ -244,6 +232,7 @@
             {
                 "pattern": "^/annual\\-reports$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/annual\\-reports$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -255,7 +244,14 @@
             {
                 "pattern": "^/subjects$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/subjects$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/major-subject-areas$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/major-subject-areas$", 
+                "starts": null
             }
         ], 
         "name": "subjects", 
@@ -268,18 +264,272 @@
             {
                 "pattern": "^/collections$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/collections$", 
                 "starts": "2017-01-01"
             }
         ], 
         "name": "collections", 
         "examples": []
     }, 
+    "interview": {
+        "frames": [
+            {
+                "pattern": "^/interviews/[a-z0-9-]+/.+$", 
+                "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/interviews/[a-z0-9-]+/.+$", 
+                "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/early-careers-interviews/.+$|^/interviews/early-career-researchers/.+$|^/interviews/working-lives/.+$|^/elife-news/chemistry-versus-cancer-an-interview-with-daniel-abankwa$|^/elife-news/connecting-the-flight-controls-an-interview-with-tarjani-agrawal$|^/elife-news/controlling-the-immune-response-an-interview-with-donna-macduff$|^/elife-news/controlling-traffic-an-interview-with-ramanath-hegde$|^/elife-news/decoding-behaviour-an-interview-with-fanny-cazettes$|^/elife-news/developing-kidneys-an-interview-with-peter-hohenstein$|^/elife-news/getting-under-the-skin-an-interview-with-elena-oancea$|^/elife-news/helping-the-neighbours-an-interview-with-meredith-schuman$|^/elife-news/imprinting-memories-an-interview-with-katja-kornysheva$|^/elife-news/infection-statistics-and-public-health-an-interview-with-alicia-rosello$|^/elife-news/looking-at-lipids-an-interview-with-jessica-hughes$|^/elife-news/modelling-metabolism-an-interview-with-keren-yizhak$|^/elife-news/of-plants-and-parasites-an-interview-with-yong-woo$|^/elife-news/repeating-the-message-an-interview-with-yunsheng-cheng$|^/elife-news/the-benefits-of-new-brain-cells-an-interview-with-antonia-marin-burgin$|^/elife-news/the-regeneration-game-an-interview-with-brian-bradshaw$|^/elife-news/understanding-the-evolution-of-defence-an-interview-with-maurijn-van-der-zee$|^/food-for-thought-an-interview-with-ana-domingos$|^/from-ancient-dna-to-decay-an-interview-with-jessica-metcalf$|^/helping-to-fight-tuberculosis-an-interview-with-david-dowdy$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/early-careers-interviews/.+$,ga:pagePath=~^/interviews/early-career-researchers/.+$,ga:pagePath=~^/interviews/working-lives/.+$,ga:pagePath=~^/elife-news/chemistry-versus-cancer-an-interview-with-daniel-abankwa$,ga:pagePath=~^/elife-news/connecting-the-flight-controls-an-interview-with-tarjani-agrawal$,ga:pagePath=~^/elife-news/controlling-the-immune-response-an-interview-with-donna-macduff$,ga:pagePath=~^/elife-news/controlling-traffic-an-interview-with-ramanath-hegde$,ga:pagePath=~^/elife-news/decoding-behaviour-an-interview-with-fanny-cazettes$,ga:pagePath=~^/elife-news/developing-kidneys-an-interview-with-peter-hohenstein$,ga:pagePath=~^/elife-news/getting-under-the-skin-an-interview-with-elena-oancea$,ga:pagePath=~^/elife-news/helping-the-neighbours-an-interview-with-meredith-schuman$,ga:pagePath=~^/elife-news/imprinting-memories-an-interview-with-katja-kornysheva$,ga:pagePath=~^/elife-news/infection-statistics-and-public-health-an-interview-with-alicia-rosello$,ga:pagePath=~^/elife-news/looking-at-lipids-an-interview-with-jessica-hughes$,ga:pagePath=~^/elife-news/modelling-metabolism-an-interview-with-keren-yizhak$,ga:pagePath=~^/elife-news/of-plants-and-parasites-an-interview-with-yong-woo$,ga:pagePath=~^/elife-news/repeating-the-message-an-interview-with-yunsheng-cheng$,ga:pagePath=~^/elife-news/the-benefits-of-new-brain-cells-an-interview-with-antonia-marin-burgin$,ga:pagePath=~^/elife-news/the-regeneration-game-an-interview-with-brian-bradshaw$,ga:pagePath=~^/elife-news/understanding-the-evolution-of-defence-an-interview-with-maurijn-van-der-zee$,ga:pagePath=~^/food-for-thought-an-interview-with-ana-domingos$,ga:pagePath=~^/from-ancient-dna-to-decay-an-interview-with-jessica-metcalf$,ga:pagePath=~^/helping-to-fight-tuberculosis-an-interview-with-david-dowdy$", 
+                "starts": null
+            }
+        ], 
+        "name": "interview", 
+        "examples": [
+            "/early-careers-interviews/alicia-rosello", 
+            "/elife-news/looking-at-lipids-an-interview-with-jessica-hughes", 
+            "/early-careers-interviews/yong-woo", 
+            "/elife-news/developing-kidneys-an-interview-with-peter-hohenstein", 
+            "/early-careers-interviews/katja-kornysheva", 
+            "/interviews/early-career-researchers/peter-hohenstein", 
+            "/interviews/early-career-researchers/jessica-metcalf", 
+            "/interviews/early-career-researchers/elena-oancea", 
+            "/interviews/working-lives/yaiza-del-pozo-martin", 
+            "/interviews/early-career-researchers/zoe-hilbert", 
+            "/interviews/early-career-researchers/katja-kornysheva", 
+            "/early-careers-interviews/ana-domingos", 
+            "/interviews/early-career-researchers/keren-yizhak", 
+            "/elife-news/understanding-the-evolution-of-defence-an-interview-with-maurijn-van-der-zee", 
+            "/interviews/early-career-researchers/donna-macduff", 
+            "/elife-news/imprinting-memories-an-interview-with-katja-kornysheva", 
+            "/interviews/early-career-researchers/yunsheng-cheng", 
+            "/interviews/early-career-researchers/tarjani-agrawal", 
+            "/elife-news/decoding-behaviour-an-interview-with-fanny-cazettes", 
+            "/interviews/early-career-researchers/antonia-marin-burgin", 
+            "/elife-news/repeating-the-message-an-interview-with-yunsheng-cheng", 
+            "/early-careers-interviews/maurijn-van-der-zee", 
+            "/elife-news/helping-the-neighbours-an-interview-with-meredith-schuman", 
+            "/early-careers-interviews/daniel-abankwa", 
+            "/interviews/working-lives/maria-fernandes", 
+            "/interviews/working-lives/diana-ordonez", 
+            "/interviews/early-career-researchers/jessica-hughes", 
+            "/interviews/early-career-researchers/daniel-abankwa", 
+            "/interviews/early-career-researchers/zach-cofran", 
+            "/early-careers-interviews/ramanath-hegde", 
+            "/early-careers-interviews/elena-oancea", 
+            "/from-ancient-dna-to-decay-an-interview-with-jessica-metcalf", 
+            "/early-careers-interviews/keren-yizhak", 
+            "/early-careers-interviews/tarjani-agrawal", 
+            "/elife-news/infection-statistics-and-public-health-an-interview-with-alicia-rosello", 
+            "/interviews/early-career-researchers/david-dowdy", 
+            "/interviews/early-career-researchers/ramanath-hegde", 
+            "/interviews/working-lives/richard-aragon", 
+            "/early-careers-interviews/brian-bradshaw", 
+            "/interviews/working-lives/ben-price", 
+            "/interviews/early-career-researchers/maurijn-van-der-zee", 
+            "/early-careers-interviews/meredith-schuman", 
+            "/early-careers-interviews/jessica-hughes", 
+            "/interviews/early-career-researchers/yong-woo", 
+            "/elife-news/of-plants-and-parasites-an-interview-with-yong-woo", 
+            "/early-careers-interviews/david-dowdy", 
+            "/elife-news/the-benefits-of-new-brain-cells-an-interview-with-antonia-marin-burgin", 
+            "/elife-news/getting-under-the-skin-an-interview-with-elena-oancea", 
+            "/early-careers-interviews/antonia-marin-burgin", 
+            "/interviews/early-career-researchers/alicia-rosello", 
+            "/interviews/early-career-researchers/meredith-schuman", 
+            "/elife-news/connecting-the-flight-controls-an-interview-with-tarjani-agrawal", 
+            "/early-careers-interviews/fanny-cazettes", 
+            "/early-careers-interviews/donna-macduff", 
+            "/interviews/early-career-researchers/brian-bradshaw", 
+            "/helping-to-fight-tuberculosis-an-interview-with-david-dowdy", 
+            "/elife-news/controlling-the-immune-response-an-interview-with-donna-macduff", 
+            "/elife-news/modelling-metabolism-an-interview-with-keren-yizhak", 
+            "/elife-news/controlling-traffic-an-interview-with-ramanath-hegde", 
+            "/interviews/working-lives/monica-alandete-saez", 
+            "/food-for-thought-an-interview-with-ana-domingos", 
+            "/interviews/working-lives/jenni-sanderson", 
+            "/interviews/working-lives/yilong-li", 
+            "/interviews/early-career-researchers/fanny-cazettes", 
+            "/early-careers-interviews/yunsheng-cheng", 
+            "/early-careers-interviews/peter-hohenstein", 
+            "/interviews/working-lives/leslee-lazar", 
+            "/interviews/early-career-researchers/lining-arnold-ju", 
+            "/early-careers-interviews/jessica-metcalf", 
+            "/interviews/early-career-researchers/jenni-sanderson", 
+            "/interviews/working-lives/dennis-breitsprecher", 
+            "/elife-news/the-regeneration-game-an-interview-with-brian-bradshaw", 
+            "/interviews/early-career-researchers/ana-domingos", 
+            "/elife-news/chemistry-versus-cancer-an-interview-with-daniel-abankwa"
+        ]
+    }, 
+    "nelmio_security": {
+        "frames": [
+            {
+                "pattern": "^/nelmio/csp/report$", 
+                "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/nelmio/csp/report$", 
+                "starts": "2017-01-01"
+            }
+        ], 
+        "name": "nelmio_security", 
+        "examples": []
+    }, 
+    "events": {
+        "frames": [
+            {
+                "pattern": "^/events$", 
+                "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/events$", 
+                "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/elife-news/events$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/elife-news/events$", 
+                "starts": null
+            }
+        ], 
+        "name": "events", 
+        "examples": [
+            "/elife-news/events"
+        ]
+    }, 
+    "resources": {
+        "frames": [
+            {
+                "pattern": "^/resources$", 
+                "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/resources$", 
+                "starts": "2017-01-01"
+            }
+        ], 
+        "name": "resources", 
+        "examples": []
+    }, 
+    "status": {
+        "frames": [
+            {
+                "pattern": "^/status$", 
+                "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/status$", 
+                "starts": "2017-01-01"
+            }
+        ], 
+        "name": "status", 
+        "examples": []
+    }, 
+    "terms": {
+        "frames": [
+            {
+                "pattern": "^/terms$", 
+                "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/terms$", 
+                "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/terms-and-conditions-of-use$|^/privacy-policy$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/terms-and-conditions-of-use$|^/privacy-policy$", 
+                "starts": null
+            }
+        ], 
+        "name": "terms", 
+        "examples": [
+            "/terms-and-conditions-of-use", 
+            "/privacy-policy"
+        ]
+    }, 
+    "archive-month": {
+        "frames": [
+            {
+                "pattern": "^/archive/[2-9][0-9]{3}/.+$", 
+                "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/archive/[2-9][0-9]{3}/.+$", 
+                "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/archive/[0-9]{4}/[0-9]{2}$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/archive/[0-9]{4}/[0-9]{2}$", 
+                "starts": null
+            }
+        ], 
+        "name": "archive-month", 
+        "examples": [
+            "/archive/2015/12", 
+            "/archive/2015/10", 
+            "/archive/2015/11", 
+            "/archive/2015/09", 
+            "/archive/2015/08", 
+            "/archive/2015/01", 
+            "/archive/2015/03", 
+            "/archive/2015/02", 
+            "/archive/2015/05", 
+            "/archive/2015/04", 
+            "/archive/2015/07", 
+            "/archive/2015/06", 
+            "/archive/2013/10", 
+            "/archive/2013/11", 
+            "/archive/2013/12", 
+            "/archive/2017/06", 
+            "/archive/2017/05", 
+            "/archive/2017/04", 
+            "/archive/2017/03", 
+            "/archive/2017/02", 
+            "/archive/2017/01", 
+            "/archive/2013/03", 
+            "/archive/2013/01", 
+            "/archive/2013/06", 
+            "/archive/2013/05", 
+            "/archive/2013/04", 
+            "/archive/2013/09", 
+            "/archive/2013/08", 
+            "/archive/2013/02", 
+            "/archive/2013/07", 
+            "/archive/2016/04", 
+            "/archive/2016/06", 
+            "/archive/2016/07", 
+            "/archive/2016/01", 
+            "/archive/2016/02", 
+            "/archive/2016/03", 
+            "/archive/2016/08", 
+            "/archive/2016/09", 
+            "/archive/2012/10", 
+            "/archive/2016/05", 
+            "/archive/2016/12", 
+            "/archive/2016/11", 
+            "/archive/2016/10", 
+            "/archive/2014/08", 
+            "/archive/2014/09", 
+            "/archive/2014/06", 
+            "/archive/2014/07", 
+            "/archive/2014/04", 
+            "/archive/2014/05", 
+            "/archive/2014/02", 
+            "/archive/2014/03", 
+            "/archive/2014/01", 
+            "/archive/2012/12", 
+            "/archive/2012/11", 
+            "/archive/2014/11", 
+            "/archive/2014/10", 
+            "/archive/2014/12"
+        ]
+    }, 
     "inside-elife-article": {
         "frames": [
             {
                 "pattern": "^/inside\\-elife/[a-z0-9-]+/.+$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/inside\\-elife/[a-z0-9-]+/.+$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/elife-news/[a-z0-9-\\u{2019}]+$|^/wellcome-trust[a-z0-9-]+$|^/the-[a-z0-9-]+$|^/scientific-[a-z0-9-]+$|^/open-access-[a-z0-9-]+$|^/elife-[a-z0-9-]+$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/elife-news/[a-z0-9-\\u{2019}]+$,ga:pagePath=~^/wellcome-trust[a-z0-9-]+$,ga:pagePath=~^/the-[a-z0-9-]+$,ga:pagePath=~^/scientific-[a-z0-9-]+$,ga:pagePath=~^/open-access-[a-z0-9-]+$,ga:pagePath=~^/elife-[a-z0-9-]+$", 
+                "starts": null
             }
         ], 
         "name": "inside-elife-article", 
@@ -1375,257 +1625,12 @@
             "/elife-news/petition-free-online-access-taxpayer-funded-research-wired"
         ]
     }, 
-    "interview": {
-        "frames": [
-            {
-                "pattern": "^/interviews/[a-z0-9-]+/.+$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "interview", 
-        "examples": [
-            "/early-careers-interviews/alicia-rosello", 
-            "/elife-news/looking-at-lipids-an-interview-with-jessica-hughes", 
-            "/early-careers-interviews/yong-woo", 
-            "/elife-news/developing-kidneys-an-interview-with-peter-hohenstein", 
-            "/early-careers-interviews/katja-kornysheva", 
-            "/interviews/early-career-researchers/peter-hohenstein", 
-            "/interviews/early-career-researchers/jessica-metcalf", 
-            "/interviews/early-career-researchers/elena-oancea", 
-            "/interviews/working-lives/yaiza-del-pozo-martin", 
-            "/interviews/early-career-researchers/zoe-hilbert", 
-            "/interviews/early-career-researchers/katja-kornysheva", 
-            "/early-careers-interviews/ana-domingos", 
-            "/interviews/early-career-researchers/keren-yizhak", 
-            "/elife-news/understanding-the-evolution-of-defence-an-interview-with-maurijn-van-der-zee", 
-            "/interviews/early-career-researchers/donna-macduff", 
-            "/elife-news/imprinting-memories-an-interview-with-katja-kornysheva", 
-            "/interviews/early-career-researchers/yunsheng-cheng", 
-            "/interviews/early-career-researchers/tarjani-agrawal", 
-            "/elife-news/decoding-behaviour-an-interview-with-fanny-cazettes", 
-            "/interviews/early-career-researchers/antonia-marin-burgin", 
-            "/elife-news/repeating-the-message-an-interview-with-yunsheng-cheng", 
-            "/early-careers-interviews/maurijn-van-der-zee", 
-            "/elife-news/helping-the-neighbours-an-interview-with-meredith-schuman", 
-            "/early-careers-interviews/daniel-abankwa", 
-            "/interviews/working-lives/maria-fernandes", 
-            "/interviews/working-lives/diana-ordonez", 
-            "/interviews/early-career-researchers/jessica-hughes", 
-            "/interviews/early-career-researchers/daniel-abankwa", 
-            "/interviews/early-career-researchers/zach-cofran", 
-            "/early-careers-interviews/ramanath-hegde", 
-            "/early-careers-interviews/elena-oancea", 
-            "/from-ancient-dna-to-decay-an-interview-with-jessica-metcalf", 
-            "/early-careers-interviews/keren-yizhak", 
-            "/early-careers-interviews/tarjani-agrawal", 
-            "/elife-news/infection-statistics-and-public-health-an-interview-with-alicia-rosello", 
-            "/interviews/early-career-researchers/david-dowdy", 
-            "/interviews/early-career-researchers/ramanath-hegde", 
-            "/interviews/working-lives/richard-aragon", 
-            "/early-careers-interviews/brian-bradshaw", 
-            "/interviews/working-lives/ben-price", 
-            "/interviews/early-career-researchers/maurijn-van-der-zee", 
-            "/early-careers-interviews/meredith-schuman", 
-            "/early-careers-interviews/jessica-hughes", 
-            "/interviews/early-career-researchers/yong-woo", 
-            "/elife-news/of-plants-and-parasites-an-interview-with-yong-woo", 
-            "/early-careers-interviews/david-dowdy", 
-            "/elife-news/the-benefits-of-new-brain-cells-an-interview-with-antonia-marin-burgin", 
-            "/elife-news/getting-under-the-skin-an-interview-with-elena-oancea", 
-            "/early-careers-interviews/antonia-marin-burgin", 
-            "/interviews/early-career-researchers/alicia-rosello", 
-            "/interviews/early-career-researchers/meredith-schuman", 
-            "/elife-news/connecting-the-flight-controls-an-interview-with-tarjani-agrawal", 
-            "/early-careers-interviews/fanny-cazettes", 
-            "/early-careers-interviews/donna-macduff", 
-            "/interviews/early-career-researchers/brian-bradshaw", 
-            "/helping-to-fight-tuberculosis-an-interview-with-david-dowdy", 
-            "/elife-news/controlling-the-immune-response-an-interview-with-donna-macduff", 
-            "/elife-news/modelling-metabolism-an-interview-with-keren-yizhak", 
-            "/elife-news/controlling-traffic-an-interview-with-ramanath-hegde", 
-            "/interviews/working-lives/monica-alandete-saez", 
-            "/food-for-thought-an-interview-with-ana-domingos", 
-            "/interviews/working-lives/jenni-sanderson", 
-            "/interviews/working-lives/yilong-li", 
-            "/interviews/early-career-researchers/fanny-cazettes", 
-            "/early-careers-interviews/yunsheng-cheng", 
-            "/early-careers-interviews/peter-hohenstein", 
-            "/interviews/working-lives/leslee-lazar", 
-            "/interviews/early-career-researchers/lining-arnold-ju", 
-            "/early-careers-interviews/jessica-metcalf", 
-            "/interviews/early-career-researchers/jenni-sanderson", 
-            "/interviews/working-lives/dennis-breitsprecher", 
-            "/elife-news/the-regeneration-game-an-interview-with-brian-bradshaw", 
-            "/interviews/early-career-researchers/ana-domingos", 
-            "/elife-news/chemistry-versus-cancer-an-interview-with-daniel-abankwa"
-        ]
-    }, 
-    "nelmio_security": {
-        "frames": [
-            {
-                "pattern": "^/nelmio/csp/report$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "nelmio_security", 
-        "examples": []
-    }, 
-    "article-ris": {
-        "frames": [
-            {
-                "pattern": "^/articles/[a-z0-9-]+\\.ris$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "article-ris", 
-        "examples": []
-    }, 
-    "log-in-check": {
-        "frames": [
-            {
-                "pattern": "^/log\\-in/check$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "log-in-check", 
-        "examples": []
-    }, 
-    "podcast-episode": {
-        "frames": [
-            {
-                "pattern": "^/podcast/episode[1-9][0-9]*$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "podcast-episode", 
-        "examples": []
-    }, 
-    "status": {
-        "frames": [
-            {
-                "pattern": "^/status$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "status", 
-        "examples": []
-    }, 
-    "terms": {
-        "frames": [
-            {
-                "pattern": "^/terms$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "terms", 
-        "examples": [
-            "/terms-and-conditions-of-use", 
-            "/privacy-policy"
-        ]
-    }, 
-    "article-figures": {
-        "frames": [
-            {
-                "pattern": "^/articles/[a-z0-9-]+/figures$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "article-figures", 
-        "examples": []
-    }, 
-    "archive-month": {
-        "frames": [
-            {
-                "pattern": "^/archive/[2-9][0-9]{3}/.+$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "archive-month", 
-        "examples": [
-            "/archive/2015/12", 
-            "/archive/2015/10", 
-            "/archive/2015/11", 
-            "/archive/2015/09", 
-            "/archive/2015/08", 
-            "/archive/2015/01", 
-            "/archive/2015/03", 
-            "/archive/2015/02", 
-            "/archive/2015/05", 
-            "/archive/2015/04", 
-            "/archive/2015/07", 
-            "/archive/2015/06", 
-            "/archive/2013/10", 
-            "/archive/2013/11", 
-            "/archive/2013/12", 
-            "/archive/2017/06", 
-            "/archive/2017/05", 
-            "/archive/2017/04", 
-            "/archive/2017/03", 
-            "/archive/2017/02", 
-            "/archive/2017/01", 
-            "/archive/2013/03", 
-            "/archive/2013/01", 
-            "/archive/2013/06", 
-            "/archive/2013/05", 
-            "/archive/2013/04", 
-            "/archive/2013/09", 
-            "/archive/2013/08", 
-            "/archive/2013/02", 
-            "/archive/2013/07", 
-            "/archive/2016/04", 
-            "/archive/2016/06", 
-            "/archive/2016/07", 
-            "/archive/2016/01", 
-            "/archive/2016/02", 
-            "/archive/2016/03", 
-            "/archive/2016/08", 
-            "/archive/2016/09", 
-            "/archive/2012/10", 
-            "/archive/2016/05", 
-            "/archive/2016/12", 
-            "/archive/2016/11", 
-            "/archive/2016/10", 
-            "/archive/2014/08", 
-            "/archive/2014/09", 
-            "/archive/2014/06", 
-            "/archive/2014/07", 
-            "/archive/2014/04", 
-            "/archive/2014/05", 
-            "/archive/2014/02", 
-            "/archive/2014/03", 
-            "/archive/2014/01", 
-            "/archive/2012/12", 
-            "/archive/2012/11", 
-            "/archive/2014/11", 
-            "/archive/2014/10", 
-            "/archive/2014/12"
-        ]
-    }, 
-    "doi-sub": {
-        "frames": [
-            {
-                "pattern": "^/lookup/doi/10.7554/eLife\\.([a-z0-9-.]+)$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "doi-sub", 
-        "examples": []
-    }, 
     "who-we-work-with": {
         "frames": [
             {
                 "pattern": "^who\\-we\\-work\\-with$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^who\\-we\\-work\\-with$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -1637,6 +1642,7 @@
             {
                 "pattern": "^/search$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/search$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -1648,7 +1654,14 @@
             {
                 "pattern": "^/collections/[a-z0-9-]+/.+$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/collections/[a-z0-9-]+/.+$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/collections/reproducibility-project-cancer-biology$|^/collections/plain-language-summaries$|^/collections/human-genetics$|^/collections/chemical-biology$|^/interviews/working-lives$|^/collections/natural-history-model-organisms$|^/interviews/early-career-researchers$|^/collections/paleontology$|^/collections/tropical-disease$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/collections/reproducibility-project-cancer-biology$,ga:pagePath=~^/collections/plain-language-summaries$,ga:pagePath=~^/collections/human-genetics$,ga:pagePath=~^/collections/chemical-biology$,ga:pagePath=~^/interviews/working-lives$,ga:pagePath=~^/collections/natural-history-model-organisms$,ga:pagePath=~^/interviews/early-career-researchers$,ga:pagePath=~^/collections/paleontology$,ga:pagePath=~^/collections/tropical-disease$", 
+                "starts": null
             }
         ], 
         "name": "collection", 
@@ -1669,7 +1682,14 @@
             {
                 "pattern": "^/labs$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/labs$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/elife-news/labs$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/elife-news/labs$", 
+                "starts": null
             }
         ], 
         "name": "labs", 
@@ -1677,34 +1697,31 @@
             "/elife-news/labs"
         ]
     }, 
-    "article-type": {
+    "podcast-episode": {
         "frames": [
             {
-                "pattern": "^/articles/(correction|editorial|feature|insight|research-advance|research-article|retraction|registered-report|replication-study|scientific-correspondence|short-report|tools-resources)$", 
+                "pattern": "^/podcast/episode[1-9][0-9]*$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/podcast/episode[1-9][0-9]*$", 
                 "starts": "2017-01-01"
             }
         ], 
-        "name": "article-type", 
-        "examples": [
-            "/category/editorial", 
-            "/category/research-advance", 
-            "/category/tools-and-resources", 
-            "/category/replication-study", 
-            "/category/feature-article", 
-            "/category/registered-report", 
-            "/category/insight", 
-            "/category/correction", 
-            "/category/short-report", 
-            "/category/research-article"
-        ]
+        "name": "podcast-episode", 
+        "examples": []
     }, 
     "press-pack": {
         "frames": [
             {
                 "pattern": "^/for\\-the\\-press/[a-z0-9-]+/.+$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/for\\-the\\-press/[a-z0-9-]+/.+$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/elife-news/press-package-[a-z0-9-]+$|^/elife-news/researchers-uncover-more-about-why-and-when-hiv-rebounds-after-remission$|^/elife-news/new-test-for-ancient-dna-authenticity$|^/elife-news/generous-mothers-receive-less-nagging$|^/elife-news/social-yeast-cells-prefer-to-work-with-close-relatives-to-make-our-beer-bread-and-wine$|^/elife-news/hunger-hormone-is-boosted-by-restricted-meal-times$|^/elife-news/media-coverage-infant-brains-develop-years-faster-than-we-thought$|^/elife-news/early-hospitalisation-key-to-survival-for-ebola-victims-drc$|^/elife-news/new-way-to-fix-broken-heart$|^/elife-news/researchers-identify-potential-drug-that-could-help-treat-cystic-fibrosis$|^/elife-news/scientists-create-imaging-toolkit-to-help-identify-new-brain-tumour-drug-targets$|^/elife-news/press package-airport-screening-misses-half-of-disease-cases-but-could-be-improved-by-customising-to-pathogens$|^/elife-news/hummingbirds-rely-on-raw-power-not-physique-to-outmanoeuvre-rivals$|^/elife-news/first-insights-into-changes-to-developing-brain-caused-by-gene-associated-with-autism$|^/elife-news/new-species-of-human-relative-discovered-in-south-african-cave$|^/elife-news/drugs-from-dirt-scientists-develop-first-global-roadmap-for-drug-discovery$|^/elife-news/how-reward-daytime-sleep-boost-learning$|^/elife-news/golden-discovery-of-novel-imaging-technique-captures-beauty-of-metal-labeled-neurons-in-3d$|^/elife-news/midnight-munchies-mangle-memory$|^/elife-news/could-2016-be-a-bad-year-for-the-malaria-parasite-in-africa\\?$|^/elife-news/studies-explain-adolescents-vulnerability-to-addictive-drugs$|^/elife-news/anticancer-effects-of-drugs-overestimated-by-as-much-as-45%-in-animal-models$|^/elife-news/scientists-prove-key-aspect-of-evolutionary-theory$|^/elife-news/researchers-look-to-exploit-females-natural-resistance-to-infection$|^/elife-news/first-imagery-from-echolocation-reveals-elite-hunting-techniques-of-bats$|^/elife-news/researchers-map-areas-at-risk-of-ebola-outbreak$|^/elife-news/molecular-tweezer-targets-hiv-and-prevents-semen-from-promoting-infection$|^/elife-news/being-anxious-could-be-good-for-you-in-a-crisis$|^/elife-news/slime-can-see$|^/elife-news/scientists-robotically-driven-system-could-reduce-cost-of-discovering-drug-and-target-interactions$|^/elife-news/q-and-a-with-researchers-from-the-university-of-california-berkeley$|^/elife-news/scientists-warn-light-pollution-can-stop-coral-from-spawning$|^/elife-news/study-illuminates-new-design-strategies-for-optogenetic-tools$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/elife-news/press-package-[a-z0-9-]+$,ga:pagePath=~^/elife-news/researchers-uncover-more-about-why-and-when-hiv-rebounds-after-remission$,ga:pagePath=~^/elife-news/new-test-for-ancient-dna-authenticity$,ga:pagePath=~^/elife-news/generous-mothers-receive-less-nagging$,ga:pagePath=~^/elife-news/social-yeast-cells-prefer-to-work-with-close-relatives-to-make-our-beer-bread-and-wine$,ga:pagePath=~^/elife-news/hunger-hormone-is-boosted-by-restricted-meal-times$,ga:pagePath=~^/elife-news/media-coverage-infant-brains-develop-years-faster-than-we-thought$,ga:pagePath=~^/elife-news/early-hospitalisation-key-to-survival-for-ebola-victims-drc$,ga:pagePath=~^/elife-news/new-way-to-fix-broken-heart$,ga:pagePath=~^/elife-news/researchers-identify-potential-drug-that-could-help-treat-cystic-fibrosis$,ga:pagePath=~^/elife-news/scientists-create-imaging-toolkit-to-help-identify-new-brain-tumour-drug-targets$,ga:pagePath=~^/elife-news/press package-airport-screening-misses-half-of-disease-cases-but-could-be-improved-by-customising-to-pathogens$,ga:pagePath=~^/elife-news/hummingbirds-rely-on-raw-power-not-physique-to-outmanoeuvre-rivals$,ga:pagePath=~^/elife-news/first-insights-into-changes-to-developing-brain-caused-by-gene-associated-with-autism$,ga:pagePath=~^/elife-news/new-species-of-human-relative-discovered-in-south-african-cave$,ga:pagePath=~^/elife-news/drugs-from-dirt-scientists-develop-first-global-roadmap-for-drug-discovery$,ga:pagePath=~^/elife-news/how-reward-daytime-sleep-boost-learning$,ga:pagePath=~^/elife-news/golden-discovery-of-novel-imaging-technique-captures-beauty-of-metal-labeled-neurons-in-3d$,ga:pagePath=~^/elife-news/midnight-munchies-mangle-memory$,ga:pagePath=~^/elife-news/could-2016-be-a-bad-year-for-the-malaria-parasite-in-africa\\?$,ga:pagePath=~^/elife-news/studies-explain-adolescents-vulnerability-to-addictive-drugs$,ga:pagePath=~^/elife-news/anticancer-effects-of-drugs-overestimated-by-as-much-as-45%-in-animal-models$,ga:pagePath=~^/elife-news/scientists-prove-key-aspect-of-evolutionary-theory$,ga:pagePath=~^/elife-news/researchers-look-to-exploit-females-natural-resistance-to-infection$,ga:pagePath=~^/elife-news/first-imagery-from-echolocation-reveals-elite-hunting-techniques-of-bats$,ga:pagePath=~^/elife-news/researchers-map-areas-at-risk-of-ebola-outbreak$,ga:pagePath=~^/elife-news/molecular-tweezer-targets-hiv-and-prevents-semen-from-promoting-infection$,ga:pagePath=~^/elife-news/being-anxious-could-be-good-for-you-in-a-crisis$,ga:pagePath=~^/elife-news/slime-can-see$,ga:pagePath=~^/elife-news/scientists-robotically-driven-system-could-reduce-cost-of-discovering-drug-and-target-interactions$,ga:pagePath=~^/elife-news/q-and-a-with-researchers-from-the-university-of-california-berkeley$,ga:pagePath=~^/elife-news/scientists-warn-light-pollution-can-stop-coral-from-spawning$,ga:pagePath=~^/elife-news/study-illuminates-new-design-strategies-for-optogenetic-tools$", 
+                "starts": null
             }
         ], 
         "name": "press-pack", 
@@ -1840,7 +1857,14 @@
             {
                 "pattern": "^/about/peer\\-review$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/about/peer\\-review$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/review-process$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/review-process$", 
+                "starts": null
             }
         ], 
         "name": "about-peer-review", 
@@ -1848,37 +1872,16 @@
             "/review-process"
         ]
     }, 
-    "article": {
-        "frames": [
-            {
-                "pattern": "^/articles/[a-z0-9-]+$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "article", 
-        "examples": []
-    }, 
     "podcast": {
         "frames": [
             {
                 "pattern": "^/podcast$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/podcast$", 
                 "starts": "2017-01-01"
             }
         ], 
         "name": "podcast", 
-        "examples": []
-    }, 
-    "article-version-figures": {
-        "frames": [
-            {
-                "pattern": "^/articles/[a-z0-9-]+v[1-9][0-9]*/figures$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "article-version-figures", 
         "examples": []
     }, 
     "about": {
@@ -1886,21 +1889,11 @@
             {
                 "pattern": "^/about$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/about$", 
                 "starts": "2017-01-01"
             }
         ], 
         "name": "about", 
-        "examples": []
-    }, 
-    "doi": {
-        "frames": [
-            {
-                "pattern": "^/lookup/doi/10.7554/eLife\\.([a-z0-9-]+)$", 
-                "ends": null, 
-                "starts": "2017-01-01"
-            }
-        ], 
-        "name": "doi", 
         "examples": []
     }, 
     "archive-year": {
@@ -1908,30 +1901,31 @@
             {
                 "pattern": "^/archive/[2-9][0-9]{3}$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/archive/[2-9][0-9]{3}$", 
                 "starts": "2017-01-01"
             }
         ], 
         "name": "archive-year", 
         "examples": []
     }, 
-    "events": {
+    "log-in-check": {
         "frames": [
             {
-                "pattern": "^/events$", 
+                "pattern": "^/log\\-in/check$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/log\\-in/check$", 
                 "starts": "2017-01-01"
             }
         ], 
-        "name": "events", 
-        "examples": [
-            "/elife-news/events"
-        ]
+        "name": "log-in-check", 
+        "examples": []
     }, 
     "rss-ahead": {
         "frames": [
             {
                 "pattern": "^/rss/ahead\\.xml$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/rss/ahead\\.xml$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -1943,6 +1937,7 @@
             {
                 "pattern": "^/magazine$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/magazine$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -1954,6 +1949,7 @@
             {
                 "pattern": "^/contact$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/contact$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -1965,6 +1961,7 @@
             {
                 "pattern": "^/log\\-in$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/log\\-in$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -1976,6 +1973,7 @@
             {
                 "pattern": "^/about/innovation$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/about/innovation$", 
                 "starts": "2017-01-01"
             }
         ], 
@@ -1987,7 +1985,14 @@
             {
                 "pattern": "^/inside\\-elife$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/inside\\-elife$", 
                 "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/elife-news/news$|^/elife-news/news-elife$|^/elife-news$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/elife-news/news$|^/elife-news/news-elife$|^/elife-news$", 
+                "starts": null
             }
         ], 
         "name": "inside-elife", 
@@ -2002,6 +2007,7 @@
             {
                 "pattern": "^/about/early\\-career$", 
                 "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/about/early\\-career$", 
                 "starts": "2017-01-01"
             }
         ], 

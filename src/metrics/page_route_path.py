@@ -11,28 +11,24 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-def explode_ga_pattern(pattern):
-    ga_pattern = "ga:pagePath=~" + pattern
+def save_pages(routing_table):
+    return map(lambda pagename: utils.create_or_update(models.Page, {'name': pagename}), routing_table)
 
-    # TODO: shift this into an 'explode' type function
-    if len(pattern) > 128 and '|' in pattern:
-        # this regex is too damn long. in some cases we can explode patterns
-        # in this case, we're looking for patterns like '/(foo|bar|baz|bup)/' to explode
-        regex2 = r"\([()\w|-]+\)" # regex matching regex
-        matches = re.finditer(regex2, pattern)
-        match = next(matches)
-        if not match:
-            raise ValueError("failed to reduce size of regular expression. GA will refuse to run this query: %s" % ga_pattern)
+def test_route_examples(route):
+    "each route contains a number of examples. every example should match against one of the route's frames"
+    #ensure(route['examples'], "route missing examples to test")
+    #ensure(route['frames'], "route missing frames to test")
 
-        match = match.group()
-        subs = match.strip('()').split('|') # explode
-        subs = map(lambda sub: ga_pattern.replace(match, sub), subs)
+    def match(pattern, path):
+        return re.match(pattern, path)
 
-        # final check nothing is huge
-        map(lambda sub: ensure(len(sub) <= 128, "GA requires a pattern 128 characters or less: %s" % sub), subs)
+    for example_path in route['examples']:
+        result = [match(frame['pattern'], example_path) for frame in route['frames']]
+        ensure(any(result), "failed to match path %s against any known frame: %s" % (example_path, [f['pattern'] for f in route['frames']]))
 
-        # make a super long expression
-        ga_pattern = ",".join(subs)
+#
+# old
+#
 
 
 def ga_regex(pattern):

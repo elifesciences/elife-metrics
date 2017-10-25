@@ -18,6 +18,18 @@ keys = lambda d: list(d.keys())
 
 lfiltermap = lambda func, *iterable: lfilter(None, lmap(func, *iterable))
 
+def merge(d1, d2):
+    if type(d1) != type(d2):
+        raise ValueError("no idea how to merge a %s with a %s" % (type(d1), type(d2)))
+    if isinstance(d1, list):
+        return d1 + d2
+    if isinstance(d1, dict):
+        overlap = set(d1.keys()).intersection(d2.keys())
+        d1.update({key: merge(d1[key], d2[key]) for key in overlap})
+        return d1
+    # d2 values override those in d1
+    return d2
+
 def comp(*fns):
     "composes functions LEFT to RIGHT"
     def _comp(*args, **kwargs):

@@ -210,6 +210,7 @@ SCHEMA_IDX = {
 API_PATH = join(SCHEMA_PATH, 'api.raml')
 
 JOURNAL_ROUTES = join(PROJECT_DIR, 'schema/journal/routing.yml')
+CUSTOM_ROUTES = join(PROJECT_DIR, 'schema/journal/custom-routes.json')
 JOURNAL_REDIRECTS = join(PROJECT_DIR, 'schema/journal/redirects.nginx.conf')
 ROUTE_TABLE = join(PROJECT_DIR, 'schema/journal/metrics-routing.json')
 

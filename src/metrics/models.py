@@ -148,7 +148,7 @@ class Page(models.Model):
         return self.name
 
     def __repr__(self):
-        return '<ContentType %s %r>' % (self.name, self.pattern)
+        return '<ContentType %r>' % self.name
 
 class Path(models.Model):
     page = ForeignKey(Page)
