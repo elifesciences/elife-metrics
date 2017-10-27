@@ -95,9 +95,18 @@ def _update_page_counts(page, frame):
     results = ga_core.query_ga(query_map)
 
     # post-process the result, do stuff we couldn't do in GA
-    results = lfiltermap(norm_row, results.get('rows', []))
+    return lfiltermap(norm_row, results.get('rows', []))
 
-    # after normalising the path, we're going to have duplicate paths
+def update_page_counts(page, route):
+    "updates page counts for all of a route's time frames"
+
+    # call update page count for each frame
+    per_frame_results = map(partial(_update_page_counts, page), route['frames'])
+
+    # flatten per-frame results into a single list
+    results = utils.flatten(per_frame_results)
+
+    # after query each frame and normalising the paths, we're going to have duplicates
     grouped_results = utils.group(results, lambda m: m['path'])
 
     def aggregate_paths(a, b):
@@ -114,9 +123,6 @@ def _update_page_counts(page, frame):
 
     return map(insert_path, results)
 
-def update_page_counts(page, route):
-    "updates page counts for all of a route's time frames"
-    return map(partial(_update_page_counts, page), route['frames'])
 
 @atomic
 def update_all_page_counts(dry_run=False):
