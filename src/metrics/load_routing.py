@@ -175,6 +175,10 @@ def load_custom_route_file(path):
     if os.path.exists(path):
         return json.load(open(path, 'r'))
 
+def gaify(frame):
+    frame['ga_pattern'] = explode_ga_pattern(frame['pattern'])
+    return frame
+
 def routing_table():
     "generates a route table with examples"
     routes = load_journal_route_file(settings.JOURNAL_ROUTES)
@@ -198,10 +202,6 @@ def routing_table():
 
     # add custom routes
     route_idx = utils.merge(route_idx, custom_routes)
-
-    def gaify(frame):
-        frame['ga_pattern'] = explode_ga_pattern(frame['pattern'])
-        return frame
     
     # generate regex for GA
     for name, route in route_idx.items():
