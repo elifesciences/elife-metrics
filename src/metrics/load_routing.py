@@ -211,6 +211,7 @@ def routing_table():
 
 '''
 def gen_overrides():
+    "create an example file that can be modified to provide overrides"
     route_idx = routing_table()
     return {key: {'frames': [frame("|".join(map(path_to_regex, val['examples'])), None, '2017-01-01')]} for key, val in route_idx.items()}
 '''

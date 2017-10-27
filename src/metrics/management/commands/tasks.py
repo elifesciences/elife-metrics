@@ -17,18 +17,22 @@ def load_journal_routes(stdout):
     "load the journal routes from the schema directory and create Page objects"
     load_routing.insert_all(load_routing.load(settings.JOURNAL_ROUTES))
 
-def missing_routes(stdout):
-    stdout.write(json.dumps(load_routing.old_paths_without_a_new_route()))
+#def missing_routes(stdout):
+#    stdout.write(json.dumps(load_routing.old_paths_without_a_new_route()))
 
-def final(stdout):
+def write_final_routes(stdout):
     stdout.write(json.dumps(load_routing.dump_routing_table(), indent=4))
+
+def print_final_routes(stdout):
+    stdout.write(json.dumps(load_routing.routing_table(), indent=4))
 
 TASKS = {
     'journal-routes': print_journal_routes,
     'journal-redirects': print_journal_redirects,
     'load-journal-routes': load_journal_routes,
-    'missing-routes': missing_routes,
-    'final': final,
+    #'missing-routes': missing_routes,
+    'final-routes': print_final_routes,
+    'write-final-routes': write_final_routes,
 }
 
 class Command(BaseCommand):
