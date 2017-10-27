@@ -110,14 +110,14 @@ def update_page_counts(page, route):
     grouped_results = utils.group(results, lambda m: m['path'])
 
     def aggregate_paths(a, b):
-        a.update(b)
+        a['count'] += b['count']
         return a
 
     # these groups of results then need to be aggregated into a single result
     results = map(lambda vals: reduce(aggregate_paths, vals), grouped_results.values())
 
     def insert_path(row):
-        row['count'] = sum(row['count'].values()) # tally the results
+        row['count'] = sum(row['count'].values())
         row['page'] = page
         return utils.create_or_update(models.Path, row, ['page', 'path'])
 
