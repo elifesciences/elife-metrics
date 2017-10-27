@@ -1,9 +1,9 @@
+from functools import partial
 import re
 import utils, models
-from utils import ensure, first, lfiltermap
+from utils import ensure, first, lfiltermap, todt
 from utils import atomic
 from ga_metrics import core as ga_core, utils as ga_utils
-from datetime import datetime
 from django.conf import settings
 from collections import Counter
 from functools import reduce
@@ -35,14 +35,9 @@ def ga_regex(pattern):
     return pattern.startswith('ga:pagePath=~')
 
 def insert(page_route):
-    ensure(ga_regex(page_route['pattern']), "regular expression doesn't look like something we can give to google.", ValueError)
-
     page = utils.subdict(page_route, ['name'])
     page, _, _ = utils.create_or_update(models.Page, page, ['name'])
-
-    route = {'page': page, 'pattern': page_route['pattern']}
-    route, _, _ = utils.create_or_update(models.Route, route)
-    return route
+    return page
 
 
 @atomic
@@ -79,19 +74,23 @@ def norm_row(row):
         'count': count
     }
 
-def update_page_counts(page):
+def _update_page_counts(page, frame):
+    "creates/updates the page counts for a particular "
     table_id = ga_utils.norm_table_id(settings.GA_TABLE_ID)
-    from_date, to_date = settings.TWOPOINTZERO_START, datetime.now()
+    #from_date, to_date = settings.TWOPOINTZERO_START, datetime.now()
+    earliest = '2016-01-01'
+    latest = '2017-12-31'
+    from_date, to_date = todt(frame['starts'] or earliest), todt(frame['ends'] or latest)
 
     query_map = {
         'ids': table_id,
         'max_results': 10000, # 10,000 is the max GA will ever return
-        'start_date': utils.ymd(from_date),
-        'end_date': utils.ymd(to_date),
+        'start_date': utils.ymd(todt(from_date)),
+        'end_date': utils.ymd(todt(to_date)),
         'metrics': 'ga:sessions', # less flattering, more accurate
         'dimensions': 'ga:pagePath',
         'sort': 'ga:pagePath',
-        'filters': page.pattern,
+        'filters': frame['ga_pattern'],
     }
     results = ga_core.query_ga(query_map)
 
@@ -114,6 +113,10 @@ def update_page_counts(page):
         return utils.create_or_update(models.Path, row, ['page', 'path'])
 
     return map(insert_path, results)
+
+def update_page_counts(page, route):
+    "updates page counts for all of a route's time frames"
+    return map(partial(_update_page_counts, page), route['frames'])
 
 @atomic
 def update_all_page_counts(dry_run=False):

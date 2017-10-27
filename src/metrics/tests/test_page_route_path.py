@@ -40,26 +40,22 @@ class One(base.BaseCase):
         self.assertEqual(len(errors), 2)
 
     def test_double_insert(self):
-        ctypes = lr.load_journal_route_file(self.fixture)
-        map(lr.insert, ctypes)
+        ctypes = lr.routing_table().values()
+        map(prp.insert, ctypes)
         self.assertEqual(len(ctypes), models.Page.objects.count())
         # results don't accumulate
-        map(lr.insert, ctypes)
-        self.assertEqual(len(ctypes), models.Page.objects.count())
-        # even if you change their pattern
-        ctypes[0]['pattern'] = "%s,%s" % tuple([ctypes[0]['pattern']] * 2)
-        map(lr.insert, ctypes)
+        map(prp.insert, ctypes)
         self.assertEqual(len(ctypes), models.Page.objects.count())
 
     def test_call_ga(self):
-        ctypes = lr.loads(self.fixture)
-        page = lr.insert(ctypes[0])
-        page = page[0] # ll: (obj, created?, updated?)
+        rtbl = lr.routing_table()
+        route = rtbl['about-peer-review']
+        page = prp.insert(route)
 
         ga_fixture = {u'kind': u'analytics#gaData', u'rows': [[u'/about/peer-review', u'440']], u'containsSampledData': False, u'profileInfo': {u'webPropertyId': u'UA-48379231-2', u'internalWebPropertyId': u'79882125', u'tableId': u'ga:82618489', u'profileId': u'82618489', u'profileName': u'All Web Site Data', u'accountId': u'48379231'}, u'itemsPerPage': 10000, u'totalsForAllResults': {u'ga:sessions': u'440'}, u'columnHeaders': [{u'dataType': u'STRING', u'columnType': u'DIMENSION', u'name': u'ga:pagePath'}, {u'dataType': u'INTEGER', u'columnType': u'METRIC', u'name': u'ga:sessions'}], u'query': {u'sort': [u'ga:pagePath'], u'max-results': 10000, u'dimensions': u'ga:pagePath', u'start-date': u'2017-01-01', u'start-index': 1, u'ids': u'ga:82618489', u'metrics': [u'ga:sessions'], u'filters': u'ga:pagePath=~^/about/peer\\-review$', u'end-date': u'2017-10-11'}, u'totalResults': 1, u'id': u'https://www.googleapis.com/analytics/v3/data/ga?ids=ga:82618489&dimensions=ga:pagePath&metrics=ga:sessions&sort=ga:pagePath&filters=ga:pagePath%3D~%5E/about/peer%5C-review$&start-date=2017-01-01&end-date=2017-10-11&max-results=10000', u'selfLink': u'https://www.googleapis.com/analytics/v3/data/ga?ids=ga:82618489&dimensions=ga:pagePath&metrics=ga:sessions&sort=ga:pagePath&filters=ga:pagePath%3D~%5E/about/peer%5C-review$&start-date=2017-01-01&end-date=2017-10-11&max-results=10000'}
 
         with patch('metrics.ga_metrics.core.query_ga', return_value=ga_fixture):
-            lr.update_page_counts(page)
+            prp._update_page_counts(page, route['frames'][0]) # current frame
 
         path_views = models.Path.objects.all()
         self.assertEqual(path_views.count(), 1)

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import os, json
 import requests
 import re
@@ -101,7 +102,7 @@ def excluded(path):
 
 def load_journal_route_string(string):
     raw = utils.yaml_loads(StringIO(string))
-    ensure(isinstance(raw, dict), "dictionary expected after deserialising", ValueError)
+    ensure(isinstance(raw, OrderedDict), "ordered dictionary expected after deserialising", ValueError)
     return [parse(name, rest) for name, rest in raw.items() if not excluded(rest['path'])]
 
 def load_journal_route_file(path):
@@ -184,7 +185,7 @@ def routing_table():
     custom_routes = load_custom_route_file(settings.CUSTOM_ROUTES)
     redirects = load_nginx_redirect_file(settings.JOURNAL_REDIRECTS)
 
-    route_idx = {r['name']: r for r in routes}
+    route_idx = OrderedDict([(r['name'], r) for r in routes])
 
     def _route_path(path):
         for route in routes:
