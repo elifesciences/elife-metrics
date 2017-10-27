@@ -34,7 +34,7 @@ def explode_ga_pattern(pattern):
         regex2 = r"\([()\w|-]+\)" # regex matching regex
         matches = re.finditer(regex2, pattern)
         match = next(matches, None)
-        if  match:
+        if match:
             match = match.group()
             subs = match.strip('()').split('|') # explode
             subs = map(lambda sub: ga_pattern.replace(match, sub), subs)
@@ -54,9 +54,8 @@ def explode_ga_pattern(pattern):
             raise ValueError("failed to reduce size of regular expression. GA will refuse to run this query: %s" % ga_pattern)
 
     ensure(len(ga_pattern) <= 4096, "%s\nexpression too large by %s bytes" % (ga_pattern, (len(ga_pattern) - 4096)))
-        
-    return ga_pattern
 
+    return ga_pattern
 
 
 #
@@ -202,11 +201,11 @@ def routing_table():
 
     # add custom routes
     route_idx = utils.merge(route_idx, custom_routes)
-    
+
     # generate regex for GA
     for name, route in route_idx.items():
         route_idx[name]['frames'] = map(gaify, route['frames'])
-        
+
     return route_idx
 
 '''
