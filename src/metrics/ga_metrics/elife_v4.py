@@ -25,17 +25,17 @@ event_counts = elife_v1.event_counts
 def path_counts_query(table_id, from_date, to_date):
     # use the v1 query as a template
     new_query = elife_v1.path_counts_query(table_id, from_date, to_date)
-    new_query['filters'] = r'ga:pagePath=~^/articles/[0-9]{1,5}$'
+    new_query['filters'] = r'ga:pagePath=~^/articles/[0-9]+$' # note: GA doesn't support {n,m} syntax. you're not crazy
     return new_query
 
-REGEX = r"/articles/(?P<artid>\d+)$"
+REGEX = r"/articles/(?P<artid>\d{1,5})$" # python does support it though, so we can filter bad eggs in post
 PATH_RE = re.compile(REGEX, re.IGNORECASE)
 
 def path_count(pair):
     "handles a single pair of (path, count). emits a triple of (art-id, art-type, count)"
     path, count = pair
     # path ll: /articles/12345
-    bits = re.search(PATH_RE, path.lower())
+    bits = re.match(PATH_RE, path.lower())
     if not bits:
         LOG.warn("skpping unhandled path %s", pair)
         return
