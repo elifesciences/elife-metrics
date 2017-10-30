@@ -1,9 +1,8 @@
 import base, json
 from os.path import join
 from datetime import timedelta, datetime
-from metrics.ga_metrics import core
+from metrics.ga_metrics import core, utils
 from collections import Counter
-from metrics import utils
 from mock import patch
 
 class TestQueryResults(base.SimpleBaseCase):
@@ -61,3 +60,8 @@ class Two(base.SimpleBaseCase):
                 # after filtering bad eggs and aggregation: 4491
                 expected = 4491
                 self.assertEqual(expected, len(results))
+
+        final_doi_list = results.values()
+        for path in dict(self.bad_eggs).values():
+            doi = utils.enplumpen(path.rsplit('/', 1)[-1])
+            self.assertTrue(doi not in final_doi_list)
