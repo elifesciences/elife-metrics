@@ -26,8 +26,7 @@ class TestUtils(base.BaseCase):
     def test_isnotint(self):
         not_int_list = ['one', 'a', utils]
         for not_int in not_int_list:
-            print('testing', not_int)
-            self.assertFalse(utils.isint(not_int))
+            self.assertFalse(utils.isint(not_int), "failed on %s" % not_int)
 
     def test_nth(self):
         expected_list = [
@@ -48,8 +47,7 @@ class TestUtils(base.BaseCase):
             (None, 1, None),
         ]
         for val, idx, expected in expected_list:
-            print('testing', val, idx, expected)
-            self.assertEqual(utils.nth(idx, val), expected)
+            self.assertEqual(utils.nth(idx, val), expected, "failed: %s %s %s" % (val, idx, expected))
 
     def test_bad_nths(self):
         bad_list = [
