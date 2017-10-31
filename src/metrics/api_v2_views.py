@@ -1,4 +1,4 @@
-from metrics import models, load_routing
+from metrics import models, page_route_path as prp
 from django.shortcuts import get_object_or_404
 import string
 from django.conf import settings
@@ -136,7 +136,7 @@ def page_views(request):
     try:
         ensure('path' in request.query_params, "'path' is a required query parameter")
         path = request.query_params.get('path')
-        ensure(load_routing.norm_path(path), "'path' parameter contains invalid characters")
+        ensure(prp.norm_path(path), "'path' parameter contains invalid characters")
 
         # we use the path given to us as-is. we don't transform it!
         # if it contains whitespace or uppercase characters, etc, it will fail with a 404

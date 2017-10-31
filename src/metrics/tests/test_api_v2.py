@@ -1,5 +1,5 @@
 import json
-from metrics import models, load_routing
+from metrics import models, page_route_path as prp #load_routing
 from django.test import Client
 import base
 from django.core.urlresolvers import reverse
@@ -287,7 +287,7 @@ class ApiV2(base.BaseCase):
     def test_page_views(self):
         path = '/about'
 
-        pageobj = load_routing.insert({'name': 'about', 'pattern': 'ga:pagePath=~^/about$'})[0]
+        pageobj = prp.insert({'name': 'about'})
         models.Path(page=pageobj, path=path, count=1).save()
 
         url = reverse('v2:page-views')
