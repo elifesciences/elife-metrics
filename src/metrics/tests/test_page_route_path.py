@@ -77,12 +77,15 @@ article-type:
     requirements:
         type: '(correction|editorial|feature|insight|research-advance|research-article|retraction|registered-report|replication-study|scientific-correspondence|short-report|tools-resources)'
         '''
-        route = lr.loads(fixture)[0]
-        page = lr.insert(route)[0]
+        routes = lr.load_journal_route_string(fixture)
+        rtbl = lr.routing_table(routes)
+        route = rtbl['article-type']
+        
+        page = prp.insert(route)
 
         ga_fixture = json.load(open(join(self.fixture_dir, 'ga-ctype', 'exploded-fixture.json'), 'r'))
         with patch('metrics.ga_metrics.core.query_ga', return_value=ga_fixture):
-            lr.update_page_counts(page)
+            prp.update_page_counts(page, route)
         self.assertEqual(models.Path.objects.all().count(), 10)
 
         expected = ga_fixture['rows']
@@ -92,7 +95,7 @@ article-type:
 
         for path, path_count in expected:
             # will fail if doesn't exist
-            if lr.norm_path(path):
+            if prp.norm_path(path):
                 models.Path.objects.get(page=page, path=path, count=path_count)
             else:
                 # I've added two bad paths to the fixture. I expect them to be absent
@@ -118,7 +121,7 @@ class Two(base.BaseCase):
             ('/InsIde-elife', '/inside-elife'),
         ]
         for given, expected in cases:
-            self.assertEqual(expected, lr.norm_path(given))
+            self.assertEqual(expected, prp.norm_path(given))
 
     def test_bad_paths(self):
         "bad paths that are considered unparseable will return 'None'"
@@ -131,4 +134,4 @@ class Two(base.BaseCase):
             "/inside-elife/e832444e/innovation@elifesciences.org",
         ]
         for case in hopeless_cases:
-            self.assertEqual(lr.norm_path(case), None)
+            self.assertEqual(prp.norm_path(case), None)

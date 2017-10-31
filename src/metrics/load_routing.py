@@ -179,9 +179,10 @@ def gaify(frame):
     frame['ga_pattern'] = explode_ga_pattern(frame['pattern'])
     return frame
 
-def routing_table():
+def routing_table(routes=None):
     "generates a route table with examples"
-    routes = load_journal_route_file(settings.JOURNAL_ROUTES)
+    if not routes:
+        routes = load_journal_route_file(settings.JOURNAL_ROUTES)
     custom_routes = load_custom_route_file(settings.CUSTOM_ROUTES)
     redirects = load_nginx_redirect_file(settings.JOURNAL_REDIRECTS)
 
