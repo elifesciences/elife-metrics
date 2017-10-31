@@ -3,9 +3,9 @@ from metrics import models, page_route_path as prp #load_routing
 from django.test import Client
 import base
 from django.core.urlresolvers import reverse
-from django.core.management import call_command
-from os.path import join
-from django.conf import settings
+#from django.core.management import call_command
+#from os.path import join
+#from django.conf import settings
 
 class ApiV2(base.BaseCase):
     def setUp(self):
@@ -300,6 +300,7 @@ class ApiV2(base.BaseCase):
         }
         self.assertEqual(resp.data, expected_resp)
 
+'''
 class Two(base.BaseCase):
     def setUp(self):
         self.c = Client()
@@ -315,3 +316,4 @@ class Two(base.BaseCase):
                 'views': pathobj.count
             }
             self.assertEqual(resp.data, expected_resp)
+'''
