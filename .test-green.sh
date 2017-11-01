@@ -9,7 +9,7 @@ pyflakes src/
 args="$@"
 module="src"
 if [ ! -z "$args" ]; then
-    module="src.$args"
+    module="$args"
 fi
 
 # remove any old compiled python files

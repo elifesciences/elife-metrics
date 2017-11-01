@@ -1,7 +1,9 @@
-import base
-from datetime import timedelta
-from metrics.ga_metrics import core
+import base, json
+from os.path import join
+from datetime import timedelta, datetime
+from metrics.ga_metrics import core, utils
 from collections import Counter
+from mock import patch
 
 class TestQueryResults(base.SimpleBaseCase):
     def setUp(self):
@@ -33,3 +35,33 @@ class TestQueryResults(base.SimpleBaseCase):
         }
         for key, expected_val in expected.items():
             self.assertEqual(expected_val, counts[key])
+
+class Two(base.SimpleBaseCase):
+    def setUp(self):
+        self.fixture_path = join(self.fixture_dir, '2017-10-01_2017-10-31.json.partial')
+        self.fixture = json.load(open(self.fixture_path, 'r'))
+
+        # this fixture has a number of bad paths:
+        self.bad_eggs = [
+            [u'/articles/004071', u'1'],
+            [u'/articles/121771', u'1'],
+            [u'/articles/2212815887', u'1'],
+            [u'/articles/292222222222222222222222222222222222222222222222222222222222222', u'1'],
+            [u'/articles/2922222222222222222222222222222222222222222222222222222222222229999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999', u'2'],
+            [u'/articles/305610', u'1'],
+        ]
+
+    def test_elife_v4_excludes_bad_paths(self):
+        from_dt, to_dt = datetime(2017, 10, 1), datetime(2017, 10, 31)
+        with patch('metrics.ga_metrics.core.query_ga_write_results', return_value=(self.fixture, self.fixture_path)):
+            with patch('metrics.ga_metrics.core.output_path', return_value=self.fixture_path):
+                results = core.article_views('0xdeadbeef', from_dt, to_dt, cached=False, only_cached=False)
+                # total raw results = 4501
+                # after filtering bad eggs and aggregation: 4491
+                expected = 4491
+                self.assertEqual(expected, len(results))
+
+        final_doi_list = results.values()
+        for path in dict(self.bad_eggs).values():
+            doi = utils.enplumpen(path.rsplit('/', 1)[-1])
+            self.assertTrue(doi not in final_doi_list)
