@@ -11,6 +11,7 @@ from django.conf import settings
 from collections import Counter
 from functools import reduce
 import logging
+from googleapiclient import errors
 
 LOG = logging.getLogger(__name__)
 
@@ -81,7 +82,6 @@ def _update_page_counts(page, frame):
     latest = datetime.now() + timedelta(days=1) # tomorrow
 
     from_date, to_date = ymd(todt(frame['starts'] or earliest)), ymd(todt(frame['ends'] or latest))
-
     query_map = {
         'ids': table_id,
         'max_results': 10000, # 10,000 is the max GA will ever return
@@ -92,13 +92,21 @@ def _update_page_counts(page, frame):
         'sort': 'ga:pagePath',
         'filters': frame['ga_pattern'],
     }
-    results = ga_core.query_ga(query_map)
+    try:
+        results = ga_core.query_ga(query_map)
+        cname = "%s--%s-to-%s" % (page.name, from_date, to_date)
+        json.dump(results, open(join(settings.OUTPUT_PATH, 'non-article', cname + ".json"), 'w'), indent=4)
 
-    cname = "%s--%s-to-%s" % (page.name, from_date, to_date)
-    json.dump(results, open(join(settings.OUTPUT_PATH, 'non-article', cname + ".json"), 'w'), indent=4)
+        # post-process the result, do stuff we couldn't do in GA
+        return lfiltermap(norm_row, results.get('rows', []))
 
-    # post-process the result, do stuff we couldn't do in GA
-    return lfiltermap(norm_row, results.get('rows', []))
+    except errors.HttpError as e:
+        status_code = e.resp.status
+        if status_code in [400]:
+            payload = utils.lossy_json_dumps(query_map)
+            LOG.error("400: we made bad a request to Google Analytics", extra={'request': payload})
+            return []
+
 
 def update_page_counts(route):
     "updates page counts for all of a route's time frames"
@@ -133,4 +141,6 @@ def update_page_counts(route):
 def update_all_page_counts(dry_run=False):
     rtbl = lr.routing_table().values()
     insert_all(rtbl, dry_run)
+    #rtblidx = lr.routing_table()
+    #rtbl = [rtblidx['inside-elife-article']]
     return map(update_page_counts, rtbl)

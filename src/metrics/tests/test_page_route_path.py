@@ -1,9 +1,10 @@
 import json
-from mock import patch
+from mock import patch #, MagicMock
 from os.path import join
 import base
 from metrics import load_routing as lr, page_route_path as prp, models
 import logging
+from googleapiclient import errors
 
 LOG = logging.getLogger(__name__)
 
@@ -135,3 +136,21 @@ class Two(base.BaseCase):
         ]
         for case in hopeless_cases:
             self.assertEqual(prp.norm_path(case), None)
+
+    def test_bad_request_returns_no_results(self):
+        "GA throwing a 400 for a page doesn't prevent other pages from being updated"
+        
+        def err400(x):
+            class Foo(object):
+                status = 400
+            raise errors.HttpError(Foo(), bytes())
+
+        rtbl = lr.routing_table()
+        route = rtbl['about-peer-review']
+        prp.insert(route)
+        
+        with patch('metrics.ga_metrics.core.query_ga', side_effect=err400) as mock:
+            results = prp.update_page_counts(route)
+            self.assertEqual(mock.call_count, 2) # two frames
+            expected = [] # one route with two frames that both fail to talk to GA should generate no results
+            self.assertEqual(results, expected)
