@@ -29,7 +29,17 @@ logging.basicConfig()
 LOG = logging.getLogger(__name__)
 LOG.level = logging.INFO
 
-#OUTPUT_SUBDIR = 'output'
+
+# silences this error:
+#WARNING - file_cache is unavailable when using oauth2client >= 4.0.0
+#Traceback (most recent call last):
+#  File "/home/luke/dev/python/elife-metrics/venv/lib/python2.7/site-packages/googleapiclient/discovery_cache/__init__.py", line 41, in autodetect
+#    from . import file_cache
+#  File "/home/luke/dev/python/elife-metrics/venv/lib/python2.7/site-packages/googleapiclient/discovery_cache/file_cache.py", line 41, in <module>
+#    'file_cache is unavailable when using oauth2client >= 4.0.0')
+#ImportError: file_cache is unavailable when using oauth2client >= 4.0.0
+logging.getLogger('googleapiclient.discovery_cache').setLevel(logging.ERROR)
+
 
 SECRETS_LOCATIONS = [
     'client-secrets.json',
