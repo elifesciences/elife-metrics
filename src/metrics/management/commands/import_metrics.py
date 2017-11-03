@@ -14,7 +14,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         # all
-        parser.add_argument('--only-target', nargs='?', choices=[models.PAGE], default=None)
+        parser.add_argument('--only-source', nargs='?', choices=[models.PAGE], default=None)
 
         # views+downloads
         # import the last two days by default
@@ -40,7 +40,7 @@ class Command(BaseCommand):
         from_date = n_days_ago
         to_date = today
 
-        only_target = options['only_target']
+        only_source = options['only_source']
 
         # print 'use cached? %r only cached? %r' % (use_cached, only_cached)
 
@@ -58,8 +58,8 @@ class Command(BaseCommand):
             (models.PAGE, (page_route_path.update_all_page_counts,)),
         ])
 
-        if only_target:
-            sources = {only_target: sources[only_target]}
+        if only_source:
+            sources = {only_source: sources[only_source]}
 
         try:
             start_time = time.time() # seconds since epoch
