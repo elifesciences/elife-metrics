@@ -1,73 +1,10 @@
 {
-    "community": {
-        "frames": [
-            {
-                "pattern": "^/careers$|^/elife-news/early-careers$", 
-                "ends": "2017-01-01", 
-                "starts": null
-            }
-        ]
-    }, 
-    "home": {
-        "frames": [
-            {
-                "pattern": "^/articles$|^/upcoming$|^/browse$|^/the-journal/articles$|^/the-journal/in-press$|^/the-journal$", 
-                "ends": "2017-01-01", 
-                "starts": null
-            }
-        ]
-    }, 
-    "subject": {
-        "frames": [
-            {
-                "pattern": "^/category/[a-z-]+$",
-                "ends": "2017-01-01", 
-                "starts": null
-            }
-        ]
-    }, 
-    "alerts": {
-        "frames": [
-            {
-                "pattern": "^/alerts-and-feeds$", 
-                "ends": "2017-01-01", 
-                "starts": null
-            }
-        ]
-    }, 
-    "subjects": {
-        "frames": [
-            {
-                "pattern": "^/major-subject-areas$", 
-                "ends": "2017-01-01", 
-                "starts": null
-            }
-        ]
-    },
-    "interview": {
-        "frames": [
-            {
-                "pattern": "^/early-careers-interviews/.+$|^/interviews/early-career-researchers/.+$|^/interviews/working-lives/.+$|^/elife-news/chemistry-versus-cancer-an-interview-with-daniel-abankwa$|^/elife-news/connecting-the-flight-controls-an-interview-with-tarjani-agrawal$|^/elife-news/controlling-the-immune-response-an-interview-with-donna-macduff$|^/elife-news/controlling-traffic-an-interview-with-ramanath-hegde$|^/elife-news/decoding-behaviour-an-interview-with-fanny-cazettes$|^/elife-news/developing-kidneys-an-interview-with-peter-hohenstein$|^/elife-news/getting-under-the-skin-an-interview-with-elena-oancea$|^/elife-news/helping-the-neighbours-an-interview-with-meredith-schuman$|^/elife-news/imprinting-memories-an-interview-with-katja-kornysheva$|^/elife-news/infection-statistics-and-public-health-an-interview-with-alicia-rosello$|^/elife-news/looking-at-lipids-an-interview-with-jessica-hughes$|^/elife-news/modelling-metabolism-an-interview-with-keren-yizhak$|^/elife-news/of-plants-and-parasites-an-interview-with-yong-woo$|^/elife-news/repeating-the-message-an-interview-with-yunsheng-cheng$|^/elife-news/the-benefits-of-new-brain-cells-an-interview-with-antonia-marin-burgin$|^/elife-news/the-regeneration-game-an-interview-with-brian-bradshaw$|^/elife-news/understanding-the-evolution-of-defence-an-interview-with-maurijn-van-der-zee$|^/food-for-thought-an-interview-with-ana-domingos$|^/from-ancient-dna-to-decay-an-interview-with-jessica-metcalf$|^/helping-to-fight-tuberculosis-an-interview-with-david-dowdy$",
-                "ends": "2017-01-01", 
-                "starts": null
-            }
-        ]
-    }, 
-    "events": {
-        "frames": [
-            {
-                "pattern": "^/elife-news/events$", 
-                "ends": "2017-01-01", 
-                "starts": null
-            }
-        ]
-    }, 
     "terms": {
         "frames": [
             {
                 "pattern": "^/terms-and-conditions-of-use$|^/privacy-policy$", 
-                "ends": "2017-01-01", 
-                "starts": null
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
             }
         ]
     }, 
@@ -75,8 +12,8 @@
         "frames": [
             {
                 "pattern": "^/archive/[0-9]{4}/[0-9]{2}$", 
-                "ends": "2017-01-01", 
-                "starts": null
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
             }
         ]
     }, 
@@ -84,17 +21,26 @@
         "frames": [
             {
                 "pattern": "^/elife-news/[a-z0-9-\\u{2019}]+$|^/wellcome-trust[a-z0-9-]+$|^/the-[a-z0-9-]+$|^/scientific-[a-z0-9-]+$|^/open-access-[a-z0-9-]+$|^/elife-[a-z0-9-]+$|^/[a-z0-9-]+$", 
-                "ends": "2017-01-01", 
-                "starts": null
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
             }
         ]
     }, 
-    "collection": {
+    "alerts": {
         "frames": [
             {
-                "pattern": "^/collections/reproducibility-project-cancer-biology$|^/collections/plain-language-summaries$|^/collections/human-genetics$|^/collections/chemical-biology$|^/interviews/working-lives$|^/collections/natural-history-model-organisms$|^/interviews/early-career-researchers$|^/collections/paleontology$|^/collections/tropical-disease$", 
-                "ends": "2017-01-01", 
-                "starts": null
+                "pattern": "^/alerts-and-feeds$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
+            }
+        ]
+    }, 
+    "community": {
+        "frames": [
+            {
+                "pattern": "^/careers$|^/elife-news/early-careers$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
             }
         ]
     }, 
@@ -102,17 +48,8 @@
         "frames": [
             {
                 "pattern": "^/elife-news/labs$", 
-                "ends": "2017-01-01", 
-                "starts": null
-            }
-        ]
-    }, 
-    "press-pack": {
-        "frames": [
-            {
-                "pattern": "^/elife-news/press-package-[a-z0-9-]+$|^/elife-news/researchers-uncover-more-about-why-and-when-hiv-rebounds-after-remission$|^/elife-news/new-test-for-ancient-dna-authenticity$|^/elife-news/generous-mothers-receive-less-nagging$|^/elife-news/social-yeast-cells-prefer-to-work-with-close-relatives-to-make-our-beer-bread-and-wine$|^/elife-news/hunger-hormone-is-boosted-by-restricted-meal-times$|^/elife-news/media-coverage-infant-brains-develop-years-faster-than-we-thought$|^/elife-news/early-hospitalisation-key-to-survival-for-ebola-victims-drc$|^/elife-news/new-way-to-fix-broken-heart$|^/elife-news/researchers-identify-potential-drug-that-could-help-treat-cystic-fibrosis$|^/elife-news/scientists-create-imaging-toolkit-to-help-identify-new-brain-tumour-drug-targets$|^/elife-news/press package-airport-screening-misses-half-of-disease-cases-but-could-be-improved-by-customising-to-pathogens$|^/elife-news/hummingbirds-rely-on-raw-power-not-physique-to-outmanoeuvre-rivals$|^/elife-news/first-insights-into-changes-to-developing-brain-caused-by-gene-associated-with-autism$|^/elife-news/new-species-of-human-relative-discovered-in-south-african-cave$|^/elife-news/drugs-from-dirt-scientists-develop-first-global-roadmap-for-drug-discovery$|^/elife-news/how-reward-daytime-sleep-boost-learning$|^/elife-news/golden-discovery-of-novel-imaging-technique-captures-beauty-of-metal-labeled-neurons-in-3d$|^/elife-news/midnight-munchies-mangle-memory$|^/elife-news/could-2016-be-a-bad-year-for-the-malaria-parasite-in-africa\\?$|^/elife-news/studies-explain-adolescents-vulnerability-to-addictive-drugs$|^/elife-news/anticancer-effects-of-drugs-overestimated-by-as-much-as-45%-in-animal-models$|^/elife-news/scientists-prove-key-aspect-of-evolutionary-theory$|^/elife-news/researchers-look-to-exploit-females-natural-resistance-to-infection$|^/elife-news/first-imagery-from-echolocation-reveals-elite-hunting-techniques-of-bats$|^/elife-news/researchers-map-areas-at-risk-of-ebola-outbreak$|^/elife-news/molecular-tweezer-targets-hiv-and-prevents-semen-from-promoting-infection$|^/elife-news/being-anxious-could-be-good-for-you-in-a-crisis$|^/elife-news/slime-can-see$|^/elife-news/scientists-robotically-driven-system-could-reduce-cost-of-discovering-drug-and-target-interactions$|^/elife-news/q-and-a-with-researchers-from-the-university-of-california-berkeley$|^/elife-news/scientists-warn-light-pollution-can-stop-coral-from-spawning$|^/elife-news/study-illuminates-new-design-strategies-for-optogenetic-tools$",
-                "ends": "2017-01-01", 
-                "starts": null
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
             }
         ]
     }, 
@@ -120,8 +57,53 @@
         "frames": [
             {
                 "pattern": "^/review-process$", 
-                "ends": "2017-01-01", 
-                "starts": null
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
+            }
+        ]
+    }, 
+    "subjects": {
+        "frames": [
+            {
+                "pattern": "^/major-subject-areas$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
+            }
+        ]
+    }, 
+    "collection": {
+        "frames": [
+            {
+                "pattern": "^/collections/reproducibility-project-cancer-biology$|^/collections/plain-language-summaries$|^/collections/human-genetics$|^/collections/chemical-biology$|^/interviews/working-lives$|^/collections/natural-history-model-organisms$|^/interviews/early-career-researchers$|^/collections/paleontology$|^/collections/tropical-disease$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
+            }
+        ]
+    }, 
+    "press-pack": {
+        "frames": [
+            {
+                "pattern": "^/elife-news/press-package-[a-z0-9-]+$|^/elife-news/researchers-uncover-more-about-why-and-when-hiv-rebounds-after-remission$|^/elife-news/new-test-for-ancient-dna-authenticity$|^/elife-news/generous-mothers-receive-less-nagging$|^/elife-news/social-yeast-cells-prefer-to-work-with-close-relatives-to-make-our-beer-bread-and-wine$|^/elife-news/hunger-hormone-is-boosted-by-restricted-meal-times$|^/elife-news/media-coverage-infant-brains-develop-years-faster-than-we-thought$|^/elife-news/early-hospitalisation-key-to-survival-for-ebola-victims-drc$|^/elife-news/new-way-to-fix-broken-heart$|^/elife-news/researchers-identify-potential-drug-that-could-help-treat-cystic-fibrosis$|^/elife-news/scientists-create-imaging-toolkit-to-help-identify-new-brain-tumour-drug-targets$|^/elife-news/press package-airport-screening-misses-half-of-disease-cases-but-could-be-improved-by-customising-to-pathogens$|^/elife-news/hummingbirds-rely-on-raw-power-not-physique-to-outmanoeuvre-rivals$|^/elife-news/first-insights-into-changes-to-developing-brain-caused-by-gene-associated-with-autism$|^/elife-news/new-species-of-human-relative-discovered-in-south-african-cave$|^/elife-news/drugs-from-dirt-scientists-develop-first-global-roadmap-for-drug-discovery$|^/elife-news/how-reward-daytime-sleep-boost-learning$|^/elife-news/golden-discovery-of-novel-imaging-technique-captures-beauty-of-metal-labeled-neurons-in-3d$|^/elife-news/midnight-munchies-mangle-memory$|^/elife-news/could-2016-be-a-bad-year-for-the-malaria-parasite-in-africa\\?$|^/elife-news/studies-explain-adolescents-vulnerability-to-addictive-drugs$|^/elife-news/anticancer-effects-of-drugs-overestimated-by-as-much-as-45%-in-animal-models$|^/elife-news/scientists-prove-key-aspect-of-evolutionary-theory$|^/elife-news/researchers-look-to-exploit-females-natural-resistance-to-infection$|^/elife-news/first-imagery-from-echolocation-reveals-elite-hunting-techniques-of-bats$|^/elife-news/researchers-map-areas-at-risk-of-ebola-outbreak$|^/elife-news/molecular-tweezer-targets-hiv-and-prevents-semen-from-promoting-infection$|^/elife-news/being-anxious-could-be-good-for-you-in-a-crisis$|^/elife-news/slime-can-see$|^/elife-news/scientists-robotically-driven-system-could-reduce-cost-of-discovering-drug-and-target-interactions$|^/elife-news/q-and-a-with-researchers-from-the-university-of-california-berkeley$|^/elife-news/scientists-warn-light-pollution-can-stop-coral-from-spawning$|^/elife-news/study-illuminates-new-design-strategies-for-optogenetic-tools$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
+            }
+        ]
+    }, 
+    "interview": {
+        "frames": [
+            {
+                "pattern": "^/early-careers-interviews/.+$|^/interviews/early-career-researchers/.+$|^/interviews/working-lives/.+$|^/elife-news/chemistry-versus-cancer-an-interview-with-daniel-abankwa$|^/elife-news/connecting-the-flight-controls-an-interview-with-tarjani-agrawal$|^/elife-news/controlling-the-immune-response-an-interview-with-donna-macduff$|^/elife-news/controlling-traffic-an-interview-with-ramanath-hegde$|^/elife-news/decoding-behaviour-an-interview-with-fanny-cazettes$|^/elife-news/developing-kidneys-an-interview-with-peter-hohenstein$|^/elife-news/getting-under-the-skin-an-interview-with-elena-oancea$|^/elife-news/helping-the-neighbours-an-interview-with-meredith-schuman$|^/elife-news/imprinting-memories-an-interview-with-katja-kornysheva$|^/elife-news/infection-statistics-and-public-health-an-interview-with-alicia-rosello$|^/elife-news/looking-at-lipids-an-interview-with-jessica-hughes$|^/elife-news/modelling-metabolism-an-interview-with-keren-yizhak$|^/elife-news/of-plants-and-parasites-an-interview-with-yong-woo$|^/elife-news/repeating-the-message-an-interview-with-yunsheng-cheng$|^/elife-news/the-benefits-of-new-brain-cells-an-interview-with-antonia-marin-burgin$|^/elife-news/the-regeneration-game-an-interview-with-brian-bradshaw$|^/elife-news/understanding-the-evolution-of-defence-an-interview-with-maurijn-van-der-zee$|^/food-for-thought-an-interview-with-ana-domingos$|^/from-ancient-dna-to-decay-an-interview-with-jessica-metcalf$|^/helping-to-fight-tuberculosis-an-interview-with-david-dowdy$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
+            }
+        ]
+    }, 
+    "home": {
+        "frames": [
+            {
+                "pattern": "^/articles$|^/upcoming$|^/browse$|^/the-journal/articles$|^/the-journal/in-press$|^/the-journal$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
             }
         ]
     }, 
@@ -129,8 +111,17 @@
         "frames": [
             {
                 "pattern": "^/elife-news/news$|^/elife-news/news-elife$|^/elife-news$", 
-                "ends": "2017-01-01", 
-                "starts": null
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
+            }
+        ]
+    }, 
+    "events": {
+        "frames": [
+            {
+                "pattern": "^/elife-news/events$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
             }
         ]
     }, 
@@ -138,8 +129,17 @@
         "frames": [
             {
                 "pattern": "^/elife-news/introducing-our-new-experiment-lens-writer$|^/elife-news/introducing-lens-writer$|^/elife-news/writing-scholarly-documents-manuscripts$|^/elife-news/international-image-interoperability-framework-iiif-science-publishers$|^/elife-news/toward-publishing-reproducible-computation-binder$|^/elife-news/composing-reproducible-manuscripts-using-r-markdown$|^/elife-news/elife-labs-what-manuscripts$|^/elife-news/authoring-online-lens-writer$|^/elife-news/elife-labs-presenting-proteopedia-sharing-macromolecule-concepts-online$|^/elife-news/colab-instant-messaging-scientists$|^/elife-news/hack-cambridge-recurse-entries-explore-knowledge-direct-scichat$|^/elife-news/what-is-manuscripts$|^/elife-news/proteopedia-sharing-macromolecule-concepts-online$", 
-                "ends": "2017-01-01", 
-                "starts": null
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
+            }
+        ]
+    }, 
+    "subject": {
+        "frames": [
+            {
+                "pattern": "^/category/[a-z-]+$", 
+                "ends": "2017-06-01", 
+                "starts": "2014-03-12"
             }
         ]
     }
