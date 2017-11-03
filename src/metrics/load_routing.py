@@ -6,13 +6,12 @@ from StringIO import StringIO
 import utils
 from utils import ensure, lfiltermap
 from django.conf import settings
-#from kids.cache import cache
+from kids.cache import cache
 import logging
 from urlparse import urlparse
+from ga_metrics import core as ga_core
 
 LOG = logging.getLogger(__name__)
-
-JOURNAL_INCEPTION = '2017-01-01'
 
 def path_to_regex(path):
     return "^%s$" % path
@@ -23,7 +22,6 @@ def frame(pattern, starts=None, ends=None):
         'starts': starts,
         'ends': ends
     }
-
 
 def explode_ga_pattern(pattern):
     ga_pattern = "ga:pagePath=~" + pattern
@@ -88,7 +86,7 @@ def parse(name, body):
             path = path.replace(match.group(), replacement)
 
     retval = {'name': name, 'frames': [], 'examples': []}
-    retval['frames'] = [frame(path_to_regex(path), JOURNAL_INCEPTION)]
+    retval['frames'] = [frame(path_to_regex(path), ga_core.SITE_SWITCH_v2)]
     return retval
 
 def excluded(path):
@@ -179,6 +177,7 @@ def gaify(frame):
     frame['ga_pattern'] = explode_ga_pattern(frame['pattern'])
     return frame
 
+@cache
 def routing_table(routes=None):
     "generates a route table with examples"
     if not routes:

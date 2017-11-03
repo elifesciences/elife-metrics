@@ -9,6 +9,6 @@ class One(base.BaseCase):
         self.assertRaises(CommandError, base.call_command, 'tasks', 'footask') # an actual task is required
 
     def test_tasks_actual_cmd(self):
-        errcode, stdout = base.call_command('tasks', 'journal-routes')
+        errcode, stdout = base.call_command('tasks', 'routing-table')
         self.assertEqual(errcode, 0) # no problems
         self.assertTrue(json.loads(stdout)) # we don't care what the output is, so long as it's json

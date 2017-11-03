@@ -1,5 +1,5 @@
 import json
-from metrics import models, page_route_path as prp #load_routing
+from metrics import models, page_route_path as prp
 from django.test import Client
 import base
 from django.core.urlresolvers import reverse

@@ -3,7 +3,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
-from metrics import logic, models, load_routing
+from metrics import logic, models, page_route_path
 from metrics.utils import first, rest
 
 import logging
@@ -55,7 +55,7 @@ class Command(BaseCommand):
             (models.CROSSREF, (logic.import_crossref_citations,)),
             (models.SCOPUS, (logic.import_scopus_citations,)),
             (models.PUBMED, (logic.import_pmc_citations,)),
-            (models.PAGE, (load_routing.update_all_page_counts,)),
+            (models.PAGE, (page_route_path.update_all_page_counts,)),
         ])
 
         if only_target:

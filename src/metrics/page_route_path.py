@@ -1,8 +1,11 @@
+from os.path import join
+import json
 from functools import partial
 import re
-import utils, models
-from utils import ensure, first, lfiltermap, todt
+import utils, models, load_routing as lr
+from utils import ensure, first, lfiltermap, todt, ymd
 from utils import atomic
+from datetime import datetime, timedelta
 from ga_metrics import core as ga_core, utils as ga_utils
 from django.conf import settings
 from collections import Counter
@@ -26,24 +29,20 @@ def test_route_examples(route):
         result = [match(frame['pattern'], example_path) for frame in route['frames']]
         ensure(any(result), "failed to match path %s against any known frame: %s" % (example_path, [f['pattern'] for f in route['frames']]))
 
-#
-# old
-#
-
-
 def ga_regex(pattern):
     return pattern.startswith('ga:pagePath=~')
 
 def insert(page_route):
     page = utils.subdict(page_route, ['name'])
-    page, _, _ = utils.create_or_update(models.Page, page, ['name'])
-    return page
-
+    return first(utils.create_or_update(models.Page, page, ['name']))
 
 @atomic
 def insert_all(page_route_list, dry_run=False):
-    return map(first, map(insert, page_route_list))
+    return map(insert, page_route_list)
 
+#
+#
+#
 
 def norm_path(path):
     "takes a path given to us by GA and normalises it for counting"
@@ -77,16 +76,17 @@ def norm_row(row):
 def _update_page_counts(page, frame):
     "creates/updates the page counts for a particular "
     table_id = ga_utils.norm_table_id(settings.GA_TABLE_ID)
-    #from_date, to_date = settings.TWOPOINTZERO_START, datetime.now()
-    earliest = '2016-01-01'
-    latest = '2017-12-31'
-    from_date, to_date = todt(frame['starts'] or earliest), todt(frame['ends'] or latest)
+
+    earliest = ga_core.VIEWS_INCEPTION
+    latest = datetime.now() + timedelta(days=1) # tomorrow
+
+    from_date, to_date = ymd(todt(frame['starts'] or earliest)), ymd(todt(frame['ends'] or latest))
 
     query_map = {
         'ids': table_id,
         'max_results': 10000, # 10,000 is the max GA will ever return
-        'start_date': utils.ymd(todt(from_date)),
-        'end_date': utils.ymd(todt(to_date)),
+        'start_date': from_date,
+        'end_date': to_date,
         'metrics': 'ga:sessions', # less flattering, more accurate
         'dimensions': 'ga:pagePath',
         'sort': 'ga:pagePath',
@@ -94,11 +94,16 @@ def _update_page_counts(page, frame):
     }
     results = ga_core.query_ga(query_map)
 
+    cname = "%s--%s-to-%s" % (page.name, from_date, to_date)
+    json.dump(results, open(join(settings.OUTPUT_PATH, 'non-article', cname + ".json"), 'w'), indent=4)
+
     # post-process the result, do stuff we couldn't do in GA
     return lfiltermap(norm_row, results.get('rows', []))
 
-def update_page_counts(page, route):
+def update_page_counts(route):
     "updates page counts for all of a route's time frames"
+
+    page = models.Page.objects.get(name=route['name'])
 
     # call update page count for each frame
     per_frame_results = map(partial(_update_page_counts, page), route['frames'])
@@ -126,4 +131,6 @@ def update_page_counts(page, route):
 
 @atomic
 def update_all_page_counts(dry_run=False):
-    return map(update_page_counts, models.Page.objects.all())
+    rtbl = lr.routing_table().values()
+    insert_all(rtbl, dry_run)
+    return map(update_page_counts, rtbl)
