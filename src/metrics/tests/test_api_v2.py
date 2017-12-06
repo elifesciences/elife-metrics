@@ -23,7 +23,6 @@ class ApiV2(base.BaseCase):
         "the '?order=' parameter affecting result ordering"
         cases = {
             # msid, citations, downloads, views
-            # crossref, scopus, pubmed
             '1234': ([
                 2, # crossref
                 3, # scopus
@@ -278,3 +277,103 @@ class ApiV2(base.BaseCase):
         resp = self.c.get(url, {'by': models.MONTH})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
+
+class Three(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_results_empty_summary(self):
+        url = reverse('v2:summary')
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+        expected_response = {
+            'totalArticles': 0,
+            'summaries': []
+        }
+        self.assertEqual(resp.json(), expected_response)
+
+    def test_results_single_summary(self):
+        cases = {
+            # msid, citations, downloads, views
+            '1234': ([
+                2, # crossref
+                3, # scopus
+                1, # pubmed
+            ], 10, 11),
+        }
+        base.insert_metrics(cases)
+
+        expected_response = {
+            'totalArticles': 1,
+            'summaries': [{
+                'msid': 1234,
+                'views': 11,
+                'downloads': 10,
+                models.CROSSREF: 2,
+                models.PUBMED: 1,
+                models.SCOPUS: 3
+            }]
+        }
+
+        url = reverse('v2:summary')
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected_response)
+
+    def test_results_multiple_summary(self):
+        cases = {
+            '1111': ([1, 1, 1], 1, 1),
+            '2222': ([2, 2, 2], 2, 2),
+            '3333': ([3, 3, 3], 3, 3),
+        }
+        base.insert_metrics(cases)
+
+        expected_response = {
+            'totalArticles': 3,
+            'summaries': [
+                # default ordering per API is DESC
+                # default ordering key for articles is DOI
+                {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3},
+                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+                {'msid': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
+            ]
+        }
+
+        url = reverse('v2:summary')
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected_response)
+
+    def test_paginate_results(self):
+        cases = {
+            '1111': ([1, 1, 1], 1, 1),
+            '2222': ([2, 2, 2], 2, 2),
+            '3333': ([3, 3, 3], 3, 3),
+        }
+        base.insert_metrics(cases)
+
+        page_cases = [
+            {'totalArticles': 3, 'summaries': [
+                {'msid': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
+            ]},
+
+
+            {'totalArticles': 3, 'summaries': [
+                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+            ]},
+
+            {'totalArticles': 3, 'summaries': [
+                {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3}
+            ]},
+
+        ]
+
+        for page, expected_response in enumerate(page_cases):
+            page += 1 # enumerate is zero-based
+            url = reverse('v2:summary')
+            resp = self.c.get(url, {'page': page, 'per-page': 1, 'order': 'asc'})
+            self.assertEqual(resp.json(), expected_response)

@@ -122,3 +122,25 @@ def article_metrics(request, id, metric):
 def ping(request):
     "Returns a constant response for monitoring. Never to be cached."
     return Response('pong', content_type='text/plain; charset=UTF-8', headers={'Cache-Control': 'must-revalidate, no-cache, no-store, private'})
+
+@api_view(['GET'])
+def summary(request):
+    try:
+        kwargs = request_args(request)
+        print kwargs
+        qobj = models.Article.objects.all()
+        total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
+        payload = map(logic.summary_by_obj, qpage)
+
+        payload = {
+            'totalArticles': total_results,
+            'summaries': payload
+        }
+        return Response(payload, content_type="application/json")
+
+    except AssertionError as err:
+        raise ValidationError(err) # 400, client error
+
+    except Exception as err:
+        LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
+        raise # 500, server error

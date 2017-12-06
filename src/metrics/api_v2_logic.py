@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import models
 import utils
 from utils import ensure, rest, lmap
@@ -8,6 +9,7 @@ def chop(q, page, per_page, order):
     total = q.count()
 
     order_by_idx = {
+        models.Article: 'doi',
         models.Metric: 'date',
         models.Citation: 'num',
     }
@@ -74,3 +76,24 @@ def article_views(msid, period):
     # convenience
     total_views, _, qobj = article_stats(msid, period)
     return total_views, qobj
+
+#
+#
+#
+
+def summary_by_msid(msid):
+    views, downloads, _ = article_stats(msid, models.DAY)
+    row = OrderedDict([
+        ('msid', msid),
+        ('views', views),
+        ('downloads', downloads),
+        (models.CROSSREF, 0),
+        (models.PUBMED, 0),
+        (models.SCOPUS, 0)
+    ])
+    _, qobj = article_citations(msid)
+    row.update(dict(map(lambda obj: (obj.source, obj.num), qobj.order_by('source'))))
+    return row
+
+def summary_by_obj(artobj):
+    return summary_by_msid(utils.doi2msid(artobj.doi))
