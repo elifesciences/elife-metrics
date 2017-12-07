@@ -360,18 +360,13 @@ class Three(base.BaseCase):
             {'totalArticles': 3, 'summaries': [
                 {'msid': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
             ]},
-
-
             {'totalArticles': 3, 'summaries': [
                 {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
             ]},
-
             {'totalArticles': 3, 'summaries': [
                 {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3}
             ]},
-
         ]
-
         for page, expected_response in enumerate(page_cases):
             page += 1 # enumerate is zero-based
             url = reverse('v2:summary')

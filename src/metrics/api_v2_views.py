@@ -117,17 +117,25 @@ def article_metrics(request, id, metric):
         LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
         raise # 500, server error
 
+#
+#
+#
+
 @api_view(['GET'])
 @renderer_classes((StaticHTMLRenderer,))
 def ping(request):
     "Returns a constant response for monitoring. Never to be cached."
     return Response('pong', content_type='text/plain; charset=UTF-8', headers={'Cache-Control': 'must-revalidate, no-cache, no-store, private'})
 
+#
+#
+#
+
 @api_view(['GET'])
 def summary(request):
+    "returns the final totals for all articles with no finer grained information"
     try:
         kwargs = request_args(request)
-        print kwargs
         qobj = models.Article.objects.all()
         total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
         payload = map(logic.summary_by_obj, qpage)
