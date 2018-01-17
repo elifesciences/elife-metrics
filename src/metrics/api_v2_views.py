@@ -1,6 +1,7 @@
 from metrics import models
 from django.shortcuts import get_object_or_404
 import string
+from django.http import Http404
 from django.conf import settings
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import StaticHTMLRenderer
@@ -32,7 +33,7 @@ def request_args(request, **overrides):
 
     def isin(lst):
         def fn(val):
-            ensure(val in lst, "value %r is not in %r" % (val, lst))
+            ensure(val in lst, "value is not in %r" % (lst,))
             return val
         return fn
 
@@ -132,12 +133,19 @@ def ping(request):
 #
 
 @api_view(['GET'])
-def summary(request):
+def summary(request, id=None):
     "returns the final totals for all articles with no finer grained information"
     try:
         kwargs = request_args(request)
         qobj = models.Article.objects.all()
+        if id:
+            qobj = qobj.filter(doi=msid2doi(id))
+
         total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
+
+        if id and total_results == 0:
+            raise Http404("summary for article does not exist")
+
         payload = map(logic.summary_by_obj, qpage)
 
         payload = {
