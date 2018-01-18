@@ -372,3 +372,45 @@ class Three(base.BaseCase):
             url = reverse('v2:summary')
             resp = self.c.get(url, {'page': page, 'per-page': 1, 'order': 'asc'})
             self.assertEqual(resp.json(), expected_response)
+
+
+class Four(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_results_single_article_summary(self):
+        "summaries can be provided on a per-article basis. results are the same as regular summary, just reduced to one item"
+        cases = {
+            # msid, citations, downloads, views
+            '1234': ([
+                2, # crossref
+                3, # scopus
+                1, # pubmed
+            ], 10, 11),
+        }
+        base.insert_metrics(cases)
+
+        expected_response = {
+            'totalArticles': 1,
+            'summaries': [{
+                'msid': 1234,
+                'views': 11,
+                'downloads': 10,
+                models.CROSSREF: 2,
+                models.PUBMED: 1,
+                models.SCOPUS: 3
+            }]
+        }
+
+        url = reverse('v2:article-summary', kwargs={'id': 1234})
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected_response)
+
+    def test_no_single_article_summary(self):
+        url = reverse('v2:article-summary', kwargs={'id': 1234})
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 404)
