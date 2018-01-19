@@ -137,7 +137,11 @@ def summary(request, id=None):
     "returns the final totals for all articles with no finer grained information"
     try:
         kwargs = request_args(request)
-        qobj = models.Article.objects.all()
+        # TODO: we have a '10.7554/eLife.00000' in models.Article that needs deleting
+        #qobj = models.Article.objects.all()
+        qobj = models.Article.objects.all() \
+          .exclude(doi='10.7554/eLife.00000')
+
         if id:
             qobj = qobj.filter(doi=msid2doi(id))
 

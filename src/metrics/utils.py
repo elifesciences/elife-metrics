@@ -94,10 +94,12 @@ def pad_msid(msid):
 def doi2msid(doi):
     "doi to manuscript id used in EJP"
     prefix = '10.7554/eLife.'
-    ensure(doi.startswith(prefix), "this doesn't look like an eLife doi: %s" % prefix)
+    ensure(doi.startswith(prefix), "unparseable eLife doi")
     stripped = doi[len(prefix):].lstrip('0')
+    stripped = stripped.split('.')[0]
+    ensure(isint(stripped), "unparseable eLife doi")
     # handles dois like: 10.7554/eLife.09560.001
-    return int(stripped.split('.')[0])
+    return int(stripped)
 
 def msid2doi(msid):
     assert isint(msid), "given msid must be an integer: %r" % msid
