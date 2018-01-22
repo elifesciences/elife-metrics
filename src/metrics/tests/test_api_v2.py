@@ -1,5 +1,5 @@
 import json
-from metrics import models
+from metrics import models, utils
 from django.test import Client
 import base
 from django.core.urlresolvers import reverse
@@ -373,6 +373,28 @@ class Three(base.BaseCase):
             resp = self.c.get(url, {'page': page, 'per-page': 1, 'order': 'asc'})
             self.assertEqual(resp.json(), expected_response)
 
+    def test_one_bad_apple(self):
+        "articles with bad dois don't prevent an entire summary from being returned"
+        cases = {
+            '1111': ([1, 1, 1], 1, 1),
+            '2222': ([2, 2, 2], 2, 2),
+        }
+        base.insert_metrics(cases)
+
+        # skitch doi
+        # this is the particular bad doi I'm dealing with right now
+        bad_doi = '10.7554/eLife.00000'
+        models.Article.objects.filter(doi=utils.msid2doi('1111')).update(doi=bad_doi)
+
+        # expect just one result
+        resp = self.c.get(reverse('v2:summary'))
+        expected_response = {
+            'totalArticles': 1,
+            'summaries': [
+                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+            ]
+        }
+        self.assertEqual(resp.json(), expected_response)
 
 class Four(base.BaseCase):
     def setUp(self):

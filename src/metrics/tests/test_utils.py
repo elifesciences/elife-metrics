@@ -94,6 +94,16 @@ class TestUtils(base.BaseCase):
         for given, expected in cases:
             self.assertEqual(utils.doi2msid(given), expected)
 
+    def test_bad_doi_to_msid(self):
+        cases = [
+            '',
+            '10.7554/eLife.',
+            '10.7554/eLife.0',
+            '10.7554/eLife.0000000000000000000',
+        ]
+        for badegg in cases:
+            self.assertRaises(AssertionError, utils.doi2msid, badegg)
+
     def test_msid_to_doi(self):
         self.assertEqual(utils.msid2doi(3), '10.7554/eLife.00003')
         self.assertEqual(utils.msid2doi(10627), '10.7554/eLife.10627')
