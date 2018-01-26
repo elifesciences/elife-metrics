@@ -140,7 +140,7 @@ def summary(request, id=None):
         # TODO: we have a '10.7554/eLife.00000' in models.Article that needs deleting
         #qobj = models.Article.objects.all()
         qobj = models.Article.objects.all() \
-          .exclude(doi='10.7554/eLife.00000')
+            .exclude(doi='10.7554/eLife.00000')
 
         if id:
             qobj = qobj.filter(doi=msid2doi(id))
