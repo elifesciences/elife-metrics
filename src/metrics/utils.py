@@ -93,8 +93,8 @@ def pad_msid(msid):
 
 def doi2msid(doi):
     "doi to manuscript id used in EJP"
-    prefix = '10.7554/eLife.'
-    ensure(doi.startswith(prefix), "unparseable eLife doi")
+    prefix = '10.7554/elife.'
+    ensure(doi.lower().startswith(prefix), "unparseable eLife doi (%sxxxxx)" % prefix)
     stripped = doi[len(prefix):].lstrip('0')
     stripped = stripped.split('.')[0]
     ensure(isint(stripped), "unparseable eLife doi")
