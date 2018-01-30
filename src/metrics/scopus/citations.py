@@ -2,7 +2,7 @@ import requests
 import logging
 from django.conf import settings
 from metrics import models, handler
-from metrics.utils import first, flatten, simple_rate_limiter
+from metrics.utils import first, flatten, simple_rate_limiter, lmap
 
 LOG = logging.getLogger(__name__)
 

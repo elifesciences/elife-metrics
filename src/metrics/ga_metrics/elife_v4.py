@@ -8,7 +8,7 @@ the urls become greatly simplified. no more volumes, no content types, no abstra
 """
 
 # we can reuse these functions
-import elife_v1
+from . import elife_v1
 # these seemingly unused imports are actually used
 from .elife_v1 import group_results
 import re

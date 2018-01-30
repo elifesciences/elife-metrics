@@ -1,5 +1,5 @@
 from metrics import models, utils, handler
-from metrics.utils import ensure, lmap, subdict, first
+from metrics.utils import ensure, lmap, subdict, first, lfilter
 import requests
 from django.conf import settings
 import logging

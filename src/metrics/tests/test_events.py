@@ -1,5 +1,5 @@
 import json
-import base
+from . import base
 from mock import patch, Mock
 from metrics import models, logic
 from django.test import override_settings
