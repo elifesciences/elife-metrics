@@ -13,7 +13,8 @@ from collections import Counter
 from datetime import datetime
 from . import utils
 from .utils import ymd
-from ..utils import lmap
+#from ..utils import lmap, lfilter
+from metrics.utils import lmap, lfilter
 import logging
 from functools import reduce
 
@@ -162,4 +163,4 @@ def group_results(triplet_list):
 def path_counts(path_count_pairs):
     """takes raw path data from GA and groups by article, returning a
     list of (artid, full-count, abstract-count, digest-count)"""
-    return group_results(filter(None, map(path_count, path_count_pairs)))
+    return group_results(lfilter(None, map(path_count, path_count_pairs)))

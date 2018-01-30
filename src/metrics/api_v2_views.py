@@ -150,7 +150,7 @@ def summary(request, id=None):
         if id and total_results == 0:
             raise Http404("summary for article does not exist")
 
-        payload = map(logic.summary_by_obj, qpage)
+        payload = lmap(logic.summary_by_obj, qpage)
 
         payload = {
             'totalArticles': total_results,

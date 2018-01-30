@@ -6,7 +6,7 @@ from django.conf import settings
 from . import models
 from django.db import transaction
 from . import utils
-from .utils import first, create_or_update, ensure, splitfilter, comp, lmap
+from .utils import first, create_or_update, ensure, splitfilter, comp, lmap, lfilter
 import logging
 from . import events
 
@@ -59,8 +59,8 @@ def recently_updated_metrics(td):
 def recently_updated_article_notifications(**kwargs):
     "send notifications about all articles recently updated"
     td = timedelta(**kwargs)
-    map(notify, recently_updated_citations(td))
-    map(notify, recently_updated_metrics(td))
+    lmap(notify, recently_updated_citations(td))
+    lmap(notify, recently_updated_metrics(td))
 
 #
 #
@@ -76,7 +76,7 @@ def create_row(doi, period, views, downloads):
     views['pdf'] = downloads or 0
     views['doi'] = doi
     views['source'] = models.GA
-    row = dict(zip(['period', 'date'], format_dt_pair(period)))
+    row = dict(list(zip(['period', 'date'], format_dt_pair(period))))
     row.update(views)
     return row
 
@@ -95,7 +95,7 @@ def insert_row(data):
 
 @transaction.atomic
 def insert_many_rows(data_list):
-    return map(_insert_row, data_list)
+    return lmap(_insert_row, data_list)
 
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from inception"
@@ -122,10 +122,10 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         views, downloads = metrics['views'], metrics['downloads']
         # there is often a disjoint between articles that have been viewed and those downloaded within a period
         # what we do is create a record for *all* articles seen, even if their views or downloads may not exist
-        doi_list = set(views.keys()).union(downloads.keys())
+        doi_list = set(views.keys()).union(list(downloads.keys()))
         row_list = [create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
         # insert rows in batches of 1000
-        map(insert_many_rows, utils.partition(row_list, 1000))
+        lmap(insert_many_rows, utils.partition(row_list, 1000))
 
 #
 # citations
@@ -160,4 +160,4 @@ def import_pmc_citations():
 def import_crossref_citations():
     from .crossref.citations import citations_for_all_articles
     results = citations_for_all_articles()
-    return lmap(comp(insert_citation, countable), filter(None, results))
+    return lmap(comp(insert_citation, countable), lfilter(None, results))

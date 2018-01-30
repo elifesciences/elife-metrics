@@ -2,7 +2,7 @@ import requests
 import logging
 from django.conf import settings
 from metrics import models, handler
-from metrics.utils import first, flatten, simple_rate_limiter, lmap
+from metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter
 
 LOG = logging.getLogger(__name__)
 
@@ -76,7 +76,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 @handler.capture_parse_error
 def parse_entry(entry):
     "parses a single search result from scopus"
-    citedby_link = first(filter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
+    citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
     return {
         'doi': entry['prism:doi'],
         'num': int(entry['citedby-count']),

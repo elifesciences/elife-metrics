@@ -115,7 +115,7 @@ def fetch_parse(pmcid_list):
         # result is a list of maps. add all maps returned to a single list ...
         results.extend(result)
     # ... to be parsed all at once.
-    return map(parse_result, results)
+    return lmap(parse_result, results)
 
 def process_results(results):
     "post process the parsed results"

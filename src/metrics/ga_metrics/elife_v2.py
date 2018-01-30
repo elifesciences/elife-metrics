@@ -4,6 +4,7 @@
 # we can reuse these functions
 from . import elife_v1
 from .elife_v1 import group_results
+from metrics.utils import lfilter
 import re
 import logging
 
@@ -57,4 +58,4 @@ def path_count(pair):
     return data['artid'], TYPE_MAP[data['type']], int(count)
 
 def path_counts(path_count_pairs):
-    return group_results(filter(None, map(path_count, path_count_pairs)))
+    return group_results(lfilter(None, map(path_count, path_count_pairs)))
