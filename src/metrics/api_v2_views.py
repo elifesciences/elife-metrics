@@ -1,8 +1,10 @@
 from metrics import models
 from django.shortcuts import get_object_or_404
 import string
+from django.http import Http404
 from django.conf import settings
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework.renderers import StaticHTMLRenderer
 from et3.render import render_item
 from et3.extract import path as p
 from .utils import isint, ensure, exsubdict, lmap, msid2doi
@@ -31,7 +33,7 @@ def request_args(request, **overrides):
 
     def isin(lst):
         def fn(val):
-            ensure(val in lst, "value %r is not in %r" % (val, lst))
+            ensure(val in lst, "value is not in %r" % (lst,))
             return val
         return fn
 
@@ -51,7 +53,7 @@ def request_args(request, **overrides):
 def serialize_citations(obj_list):
     def do(obj):
         return {
-            'service': obj.source,
+            'service': obj.source_label(),
             'uri': obj.source_id,
             'citations': obj.num
         }
@@ -108,6 +110,53 @@ def article_metrics(request, id, metric):
             'page-views': 'application/vnd.elife.metric-time-period+json;version=1',
         }
         return Response(payload, content_type=ctype_idx[metric])
+
+    except AssertionError as err:
+        raise ValidationError(err) # 400, client error
+
+    except Exception as err:
+        LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
+        raise # 500, server error
+
+#
+#
+#
+
+@api_view(['GET'])
+@renderer_classes((StaticHTMLRenderer,))
+def ping(request):
+    "Returns a constant response for monitoring. Never to be cached."
+    return Response('pong', content_type='text/plain; charset=UTF-8', headers={'Cache-Control': 'must-revalidate, no-cache, no-store, private'})
+
+#
+#
+#
+
+@api_view(['GET'])
+def summary(request, id=None):
+    "returns the final totals for all articles with no finer grained information"
+    try:
+        kwargs = request_args(request)
+        # TODO: we have a '10.7554/eLife.00000' in models.Article that needs deleting
+        #qobj = models.Article.objects.all()
+        qobj = models.Article.objects.all() \
+            .exclude(doi='10.7554/eLife.00000')
+
+        if id:
+            qobj = qobj.filter(doi=msid2doi(id))
+
+        total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
+
+        if id and total_results == 0:
+            raise Http404("summary for article does not exist")
+
+        payload = map(logic.summary_by_obj, qpage)
+
+        payload = {
+            'totalArticles': total_results,
+            'summaries': payload
+        }
+        return Response(payload, content_type="application/json")
 
     except AssertionError as err:
         raise ValidationError(err) # 400, client error

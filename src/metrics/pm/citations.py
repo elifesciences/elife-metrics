@@ -1,22 +1,10 @@
-from os.path import join
-from metrics import models, utils
-from metrics.utils import ensure, lmap, subdict, first, lfilter
+from metrics import models, utils, handler
+from metrics.utils import ensure, lmap, subdict, first
 import requests
-import requests_cache
-from datetime import timedelta
 from django.conf import settings
 import logging
 
 LOG = logging.getLogger(__name__)
-
-requests_cache.install_cache(**{
-    'cache_name': join(settings.PMC_OUTPUT_PATH, 'db'),
-    'backend': 'sqlite',
-    'fast_save': True,
-    'extension': '.sqlite3',
-    # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
-    'expire_after': timedelta(hours=24 * settings.PMC_CACHE_EXPIRY)
-})
 
 def norm_pmcid(pmcid):
     "returns the integer form of a pmc id, stripping any leading 'pmc' prefix."
@@ -78,7 +66,9 @@ def resolve_pmcid(artobj):
 #
 #
 
-def _fetch(pmcid_list):
+PM_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
+
+def fetch(pmcid_list):
     ensure(len(pmcid_list) <= MAX_PER_PAGE,
            "no more than %s can be processed per-request. requested: %s" % (MAX_PER_PAGE, len(pmcid_list)))
     headers = {
@@ -92,54 +82,58 @@ def _fetch(pmcid_list):
         'email': settings.CONTACT_EMAIL,
         'retmode': 'json'
     }
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
-    resp = requests.get(url, params=params, headers=headers)
-    # raise error if error
-    resp.raise_for_status()
-    return resp.json()
+    return handler.requests_get(PM_URL, params=params, headers=headers)
 
-def fetch(pmcid_list):
-    results = []
-    for page, sub_pmcid_list in enumerate(utils.paginate(pmcid_list, MAX_PER_PAGE)):
-        LOG.info("page %s, %s per-page", page + 1, MAX_PER_PAGE)
-        data = _fetch(sub_pmcid_list)
-        results.extend(data["linksets"])
+@handler.capture_parse_error
+def parse_result(result):
+    if 'linksetdbs' in result:
+        cited_by = result['linksetdbs'][0]['links']
+    else:
+        cited_by = []
+    pmcid = 'PMC' + str(result['ids'][0]) # there can be more than one
     return {
-        'linksets': results
+        'pmcid': pmcid,
+        'source': models.PUBMED,
+        'source_id': "https://www.ncbi.nlm.nih.gov/pmc/articles/%s/" % pmcid,
+        'num': len(cited_by),
+        #'links': cited_by # PMC ids of articles linking to this one
     }
 
-def parse_results(results):
-    def parse(result):
-        if 'linksetdbs' in result:
-            cited_by = result['linksetdbs'][0]['links']
-        else:
-            cited_by = []
-        pmcid = 'PMC' + str(result['ids'][0]) # there can be more than one ??
-        return {
-            'pmcid': pmcid,
-            'source': models.PUBMED,
-            'source_id': "https://www.ncbi.nlm.nih.gov/pmc/articles/%s/" % pmcid,
-            'num': len(cited_by),
-            #'links': cited_by # PMC ids of articles linking to this one
-        }
-    data = results['linksets']
-    data = lmap(parse, data)
+#
+#
+#
+
+def fetch_parse(pmcid_list):
+    "pages through all results for a list of PMC ids (can be just one) and parses the results."
+    results = []
+
+    for page, sub_pmcid_list in enumerate(utils.paginate(pmcid_list, MAX_PER_PAGE)):
+        LOG.debug("page %s, %s per-page", page + 1, MAX_PER_PAGE)
+
+        resp = fetch(sub_pmcid_list)
+        result = resp.json()["linksets"]
+        # result is a list of maps. add all maps returned to a single list ...
+        results.extend(result)
+    # ... to be parsed all at once.
+    return map(parse_result, results)
+
+def process_results(results):
+    "post process the parsed results"
 
     def good_row(row):
-        # need to figure our where these are sneaking in
+        # need to figure out where these are sneaking in
         return row['pmcid'] != 'PMC0'
 
-    data = lfilter(good_row, data)
+    data = lfilter(good_row, results)
     return data
 
 #
-#
+# results for individual articles
+# request overhead is low
 #
 
 def count_for_obj(art):
-    if not art.pmcid:
-        raise ValueError("art has no pmcid")
-    return parse_results(fetch([art.pmcid]))
+    return process_results(fetch_parse([resolve_pmcid(art)]))
 
 def count_for_doi(doi):
     return count_for_obj(models.Article.objects.get(doi=doi))
@@ -148,11 +142,12 @@ def count_for_msid(msid):
     return count_for_obj(models.Article.objects.get(doi=utils.msid2doi(msid)))
 
 #
-#
+# results for many articles
+# request overhead is HIGH if pmcids haven't been loaded
 #
 
 def count_for_qs(qs):
-    return parse_results(fetch(lmap(resolve_pmcid, qs)))
+    return process_results(fetch_parse(lmap(resolve_pmcid, qs)))
 
 def citations_for_all_articles():
     return count_for_qs(models.Article.objects.all())

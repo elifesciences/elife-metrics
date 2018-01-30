@@ -1,9 +1,8 @@
 import json
-from metrics import models
+from metrics import models, utils
 from django.test import Client
 from . import base
 from django.core.urlresolvers import reverse
-from metrics.utils import ymd, ym, utcnow
 
 class ApiV2(base.BaseCase):
     def setUp(self):
@@ -13,11 +12,17 @@ class ApiV2(base.BaseCase):
     def tearDown(self):
         pass
 
+    def test_ping(self):
+        resp = self.c.get(reverse('v2:ping'))
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.content_type, 'text/plain; charset=UTF-8')
+        self.assertEqual(resp['Cache-Control'], 'must-revalidate, no-cache, no-store, private')
+        self.assertEqual(resp.content.decode('utf-8'), 'pong')
+
     def test_order_param_on_citations(self):
         "the '?order=' parameter affecting result ordering"
         cases = {
             # msid, citations, downloads, views
-            # crossref, scopus, pubmed
             '1234': ([
                 2, # crossref
                 3, # scopus
@@ -28,21 +33,20 @@ class ApiV2(base.BaseCase):
 
         expected_response = [
             {
-                'service': models.PUBMED,
+                'service': models.PUBMED_LABEL,
                 'uri': 'asdf',
                 'citations': 1
             },
             {
-                'service': models.CROSSREF,
+                'service': models.CROSSREF_LABEL,
                 'uri': 'asdf',
                 'citations': 2
             },
             {
-                'service': models.SCOPUS,
+                'service': models.SCOPUS_LABEL,
                 'uri': 'asdf',
                 'citations': 3
             },
-
         ]
         url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
         resp = self.c.get(url, {'order': 'asc'})
@@ -64,17 +68,17 @@ class ApiV2(base.BaseCase):
 
         expected_response = [
             {
-                'service': models.SCOPUS,
+                'service': models.SCOPUS_LABEL,
                 'uri': 'asdf',
                 'citations': 3
             },
             {
-                'service': models.CROSSREF,
+                'service': models.CROSSREF_LABEL,
                 'uri': 'asdf',
                 'citations': 2
             },
             {
-                'service': models.PUBMED,
+                'service': models.PUBMED_LABEL,
                 'uri': 'asdf',
                 'citations': 1
             },
@@ -120,17 +124,17 @@ class ApiV2(base.BaseCase):
 
         expected_response = [
             {
-                'service': models.CROSSREF,
+                'service': models.CROSSREF_LABEL,
                 'uri': 'asdf',
                 'citations': 23
             },
             {
-                'service': models.SCOPUS,
+                'service': models.PUBMED_LABEL,
                 'uri': '',
                 'citations': 0
             },
             {
-                'service': models.PUBMED,
+                'service': models.SCOPUS_LABEL,
                 'uri': '',
                 'citations': 0
             }
@@ -155,17 +159,17 @@ class ApiV2(base.BaseCase):
         self.assertEqual(resp.status_code, 200)
         expected_response = [
             {
-                'service': models.CROSSREF,
+                'service': models.CROSSREF_LABEL,
                 'uri': '',
                 'citations': 0
             },
             {
-                'service': models.PUBMED,
+                'service': models.PUBMED_LABEL,
                 'uri': '',
                 'citations': 0
             },
             {
-                'service': models.SCOPUS,
+                'service': models.SCOPUS_LABEL,
                 'uri': '',
                 'citations': 0
             }
@@ -183,8 +187,29 @@ class ApiV2(base.BaseCase):
             'totalValue': 1,
             'periods': [
                 {
-                    'period': ymd(utcnow()),
+                    'period': '2001-01-01',
                     'value': 1
+                }
+            ]
+        }
+        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        resp = self.c.get(url, {'by': models.DAY})
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(expected_response, resp.data)
+
+    def test_daily_views2(self):
+        "all three of full, abstract and digest daily views are counted"
+        cases = {
+            1234: (0, 0, (1, 2, 3))
+        }
+        base.insert_metrics(cases)
+        expected_response = {
+            'totalPeriods': 1,
+            'totalValue': 6,
+            'periods': [
+                {
+                    'period': '2001-01-01',
+                    'value': 6
                 }
             ]
         }
@@ -203,7 +228,7 @@ class ApiV2(base.BaseCase):
             'totalValue': 1,
             'periods': [
                 {
-                    'period': ymd(),
+                    'period': '2001-01-01',
                     'value': 1
                 }
             ]
@@ -223,7 +248,7 @@ class ApiV2(base.BaseCase):
             'totalValue': 1,
             'periods': [
                 {
-                    'period': ym(),
+                    'period': '2001-01',
                     'value': 1
                 }
             ]
@@ -243,7 +268,7 @@ class ApiV2(base.BaseCase):
             'totalValue': 1,
             'periods': [
                 {
-                    'period': ym(),
+                    'period': '2001-01',
                     'value': 1
                 }
             ]
@@ -252,3 +277,162 @@ class ApiV2(base.BaseCase):
         resp = self.c.get(url, {'by': models.MONTH})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
+
+class Three(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_results_empty_summary(self):
+        url = reverse('v2:summary')
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+        expected_response = {
+            'totalArticles': 0,
+            'summaries': []
+        }
+        self.assertEqual(resp.json(), expected_response)
+
+    def test_results_single_summary(self):
+        cases = {
+            # msid, citations, downloads, views
+            '1234': ([
+                2, # crossref
+                3, # scopus
+                1, # pubmed
+            ], 10, 11),
+        }
+        base.insert_metrics(cases)
+
+        expected_response = {
+            'totalArticles': 1,
+            'summaries': [{
+                'msid': 1234,
+                'views': 11,
+                'downloads': 10,
+                models.CROSSREF: 2,
+                models.PUBMED: 1,
+                models.SCOPUS: 3
+            }]
+        }
+
+        url = reverse('v2:summary')
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected_response)
+
+    def test_results_multiple_summary(self):
+        cases = {
+            '1111': ([1, 1, 1], 1, 1),
+            '2222': ([2, 2, 2], 2, 2),
+            '3333': ([3, 3, 3], 3, 3),
+        }
+        base.insert_metrics(cases)
+
+        expected_response = {
+            'totalArticles': 3,
+            'summaries': [
+                # default ordering per API is DESC
+                # default ordering key for articles is DOI
+                {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3},
+                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+                {'msid': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
+            ]
+        }
+
+        url = reverse('v2:summary')
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected_response)
+
+    def test_paginate_results(self):
+        cases = {
+            '1111': ([1, 1, 1], 1, 1),
+            '2222': ([2, 2, 2], 2, 2),
+            '3333': ([3, 3, 3], 3, 3),
+        }
+        base.insert_metrics(cases)
+
+        page_cases = [
+            {'totalArticles': 3, 'summaries': [
+                {'msid': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
+            ]},
+            {'totalArticles': 3, 'summaries': [
+                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+            ]},
+            {'totalArticles': 3, 'summaries': [
+                {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3}
+            ]},
+        ]
+        for page, expected_response in enumerate(page_cases):
+            page += 1 # enumerate is zero-based
+            url = reverse('v2:summary')
+            resp = self.c.get(url, {'page': page, 'per-page': 1, 'order': 'asc'})
+            self.assertEqual(resp.json(), expected_response)
+
+    def test_one_bad_apple(self):
+        "articles with bad dois don't prevent an entire summary from being returned"
+        cases = {
+            '1111': ([1, 1, 1], 1, 1),
+            '2222': ([2, 2, 2], 2, 2),
+        }
+        base.insert_metrics(cases)
+
+        # skitch doi
+        # this is the particular bad doi I'm dealing with right now
+        bad_doi = '10.7554/eLife.00000'
+        models.Article.objects.filter(doi=utils.msid2doi('1111')).update(doi=bad_doi)
+
+        # expect just one result
+        resp = self.c.get(reverse('v2:summary'))
+        expected_response = {
+            'totalArticles': 1,
+            'summaries': [
+                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+            ]
+        }
+        self.assertEqual(resp.json(), expected_response)
+
+class Four(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+
+    def tearDown(self):
+        pass
+
+    def test_results_single_article_summary(self):
+        "summaries can be provided on a per-article basis. results are the same as regular summary, just reduced to one item"
+        cases = {
+            # msid, citations, downloads, views
+            '1234': ([
+                2, # crossref
+                3, # scopus
+                1, # pubmed
+            ], 10, 11),
+        }
+        base.insert_metrics(cases)
+
+        expected_response = {
+            'totalArticles': 1,
+            'summaries': [{
+                'msid': 1234,
+                'views': 11,
+                'downloads': 10,
+                models.CROSSREF: 2,
+                models.PUBMED: 1,
+                models.SCOPUS: 3
+            }]
+        }
+
+        url = reverse('v2:article-summary', kwargs={'id': 1234})
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.json(), expected_response)
+
+    def test_no_single_article_summary(self):
+        url = reverse('v2:article-summary', kwargs={'id': 1234})
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 404)

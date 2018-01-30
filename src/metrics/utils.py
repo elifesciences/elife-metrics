@@ -1,3 +1,6 @@
+import time
+import os, json
+import tempfile, shutil
 from functools import wraps
 import logging
 from datetime import datetime
@@ -69,6 +72,13 @@ def nth(idx, x):
 def first(x):
     return nth(0, x)
 
+def second(x):
+    return nth(1, x)
+
+def firstnn(x):
+    "given sequential `x`, returns the first non-nil value"
+    return first(lfilter(None, x))
+
 def rest(x):
     return x[1:]
 
@@ -78,11 +88,18 @@ def ensure(assertion, msg, *args):
     if not assertion:
         raise AssertionError(msg % args)
 
+def pad_msid(msid):
+    return str(int(msid)).zfill(5)
+
 def doi2msid(doi):
     "doi to manuscript id used in EJP"
-    prefix = '10.7554/eLife.'
-    ensure(doi.startswith(prefix), "this doesn't look like an eLife doi: %s" % prefix)
-    return doi[len(prefix):].lstrip('0')
+    prefix = '10.7554/elife.'
+    ensure(doi.lower().startswith(prefix), "unparseable eLife doi (%sxxxxx)" % prefix)
+    stripped = doi[len(prefix):].lstrip('0')
+    stripped = stripped.split('.')[0]
+    ensure(isint(stripped), "unparseable eLife doi")
+    # handles dois like: 10.7554/eLife.09560.001
+    return int(stripped)
 
 def msid2doi(msid):
     assert isint(msid), "given msid must be an integer: %r" % msid
@@ -99,6 +116,9 @@ def fmtdt(dt, fmt="%Y-%m-%d"):
         dt = utcnow()
     ensure(isinstance(dt, datetime), "datetime object expected, got %r" % type(dt))
     return dt.strftime(fmt)
+
+def ymdhms(dt=None):
+    return fmtdt(dt, "%Y-%m-%d-%H-%M-%S")
 
 def ymd(dt=None):
     "returns a simple YYYY-MM-DD representation of a datetime object"
@@ -193,3 +213,68 @@ def create_or_update(Model, orig_data, key_list, create=True, update=True, updat
     # it is possible to neither create nor update.
     # in this case if the model cannot be found then None is returned: (None, False, False)
     return (inst, created, updated)
+
+# http://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
+def partition(seq, size):
+    res = []
+    for el in seq:
+        res.append(el)
+        if len(res) == size:
+            yield res
+            res = []
+    if res:
+        yield res
+
+def lossy_json_dumps(obj, **kwargs):
+    "drop-in for json.dumps that handles unserialisable objects."
+    def _handler(obj):
+        if hasattr(obj, 'isoformat'):
+            return ymdhms(obj)
+        else:
+            LOG.debug('Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj)))
+            return '[unserialisable %s object]: %s' % (type(obj), str(obj))
+    return json.dumps(obj, default=_handler, **kwargs)
+
+def mkdirs(path):
+    os.system('mkdir -p %s' % path)
+    return os.path.exists(path)
+
+def tempdir():
+    # usage: tempdir, killer = tempdir(); killer()
+    name = tempfile.mkdtemp()
+    return (name, lambda: shutil.rmtree(name))
+
+# modified from:
+# http://stackoverflow.com/questions/9323749/python-check-if-one-dictionary-is-a-subset-of-another-larger-dictionary
+def partial_match(patn, real):
+    """does real dict match pattern?"""
+    for pkey, pvalue in patn.items():
+        if isinstance(pvalue, dict):
+            partial_match(pvalue, real[pkey]) # recurse
+        else:
+            ensure(real[pkey] == pvalue, "%s != %s" % (real[pkey], pvalue))
+    return True
+
+#
+#
+#
+
+# don't use if we ever go concurrent
+# http://blog.gregburek.com/2011/12/05/Rate-limiting-with-decorators/
+# https://stackoverflow.com/questions/667508/whats-a-good-rate-limiting-algorithm/667706#667706
+def simple_rate_limiter(maxPerSecond):
+    minInterval = 1.0 / float(maxPerSecond)
+
+    def decorate(func):
+        lastTimeCalled = [0.0]
+
+        def rateLimitedFunction(*args, **kargs):
+            elapsed = time.clock() - lastTimeCalled[0]
+            leftToWait = minInterval - elapsed
+            if leftToWait > 0:
+                time.sleep(leftToWait)
+            ret = func(*args, **kargs)
+            lastTimeCalled[0] = time.clock()
+            return ret
+        return rateLimitedFunction
+    return decorate

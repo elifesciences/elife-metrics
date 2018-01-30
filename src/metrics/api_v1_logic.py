@@ -11,7 +11,7 @@ LOG = logging.getLogger(__name__)
 
 class MetricSerializer(szr.ModelSerializer):
     class Meta:
-        exclude = ('article', 'id', 'period', 'source')
+        exclude = ('article', 'id', 'period', 'source', 'datetime_record_updated', 'datetime_record_created')
         model = models.Metric
 #
 #

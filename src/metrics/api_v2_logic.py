@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from . import models
 from . import utils
 from .utils import ensure, rest, lmap
@@ -8,6 +9,7 @@ def chop(q, page, per_page, order):
     total = q.count()
 
     order_by_idx = {
+        models.Article: 'doi',
         models.Metric: 'date',
         models.Citation: 'num',
     }
@@ -29,8 +31,9 @@ def chop(q, page, per_page, order):
 
 def pad_citations(serialized_citation_response):
     cr = serialized_citation_response
-    known_sources = list(dict(models.source_choices()).keys())
-    missing_sources = set(known_sources) - set([cite['service'] for cite in cr])
+    # TODO: bug here. pads will have the order of
+    # models.SOURCE_LABELS (alphabetical, asc) and not what the user specified
+    missing_sources = set(models.SOURCE_LABELS) - set([cite['service'] for cite in cr])
 
     def pad(source):
         return {
@@ -60,7 +63,7 @@ def article_stats(msid, period):
         .filter(source=models.GA) \
         .filter(period=period)
     sums = qobj.aggregate(
-        views=Sum(F('full') + F('abstract')),
+        views=Sum(F('full') + F('abstract') + F('digest')),
         downloads=Sum('pdf'))
     return sums['views'] or 0, sums['downloads'] or 0, qobj
 
@@ -73,3 +76,24 @@ def article_views(msid, period):
     # convenience
     total_views, _, qobj = article_stats(msid, period)
     return total_views, qobj
+
+#
+#
+#
+
+def summary_by_msid(msid):
+    views, downloads, _ = article_stats(msid, models.DAY)
+    row = OrderedDict([
+        ('msid', msid),
+        ('views', views),
+        ('downloads', downloads),
+        (models.CROSSREF, 0),
+        (models.PUBMED, 0),
+        (models.SCOPUS, 0)
+    ])
+    _, qobj = article_citations(msid)
+    row.update(dict(map(lambda obj: (obj.source, obj.num), qobj.order_by('source'))))
+    return row
+
+def summary_by_obj(artobj):
+    return summary_by_msid(utils.doi2msid(artobj.doi))

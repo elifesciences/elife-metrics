@@ -1,6 +1,7 @@
 import calendar
 from datetime import datetime, timedelta
 import logging
+from ..utils import ensure, isint, msid2doi
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)
@@ -68,6 +69,9 @@ def firstof(fn, x):
 
 def enplumpen(artid):
     "takes an article id like e01234 and returns a DOI like 10.7554/eLife.01234"
+    if isint(artid):
+        return msid2doi(artid)
+    ensure(artid[0] == 'e', 'cannot convert article id %s to doi' % artid)
     return artid.replace('e', '10.7554/eLife.')
 
 def deplumpen(artid):
@@ -78,7 +82,7 @@ def deplumpen(artid):
         # TODO: consider turning this into a hard failure
         LOG.error("unable to deplump %r", artid)
         return artid
-    except:
+    except BaseException:
         msg = "unhandled exception attempting to parse given value %r" % str(artid)
         LOG.error(msg)
         raise ValueError(msg)

@@ -1,19 +1,21 @@
 import os, json
-from django.test import TestCase as DjangoTestCase
+from django.test import TestCase as DjangoTestCase, TransactionTestCase
 import unittest
 from metrics import utils, models, logic
+from datetime import timedelta, datetime
+
+BASE_DATE = datetime(year=2001, month=1, day=1)
 
 def resp_json(resp):
     # json.loads(resp.bytes.decode('utf-8')) # python3
     return json.loads(resp.content.decode('utf-8')) # resp.json() fails with header issues
 
-def insert_metrics(abbr_map):
+def insert_metrics(abbr_list):
     "function to bypass scraping logic and insert metrics and citations directly into db"
-    def wrangle(msid, data):
+    def wrangle(msid, data, date):
         full = abstract = digest = pdf = 0
         citations = [0]
         period = models.DAY
-        date = utils.utcnow()
 
         if len(data) == 3:
             citations, pdf, full = data
@@ -21,6 +23,11 @@ def insert_metrics(abbr_map):
             citations, pdf, full, period = data
         else:
             raise ValueError("cannot handle row of length %s" % len(data))
+
+        # allows us to pass in a triple for better testing
+        if isinstance(full, int):
+            full = [full, abstract, digest]
+        full, abstract, digest = full
 
         # format date
         fn = utils.ym if period == models.MONTH else utils.ymd
@@ -53,7 +60,15 @@ def insert_metrics(abbr_map):
                 'source_id': 'asdf'
             }))
         return metric, citation_objs
-    return [wrangle(msid, data) for msid, data in abbr_map.items()]
+
+    # abbr_list has to be a list of [(msid, (citations, pdf, full)), ...]
+    if isinstance(abbr_list, dict):
+        abbr_list = abbr_list.items()
+
+    date = BASE_DATE - timedelta(days=len(abbr_list))
+    for msid, data in abbr_list:
+        date += timedelta(days=1)
+        wrangle(msid, data, date)
 
 class SimpleBaseCase(unittest.TestCase):
     "use this base if you don't need database wrangling"
@@ -66,6 +81,8 @@ class BaseCase(SimpleBaseCase, DjangoTestCase):
     # https://docs.djangoproject.com/en/1.10/topics/testing/tools/#django.test.TestCase
     pass
 
+class TransactionBaseCase(SimpleBaseCase, TransactionTestCase):
+    pass
 
 #
 #

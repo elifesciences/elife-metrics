@@ -1,4 +1,4 @@
-import time
+import time, math
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from metrics import logic, models
 
 import logging
-LOG = logging.getLogger(__name__)
+LOG = logging.getLogger('debugger')
 
 '''
 def hw_or_ga(v):
@@ -72,17 +72,36 @@ class Command(BaseCommand):
         ])
 
         try:
+            start_time = time.time() # seconds since epoch
             for source, row in sources.items():
                 try:
-                    first(row)(*rest(row))
+                    fn, args = first(row), rest(row)
+                    fn(*args)
                 except KeyboardInterrupt:
-                    print('ctrl-c caught.')
+                    print('ctrl-c caught, skipping rest of %s' % source)
                     print('use ctrl-c again to abort immediately')
                     time.sleep(1)
+
+                except BaseException as err:
+                    LOG.exception("unhandled error in source %s: %s", source, err)
+                    continue
+
+            end_time = time.time()
+
+            elapsed_seconds = end_time - start_time
+            LOG.info("time elapsed: %s minutes" % elapsed_seconds * 60)
+            elapsed_hours = math.ceil(elapsed_seconds / 3600)
+            logic.recently_updated_article_notifications(hours=elapsed_hours)
 
         except KeyboardInterrupt:
             print('caught second ctrl-c')
             print('quitting')
+            exit(1)
+
+        except BaseException as err:
+            msg = "unhandled exception calling the import-metrics command."
+            LOG.exception(msg) # capture a stacktrace
+            LOG.critical(msg) # we can't recover, this command must exit
             exit(1)
 
         self.stdout.write("...done\n")

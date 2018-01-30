@@ -14,10 +14,21 @@ elifePipeline {
 
     elifeMainlineOnly {
         stage 'End2end tests', {
-            elifeEnd2EndTest({
-                builderDeployRevision 'elife-metrics--end2end', commit
-                builderSmokeTests 'elife-metrics--end2end', '/srv/elife-metrics'
-            }, 'metrics')
+            elifeSpectrum(
+                deploy: [
+                    stackname: 'elife-metrics--end2end',
+                    revision: commit,
+                    folder: '/srv/elife-metrics'
+                ],
+                marker: 'metrics'
+            )
+        }
+
+        stage 'Deploy on continuumtest', {
+            lock('elife-metrics--continuumtest') {
+                builderDeployRevision 'elife-metrics--continuumtest', commit
+                builderSmokeTests 'elife-metrics--continuumtest', '/srv/elife-metrics'
+            }
         }
 
         stage 'Approval', {

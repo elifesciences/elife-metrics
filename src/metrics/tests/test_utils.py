@@ -26,8 +26,7 @@ class TestUtils(base.BaseCase):
     def test_isnotint(self):
         not_int_list = ['one', 'a', utils]
         for not_int in not_int_list:
-            print(('testing', not_int))
-            self.assertFalse(utils.isint(not_int))
+            self.assertFalse(utils.isint(not_int), "failed on %s" % not_int)
 
     def test_nth(self):
         expected_list = [
@@ -48,8 +47,7 @@ class TestUtils(base.BaseCase):
             (None, 1, None),
         ]
         for val, idx, expected in expected_list:
-            print(('testing', val, idx, expected))
-            self.assertEqual(utils.nth(idx, val), expected)
+            self.assertEqual(utils.nth(idx, val), expected, "failed: %s %s %s" % (val, idx, expected))
 
     def test_bad_nths(self):
         bad_list = [
@@ -87,3 +85,32 @@ class TestUtils(base.BaseCase):
         ]
         for string, expected in cases:
             self.assertEqual(utils.todt(string), expected)
+
+    def test_doi_to_msid(self):
+        cases = [
+            ('10.7554/eLife.09560', 9560),
+            ('10.7554/eLife.09560.001', 9560),
+            ('10.7554/elife.09560', 9560), # lowercase 'l' in 'elife'
+        ]
+        for given, expected in cases:
+            self.assertEqual(utils.doi2msid(given), expected)
+
+    def test_bad_doi_to_msid(self):
+        cases = [
+            '',
+            '10.7554/eLife.',
+            '10.7554/eLife.0',
+            '10.7554/eLife.0000000000000000000',
+
+            '10.7555/eLife.09560', # bad prefix
+        ]
+        for badegg in cases:
+            self.assertRaises(AssertionError, utils.doi2msid, badegg)
+
+    def test_msid_to_doi(self):
+        cases = [
+            (3, '10.7554/eLife.00003'),
+            (10627, '10.7554/eLife.10627')
+        ]
+        for given, expected in cases:
+            self.assertEqual(utils.msid2doi(given), expected)

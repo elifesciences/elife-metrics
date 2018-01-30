@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import DateTimeField, PositiveIntegerField, ForeignKey, CharField
 from django.conf import settings
 from django.core.exceptions import ValidationError
 
@@ -19,9 +20,9 @@ def validate_doi(val):
     raise ValidationError('%r has an unknown doi prefix. known prefixes: %r' % (val, known_doi_prefix_list))
 
 class Article(models.Model):
-    doi = models.CharField(max_length=255, unique=True, help_text="article identifier", validators=[validate_doi])
-    pmid = models.PositiveIntegerField(unique=True, blank=True, null=True)
-    pmcid = models.CharField(max_length=10, unique=True, blank=True, null=True)
+    doi = CharField(max_length=255, unique=True, help_text="article identifier", validators=[validate_doi])
+    pmid = PositiveIntegerField(unique=True, blank=True, null=True)
+    pmcid = CharField(max_length=10, unique=True, blank=True, null=True)
 
     class Meta:
         ordering = ('-doi',)
@@ -51,15 +52,18 @@ def metric_source_list():
     ]
 
 class Metric(models.Model):
-    article = models.ForeignKey(Article)
-    date = models.CharField(max_length=10, blank=True, null=True, help_text="the date this metric is for in YYYY-MM-DD, YYYY-MM and YYYY formats or None for 'all time'")
-    period = models.CharField(max_length=10, choices=metric_period_list())
-    source = models.CharField(max_length=2, choices=metric_source_list())
+    article = ForeignKey(Article)
+    date = CharField(max_length=10, blank=True, null=True, help_text="the date this metric is for in YYYY-MM-DD, YYYY-MM and YYYY formats or None for 'all time'")
+    period = CharField(max_length=10, choices=metric_period_list())
+    source = CharField(max_length=2, choices=metric_source_list())
 
-    full = models.PositiveIntegerField(help_text="article page views")
-    abstract = models.PositiveIntegerField(help_text="article abstract page views")
-    digest = models.PositiveIntegerField(help_text="article digest page views")
-    pdf = models.PositiveIntegerField(help_text="pdf downloads")
+    full = PositiveIntegerField(help_text="article page views")
+    abstract = PositiveIntegerField(help_text="article abstract page views")
+    digest = PositiveIntegerField(help_text="article digest page views")
+    pdf = PositiveIntegerField(help_text="pdf downloads")
+
+    datetime_record_created = DateTimeField(auto_now_add=True)
+    datetime_record_updated = DateTimeField(auto_now=True)
 
     @property
     def downloads(self):
@@ -94,15 +98,11 @@ class Metric(models.Model):
 #
 #
 
-CROSSREF, PUBMED, SCOPUS = 'crossref', 'pubmed', 'scopus'
+SOURCES = CROSSREF, PUBMED, SCOPUS = 'crossref', 'pubmed', 'scopus'
+SOURCE_LABELS = CROSSREF_LABEL, PUBMED_LABEL, SCOPUS_LABEL = 'Crossref', 'PubMed Central', 'Scopus'
 
-def source_choices():
-    return [
-        (SCOPUS, "Elsevier's Scopus"),
-        (CROSSREF, 'Crossref'),
-        (PUBMED, 'PubMed Central'),
-    ]
-
+SOURCE_CHOICES = zip(SOURCES, SOURCE_LABELS)
+SOURCE_CHOICES_IDX = dict(SOURCE_CHOICES)
 
 class CitationManager(models.Manager):
     def get_queryset(self):
@@ -110,12 +110,18 @@ class CitationManager(models.Manager):
         return super(CitationManager, self).get_queryset().select_related('article')
 
 class Citation(models.Model):
-    article = models.ForeignKey(Article)
-    num = models.PositiveIntegerField()
-    source = models.CharField(max_length=10, choices=source_choices()) # scopus, crossref, pubmed, etc
-    source_id = models.CharField(max_length=255) # a link back to this article for given source
+    article = ForeignKey(Article)
+    num = PositiveIntegerField()
+    source = CharField(max_length=10, choices=SOURCE_CHOICES) # scopus, crossref, pubmed, etc
+    source_id = CharField(max_length=255) # a link back to this article for given source
+
+    datetime_record_created = DateTimeField(auto_now_add=True)
+    datetime_record_updated = DateTimeField(auto_now=True)
 
     objects = CitationManager()
+
+    def source_label(self):
+        return SOURCE_CHOICES_IDX.get(self.source)
 
     class Meta:
         # an article may only have one instance of a source
