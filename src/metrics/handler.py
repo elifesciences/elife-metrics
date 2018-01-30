@@ -35,7 +35,9 @@ def writefile(id, content, fname):
     path = join(settings.DUMP_PATH, id)
     ensure(utils.mkdirs(path), "failed to create path %s" % path)
     path = join(path, fname) # ll: /tmp/elife-metrics/pmc-asdfasdfasdf-482309849230/log
-    open(path, 'w').write(content)
+    if isinstance(content, str):
+        content = content.encode('utf8')
+    open(path, 'wb').write(content)
     return path
 
 #
