@@ -9,13 +9,13 @@ django-markdown2==0.3.0
 django-rest-swagger==2.1.2
 djangorestframework==3.6.3
 et3==1.5
-google-api-python-client==1.6.2
+google-api-python-client==1.6.5
 green==2.5.0
 kids.cache==0.0.4
 markdown2==2.3.4
 mock==2.0.0
 newrelic==2.86.3.70
-oauth2client==4.1.0
+oauth2client==4.1.2
 psycopg2==2.7.1
 pyflakes==1.5.0
 pylint==1.7.1
