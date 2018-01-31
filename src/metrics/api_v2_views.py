@@ -1,12 +1,12 @@
 from metrics import models
 from django.shortcuts import get_object_or_404
-import string
 from django.http import Http404
 from django.conf import settings
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import StaticHTMLRenderer
 from et3.render import render_item
 from et3.extract import path as p
+from et3.utils import uppercase, lowercase
 from .utils import isint, ensure, exsubdict, lmap, msid2doi
 from . import api_v2_logic as logic
 from rest_framework.response import Response
@@ -40,9 +40,9 @@ def request_args(request, **overrides):
     desc = {
         'page': [p('page', opts['page_num']), ispositiveint],
         'per_page': [p('per-page', opts['per_page']), ispositiveint, inrange(opts['min_per_page'], opts['max_per_page'])],
-        'order': [p('order', opts['order_direction']), string.ascii_uppercase, isin(['ASC', 'DESC'])],
+        'order': [p('order', opts['order_direction']), uppercase, isin(['ASC', 'DESC'])],
 
-        'period': [p('by', 'day'), string.ascii_lowercase, isin(['day', 'month'])],
+        'period': [p('by', 'day'), lowercase, isin(['day', 'month'])],
     }
     return render_item(desc, request.GET)
 
