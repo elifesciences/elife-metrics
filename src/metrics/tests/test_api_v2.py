@@ -311,7 +311,7 @@ class Three(base.BaseCase):
         expected_response = {
             'total': 1,
             'items': [{
-                'msid': 1234,
+                'id': 1234,
                 'views': 11,
                 'downloads': 10,
                 models.CROSSREF: 2,
@@ -338,9 +338,9 @@ class Three(base.BaseCase):
             'items': [
                 # default ordering per API is DESC
                 # default ordering key for articles is DOI
-                {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3},
-                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
-                {'msid': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
+                {'id': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3},
+                {'id': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+                {'id': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
             ]
         }
 
@@ -359,13 +359,13 @@ class Three(base.BaseCase):
 
         page_cases = [
             {'total': 3, 'items': [
-                {'msid': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
+                {'id': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
             ]},
             {'total': 3, 'items': [
-                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+                {'id': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
             ]},
             {'total': 3, 'items': [
-                {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3}
+                {'id': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3}
             ]},
         ]
         for page, expected_response in enumerate(page_cases):
@@ -392,7 +392,7 @@ class Three(base.BaseCase):
         expected_response = {
             'total': 1,
             'items': [
-                {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
+                {'id': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
             ]
         }
         self.assertEqual(resp.json(), expected_response)
@@ -419,7 +419,7 @@ class Four(base.BaseCase):
         expected_response = {
             'total': 1,
             'items': [{
-                'msid': 1234,
+                'id': 1234,
                 'views': 11,
                 'downloads': 10,
                 models.CROSSREF: 2,

@@ -84,7 +84,7 @@ def article_views(msid, period):
 def summary_by_msid(msid):
     views, downloads, _ = article_stats(msid, models.DAY)
     row = OrderedDict([
-        ('msid', msid),
+        ('id', msid),
         ('views', views),
         ('downloads', downloads),
         (models.CROSSREF, 0),
