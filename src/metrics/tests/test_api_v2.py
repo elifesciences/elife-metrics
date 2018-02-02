@@ -116,6 +116,7 @@ class ApiV2(base.BaseCase):
                 # json.loads(resp.bytes.decode('utf-8')) # python3
                 json.loads(resp.content.decode('utf-8'))
 
+    # WARN! non-deterministic results!
     def test_citations(self):
         cases = {
             '5678': (23, 0, 0)
@@ -291,8 +292,8 @@ class Three(base.BaseCase):
         self.assertEqual(resp.status_code, 200)
 
         expected_response = {
-            'totalArticles': 0,
-            'summaries': []
+            'total': 0,
+            'items': []
         }
         self.assertEqual(resp.json(), expected_response)
 
@@ -308,8 +309,8 @@ class Three(base.BaseCase):
         base.insert_metrics(cases)
 
         expected_response = {
-            'totalArticles': 1,
-            'summaries': [{
+            'total': 1,
+            'items': [{
                 'msid': 1234,
                 'views': 11,
                 'downloads': 10,
@@ -333,8 +334,8 @@ class Three(base.BaseCase):
         base.insert_metrics(cases)
 
         expected_response = {
-            'totalArticles': 3,
-            'summaries': [
+            'total': 3,
+            'items': [
                 # default ordering per API is DESC
                 # default ordering key for articles is DOI
                 {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3},
@@ -357,13 +358,13 @@ class Three(base.BaseCase):
         base.insert_metrics(cases)
 
         page_cases = [
-            {'totalArticles': 3, 'summaries': [
+            {'total': 3, 'items': [
                 {'msid': 1111, 'views': 1, 'downloads': 1, models.CROSSREF: 1, models.PUBMED: 1, models.SCOPUS: 1},
             ]},
-            {'totalArticles': 3, 'summaries': [
+            {'total': 3, 'items': [
                 {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
             ]},
-            {'totalArticles': 3, 'summaries': [
+            {'total': 3, 'items': [
                 {'msid': 3333, 'views': 3, 'downloads': 3, models.CROSSREF: 3, models.PUBMED: 3, models.SCOPUS: 3}
             ]},
         ]
@@ -389,8 +390,8 @@ class Three(base.BaseCase):
         # expect just one result
         resp = self.c.get(reverse('v2:summary'))
         expected_response = {
-            'totalArticles': 1,
-            'summaries': [
+            'total': 1,
+            'items': [
                 {'msid': 2222, 'views': 2, 'downloads': 2, models.CROSSREF: 2, models.PUBMED: 2, models.SCOPUS: 2},
             ]
         }
@@ -416,8 +417,8 @@ class Four(base.BaseCase):
         base.insert_metrics(cases)
 
         expected_response = {
-            'totalArticles': 1,
-            'summaries': [{
+            'total': 1,
+            'items': [{
                 'msid': 1234,
                 'views': 11,
                 'downloads': 10,
