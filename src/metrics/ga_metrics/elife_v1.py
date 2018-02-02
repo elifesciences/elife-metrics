@@ -13,7 +13,6 @@ from collections import Counter
 from datetime import datetime
 from . import utils
 from .utils import ymd
-#from ..utils import lmap, lfilter
 from metrics.utils import lmap, lfilter
 import logging
 from functools import reduce
