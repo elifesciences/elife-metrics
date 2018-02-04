@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 from rest_framework_swagger.views import get_swagger_view
-import views
+from . import views
 
 urlpatterns = [
     url(r'^api/docs/', get_swagger_view(title='Article Metrics API')),

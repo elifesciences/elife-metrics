@@ -1,9 +1,11 @@
-import base, json
 from os.path import join
-from datetime import timedelta, datetime
-from metrics.ga_metrics import core, utils
+from . import base
+import json
+from datetime import datetime, timedelta
+from metrics import utils
+from metrics.ga_metrics import core
 from collections import Counter
-from mock import patch
+from mock import patch # TODO: replace mock with unittest.mock
 
 class TestQueryResults(base.SimpleBaseCase):
     def setUp(self):
@@ -17,9 +19,9 @@ class TestQueryResults(base.SimpleBaseCase):
         from_date = to_date = core.SITE_SWITCH - timedelta(days=1)
         counts = core.article_views(self.table_id, from_date, to_date)
         expected = {
-            u'10.7554/eLife.10778': Counter({'full': 119, 'abstract': 10, 'digest': 1}),
-            u'10.7554/eLife.10509': Counter({'full': 11, 'abstract': 2, 'digest': 0}),
-            u'10.7554/eLife.09560': Counter({'full': 182, 'abstract': 17, 'digest': 0}),
+            '10.7554/eLife.10778': Counter({'full': 119, 'abstract': 10, 'digest': 1}),
+            '10.7554/eLife.10509': Counter({'full': 11, 'abstract': 2, 'digest': 0}),
+            '10.7554/eLife.09560': Counter({'full': 182, 'abstract': 17, 'digest': 0}),
         }
         for key, expected_val in expected.items():
             self.assertEqual(expected_val, counts[key])
@@ -29,9 +31,9 @@ class TestQueryResults(base.SimpleBaseCase):
         from_date = to_date = core.SITE_SWITCH + timedelta(days=1) # day after
         counts = core.article_views(self.table_id, from_date, to_date, cached=True)
         expected = {
-            u'10.7554/eLife.10518': Counter({'abstract': 0, 'digest': 1, 'full': 4}),
-            u'10.7554/eLife.10921': Counter({'abstract': 0, 'digest': 2, 'full': 153}),
-            u'10.7554/eLife.12620': Counter({'abstract': 29, 'digest': 4, 'full': 2053}),
+            '10.7554/eLife.10518': Counter({'abstract': 0, 'digest': 1, 'full': 4}),
+            '10.7554/eLife.10921': Counter({'abstract': 0, 'digest': 2, 'full': 153}),
+            '10.7554/eLife.12620': Counter({'abstract': 29, 'digest': 4, 'full': 2053}),
         }
         for key, expected_val in expected.items():
             self.assertEqual(expected_val, counts[key])
@@ -43,12 +45,12 @@ class Two(base.SimpleBaseCase):
 
         # this fixture has a number of bad paths:
         self.bad_eggs = [
-            [u'/articles/004071', u'1'],
-            [u'/articles/121771', u'1'],
-            [u'/articles/2212815887', u'1'],
-            [u'/articles/292222222222222222222222222222222222222222222222222222222222222', u'1'],
-            [u'/articles/2922222222222222222222222222222222222222222222222222222222222229999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999', u'2'],
-            [u'/articles/305610', u'1'],
+            ['/articles/004071', '1'],
+            ['/articles/121771', '1'],
+            ['/articles/2212815887', '1'],
+            ['/articles/292222222222222222222222222222222222222222222222222222222222222', '1'],
+            ['/articles/2922222222222222222222222222222222222222222222222222222222222229999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999', '2'],
+            ['/articles/305610', '1'],
         ]
 
     def test_elife_v4_excludes_bad_paths(self):
@@ -61,7 +63,7 @@ class Two(base.SimpleBaseCase):
                 expected = 4491
                 self.assertEqual(expected, len(results))
 
-        final_doi_list = results.values()
+        final_doi_list = list(results.values())
         for path in dict(self.bad_eggs).values():
-            doi = utils.enplumpen(path.rsplit('/', 1)[-1])
+            doi = utils.pad_msid(path.rsplit('/', 1)[-1])
             self.assertTrue(doi not in final_doi_list)

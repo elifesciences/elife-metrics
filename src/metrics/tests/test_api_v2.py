@@ -1,7 +1,7 @@
 import json
 from metrics import models, utils
 from django.test import Client
-import base
+from . import base
 from django.core.urlresolvers import reverse
 
 class ApiV2(base.BaseCase):

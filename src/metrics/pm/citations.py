@@ -1,5 +1,5 @@
 from metrics import models, utils, handler
-from metrics.utils import ensure, lmap, subdict, first
+from metrics.utils import ensure, lmap, subdict, first, lfilter
 import requests
 from django.conf import settings
 import logging
@@ -115,7 +115,7 @@ def fetch_parse(pmcid_list):
         # result is a list of maps. add all maps returned to a single list ...
         results.extend(result)
     # ... to be parsed all at once.
-    return map(parse_result, results)
+    return lmap(parse_result, results)
 
 def process_results(results):
     "post process the parsed results"
@@ -124,7 +124,7 @@ def process_results(results):
         # need to figure out where these are sneaking in
         return row['pmcid'] != 'PMC0'
 
-    data = filter(good_row, results)
+    data = lfilter(good_row, results)
     return data
 
 #

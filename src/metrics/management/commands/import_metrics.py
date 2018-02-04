@@ -78,8 +78,8 @@ class Command(BaseCommand):
                     fn, args = first(row), rest(row)
                     fn(*args)
                 except KeyboardInterrupt:
-                    print 'ctrl-c caught, skipping rest of %s' % source
-                    print 'use ctrl-c again to abort immediately'
+                    print('ctrl-c caught, skipping rest of %s' % source)
+                    print('use ctrl-c again to abort immediately')
                     time.sleep(1)
 
                 except BaseException as err:
@@ -94,8 +94,8 @@ class Command(BaseCommand):
             logic.recently_updated_article_notifications(hours=elapsed_hours)
 
         except KeyboardInterrupt:
-            print 'caught ctrl-c'
-            print 'quitting'
+            print('caught second ctrl-c')
+            print('quitting')
             exit(1)
 
         except BaseException as err:

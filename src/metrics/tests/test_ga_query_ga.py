@@ -1,4 +1,4 @@
-import base
+from . import base
 from metrics.ga_metrics import core
 from apiclient import errors
 
@@ -13,7 +13,7 @@ class Object(object):
 class DummyQuery(object):
     def __init__(self, raises):
         self.resp = Object()
-        self.content = '{"data": {"error": {"message": "dummy error message"}}}'
+        self.content = b'{"data": {"error": {"message": "dummy error message"}}}'
         attrs = {
             'reason': 'dummy reason',
             'status': raises,

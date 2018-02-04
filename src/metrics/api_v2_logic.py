@@ -1,7 +1,7 @@
 from collections import OrderedDict
-import models
-import utils
-from utils import ensure, rest, lmap
+from . import models
+from . import utils
+from .utils import ensure, rest, lmap
 from django.db.models import Sum, F, Max
 
 def chop(q, page, per_page, order):
@@ -92,7 +92,7 @@ def summary_by_msid(msid):
         (models.SCOPUS, 0)
     ])
     _, qobj = article_citations(msid)
-    row.update(dict(map(lambda obj: (obj.source, obj.num), qobj.order_by('source'))))
+    row.update(dict(lmap(lambda obj: (obj.source, obj.num), qobj.order_by('source'))))
     return row
 
 def summary_by_obj(artobj):

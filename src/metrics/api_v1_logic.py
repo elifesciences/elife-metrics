@@ -1,9 +1,9 @@
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from ga_metrics import utils as ga_utils
-from ga_metrics.core import ymd
+from .ga_metrics import utils as ga_utils
+from .ga_metrics.core import ymd
 from django.conf import settings
-import models
+from . import models
 import logging
 from rest_framework import serializers as szr
 

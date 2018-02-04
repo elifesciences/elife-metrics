@@ -1,4 +1,4 @@
-from base import BaseCase
+from .base import BaseCase
 from datetime import timedelta
 from metrics.ga_metrics import core
 from collections import Counter
@@ -15,9 +15,9 @@ class TestQueryResults(BaseCase):
         from_date = to_date = core.SITE_SWITCH - timedelta(days=1)
         counts = core.article_views(self.table_id, from_date, to_date)
         expected = {
-            u'10.7554/eLife.10778': Counter({'full': 119, 'abstract': 10, 'digest': 1}),
-            u'10.7554/eLife.10509': Counter({'full': 11, 'abstract': 2, 'digest': 0}),
-            u'10.7554/eLife.09560': Counter({'full': 182, 'abstract': 17, 'digest': 0}),
+            '10.7554/eLife.10778': Counter({'full': 119, 'abstract': 10, 'digest': 1}),
+            '10.7554/eLife.10509': Counter({'full': 11, 'abstract': 2, 'digest': 0}),
+            '10.7554/eLife.09560': Counter({'full': 182, 'abstract': 17, 'digest': 0}),
         }
         for key, expected_val in expected.items():
             self.assertEqual(expected_val, counts[key])

@@ -1,6 +1,6 @@
 __description__ = "General purpose interesting metrics we can pull from GA"
 
-import utils, core
+from . import utils, core
 from .utils import ymd
 from collections import OrderedDict
 from datetime import datetime
@@ -31,7 +31,7 @@ def total_traffic_monthly_query(table_id, from_date=None, to_date=None):
 
 def total_traffic_monthly(table_id, from_date=None, to_date=None):
     results = core.query_ga(total_traffic_monthly_query(table_id, from_date, to_date))
-    rows = OrderedDict(map(lambda r: ("%s-%s" % (r[0], r[1]), int(r[2])), results['rows']))
+    rows = OrderedDict([("%s-%s" % (r[0], r[1]), int(r[2])) for r in results['rows']])
     average = 0
     if rows:
         average = sum(rows.values()) / len(rows)

@@ -86,5 +86,4 @@ class One(base.BaseCase):
         self.assertRaises(Timeout, handler.requests_get, some_url)
 
         # after dying three previous times
-        print responses.calls.__dict__
         self.assertEqual(len(responses.calls), 3)

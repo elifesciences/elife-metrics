@@ -5,7 +5,7 @@ from metrics import models, logic
 from datetime import datetime, timedelta
 from metrics.ga_metrics.utils import ymd
 
-from base import BaseCase
+from .base import BaseCase
 
 class TestAPI(BaseCase):
     def setUp(self):
@@ -96,11 +96,11 @@ class TestAPI(BaseCase):
         from_date = datetime(year=2015, month=9, day=11)
         to_date = from_date + timedelta(days=1)
         logic.import_ga_metrics('daily', from_date, to_date)
-        doi = u'10.7554/eLife.09560'
+        doi = '10.7554/eLife.09560'
 
         # hack.
-        yesterday = unicode(ymd(datetime.now() - timedelta(days=1)))
-        day_before = unicode(ymd(datetime.now() - timedelta(days=2)))
+        yesterday = str(ymd(datetime.now() - timedelta(days=1)))
+        day_before = str(ymd(datetime.now() - timedelta(days=2)))
         m1, m2 = models.Metric.objects.filter(article__doi=doi)
         m1.date = day_before
         m2.date = yesterday

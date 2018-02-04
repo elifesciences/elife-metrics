@@ -1,5 +1,5 @@
 from metrics import utils
-import base
+from . import base
 import pytz
 from datetime import datetime
 

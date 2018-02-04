@@ -2,7 +2,7 @@ import mock
 from os.path import join
 from metrics import models, logic, utils
 from datetime import datetime
-from base import BaseCase
+from .base import BaseCase
 
 class One(BaseCase):
     def setUp(self):

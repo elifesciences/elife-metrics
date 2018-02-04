@@ -1,8 +1,9 @@
 __description__ = """Bulk loading of eLife metrics from Google Analytics."""
 
 import os
-import core
-import utils
+from . import core
+from . import utils
+from metrics.utils import lmap, lfilter
 from .core import ymd
 from datetime import datetime, timedelta
 import logging
@@ -51,7 +52,7 @@ def generate_queries(table_id, query_func_name, datetime_list, use_cached=False,
 
 def bulk_query(query_list):
     "executes a list of queries"
-    return map(core.query_ga_write_results, query_list)
+    return lmap(core.query_ga_write_results, query_list)
 
 #
 # daily metrics
@@ -70,13 +71,13 @@ def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_onl
     date_list = utils.dt_range(from_date, to_date)
     query_list = []
 
-    views_dt_range = filter(core.valid_view_dt_pair, date_list)
+    views_dt_range = lfilter(core.valid_view_dt_pair, date_list)
     query_list.extend(generate_queries(table_id,
                                        'path_counts_query',
                                        views_dt_range,
                                        use_cached, use_only_cached))
 
-    pdf_dt_range = filter(core.valid_downloads_dt_pair, date_list)
+    pdf_dt_range = lfilter(core.valid_downloads_dt_pair, date_list)
     query_list.extend(generate_queries(table_id,
                                        'event_counts_query',
                                        pdf_dt_range,
@@ -94,8 +95,8 @@ def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_onl
 
 def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_only_cached=False):
     date_list = utils.dt_month_range(from_date, to_date)
-    views_dt_range = filter(core.valid_view_dt_pair, date_list)
-    pdf_dt_range = filter(core.valid_downloads_dt_pair, date_list)
+    views_dt_range = lfilter(core.valid_view_dt_pair, date_list)
+    pdf_dt_range = lfilter(core.valid_downloads_dt_pair, date_list)
 
     query_list = []
     query_list.extend(generate_queries(table_id,

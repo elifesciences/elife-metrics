@@ -1,6 +1,6 @@
 from datetime import datetime
 from metrics import logic
-from base import BaseCase
+from .base import BaseCase
 #import os
 #from os.path import join
 

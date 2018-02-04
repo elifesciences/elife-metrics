@@ -4,7 +4,7 @@ from django.conf import settings
 import inspect
 import uuid
 from metrics import utils
-from metrics.utils import ensure
+from metrics.utils import ensure, lfilter
 import requests, requests_cache
 import logging
 
@@ -25,7 +25,7 @@ LOG = logging.getLogger('debugger') # ! logs to a different file at a finer leve
 def opid(nom=''):
     "return a unique id to track a set of operations"
     # ll: pmc--20170101-235959--48029843290842903824930
-    return '--'.join(filter(None, [nom, utils.ymdhms(), str(uuid.uuid4())]))
+    return '--'.join(lfilter(None, [nom, utils.ymdhms(), str(uuid.uuid4())]))
 
 def fqfn(fn):
     mod = inspect.getmodule(fn)
@@ -35,7 +35,9 @@ def writefile(id, content, fname):
     path = join(settings.DUMP_PATH, id)
     ensure(utils.mkdirs(path), "failed to create path %s" % path)
     path = join(path, fname) # ll: /tmp/elife-metrics/pmc-asdfasdfasdf-482309849230/log
-    open(path, 'w').write(content)
+    if isinstance(content, str):
+        content = content.encode('utf8')
+    open(path, 'wb').write(content)
     return path
 
 #

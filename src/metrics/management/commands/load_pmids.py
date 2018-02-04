@@ -12,4 +12,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         path = options['path']
-        print bulkload_pmids.load_csv(path)
+        print((bulkload_pmids.load_csv(path)))

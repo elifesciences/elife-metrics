@@ -1,7 +1,7 @@
 from os.path import join
 import json
 import responses
-import base
+from . import base
 from metrics.pm import citations
 from metrics import models
 

@@ -1,4 +1,4 @@
-import base
+from . import base
 from datetime import datetime, timedelta
 from metrics.ga_metrics import utils
 from metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4
