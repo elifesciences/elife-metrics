@@ -153,8 +153,8 @@ def summary(request, id=None):
         payload = lmap(logic.summary_by_obj, qpage)
 
         payload = {
-            'totalArticles': total_results,
-            'summaries': payload
+            'total': total_results,
+            'items': payload
         }
         return Response(payload, content_type="application/json")
 

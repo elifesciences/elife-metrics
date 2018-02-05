@@ -19,7 +19,13 @@ def chop(q, page, per_page, order):
     if order == 'DESC':
         order_by = '-' + order_by
 
-    q = q.order_by(order_by)
+    more_sorting = {
+        models.Citation: lambda ob: (order_by, 'source'),
+    }
+    default = lambda ob: (order_by,)
+    order_by = more_sorting.get(q.model, default)(order_by)
+
+    q = q.order_by(*order_by)
 
     # a per-page = 0 means 'all results'
     if per_page > 0:
@@ -31,17 +37,22 @@ def chop(q, page, per_page, order):
 
 def pad_citations(serialized_citation_response):
     cr = serialized_citation_response
-    # TODO: bug here. pads will have the order of
-    # models.SOURCE_LABELS (alphabetical, asc) and not what the user specified
     missing_sources = set(models.SOURCE_LABELS) - set([cite['service'] for cite in cr])
-
+    if not missing_sources:
+        return cr
+    # WARN: thorny logic here
+    # results are sorted by number, but when there are no results for a service we pad
+    # with a zero result. when multiple citations have the same number, results are then
+    # sorted alphabetically by source (service).
     def pad(source):
         return {
             'service': source,
             'uri': '',
             'citations': 0
         }
-    return cr + lmap(pad, missing_sources)
+    pads = lmap(pad, missing_sources)
+    pads = sorted(pads, key=lambda r: r['service'])
+    return cr + pads
 
 #
 #
@@ -84,7 +95,7 @@ def article_views(msid, period):
 def summary_by_msid(msid):
     views, downloads, _ = article_stats(msid, models.DAY)
     row = OrderedDict([
-        ('msid', msid),
+        ('id', msid),
         ('views', views),
         ('downloads', downloads),
         (models.CROSSREF, 0),
