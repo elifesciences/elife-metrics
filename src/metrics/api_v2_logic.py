@@ -44,6 +44,7 @@ def pad_citations(serialized_citation_response):
     # results are sorted by number, but when there are no results for a service we pad
     # with a zero result. when multiple citations have the same number, results are then
     # sorted alphabetically by source (service).
+
     def pad(source):
         return {
             'service': source,

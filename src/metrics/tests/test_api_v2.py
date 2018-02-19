@@ -48,7 +48,7 @@ class ApiV2(base.BaseCase):
                 'citations': 3
             },
         ]
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'citations'})
         resp = self.c.get(url, {'order': 'asc'})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(base.resp_json(resp), expected_response)
@@ -83,7 +83,7 @@ class ApiV2(base.BaseCase):
                 'citations': 1
             },
         ]
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'citations'})
         resp = self.c.get(url, {'order': 'desc'})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(base.resp_json(resp), expected_response)
@@ -91,7 +91,7 @@ class ApiV2(base.BaseCase):
     def test_non_int_page_param(self):
         "a '?page=foo' type param results in a 400 error"
         for metric in self.metric_list:
-            url = reverse('v2:alm', kwargs={'id': '9560', 'metric': metric})
+            url = reverse('v2:alm', kwargs={'msid': '9560', 'metric': metric})
             resp = self.c.get(url, {'page': 'pants'})
             self.assertEqual(resp.status_code, 400)
 
@@ -108,7 +108,7 @@ class ApiV2(base.BaseCase):
             # go through each metric type and request the value
             for metric_idx, expected_val in enumerate(expected):
                 metric = metric_list[metric_idx]
-                url = reverse('v2:alm', kwargs={'id': msid, 'metric': metric})
+                url = reverse('v2:alm', kwargs={'msid': msid, 'metric': metric})
                 resp = self.c.get(url)
                 # all requests are successful
                 self.assertEqual(resp.status_code, 200)
@@ -140,7 +140,7 @@ class ApiV2(base.BaseCase):
                 'citations': 0
             }
         ]
-        url = reverse('v2:alm', kwargs={'id': 5678, 'metric': 'citations'})
+        url = reverse('v2:alm', kwargs={'msid': 5678, 'metric': 'citations'})
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 200)
         actual_response = resp.data
@@ -148,14 +148,14 @@ class ApiV2(base.BaseCase):
 
     def test_citations_missing_article(self):
         "a request for an article that doesn't exist raises a 404"
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'citations'})
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 404)
 
     def test_citations_missing_citations(self):
         "a request for an article that exists but has no citations returns a list of citation providers with a count of zero"
         base.insert_metrics({'1234': (0, 0, 0)})
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'citations'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'citations'})
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 200)
         expected_response = [
@@ -193,7 +193,7 @@ class ApiV2(base.BaseCase):
                 }
             ]
         }
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'page-views'})
         resp = self.c.get(url, {'by': models.DAY})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
@@ -214,7 +214,7 @@ class ApiV2(base.BaseCase):
                 }
             ]
         }
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'page-views'})
         resp = self.c.get(url, {'by': models.DAY})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
@@ -234,7 +234,7 @@ class ApiV2(base.BaseCase):
                 }
             ]
         }
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'downloads'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'downloads'})
         resp = self.c.get(url, {'by': models.DAY})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
@@ -254,7 +254,7 @@ class ApiV2(base.BaseCase):
                 }
             ]
         }
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'page-views'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'page-views'})
         resp = self.c.get(url, {'by': models.MONTH})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
@@ -274,7 +274,7 @@ class ApiV2(base.BaseCase):
                 }
             ]
         }
-        url = reverse('v2:alm', kwargs={'id': 1234, 'metric': 'downloads'})
+        url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'downloads'})
         resp = self.c.get(url, {'by': models.MONTH})
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(expected_response, resp.data)
@@ -428,12 +428,12 @@ class Four(base.BaseCase):
             }]
         }
 
-        url = reverse('v2:article-summary', kwargs={'id': 1234})
+        url = reverse('v2:article-summary', kwargs={'msid': 1234})
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 200)
         self.assertEqual(resp.json(), expected_response)
 
     def test_no_single_article_summary(self):
-        url = reverse('v2:article-summary', kwargs={'id': 1234})
+        url = reverse('v2:article-summary', kwargs={'msid': 1234})
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 404)

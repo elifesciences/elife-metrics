@@ -83,18 +83,18 @@ def serialize(total_results, sum_value, obj_list, metric):
 #
 
 @api_view(['GET'])
-def article_metrics(request, id, metric):
+def article_metrics(request, msid, metric):
     try:
         # /metrics/article/12345/downloads?by=month
         kwargs = request_args(request) # parse args first ...
-        get_object_or_404(models.Article, doi=msid2doi(id)) # ... then a db lookup
+        get_object_or_404(models.Article, doi=msid2doi(msid)) # ... then a db lookup
         idx = {
             'citations': logic.article_citations,
             'downloads': logic.article_downloads,
             'page-views': logic.article_views,
         }
         # fetch our results
-        sum_value, qobj = idx[metric](id, kwargs['period'])
+        sum_value, qobj = idx[metric](msid, kwargs['period'])
         # paginate
         total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
         # serialize
@@ -133,7 +133,7 @@ def ping(request):
 #
 
 @api_view(['GET'])
-def summary(request, id=None):
+def summary(request, msid=None):
     "returns the final totals for all articles with no finer grained information"
     try:
         kwargs = request_args(request)
@@ -142,12 +142,12 @@ def summary(request, id=None):
         qobj = models.Article.objects.all() \
             .exclude(doi='10.7554/eLife.00000')
 
-        if id:
-            qobj = qobj.filter(doi=msid2doi(id))
+        if msid:
+            qobj = qobj.filter(doi=msid2doi(msid))
 
         total_results, qpage = logic.chop(qobj, **exsubdict(kwargs, ['period']))
 
-        if id and total_results == 0:
+        if msid and total_results == 0:
             raise Http404("summary for article does not exist")
 
         payload = lmap(logic.summary_by_obj, qpage)
