@@ -31,8 +31,8 @@ def fqfn(fn):
     mod = inspect.getmodule(fn)
     return '.'.join([mod.__name__, fn.__name__])
 
-def writefile(id, content, fname):
-    path = join(settings.DUMP_PATH, id)
+def writefile(xid, content, fname):
+    path = join(settings.DUMP_PATH, xid)
     ensure(utils.mkdirs(path), "failed to create path %s" % path)
     path = join(path, fname) # ll: /tmp/elife-metrics/pmc-asdfasdfasdf-482309849230/log
     if isinstance(content, str):
@@ -47,29 +47,29 @@ def writefile(id, content, fname):
 class NoneObj(object):
     pass
 
-def ignore_handler(id, err):
+def ignore_handler(xid, err):
     "does absolutely nothing"
     pass
 
-def logit_handler(id, err):
+def logit_handler(xid, err):
     "writes a comprehensive log entry to a file"
     # err ll: {'request': <PreparedRequest [GET]>, 'response': <Response [404]>}
     payload = {
         'request': err.request.__dict__,
         'response': err.response.__dict__
     }
-    fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
+    fname = writefile(xid, utils.lossy_json_dumps(payload), 'log')
     body = err.response.content
-    fname2 = writefile(id, body, 'body')
+    fname2 = writefile(xid, body, 'body')
     ctx = {
-        'id': id,
+        'id': xid,
         'logged': [fname, fname2],
     }
     LOG.warn("non-2xx response %s" % err, extra=ctx)
 
-def raise_handler(id, err):
+def raise_handler(xid, err):
     "logs the error and then raises it again to be handled by the calling function"
-    logit_handler(id, err)
+    logit_handler(xid, err)
     raise err
 
 RAISE, IGNORE, LOGIT = 'raise', 'ignore', 'log'
@@ -83,9 +83,9 @@ DEFAULT_HANDLER = raise_handler
 MAX_RETRIES = 3
 
 def requests_get(*args, **kwargs):
-    id = kwargs.pop('opid', opid())
+    xid = kwargs.pop('opid', opid())
     ctx = {
-        'id': id
+        'id': xid
     }
     handler_opts = kwargs.pop('opts', {})
 
@@ -116,7 +116,7 @@ def requests_get(*args, **kwargs):
         code = handler_opts.get(status_code)
         # supports custom handlers like {404: lambda id, err: print(id, err)}
         fn = code if callable(code) else HANDLERS.get(code, DEFAULT_HANDLER)
-        fn(id, err)
+        fn(xid, err)
 
     # handle more fine-grained errors here:
     # http://docs.python-requests.org/en/master/_modules/requests/exceptions/
@@ -129,13 +129,13 @@ def requests_get(*args, **kwargs):
         # no request or response objects available for debug
         data = err.__dict__ # urgh, objects.
         payload = {
-            'id': id,
+            'id': xid,
             'dt': utils.ymdhms(),
             'error': str(err),
             'request': (data.get('request') or NoneObj()).__dict__,
             'response': (data.get('response') or NoneObj()).__dict__,
         }
-        fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
+        fname = writefile(xid, utils.lossy_json_dumps(payload), 'log')
         ctx['logged'] = fname
         LOG.exception("unhandled network exception fetching request: %s" % err, extra=ctx)
         raise
@@ -149,9 +149,9 @@ def capture_parse_error(fn):
     """wrapper around a parse function that captures any errors to a special log for debugger.
     first argument to decorated function *must* be the data that is being parsed."""
     def wrap(data, *args, **kwargs):
-        id = opid()
+        xid = opid()
         ctx = {
-            'id': id,
+            'id': xid,
             'ns': fqfn(fn),
         }
         try:
@@ -159,7 +159,7 @@ def capture_parse_error(fn):
 
         except BaseException:
             payload = {'data': data, 'args': args, 'kwargs': kwargs}
-            fname = writefile(id, utils.lossy_json_dumps(payload), 'log')
+            fname = writefile(xid, utils.lossy_json_dumps(payload), 'log')
             ctx['log'] = fname
             LOG.exception("unhandled error", extra=ctx)
             return {'bad': data}
