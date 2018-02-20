@@ -1,7 +1,7 @@
 # elife-metrics
 
 An effort by [eLife Sciences](http://elifesciences.org) to provide a data store 
-and API for accessing article-level metrics.
+and API for accessing article-level metrics (views, downloads, citations).
 
 This project uses the [Python programming language](https://www.python.org/),
 the [Django web framework](https://www.djangoproject.com/) and a
@@ -11,12 +11,16 @@ the [Django web framework](https://www.djangoproject.com/) and a
 
 API documentation can be found here:
 
-* [code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/api.py)
-* [Swagger](https://metrics.elifesciences.org/api/docs/) (or your [local version](/api/docs/))
+* [code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/api_v2_urls.py)
+* [Swagger](/api/docs/) (your local version)
 
 For example, the [Homo Naledi](https://dx.doi.org/10.7554/eLife.09560) article:
 
-* [http://metrics.elifesciences.org/api/v1/article/ga/10.7554/eLife.09560/](http://metrics.elifesciences.org/api/v1/article/ga/10.7554/eLife.09560/)
+* [/api/v2/article/9560/summary](/api/v2/article/9560/summary)
+
+would yield a response similar to:
+
+    {"total":1,"items":[{"id":9560,"views":227913,"downloads":16498,"crossref":103,"pubmed":21,"scopus":52}]}
 
 ## installation
 
@@ -30,6 +34,7 @@ For example, the [Homo Naledi](https://dx.doi.org/10.7554/eLife.09560) article:
 
 [code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh)  
 
+    git pull
     ./install.sh
 
 ## testing 
@@ -44,18 +49,6 @@ For example, the [Homo Naledi](https://dx.doi.org/10.7554/eLife.09560) article:
 
     ./manage.sh runserver
     firefox http://127.0.0.1:8000/api/docs/
-
-## importing metrics (development)
-
-[code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/management/commands/import_metrics.py)
-
-Load daily metrics for the last two days and monthly metrics for the last two months:
-
-    ./import-metrics.sh
-
-Load all the metrics you can:
-
-    ./import-all-metrics.sh
 
 ## Copyright & Licence
  
