@@ -1,4 +1,7 @@
 import time
+import json
+from os.path import join
+from metrics import utils
 import responses
 from mock import patch
 from . import base
@@ -12,6 +15,26 @@ class One(base.BaseCase):
     def tearDown(self):
         pass
 
+    def test_scopus_all_entries(self):
+        response_fixtures = utils.listfiles(join(self.fixture_dir, 'scopus-responses'))
+        response_fixtures = map(lambda path: json.load(open(path, 'r')), response_fixtures)
+        res = citations.all_entries(response_fixtures)
+        self.assertEqual(50, len(res))
+
+    def test_scopus_data_dumps(self):
+        "all responses from scopus dumped from handler.writefile in the fixtures/scopus-responses/dumps dir can be parsed"
+        response_fixtures = utils.listfiles(join(self.fixture_dir, 'scopus-responses', 'dumps'))
+        for response in response_fixtures:
+            with patch('metrics.handler.capture_parse_error', return_value=lambda fn: fn):
+                try:
+                    fixture = json.load(open(response, 'r'))['data']
+                    utils.lmap(citations.parse_entry, fixture)
+                except BaseException as err:
+                    print('caught error in', response)
+                    raise err
+
+    # TODO: this is talking to scopus.
+    # see fixtures/scopus-responses/search-p1.json and p2.json
     def test_scopus_request(self):
         search_gen = citations.search(settings.SCOPUS_KEY, settings.DOI_PREFIX)
         search_results = next(search_gen)

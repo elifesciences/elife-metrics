@@ -244,6 +244,13 @@ def tempdir():
     name = tempfile.mkdtemp()
     return (name, lambda: shutil.rmtree(name))
 
+def listfiles(path, ext_list=None):
+    "returns a list of absolute paths for given dir"
+    path_list = map(lambda fname: os.path.abspath(os.path.join(path, fname)), os.listdir(path))
+    if ext_list:
+        path_list = lfilter(lambda path: os.path.splitext(path)[1] in ext_list, path_list)
+    return sorted(filter(os.path.isfile, path_list))
+
 # modified from:
 # http://stackoverflow.com/questions/9323749/python-check-if-one-dictionary-is-a-subset-of-another-larger-dictionary
 def partial_match(patn, real):
