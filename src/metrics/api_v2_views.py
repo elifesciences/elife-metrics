@@ -113,7 +113,7 @@ def article_metrics(request, msid, metric):
 
     except Http404:
         raise # Article DNE, handled, ignore
-    
+
     except AssertionError as err:
         raise ValidationError(err) # 400, client error
 

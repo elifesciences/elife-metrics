@@ -31,26 +31,25 @@ def _fetch_pmids(doi):
     resp.raise_for_status()
 
     data = resp.json()
-    '''
-    {
-     "status": "ok",
-     "responseDate": "2017-01-31 13:35:10",
-     "request": "ids=10.7554%2FeLife.09560;format=json",
-     "records": [
-       {
-        "pmcid": "PMC4559886",
-        "pmid": "26354291",
-        "doi": "10.7554/eLife.09560",
-        "versions": [
-          {
-           "pmcid": "PMC4559886.1",
-           "current": "true"
-          }
-        ]
-       }
-     ]
-    }
-    '''
+    # ll:
+    #{
+    # "status": "ok",
+    # "responseDate": "2017-01-31 13:35:10",
+    # "request": "ids=10.7554%2FeLife.09560;format=json",
+    # "records": [
+    #   {
+    #    "pmcid": "PMC4559886",
+    #    "pmid": "26354291",
+    #    "doi": "10.7554/eLife.09560",
+    #    "versions": [
+    #      {
+    #       "pmcid": "PMC4559886.1",
+    #       "current": "true"
+    #      }
+    #    ]
+    #   }
+    # ]
+    #}
     ensure(data['status'] == 'ok', "response is not ok! %s" % data)
     return subdict(data['records'][0], ['doi', 'pmid', 'pmcid'])
 

@@ -23,15 +23,6 @@ def comp(*fns):
         return res
     return _comp
 
-'''
-def eargs(fn):
-    "expand-args. allows composing funcs that require multiple arguments"
-    @wraps(fn)
-    def wrapper(args):
-        return fn(*args)
-    return wrapper
-'''
-
 # http://stackoverflow.com/questions/3744451/is-this-how-you-paginate-or-is-there-a-better-algorithm
 def paginate(seq, rowlen):
     for start in range(0, len(seq), rowlen):
@@ -154,14 +145,6 @@ def utcnow():
     # there is a datetime.utcnow(), but it doesn't attach a timezone object
     return datetime.now(pytz.utc).replace(microsecond=0)
 
-'''
-def ymdhms(dt):
-    "returns an rfc3339 representation of a datetime object"
-    if dt:
-        dt = todt(dt) # convert to utc, etc
-        return rfc3339(dt, utc=True)
-'''
-
 #
 # django utils
 #
@@ -230,9 +213,8 @@ def lossy_json_dumps(obj, **kwargs):
     def _handler(obj):
         if hasattr(obj, 'isoformat'):
             return ymdhms(obj)
-        else:
-            LOG.debug('Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj)))
-            return '[unserialisable %s object]: %s' % (type(obj), str(obj))
+        LOG.debug('Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj)))
+        return '[unserialisable %s object]: %s' % (type(obj), str(obj))
     return json.dumps(obj, default=_handler, **kwargs)
 
 def mkdirs(path):

@@ -38,15 +38,6 @@ def notify(obj):
     else:
         events.notify(obj)
 
-'''
-def recently_updated_articles():
-    "all articles whose associated metrics/citations have been updated in the last hour"
-    since = utils.utcnow() - timedelta(hours=2)
-    recent_citations = Q(citation__datetime_record_updated__gte=since)
-    recent_views_downloads = Q(metric__datetime_record_updated__gte=since)
-    return models.Article.objects.filter(recent_citations | recent_views_downloads).distinct()
-'''
-
 def recently_updated_citations(td):
     "all articles whose associated metrics/citations have been updated in the last hour"
     since = utils.utcnow() - td
