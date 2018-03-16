@@ -17,7 +17,7 @@ pylint -E ./src/metrics/** --load-plugins=pylint_django --disable=E1103 2> /dev/
 # specific warnings we're interested in, comma separated with no spaces
 # presence of these warnings are a failure
 pylint ./src/metrics/** --load-plugins=pylint_django --disable=all --reports=n --score=n \
-    --enable=redefined-builtin
+    --enable=redefined-builtin,pointless-string-statement,no-else-return,redefined-outer-name 2> /dev/null
 
 echo "scrubbing"
 . .scrub.sh 2> /dev/null

@@ -41,14 +41,3 @@ def total_traffic_monthly(table_id, from_date=None, to_date=None):
         'from_date': results['query']['start-date'],
         'to_date': results['query']['end-date']
     }
-
-
-#####
-
-'''
-def main(args):
-    pass
-
-if __name__ == '__main__':
-    main(sys.argv[1:])
-'''

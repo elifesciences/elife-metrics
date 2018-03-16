@@ -336,11 +336,3 @@ def main(table_id):
     print(('only cached?', use_only_cached))
     #use_cached = use_only_cached = False
     return article_metrics(table_id, from_date, to_date, use_cached, use_only_cached)
-
-'''
-if __name__ == '__main__':
-    "call this app like: GA_TABLE='ga:12345678' python core.py"
-    from pprint import pprint
-    assert 'GA_TABLE' in os.environ, "the environment variable 'GA_TABLE' not found. It looks like 'ga:12345678'"
-    pprint(main(os.environ['GA_TABLE']))
-'''

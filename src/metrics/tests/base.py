@@ -85,7 +85,7 @@ class TransactionBaseCase(SimpleBaseCase, TransactionTestCase):
     pass
 
 #
-#
+# tests the insert_logic above
 #
 
 class BaseLogic(BaseCase):

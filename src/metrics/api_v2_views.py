@@ -111,10 +111,13 @@ def article_metrics(request, msid, metric):
         }
         return Response(payload, content_type=ctype_idx[metric])
 
+    except Http404:
+        raise # Article DNE, handled, ignore
+
     except AssertionError as err:
         raise ValidationError(err) # 400, client error
 
-    except Exception as err:
+    except BaseException as err:
         LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
         raise # 500, server error
 

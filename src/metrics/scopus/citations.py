@@ -89,8 +89,8 @@ def parse_results(search_result):
     return lmap(parse_entry, search_result['entry'])
 
 def all_entries(search_result_list):
-    "returns a list of 'entries', citation information for articles from a list of search result pages"
-    return flatten([parse_entry(result['entry']) for result in search_result_list])
+    "returns a list of 'entries', citation information for articles from a *list* of search result pages"
+    return flatten([parse_results(result) for result in search_result_list])
 
 def is_abstract(entry):
     # ll 10.7554/eLife.22757.001
