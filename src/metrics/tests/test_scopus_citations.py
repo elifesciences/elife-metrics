@@ -56,11 +56,16 @@ class One(base.BaseCase):
             return type('mock', (object,), {method: lambda: y})
 
         # pagination request
-        response1 = obj('json', {'search-results': {'opensearch:totalResults': 2}})
+        response1 = obj('json', {'search-results': {'opensearch:totalResults': 2, 'entry': []}})
         response2 = obj('json', {'search-results': json.load(open(join(self.fixture_dir, 'scopus-responses', 'dodgy-scopus-results.json')))})
 
         with patch('metrics.scopus.citations.fetch_page', side_effect=[response1, response2]):
-            list(citations.search())(
+            # we get something for all of our entries
+            results = citations.all_todays_entries()
+            self.assertEqual(25, len(results))
+            # but two entries have been marked as badly formed
+            bad_eggs = 2
+            self.assertEqual(25 - bad_eggs, len([r for r in results if 'bad' not in r]))
 
     @responses.activate
     def test_many_scopus_requests(self):
