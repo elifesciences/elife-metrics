@@ -67,8 +67,7 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
                 entry = first(lfilter(has_key('citedby-count'), data['search-results']['entry']))
 
                 # exit early if we start hitting 0 results
-                entry = entry['citedby-count']
-                if int(entry) == 0:
+                if entry and int(entry['citedby-count']) == 0:
                     raise GeneratorExit("no more articles with citations")
 
             except requests.HTTPError as err:
@@ -81,8 +80,8 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 def parse_entry(entry):
     "parses a single search result from scopus"
     citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
-    ensure('prism:doi' in entry, "entry is missing doi!", ParseError)
-    ensure('citedby-count' in entry, "entry is missing doi!", ParseError)
+    ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
+    ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
     return {
         'doi': entry['prism:doi'],
         'num': int(entry['citedby-count']),
