@@ -3,7 +3,7 @@ import json
 from os.path import join
 from metrics import utils
 import responses
-from mock import patch
+from unittest.mock import patch
 from . import base
 from metrics.scopus import citations
 from django.conf import settings
