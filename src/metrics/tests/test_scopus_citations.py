@@ -3,7 +3,7 @@ import json
 from os.path import join
 from metrics import utils
 import responses
-from mock import patch
+from unittest.mock import patch
 from . import base
 from metrics.scopus import citations
 from django.conf import settings
@@ -38,6 +38,10 @@ class One(base.BaseCase):
                     print('caught error in', response)
                     raise err
 
+    def test_scopus_search_exits_early(self):
+        "we stop talking to scopus when they start returning results with 0 citations"
+        pass
+
     # TODO: this is talking to scopus.
     # see fixtures/scopus-responses/search-p1.json and p2.json
     def test_scopus_request(self):
@@ -63,8 +67,8 @@ class One(base.BaseCase):
             # we get something for all of our entries
             results = citations.all_todays_entries()
             self.assertEqual(25, len(results))
-            # but two entries have been marked as badly formed
-            bad_eggs = 2
+            # and some entries have been marked as badly formed
+            bad_eggs = 3
             self.assertEqual(25 - bad_eggs, len([r for r in results if 'bad' not in r]))
 
     @responses.activate

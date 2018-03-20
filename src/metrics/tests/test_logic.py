@@ -1,8 +1,10 @@
-import mock
+from unittest import mock
 from os.path import join
 from metrics import models, logic, utils
 from datetime import datetime
 from .base import BaseCase
+import json
+from metrics.scopus import citations as scopus_citations
 
 class One(BaseCase):
     def setUp(self):
@@ -23,6 +25,16 @@ class One(BaseCase):
             logic.import_crossref_citations()
             self.assertEqual(models.Citation.objects.count(), 1)
             self.assertEqual(models.Citation.objects.get(source=models.CROSSREF).num, expected_citations)
+
+    def test_import_scopus_citations(self):
+        search_results = json.load(open(join(self.fixture_dir, "scopus-responses", "dodgy-scopus-results.json"), "r"))
+        fixture = scopus_citations.parse_results(search_results)
+        with mock.patch("metrics.scopus.citations.all_todays_entries", return_value=fixture):
+            logic.import_scopus_citations()
+            bad_eggs = 3
+            expected = len(fixture) - bad_eggs
+            self.assertEqual(expected, models.Article.objects.count())
+
 
 class TestGAImport(BaseCase):
     def setUp(self):

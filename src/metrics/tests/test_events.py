@@ -1,6 +1,6 @@
 import json
 from . import base
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 from metrics import models, logic
 from django.test import override_settings
 

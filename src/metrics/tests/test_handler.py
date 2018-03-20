@@ -1,6 +1,6 @@
 from unittest import skip
 import responses
-from mock import patch
+from unittest.mock import patch
 import requests
 import os
 import json
@@ -24,7 +24,9 @@ class One(base.BaseCase):
         with self.settings(DUMP_PATH=self.tempdir):
             self.assertRaises(requests.exceptions.InvalidSchema,
                               handler.requests_get, 'htp:/tly.wrong')
-            mock.exception.assert_called_once()
+            # http://engineroom.trackmaven.com/blog/mocking-mistakes/
+            # mock.exception.assert_called_once()
+            self.assertEqual(1, mock.exception.call_count)
 
     @patch('metrics.handler.LOG')
     def test_error_captured(self, mock):
@@ -35,7 +37,7 @@ class One(base.BaseCase):
                               handler.requests_get, 'http://asdfasdfasdf.elifesciences.org', opid=opid)
 
             # an exception is captured
-            mock.exception.assert_called_once()
+            self.assertEqual(1, mock.exception.call_count)
 
             # a file exists with the details
             expected_path = join(settings.DUMP_PATH, opid, 'log')
