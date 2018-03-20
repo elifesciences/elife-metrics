@@ -22,7 +22,7 @@ def fetch_page(api_key, doi_prefix, page=0, per_page=25):
         'count': per_page,
         'sort': 'citedby-count',
     }
-    LOG.info('calling scopus with params: %s', params)
+    LOG.debug('calling scopus with params: %s', params)
     headers = {
         'Accept': 'application/json',
         'X-ELS-APIKey': api_key,
@@ -51,14 +51,13 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     # I think we're capped at 10k/day ? can't find their docs on this
     # eLife tends to hit 0 citations at about the 2.5k mark
     max_pages = 5000
+
+    # figure out where to stop
+    end_page = max_pages if total_pages > max_pages else total_pages
+
     try:
-        for page in range(page + 1, total_pages):
-            LOG.debug("page %r", page)
-
+        for page in range(page + 1, end_page):
             try:
-                if page == max_pages:
-                    raise GeneratorExit("hit max pages (%s)" % max_pages)
-
                 data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page).json()
                 yield data['search-results']
 
@@ -69,6 +68,10 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
                 # exit early if we start hitting 0 results
                 if entry and int(entry['citedby-count']) == 0:
                     raise GeneratorExit("no more articles with citations")
+
+                # every ten pages print out our progress
+                if page % 10 == 0:
+                    LOG.info("page %s of %s, last citation count: %s" % (page, end_page, entry['citedby-count']))
 
             except requests.HTTPError as err:
                 raise GeneratorExit(str(err))
@@ -81,6 +84,7 @@ def parse_entry(entry):
     "parses a single search result from scopus"
     citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
     ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
+    ensure(entry['prism:doi'].startswith(settings.DOI_PREFIX), 'entry has an unknown DOI prefix: %r' % entry['prism:doi'])
     ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
     return {
         'doi': entry['prism:doi'],
