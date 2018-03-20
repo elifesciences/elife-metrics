@@ -1,7 +1,7 @@
 import time
 import os, json
 import tempfile, shutil
-from functools import wraps
+from functools import wraps, partial
 import logging
 from datetime import datetime
 import dateutil
@@ -13,6 +13,9 @@ LOG = logging.getLogger(__name__)
 lmap = lambda func, *iterable: list(map(func, *iterable))
 lfilter = lambda func, *iterable: list(filter(func, *iterable))
 keys = lambda d: list(d.keys())
+
+class ParseError(ValueError):
+    pass
 
 def comp(*fns):
     "composes functions LEFT to RIGHT"
@@ -73,11 +76,11 @@ def firstnn(x):
 def rest(x):
     return x[1:]
 
-def ensure(assertion, msg, *args):
+def ensure(assertion, msg, exception_class=AssertionError):
     """intended as a convenient replacement for `assert` statements that
     get compiled away with -O flags"""
     if not assertion:
-        raise AssertionError(msg % args)
+        raise exception_class(msg)
 
 def pad_msid(msid):
     return str(int(msid)).zfill(5)
@@ -267,3 +270,12 @@ def simple_rate_limiter(maxPerSecond):
             return ret
         return rateLimitedFunction
     return decorate
+
+#
+#
+#
+
+def has_key(key, data=None):
+    if data:
+        return key in data
+    return partial(has_key, key)

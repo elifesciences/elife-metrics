@@ -2,7 +2,7 @@ import requests
 import logging
 from django.conf import settings
 from metrics import models, handler
-from metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter
+from metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter, has_key, ParseError, ensure
 
 LOG = logging.getLogger(__name__)
 
@@ -62,9 +62,12 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
                 data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page).json()
                 yield data['search-results']
 
+                # find the first entry in the search results with a 'citedby-count'.
+                # this is typically the first but we have results where it's missing
+                entry = first(lfilter(has_key('citedby-count'), data['search-results']['entry']))
+
                 # exit early if we start hitting 0 results
-                fentry = data['search-results']['entry'][0]['citedby-count']
-                if int(fentry) == 0:
+                if entry and int(entry['citedby-count']) == 0:
                     raise GeneratorExit("no more articles with citations")
 
             except requests.HTTPError as err:
@@ -77,6 +80,8 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 def parse_entry(entry):
     "parses a single search result from scopus"
     citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
+    ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
+    ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
     return {
         'doi': entry['prism:doi'],
         'num': int(entry['citedby-count']),

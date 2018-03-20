@@ -1,0 +1,1463 @@
+{
+    "opensearch:totalResults": "5053",
+    "opensearch:startIndex": "113",
+    "opensearch:itemsPerPage": "25",
+    "link": [
+        {
+            "@_fa": "true",
+            "@href": "https://api.elsevier.com/content/search/scopus?start=113&count=25&query=DOI%28%2210.7554%2F*%22%29&sort=citedby-count",
+            "@type": "application/json",
+            "@ref": "self"
+        },
+        {
+            "@_fa": "true",
+            "@href": "https://api.elsevier.com/content/search/scopus?start=0&count=25&query=DOI%28%2210.7554%2F*%22%29&sort=citedby-count",
+            "@type": "application/json",
+            "@ref": "first"
+        },
+        {
+            "@_fa": "true",
+            "@href": "https://api.elsevier.com/content/search/scopus?start=88&count=25&query=DOI%28%2210.7554%2F*%22%29&sort=citedby-count",
+            "@type": "application/json",
+            "@ref": "prev"
+        },
+        {
+            "@_fa": "true",
+            "@href": "https://api.elsevier.com/content/search/scopus?start=138&count=25&query=DOI%28%2210.7554%2F*%22%29&sort=citedby-count",
+            "@type": "application/json",
+            "@ref": "next"
+        },
+        {
+            "@_fa": "true",
+            "@href": "https://api.elsevier.com/content/search/scopus?start=4975&count=25&query=DOI%28%2210.7554%2F*%22%29&sort=citedby-count",
+            "@type": "application/json",
+            "@ref": "last"
+        }
+    ],
+    "entry": [
+        {
+            "dc:title": "Three-dimensional electron crystallography of protein microcrystals",
+            "pubmed-id": "24252878",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2013-11-19",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "19 November 2013",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84888087327",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84888087327?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84888087327&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84888087327&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84888087327",
+            "eid": "2-s2.0-84888087327",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Howard Hughes Medical Institute",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Chevy Chase"
+                }
+            ],
+            "openaccessFlag": false,
+            "prism:issueIdentifier": "2",
+            "article-number": "e01345",
+            "dc:creator": "Shi D.",
+            "prism:doi": "10.7554/eLife.01345.001",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84888087327",
+            "prism:volume": "2013",
+            "openaccess": "0",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Subcellular and supracellular mechanical stress prescribes cytoskeleton behavior in Arabidopsis cotyledon pavement cells",
+            "pubmed-id": "24740969",
+            "source-id": "21100242814",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2014-01-01",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "2014",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84964312463",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84964312463?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84964312463&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84964312463&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84964312463",
+            "eid": "2-s2.0-84964312463",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "California Institute of Technology",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Pasadena"
+                }
+            ],
+            "openaccessFlag": true,
+            "@_fa": "true",
+            "prism:doi": "10.7554/eLife.01967",
+            "dc:creator": "Sampathkumar A.",
+            "citedby-count": "62",
+            "prism:pageRange": "e01967",
+            "dc:identifier": "SCOPUS_ID:84964312463",
+            "prism:volume": "3",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Expansion and conversion of human pancreatic ductal cells into insulin-secreting endocrine cells",
+            "pubmed-id": "24252877",
+            "source-id": "21100242814",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2013-11-19",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "19 November 2013",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84888096421",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84888096421?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84888096421&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84888096421&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84888096421",
+            "eid": "2-s2.0-84888096421",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Stanford University School of Medicine",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Stanford"
+                }
+            ],
+            "openaccessFlag": true,
+            "@_fa": "true",
+            "prism:doi": "10.7554/eLife.00940",
+            "dc:creator": "Lee J.",
+            "citedby-count": "62",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84888096421",
+            "prism:volume": "2013",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Head-to-tail interactions of the coiled-coil domains regulate ClpB activity and cooperation with Hsp70 in protein disaggregation",
+            "pubmed-id": "24843029",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "61",
+            "prism:coverDate": "2014-04-30",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "30 April 2014",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84899854286",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84899854286?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84899854286&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84899854286&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84899854286",
+            "eid": "2-s2.0-84899854286",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Birkbeck University of London",
+                    "affiliation-country": "United Kingdom",
+                    "affiliation-city": "London"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "3",
+            "article-number": "e02481",
+            "dc:creator": "Carroni M.",
+            "prism:doi": "10.7554/eLife.02481",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84899854286",
+            "prism:volume": "2014",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Evolution of insect olfactory receptors",
+            "pubmed-id": "24670956",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "61",
+            "prism:coverDate": "2014-03-26",
+            "prism:coverDisplayDate": "26 March 2014",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84898725860",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84898725860?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84898725860&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84898725860&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84898725860",
+            "eid": "2-s2.0-84898725860",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Max Planck Institut fur Chemische Okologie",
+                    "affiliation-country": "Germany",
+                    "affiliation-city": "Jena"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "3",
+            "prism:doi": "10.7554/eLife.02115",
+            "dc:creator": "Missbach C.",
+            "article-number": "e02115",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84898725860",
+            "prism:volume": "2014",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Arabidopsis plants perform arithmetic division to prevent starvation at night",
+            "pubmed-id": "23805380",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "61",
+            "prism:coverDate": "2013-06-25",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "25 June 2013",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84879919367",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84879919367?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84879919367&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84879919367&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84879919367",
+            "eid": "2-s2.0-84879919367",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "John Innes Centre",
+                    "affiliation-country": "United Kingdom",
+                    "affiliation-city": "Norwich"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "2",
+            "prism:doi": "10.7554/eLife.00669",
+            "dc:creator": "Scialdone A.",
+            "article-number": "e00669",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84879919367",
+            "prism:volume": "2013",
+            "openaccess": "1"
+        },
+        {
+            "dc:title": "A new family of StART domain proteins at membrane contact sites has a role in ER-PM sterol transport",
+            "pubmed-id": "26001273",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2015-05-22",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "22 May 2015",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84930652920",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84930652920?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84930652920&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84930652920&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84930652920",
+            "eid": "2-s2.0-84930652920",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "UCL Institute of Ophthalmology",
+                    "affiliation-country": "United Kingdom",
+                    "affiliation-city": "London"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "MAY",
+            "prism:doi": "10.7554/eLife.07253",
+            "dc:creator": "Gatta A.",
+            "citedby-count": "61",
+            "prism:pageRange": "1-46",
+            "dc:identifier": "SCOPUS_ID:84930652920",
+            "prism:volume": "4",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Selection of distinct populations of dentate granule cells in response to inputs as a mechanism for pattern separation in mice",
+            "pubmed-id": "23538967",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "61",
+            "prism:coverDate": "2013-03-20",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "20 March 2013",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84876687970",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84876687970?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84876687970&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84876687970&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84876687970",
+            "eid": "2-s2.0-84876687970",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Salk Institute for Biological Studies",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "San Diego"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "2",
+            "article-number": "e00312",
+            "dc:creator": "Deng W.",
+            "prism:doi": "10.7554/eLife.00312",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84876687970",
+            "prism:volume": "2013",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "MCU encodes the pore conducting mitochondrial calcium currents",
+            "pubmed-id": "23755363",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "60",
+            "prism:coverDate": "2013-06-04",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "4 June 2013",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84879052051",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84879052051?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84879052051&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84879052051&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84879052051",
+            "eid": "2-s2.0-84879052051",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Massachusetts General Hospital",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Boston"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "Children's Hospital Boston",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Boston"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "2",
+            "article-number": "e00704",
+            "dc:creator": "Chaudhuri D.",
+            "prism:doi": "10.7554/eLife.00704",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84879052051",
+            "prism:volume": "2013",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "The small molecule ISRIB reverses the effects of eIF2\u03b1 phosphorylation on translation and stress granule assembly",
+            "pubmed-id": "25719440",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "60",
+            "prism:coverDate": "2015-02-26",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "26 February 2015",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84964694840",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84964694840?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84964694840&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84964694840&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84964694840",
+            "eid": "2-s2.0-84964694840",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "University of California System",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Oakland"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "4",
+            "article-number": "e05033",
+            "dc:creator": "Sidrauski C.",
+            "prism:doi": "10.7554/eLife.05033",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84964694840",
+            "prism:volume": "2015",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Phosphoinositide-mediated oligomerization of a defensin induces cell lysis",
+            "pubmed-id": "24692446",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "60",
+            "prism:coverDate": "2014-04-01",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "1 April 2014",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84898413011",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84898413011?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84898413011&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84898413011&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84898413011",
+            "eid": "2-s2.0-84898413011",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "La Trobe University",
+                    "affiliation-country": "Australia",
+                    "affiliation-city": "Melbourne"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "3",
+            "article-number": "e01808",
+            "dc:creator": "Poon I.",
+            "prism:doi": "10.7554/eLife.01808",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84898413011",
+            "prism:volume": "2014",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "3D imaging of Sox2 enhancer clusters in embryonic stem cells",
+            "pubmed-id": "25537195",
+            "source-id": "21100242814",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2014-01-01",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "2014",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84929665381",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84929665381?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84929665381&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84929665381&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84929665381",
+            "eid": "2-s2.0-84929665381",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Howard Hughes Medical Institute",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Chevy Chase"
+                }
+            ],
+            "openaccessFlag": true,
+            "@_fa": "true",
+            "prism:doi": "10.7554/eLife.04236",
+            "dc:creator": "Liu Z.",
+            "citedby-count": "60",
+            "prism:pageRange": "e04236",
+            "dc:identifier": "SCOPUS_ID:84929665381",
+            "prism:volume": "3",
+            "openaccess": "1"
+        },
+        {
+            "dc:title": "Translation of 5' leaders is pervasive in genes resistant to eIF2 repression",
+            "pubmed-id": "25621764",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2015-01-26",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "26 January 2015",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84996773946",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84996773946?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84996773946&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84996773946&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84996773946",
+            "eid": "2-s2.0-84996773946",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Lomonosov Moscow State University",
+                    "affiliation-country": "Russian Federation",
+                    "affiliation-city": "Moscow"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "University College Cork",
+                    "affiliation-country": "Ireland",
+                    "affiliation-city": "Cork"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "4",
+            "prism:doi": "10.7554/eLife.03971",
+            "dc:creator": "Andreev D.",
+            "citedby-count": "60",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84996773946",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Decoding the neural mechanisms of human tool use",
+            "pubmed-id": "23741616",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "59",
+            "prism:coverDate": "2013-05-28",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "28 May 2013",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84879061951",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84879061951?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84879061951&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84879061951&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84879061951",
+            "eid": "2-s2.0-84879061951",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Queen's University, Kingston",
+                    "affiliation-country": "Canada",
+                    "affiliation-city": "Kingston"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "Queen's University, Kingston",
+                    "affiliation-country": "Canada",
+                    "affiliation-city": "Kingston"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "2",
+            "article-number": "e00425",
+            "dc:creator": "Gallivan J.",
+            "prism:doi": "10.7554/eLife.00425",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84879061951",
+            "prism:volume": "2013",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Identification of 'erasers' for lysine crotonylated histone marks using a chemical proteomics approach",
+            "pubmed-id": "25369635",
+            "source-id": "21100242814",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2014-01-01",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "2014",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84996553972",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84996553972?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84996553972&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84996553972&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84996553972",
+            "eid": "2-s2.0-84996553972",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "The University of Hong Kong",
+                    "affiliation-country": "Hong Kong",
+                    "affiliation-city": "Pokfulam"
+                }
+            ],
+            "openaccessFlag": true,
+            "@_fa": "true",
+            "prism:doi": "10.7554/eLife.02999",
+            "dc:creator": "Bao X.",
+            "citedby-count": "59",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84996553972",
+            "prism:volume": "3",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Serotonergic neurons signal reward and punishment on multiple timescales",
+            "pubmed-id": "25714923",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2015-02-25",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "25 February 2015",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84982913066",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84982913066?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84982913066&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84982913066&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84982913066",
+            "eid": "2-s2.0-84982913066",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Harvard University",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Cambridge"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "The Johns Hopkins School of Medicine",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Baltimore"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "4",
+            "prism:doi": "10.7554/eLife.06346",
+            "dc:creator": "Cohen J.",
+            "citedby-count": "59",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84982913066",
+            "prism:volume": "2015",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Viral dark matter and virus\u2013host interactions resolved from publicly available microbial genomes",
+            "pubmed-id": "26200428",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2015-07-22",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "22 July 2015",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84939526110",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84939526110?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84939526110&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84939526110&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84939526110",
+            "eid": "2-s2.0-84939526110",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "University of Arizona",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Tucson"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "Ohio State University",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Columbus"
+                }
+            ],
+            "openaccessFlag": false,
+            "prism:issueIdentifier": "JULY2015",
+            "prism:doi": "10.7554/eLife.08490.001",
+            "dc:creator": "Roux S.",
+            "citedby-count": "59",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84939526110",
+            "prism:volume": "4",
+            "openaccess": "0",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Social networks predict gut microbiome composition in wild baboons",
+            "pubmed-id": "25774601",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2015-03-17",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "17 March 2015",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84925002456",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84925002456?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84925002456&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84925002456&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84925002456",
+            "eid": "2-s2.0-84925002456",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Duke University",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Durham"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "Duke University",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Durham"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "Duke University",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Durham"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "National Museums of Kenya",
+                    "affiliation-country": "Kenya",
+                    "affiliation-city": "Nairobi"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "4",
+            "prism:doi": "10.7554/eLife.05224",
+            "dc:creator": "Tung J.",
+            "citedby-count": "59",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84925002456",
+            "prism:volume": "2015",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "A lipid bound actin meshwork organizes liquid phase separation in model membranes",
+            "pubmed-id": "24642407",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2014-03-18",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "18 March 2014",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84898717364",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84898717364?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84898717364&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84898717364&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84898717364",
+            "eid": "2-s2.0-84898717364",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Max Planck Institute for Biophysical Chemistry (Karl Friedrich Bonhoeffer Institute)",
+                    "affiliation-country": "Germany",
+                    "affiliation-city": "Gottingen"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "3",
+            "article-number": "e01671",
+            "dc:creator": "Honigmann A.",
+            "citedby-count": "59",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84898717364",
+            "prism:volume": "2014",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "GluN2B-containing NMDA receptors regulate depression-like behavior and are critical for the rapid antidepressant actions of ketamine",
+            "pubmed-id": "25340958",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "59",
+            "prism:coverDate": "2014-10-23",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "23 October 2014",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84920270347",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84920270347?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84920270347&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84920270347&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84920270347",
+            "eid": "2-s2.0-84920270347",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Tulane University",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "New Orleans"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "3",
+            "prism:doi": "10.7554/eLife.03581",
+            "dc:creator": "Miller O.",
+            "article-number": "e03581",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84920270347",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Structure and function of the Smoothened extracellular domain in vertebrate Hedgehog signaling",
+            "pubmed-id": "24171105",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "58",
+            "prism:coverDate": "2013-10-29",
+            "prism:aggregationType": "Journal",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84887326705",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84887326705?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84887326705&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84887326705&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84887326705",
+            "eid": "2-s2.0-84887326705",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Stanford University School of Medicine",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Stanford"
+                }
+            ],
+            "openaccessFlag": false,
+            "prism:issueIdentifier": "2",
+            "prism:doi": "10.7554/eLife.01340.001",
+            "dc:creator": "Nachtergaele S.",
+            "article-number": "e01340",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84887326705",
+            "prism:volume": "2013",
+            "openaccess": "0",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Integrative genomic analysis of the human immune response to influenza vaccination",
+            "pubmed-id": "23878721",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "58",
+            "prism:coverDate": "2013-07-16",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "16 July 2013",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84880626687",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84880626687?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84880626687&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84880626687&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84880626687",
+            "eid": "2-s2.0-84880626687",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Baylor College of Medicine",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Houston"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "Baylor College of Medicine",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Houston"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "2",
+            "article-number": "e00299",
+            "dc:creator": "Franco L.",
+            "prism:doi": "10.7554/eLife.00299",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84880626687",
+            "prism:volume": "2013",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Piezo1 links mechanical forces to red blood cell volume",
+            "pubmed-id": "26001274",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "prism:coverDate": "2015-05-22",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "22 May 2015",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84930621493",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84930621493?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84930621493&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84930621493&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84930621493",
+            "eid": "2-s2.0-84930621493",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Scripps Research Institute",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "San Diego"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "Howard Hughes Medical Institute",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Chevy Chase"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "MAY",
+            "prism:doi": "10.7554/eLife.07370",
+            "dc:creator": "Cahalan S.",
+            "citedby-count": "58",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84930621493",
+            "prism:volume": "4",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Interplay of cell dynamics and epithelial tension during morphogenesis of the Drosophila pupal wing",
+            "pubmed-id": "26102528",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "58",
+            "prism:coverDate": "2015-06-23",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "23 June 2015",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84943609025",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84943609025?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84943609025&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84943609025&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84943609025",
+            "eid": "2-s2.0-84943609025",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "Max Planck Institute of Molecular Cell Biology and Genetics",
+                    "affiliation-country": "Germany",
+                    "affiliation-city": "Dresden"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "JUNE2015",
+            "article-number": "e07090",
+            "dc:creator": "Etournay R.",
+            "prism:doi": "10.7554/eLife.07090",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84943609025",
+            "prism:volume": "4",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        },
+        {
+            "dc:title": "Acute stress enhances adult rat hippocampal neurogenesis and activation of newborn neurons via secreted astrocytic FGF2",
+            "pubmed-id": "23599891",
+            "source-id": "21100242814",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:eIssn": "2050084X",
+            "citedby-count": "58",
+            "prism:coverDate": "2013-04-16",
+            "prism:aggregationType": "Journal",
+            "prism:coverDisplayDate": "16 April 2013",
+            "link": [
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84879049906",
+                    "@ref": "self"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://api.elsevier.com/content/abstract/scopus_id/84879049906?field=author,affiliation",
+                    "@ref": "author-affiliation"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=84879049906&origin=inward",
+                    "@ref": "scopus"
+                },
+                {
+                    "@_fa": "true",
+                    "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=84879049906&origin=inward",
+                    "@ref": "scopus-citedby"
+                }
+            ],
+            "subtypeDescription": "Article",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/84879049906",
+            "eid": "2-s2.0-84879049906",
+            "affiliation": [
+                {
+                    "@_fa": "true",
+                    "affilname": "UC Berkeley",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Berkeley"
+                },
+                {
+                    "@_fa": "true",
+                    "affilname": "Stanford University",
+                    "affiliation-country": "United States",
+                    "affiliation-city": "Palo Alto"
+                }
+            ],
+            "openaccessFlag": true,
+            "prism:issueIdentifier": "2",
+            "article-number": "e00362",
+            "dc:creator": "Kirby E.",
+            "prism:doi": "10.7554/eLife.00362",
+            "prism:pageRange": null,
+            "dc:identifier": "SCOPUS_ID:84879049906",
+            "prism:volume": "2013",
+            "openaccess": "1",
+            "prism:publicationName": "eLife"
+        }
+    ],
+    "opensearch:Query": {
+        "@searchTerms": "DOI(\"10.7554/*\")",
+        "@role": "request",
+        "@startPage": "113"
+    }
+}
+
