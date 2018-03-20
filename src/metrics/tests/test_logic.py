@@ -31,6 +31,9 @@ class One(BaseCase):
         fixture = scopus_citations.parse_results(search_results)
         with mock.patch("metrics.scopus.citations.all_todays_entries", return_value=fixture):
             logic.import_scopus_citations()
+            bad_eggs = 3
+            expected = len(fixture) - bad_eggs
+            self.assertEqual(expected, models.Article.objects.count())
 
 
 class TestGAImport(BaseCase):
