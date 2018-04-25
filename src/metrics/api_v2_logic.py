@@ -3,6 +3,9 @@ from . import models
 from . import utils
 from .utils import ensure, rest, lmap
 from django.db.models import Sum, F, Max
+import logging
+
+LOG = logging.getLogger(__name__)
 
 def chop(q, page, per_page, order):
     """orders and chops a query into pages, returning the total of the original query and a query object"""
@@ -108,4 +111,7 @@ def summary_by_msid(msid):
     return row
 
 def summary_by_obj(artobj):
-    return summary_by_msid(utils.doi2msid(artobj.doi))
+    try:
+        return summary_by_msid(utils.doi2msid(artobj.doi))
+    except AssertionError:
+        LOG.warn("bad data, skipping article: %s", artobj)

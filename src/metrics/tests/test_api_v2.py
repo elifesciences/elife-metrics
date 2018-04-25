@@ -437,3 +437,33 @@ class Four(base.BaseCase):
         url = reverse('v2:article-summary', kwargs={'msid': 1234})
         resp = self.c.get(url)
         self.assertEqual(resp.status_code, 404)
+
+    def test_one_bad_apple(self):
+        "bad article objects are removed from results"
+        cases = {
+            '1111': ([1, 1, 1], 1, 1),
+            '2222': ([2, 2, 2], 2, 2),
+        }
+        base.insert_metrics(cases)
+
+        # skitch doi
+        # this is the particular bad doi I'm dealing with right now
+        bad_doi = '10.7554/eLife.e30552' # preceeding 'e'
+        models.Article.objects.filter(doi=utils.msid2doi('1111')).update(doi=bad_doi)
+
+        url = reverse('v2:summary')
+        resp = self.c.get(url)
+        self.assertEqual(resp.status_code, 200)
+
+        expected_response = {
+            'total': 2, # BUG: incorrect, should be 1, but won't-fix. this is a data and ingestion problem 
+            'items': [{
+                'id': 2222,
+                'views': 2,
+                'downloads': 2,
+                models.CROSSREF: 2,
+                models.PUBMED: 2,
+                models.SCOPUS: 2
+            }]
+        }
+        self.assertEqual(resp.json(), expected_response)

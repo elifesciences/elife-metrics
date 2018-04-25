@@ -7,7 +7,7 @@ from rest_framework.renderers import StaticHTMLRenderer
 from et3.render import render_item
 from et3.extract import path as p
 from et3.utils import uppercase, lowercase
-from .utils import isint, ensure, exsubdict, lmap, msid2doi
+from .utils import isint, ensure, exsubdict, lmap, lfilter, msid2doi
 from . import api_v2_logic as logic
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
@@ -153,7 +153,7 @@ def summary(request, msid=None):
         if msid and total_results == 0:
             raise Http404("summary for article does not exist")
 
-        payload = lmap(logic.summary_by_obj, qpage)
+        payload = lfilter(None, lmap(logic.summary_by_obj, qpage))
 
         payload = {
             'total': total_results,
