@@ -82,16 +82,24 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 @handler.capture_parse_error
 def parse_entry(entry):
     "parses a single search result from scopus"
-    citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
-    ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
-    ensure(entry['prism:doi'].startswith(settings.DOI_PREFIX), 'entry has an unknown DOI prefix: %r' % entry['prism:doi'])
-    ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
-    return {
-        'doi': entry['prism:doi'],
-        'num': int(entry['citedby-count']),
-        'source': models.SCOPUS,
-        'source_id': citedby_link['@href']
-    }
+    try:
+        citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
+        ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
+        ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
+
+        # don't swallow these, bad values are different from bad structure
+        # we may be able to recover from a dodgy doi
+        ensure(entry['prism:doi'].startswith(settings.DOI_PREFIX), 'entry has an unknown DOI prefix: %r' % entry['prism:doi'])
+        return {
+            'doi': entry['prism:doi'],
+            'num': int(entry['citedby-count']),
+            'source': models.SCOPUS,
+            'source_id': citedby_link['@href']
+        }
+    except ParseError:
+        # these won't be caught by handler.capture_parse_error
+        LOG.warn("discarding scopus citation: failed to parse response", extra={'reponse': entry})
+        return {'bad': entry}
 
 def parse_results(search_result):
     "parses citation counts from a page of search results from scopus"
