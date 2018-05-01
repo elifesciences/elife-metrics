@@ -7,6 +7,8 @@ from xml.dom.minidom import parseString
 
 LOG = logging.getLogger(__name__)
 
+URL = "https://doi.crossref.org/servlet/getForwardLinks"
+
 def fetch(doi):
     LOG.info("fetching crossref citations for %s" % doi)
     params = {
@@ -21,8 +23,8 @@ def fetch(doi):
     headers = {
         'Accept': 'application/json'
     }
-    url = "https://doi.crossref.org/servlet/getForwardLinks"
-    resp = handler.requests_get(url, params=params, headers=headers, opts={
+    resp = handler.requests_get(URL, params=params, headers=headers, opts={
+        401: handler.LOGIT, # when a doi gets into system (like via scopus) that crossref doesn't associate with account
         404: handler.IGNORE, # these happen often for articles with 0 citations
     })
     return resp.content if resp else None
