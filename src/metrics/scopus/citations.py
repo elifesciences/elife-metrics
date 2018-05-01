@@ -98,7 +98,7 @@ def parse_entry(entry):
         }
     except ParseError:
         # these won't be caught by handler.capture_parse_error
-        LOG.warn("discarding scopus citation: failed to parse response", extra={'reponse': entry})
+        LOG.warn("discarding scopus citation: failed to parse response", extra={'response': entry})
         return {'bad': entry}
 
 def parse_results(search_result):
