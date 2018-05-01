@@ -1,6 +1,6 @@
 from unittest import skip
 import responses
-from unittest.mock import patch
+from unittest.mock import patch, Mock
 import requests
 import os
 import json
@@ -52,7 +52,7 @@ class One(base.BaseCase):
         "contents of error response is written to a file. contents of request is written"
 
         opid = handler.opid()
-        bad_url = 'http://elifesciences.org'
+        bad_url = 'http://example.org'
         expected_body_content = 'pants'
 
         responses.add(responses.GET, bad_url, **{
@@ -72,6 +72,25 @@ class One(base.BaseCase):
             expected_path = join(settings.DUMP_PATH, opid, 'body')
             self.assertTrue(os.path.isfile(expected_path))
             self.assertEqual(open(expected_path, 'r').read(), expected_body_content)
+
+    @responses.activate
+    def test_custom_error_handler_404(self):
+        opid = handler.opid()
+        bad_url = 'http://example.org'
+        expected_body_content = 'pants'
+
+        responses.add(responses.GET, bad_url, **{
+            'body': expected_body_content,
+            'status': 499,
+            'content_type': 'text/plain'})
+
+        with self.settings(DUMP_PATH=self.tempdir):
+            mk = Mock()
+            handler.requests_get(bad_url, opid=opid, opts={499: mk})
+            self.assertTrue(mk.called)
+            resp_opid, resp_err = mk.call_args[0]
+            self.assertEqual(resp_opid, opid)
+            self.assertEqual(resp_err.response.status_code, 499)
 
     @skip("can't replicate this scenario. responses mocks the retry functionality away and I can't/won't dig deep enough into python's urllib3 to find where the `max_retries` is handled")
     @responses.activate

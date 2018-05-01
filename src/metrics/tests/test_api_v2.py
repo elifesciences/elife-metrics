@@ -456,7 +456,7 @@ class Four(base.BaseCase):
         self.assertEqual(resp.status_code, 200)
 
         expected_response = {
-            'total': 2, # BUG: incorrect, should be 1, but won't-fix. this is a data and ingestion problem 
+            'total': 2, # BUG: incorrect, should be 1, but won't-fix. this is a data and ingestion problem
             'items': [{
                 'id': 2222,
                 'views': 2,
