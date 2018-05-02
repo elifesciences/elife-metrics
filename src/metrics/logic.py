@@ -140,7 +140,7 @@ def import_scopus_citations():
     from .scopus.citations import all_todays_entries
     results = all_todays_entries()
     good_eggs, bad_eggs = splitfilter(lambda e: 'bad' not in e, results)
-    LOG.error("refusing to insert bad entries: %s", bad_eggs)
+    LOG.warn("refusing to insert %s bad entries", len(bad_eggs), extra={'bad-entries': bad_eggs})
     return lmap(comp(insert_citation, countable), good_eggs)
 
 def import_pmc_citations():
