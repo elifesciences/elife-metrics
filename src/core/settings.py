@@ -85,6 +85,7 @@ INSTALLED_APPS = (
     'rest_framework_swagger', # gui for api
 
     'metrics',
+    'nametrics', # non-article metrics
 )
 
 MIDDLEWARE = (
