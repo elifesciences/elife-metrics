@@ -1,6 +1,7 @@
 from . import models
 from metrics.utils import ensure
 from django.db.models import Sum
+from django.db.models.functions import TruncMonth
 
 DAY, MONTH = 'day', 'month'
 
@@ -18,12 +19,18 @@ def is_period(period):
 #
 
 def daily_page_views(pobj):
-    qobj = pobj.pagecount_set.all()
+    qobj = pobj.pagecount_set.all() # daily is the finest grain we have
     sums = qobj.aggregate(views_sum=Sum('views'))
     return sums['views_sum'] or 0, qobj
 
 def monthly_page_views(pobj):
-    return 0, None
+    qobj = pobj.pagecount_set \
+      .annotate(month=TruncMonth('date')) \
+      .values('month') \
+      .annotate(views_sum=Sum('views')) \
+      .values('month', 'views_sum')
+    sums = pobj.pagecount_set.all().aggregate(views_sum=Sum('views'))
+    return sums['views_sum'], qobj
 
 #
 #

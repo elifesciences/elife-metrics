@@ -30,10 +30,26 @@ class One(base.BaseCase):
             ('pants', 'event', '2016-01-03', 4),
             ('pants', 'event', '2016-01-04', 8)
 
-            # it's obvious the pants is exponentially popular
+            # it's obvious the pants event is exponentially popular
         ]
         base.insert_metrics(fixture)
 
-        expected = 15
-        total, _ = logic.page_views('pants', 'event', logic.DAY)
-        self.assertEqual(total, expected)
+        expected_sum = 15
+        total, qobj = logic.page_views('pants', 'event', logic.DAY)
+        self.assertEqual(total, expected_sum)
+        self.assertEqual(qobj.count(), len(fixture))
+
+    def test_monthly_metrics(self):
+        "logic.page_views returns the sum of all monthly hits (same as sum of all daily hits) and a chop'able queryset"
+        fixture = [
+            ('pants', 'event', '2016-01-31', 1),
+            ('pants', 'event', '2016-01-31', 2),
+            ('pants', 'event', '2016-02-01', 3),
+        ]
+        base.insert_metrics(fixture)
+
+        expected_sum = 6
+        expected_result_count = 2 # results span two months
+        total, qobj = logic.page_views('pants', 'event', logic.MONTH)
+        self.assertEqual(total, expected_sum)
+        self.assertEqual(qobj.count(), expected_result_count)
