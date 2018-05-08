@@ -53,3 +53,13 @@ class One(base.BaseCase):
         total, qobj = logic.page_views('pants', 'event', logic.MONTH)
         self.assertEqual(total, expected_sum)
         self.assertEqual(qobj.count(), expected_result_count)
+
+class Two(base.BaseCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_ga_ingest(self):
+        pass
