@@ -4,7 +4,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from metrics import api_v2_views as v2, api_v2_logic as v2_logic, utils
-from . import models
+from . import models, logic
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -13,6 +13,7 @@ LOG = logging.getLogger(__name__)
 # * no support for metric type (citations, downloads, etc)
 # * relatively self-contained and separate from article metrics
 # * msid is more strict than a pid
+# * doesn't capture a 'month' period, relying instead on SQL
 
 @api_view(["GET"])
 def metrics(request, ptype, pid):
@@ -20,7 +21,7 @@ def metrics(request, ptype, pid):
         # /metrics/press-packages/12345/page-views?by=month
         kwargs = v2.request_args(request)
         get_object_or_404(models.Page, name=pid, type=ptype)
-        sum_value, qobj = v2_logic.views(pid, ptype, kwargs['period'])
+        sum_value, qobj = logic.views(pid, ptype, kwargs['period'])
         total_results, qpage = v2_logic.chop(qobj, **utils.exsubdict(kwargs, ['period']))
         payload = v2.serialize(total_results, sum_value, qpage, 'page-views')
         ctype = 'application/vnd.elife.metric-time-period+json;version=1'
