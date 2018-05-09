@@ -93,11 +93,11 @@ def monthly_page_views(pobj):
 #
 
 def page_views(pid, ptype, period=DAY):
-    ensure(is_pid(pid), "bad page name", ValueError)
+    ensure(is_pid(pid), "bad page identifier", ValueError)
     ensure(is_ptype(ptype), "bad page type", ValueError)
     ensure(is_period(period), "bad period", ValueError)
     try:
-        pobj = models.Page.objects.get(name=pid, type=ptype)
+        pobj = models.Page.objects.get(identifier=pid, type=ptype)
         dispatch = {
             DAY: daily_page_views,
             MONTH: monthly_page_views

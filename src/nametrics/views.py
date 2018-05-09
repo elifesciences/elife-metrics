@@ -20,7 +20,7 @@ def metrics(request, ptype, pid):
     try:
         # /metrics/press-packages/12345/page-views?by=month
         kwargs = v2.request_args(request)
-        get_object_or_404(models.Page, name=pid, type=ptype)
+        get_object_or_404(models.Page, identifier=pid, type=ptype)
         sum_value, qobj = logic.views(pid, ptype, kwargs['period'])
         total_results, qpage = v2_logic.chop(qobj, **utils.exsubdict(kwargs, ['period']))
         payload = v2.serialize(total_results, sum_value, qpage, 'page-views')

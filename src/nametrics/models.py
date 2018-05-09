@@ -10,10 +10,10 @@ class PageType(Model):
 
 class Page(Model):
     type = ForeignKey(PageType, on_delete=CASCADE)
-    name = CharField(max_length=255)
+    identifier = CharField(max_length=255)
 
     class Meta:
-        unique_together = (('type', 'name'),)
+        unique_together = (('type', 'identifier'),)
 
 class PageCount(Model):
     page = ForeignKey(Page, on_delete=CASCADE)
