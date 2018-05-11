@@ -1,7 +1,10 @@
 from . import base
+import os
+from metrics import utils
 from nametrics import logic, models
 from datetime import date
-
+from unittest.mock import patch
+import json
 
 class One(base.BaseCase):
     def setUp(self):
@@ -58,9 +61,10 @@ class One(base.BaseCase):
 
 class Two(base.BaseCase):
     def setUp(self):
-        pass
+        self.tmpdir, self.tmpdir_killer = utils.tempdir()
 
     def tearDown(self):
+        self.tmpdir_killer()
         pass
 
     def test_build_ga_query(self):
@@ -75,3 +79,37 @@ class Two(base.BaseCase):
         self.assertEqual(ql[-1]['end_date'].date(), dec18)
         # the first chunk is correct
         self.assertEqual(ql[0]['end_date'].date(), feb18)
+
+    def test_build_ga_query_single(self):
+        jan18 = date(year=2018, month=1, day=1)
+        ql = logic.build_ga_query(models.EVENT, jan18, jan18) # two start dates...
+        self.assertEqual(len(ql), 1)
+        self.assertEqual(ql[0]['start_date'].date(), jan18)
+        self.assertEqual(ql[0]['end_date'].date(), date(year=2018, month=1, day=31)) # end date maximised
+        
+    def test_load_ptype_history(self):
+        logic.load_ptype_history(models.EVENT)
+
+    def test_load_missing_ptype_history(self):
+        self.assertRaises(ValueError, logic.load_ptype_history, "pants")
+
+    def test_query_ga(self):
+        "a standard response from GA is handled as expected, a dump file is created etc"
+        jan18 = date(year=2018, month=1, day=1)
+        q = logic.build_ga_query(models.EVENT, jan18, jan18)[0]
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        dumpfile = os.path.join(self.tmpdir, "pants.json")
+        with patch('metrics.ga_metrics.core.output_path_from_results', return_value=dumpfile):
+            with patch('metrics.ga_metrics.core.query_ga', return_value=fixture):
+                result = logic.query_ga(models.EVENT, q)
+                self.assertEqual(result, fixture) # nametrics.logic.query_ga is just a thin wrapper for now
+                # ensure the dump file was written for debugging/loading later
+                contents = os.listdir(self.tmpdir)
+                self.assertEqual(len(contents), 1)
+                self.assertEqual(json.load(open(dumpfile, 'r')), fixture)
+
+    def test_process_response(self):
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        with patch('metrics.ga_metrics.core.output_path_from_results'):
+            logic.process_response(models.EVENT, fixture)
+            

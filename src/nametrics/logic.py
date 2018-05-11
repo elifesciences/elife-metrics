@@ -63,7 +63,7 @@ def process_response(ptype, response):
     }
     ensure(ptype in processors, "no processfor for given ptype: %s" % ptype)
     normalised = lmap(processors[ptype], response['rows'])
-    return aggregate(normalised)
+    return normalised
 
 def query_ga(ptype, query):
     raw_response = ga_core.query_ga(query) # potentially 10k worth, but in actuality ...
@@ -74,7 +74,7 @@ def query_ga(ptype, query):
 
 def load_ptype_history(ptype):
     ptype_history = json.load(open(settings.GA_PTYPE_HISTORY_PATH, 'r'))
-    ensure(ptype in ptype_history, "no historical data found: %s" % ptype)
+    ensure(ptype in ptype_history, "no historical data found: %s" % ptype, ValueError)
     return ptype_history[ptype]
 
 def build_ga_query(ptype, start_date=None, end_date=None, history=None):
@@ -91,21 +91,23 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     pattern '/elife-news/.../' ends on Mar 20th and the current '/news/...'
     starts Mar 21st, then the two-month chunk spanning Mar+Apr 2017 will
     become Mar(1st)+Mar(20th) and Mar(21st)+Apr"""
-    # until historical epochs are introduced, we just assume a single epoch
-    # stretching back to the settings.INCEPTION_DATE
 
     # note: this is not how `elife.metrics.ga_metrics` works!
     # that module is doing a query for *every single day* since inception
 
-    start_date = start_date or settings.INCEPTION.date()
+    ensure(is_ptype(ptype), "bad period type")
+
+    ptype_history = history or load_ptype_history(ptype)
+
+    # until historical epochs are introduced, we only go back as far as
+    # the beginning of the first time frame (elife 2.0)
+    # start_date = start_date or settings.INCEPTION.date()
+    start_date = start_date or ptype_history['frames'][0]['start_date']
     end_date = end_date or date.today()
     table_id = settings.GA_TABLE_ID
 
-    ensure(is_ptype(ptype), "bad period type")
     ensure(is_date(start_date), "bad start date")
     ensure(is_date(end_date), "bad end date")
-
-    ptype_history = history or load_ptype_history(ptype)
 
     query_template = {
         'ids': table_id,
@@ -115,7 +117,8 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
         'metrics': 'ga:sessions', # *not* pageviews
         'dimensions': 'ga:pagePath,ga:date',
         'sort': 'ga:pagePath,ga:date',
-        'filters': None # set later
+        'filters': None, # set later,
+        'include_empty_rows': False
     }
 
     # get a single list of months from date A (start) to date B (end)
@@ -133,7 +136,7 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     # until historical epochs are supported, we just use the first entry.
     # (frames are ordered descendingly, latest to earliest)
     ptype_filter = ptype_history['frames'][0]['ga_pattern']
-    query_list = [merge(q, {"filters": [ptype_filter]}) for q in query_list]
+    query_list = [merge(q, {"filters": ptype_filter}) for q in query_list]
 
     return query_list
 
@@ -159,10 +162,13 @@ def update_page_counts(ptype, page_counts):
 #
 #
 
+# naive, will change
 def update_ptype(ptype):
+    "glue code to query ga about a page-type and then processing and storing the results"
     for query in build_ga_query(ptype):
         response = query_ga(ptype, query)
-        counts = process_response(ptype, response)
+        normalised_rows = process_response(ptype, response)
+        counts = aggregate(normalised_rows)
         update_page_counts(ptype, counts)
 
 

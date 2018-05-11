@@ -111,6 +111,15 @@ def query_ga(query_map, num_attempts=5):
 
     # build the query
     if isinstance(query_map, dict):
+
+        # clean up query, dates to strings, etc
+        if isinstance(query_map['start_date'], datetime):
+            query_map['start_date'] = ymd(query_map['start_date'])
+        if isinstance(query_map['end_date'], datetime):
+            query_map['end_date'] = ymd(query_map['end_date'])
+        if not query_map['ids'].startswith('ga:'):
+            query_map['ids'] = 'ga:%s' % query_map['ids']
+
         query = ga_service().data().ga().get(**query_map)
     else:
         # a regular query object can be passed in
@@ -161,7 +170,7 @@ def query_ga(query_map, num_attempts=5):
 
 def output_path(results_type, from_date, to_date):
     "generates a path for results of the given type"
-    assert results_type in ['views', 'downloads'], "results type must be either 'views' or 'downloads'"
+    #assert results_type in ['views', 'downloads'], "results type must be either 'views' or 'downloads'"
     if isinstance(from_date, str): # given strings
         #from_date_dt = datetime.strptime(from_date, "%Y-%m-%d")
         to_date_dt = datetime.strptime(to_date, "%Y-%m-%d")
@@ -196,7 +205,7 @@ def output_path_from_results(response, results_type=None):
     query = response['query']
     from_date = datetime.strptime(query['start-date'], "%Y-%m-%d")
     to_date = datetime.strptime(query['end-date'], "%Y-%m-%d")
-    results_type = results_type or 'downloads' if 'ga:eventLabel' in query['filters'] else 'views'
+    results_type = results_type or ('downloads' if 'ga:eventLabel' in query['filters'] else 'views')
     return output_path(results_type, from_date, to_date)
 
 def write_results(results, path):
