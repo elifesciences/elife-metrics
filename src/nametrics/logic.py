@@ -4,7 +4,7 @@ from metrics.ga_metrics import core as ga_core, utils as ga_utils
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
 from django.conf import settings
-from datetime import date
+from datetime import date, datetime
 import json
 
 DAY, MONTH = 'day', 'month'
@@ -25,11 +25,38 @@ def is_date(dt):
 #
 #
 
+def str2dt(string):
+    return datetime.strptime(string, "%Y%m%d")
+
 def process_blog(rows):
     return []
 
 def process_event(rows):
-    return []
+    # this logic may prove to be common across page types, we'll see
+    prefix = '/events'
+    prefix_len = len(prefix)
+
+    def _process(row):
+        path, datestr, count = row
+        #opath = path
+        path = path[prefix_len:].strip().strip('/')
+
+        # can probably replace this with urlparse
+        qs = path.find('?')
+        if qs > -1:
+            path = path[:qs]
+        # anchors
+        qs = path.find('#')
+        if qs > -1:
+            path = path[:qs]
+
+        return {
+            'views': int(count),
+            'date': str2dt(datestr),
+            'identifier': path,
+            #'original': opath
+        }
+    return lmap(_process, rows)
 
 def process_interview(rows):
     return []
@@ -62,7 +89,7 @@ def process_response(ptype, response):
         'press-package': process_presspackages,
     }
     ensure(ptype in processors, "no processfor for given ptype: %s" % ptype)
-    normalised = lmap(processors[ptype], response['rows'])
+    normalised = processors[ptype](response['rows'])
     return normalised
 
 def query_ga(ptype, query):

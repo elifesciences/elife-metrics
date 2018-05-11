@@ -1,0 +1,22 @@
+{
+    "event": {
+        "frames": [
+            {
+                "pattern": "^/events$", 
+                "ends": null, 
+                "ga_pattern": "ga:pagePath=~^/events$,ga:pagePath=~^/events/.*$", 
+                "starts": "2017-01-01"
+            }, 
+            {
+                "pattern": "^/elife-news/events$", 
+                "ends": "2017-01-01", 
+                "ga_pattern": "ga:pagePath=~^/elife-news/events$", 
+                "starts": null
+            }
+        ], 
+        "name": "events", 
+        "examples": [
+            "/elife-news/events"
+        ]
+    }
+}

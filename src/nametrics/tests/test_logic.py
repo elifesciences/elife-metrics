@@ -86,7 +86,7 @@ class Two(base.BaseCase):
         self.assertEqual(len(ql), 1)
         self.assertEqual(ql[0]['start_date'].date(), jan18)
         self.assertEqual(ql[0]['end_date'].date(), date(year=2018, month=1, day=31)) # end date maximised
-        
+
     def test_load_ptype_history(self):
         logic.load_ptype_history(models.EVENT)
 
@@ -111,5 +111,5 @@ class Two(base.BaseCase):
     def test_process_response(self):
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
         with patch('metrics.ga_metrics.core.output_path_from_results'):
-            logic.process_response(models.EVENT, fixture)
-            
+            expected = []
+            self.assertEqual(logic.process_response(models.EVENT, fixture), expected)
