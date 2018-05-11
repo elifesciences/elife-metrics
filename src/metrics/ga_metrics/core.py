@@ -188,7 +188,7 @@ def output_path(results_type, from_date, to_date):
     # ll: output/views/2014-01-01_2014-01-31.json.partial
     return join(output_dir(), results_type, dt_str + ".json" + partial)
 
-def output_path_from_results(response):
+def output_path_from_results(response, results_type=None):
     """determines a path where the given response can live, using the
     dates within the response and guessing the request type"""
     assert 'query' in response and 'filters' in response['query'], \
@@ -196,7 +196,7 @@ def output_path_from_results(response):
     query = response['query']
     from_date = datetime.strptime(query['start-date'], "%Y-%m-%d")
     to_date = datetime.strptime(query['end-date'], "%Y-%m-%d")
-    results_type = 'downloads' if 'ga:eventLabel' in query['filters'] else 'views'
+    results_type = results_type or 'downloads' if 'ga:eventLabel' in query['filters'] else 'views'
     return output_path(results_type, from_date, to_date)
 
 def write_results(results, path):

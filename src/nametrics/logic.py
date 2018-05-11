@@ -1,11 +1,11 @@
 from . import models
-from metrics.utils import ensure
-from metrics.ga_metrics import core as ga_core
+from metrics.utils import ensure, lmap, create_or_update, first, merge
+from metrics.ga_metrics import core as ga_core, utils as ga_utils
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
-from collections import defaultdict
 from django.conf import settings
 from datetime import date
+import json
 
 DAY, MONTH = 'day', 'month'
 
@@ -18,25 +18,72 @@ def is_ptype(ptype):
 def is_period(period):
     return period in [MONTH, DAY]
 
+def is_date(dt):
+    return isinstance(dt, date)
+
 #
 #
 #
 
-def generate_date_pairs(ptype, start_date, end_date):
-    # pseudo code!
-    while True:
-        yield {
-            'start_date': 'foo',
-            'end_date': 'bar',
-            'filters': ['']
-        }
+def process_blog(rows):
+    return []
 
-def query_ga(ptype, start_date=None, end_date=None):
+def process_event(rows):
+    return []
+
+def process_interview(rows):
+    return []
+
+def process_labs(rows):
+    return []
+
+def process_presspackages(rows):
+    return []
+
+#
+#
+#
+
+def aggregate(normalised_rows):
+    "counts up the number of times each page was visited"
+    # list of (page.identifier, count) pairs
+    return [(None, 0)]
+
+#
+#
+#
+
+def process_response(ptype, response):
+    processors = {
+        'blog-article': process_blog,
+        'event': process_event,
+        'interview': process_interview,
+        'labs-post': process_labs,
+        'press-package': process_presspackages,
+    }
+    ensure(ptype in processors, "no processfor for given ptype: %s" % ptype)
+    normalised = lmap(processors[ptype], response['rows'])
+    return aggregate(normalised)
+
+def query_ga(ptype, query):
+    raw_response = ga_core.query_ga(query) # potentially 10k worth, but in actuality ...
+    # dump the data, just for debugging
+    dump_path = ga_core.output_path_from_results(raw_response, ptype)
+    ga_core.write_results(raw_response, dump_path)
+    return raw_response
+
+def load_ptype_history(ptype):
+    ptype_history = json.load(open(settings.GA_PTYPE_HISTORY_PATH, 'r'))
+    ensure(ptype in ptype_history, "no historical data found: %s" % ptype)
+    return ptype_history[ptype]
+
+def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     """queries GA per page-type, grouped by pagePath and date.
     each result will return 10k results max and there is no pagination.
     If every page of a given type is visited once a day for a year, then
     a single query with 10k results will service 27 pages.
     A safer number is 164, which means 6 queries per page-type per year.
+
     As we go further back in history the query will change as known epochs
     overlap. These overlaps will truncate the current period to the epoch
     boundaries. For example: if we chunk Jan-Dec 2017 into two-month chunks,
@@ -50,9 +97,15 @@ def query_ga(ptype, start_date=None, end_date=None):
     # note: this is not how `elife.metrics.ga_metrics` works!
     # that module is doing a query for *every single day* since inception
 
-    start_date = start_date or settings.INCEPTION
+    start_date = start_date or settings.INCEPTION.date()
     end_date = end_date or date.today()
     table_id = settings.GA_TABLE_ID
+
+    ensure(is_ptype(ptype), "bad period type")
+    ensure(is_date(start_date), "bad start date")
+    ensure(is_date(end_date), "bad end date")
+
+    ptype_history = history or load_ptype_history(ptype)
 
     query_template = {
         'ids': table_id,
@@ -65,9 +118,52 @@ def query_ga(ptype, start_date=None, end_date=None):
         'filters': None # set later
     }
 
-    # pseudo code!
-    for subqry in generate_date_pairs(ptype, start_date, end_date):
-        ga_core.query_ga(defaultdict(query_template, subqry))
+    # get a single list of months from date A (start) to date B (end)
+    month_list = ga_utils.dt_month_range(start_date, end_date)
+
+    # group the list into n-month chunks
+    chunk_size = 2
+    chunked_months = [month_list[i:i + chunk_size] for i in range(0, len(month_list), chunk_size)]
+
+    # generate a list of queries we'll feed GA
+    # use the start date from the first group, end date from the last group
+    query_list = [merge(query_template, {"start_date": mgroup[0][0], "end_date": mgroup[-1][-1]}) for mgroup in chunked_months]
+
+    # query list is still missing the pattern(s) that GA will query for.
+    # until historical epochs are supported, we just use the first entry.
+    # (frames are ordered descendingly, latest to earliest)
+    ptype_filter = ptype_history['frames'][0]['ga_pattern']
+    query_list = [merge(q, {"filters": [ptype_filter]}) for q in query_list]
+
+    return query_list
+
+# naive, will change
+def update_page_counts(ptype, page_counts):
+    def do(row):
+        page_data = {
+            'type': ptype,
+            'identifier': row['identifier'],
+        }
+        pageobj = first(create_or_update(models.Page, page_data, update=False))
+
+        pagecount_data = {
+            'page': pageobj,
+            'views': row['views'],
+            'date': row['date']
+        }
+        pagecountobj = first(create_or_update(models.PageCount, pagecount_data, update=False))
+        return pagecountobj
+    return lmap(do, page_counts)
+
+#
+#
+#
+
+def update_ptype(ptype):
+    for query in build_ga_query(ptype):
+        response = query_ga(ptype, query)
+        counts = process_response(ptype, response)
+        update_page_counts(ptype, counts)
 
 
 #

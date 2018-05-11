@@ -1,5 +1,7 @@
 from . import base
-from nametrics import logic
+from nametrics import logic, models
+from datetime import date
+
 
 class One(base.BaseCase):
     def setUp(self):
@@ -61,5 +63,15 @@ class Two(base.BaseCase):
     def tearDown(self):
         pass
 
-    def test_ga_ingest(self):
-        pass
+    def test_build_ga_query(self):
+        "the list of queries returned has the right shape"
+        jan18 = date(year=2018, month=1, day=1)
+        feb18 = date(year=2018, month=2, day=28)
+        dec18 = date(year=2018, month=12, day=31)
+        ql = logic.build_ga_query(models.EVENT, jan18, dec18)
+        self.assertEqual(len(ql), 6) # 6 * 2 month chunks
+        # the range is correct
+        self.assertEqual(ql[0]['start_date'].date(), jan18)
+        self.assertEqual(ql[-1]['end_date'].date(), dec18)
+        # the first chunk is correct
+        self.assertEqual(ql[0]['end_date'].date(), feb18)

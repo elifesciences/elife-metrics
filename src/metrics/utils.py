@@ -1,7 +1,7 @@
 import time
-import os, json
+import os, json, copy
 import tempfile, shutil
-from functools import wraps, partial
+from functools import wraps, partial, reduce
 import logging
 from datetime import datetime
 import dateutil
@@ -279,3 +279,11 @@ def has_key(key, data=None):
     if data:
         return key in data
     return partial(has_key, key)
+
+# expensive
+def merge(*dicts):
+    def _merge(a, b):
+        c = copy.deepcopy(a)
+        c.update(copy.deepcopy(b))
+        return c
+    return reduce(_merge, dicts)
