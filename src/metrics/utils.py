@@ -3,7 +3,7 @@ import os, json, copy
 import tempfile, shutil
 from functools import wraps, partial, reduce
 import logging
-from datetime import datetime
+from datetime import datetime, date
 import dateutil
 import dateutil.parser
 import pytz
@@ -105,6 +105,7 @@ def subdict(d, kl):
 def exsubdict(d, kl):
     return {k: v for k, v in d.items() if k not in kl}
 
+# TODO: code smell, remove conditional
 def fmtdt(dt, fmt="%Y-%m-%d"):
     if not dt:
         dt = utcnow()
@@ -142,6 +143,16 @@ def todt(val):
             LOG.debug("converting an aware dt that isn't in utc TO utc: %r", dt)
             return dt.astimezone(pytz.utc)
     return dt
+
+def tod(val):
+    "return a date value"
+    if not val:
+        return None
+    if isinstance(val, date):
+        return val
+    val = todt(val)
+    return val.date()
+
 
 def utcnow():
     "returns a UTC datetime stamp with a UTC timezone object attached"

@@ -1,5 +1,5 @@
 from . import models
-from metrics.utils import ensure, lmap, create_or_update, first, merge
+from metrics.utils import ensure, lmap, create_or_update, first, merge, tod
 from metrics.ga_metrics import core as ga_core, utils as ga_utils
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
@@ -22,11 +22,46 @@ def is_date(dt):
     return isinstance(dt, date)
 
 #
+# utils
+#
+
+def _str2dt(string):
+    return datetime.strptime(string, "%Y%m%d")
+
+def mkidx(rows, keyfn):
+    idx = {}
+    for row in rows:
+        key = keyfn(row)
+        group = idx.get(key, [])
+        group.append(row)
+        idx[key] = group
+    return idx
+
+def get(k, d=None):
+    "`get('key', {}) => `{}.get('key')` but also `get('key')({})` => `{}.get('key')`"
+    if not d:
+        return lambda d: get(k, d)
+    return d.get(k)
+
+#
 #
 #
 
-def str2dt(string):
-    return datetime.strptime(string, "%Y%m%d")
+def process_path(prefix, path):
+    prefix_len = len(prefix)
+    path = path[prefix_len:].strip().strip('/') # /events/foobar => foobar
+
+    # can probably replace this with urlparse
+    # anchors
+    qs = path.find('#')
+    if qs > -1:
+        path = path[:qs]
+
+    qs = path.find('?')
+    if qs > -1:
+        path = path[:qs]
+
+    return path
 
 def process_blog(rows):
     return []
@@ -34,27 +69,15 @@ def process_blog(rows):
 def process_event(rows):
     # this logic may prove to be common across page types, we'll see
     prefix = '/events'
-    prefix_len = len(prefix)
 
     def _process(row):
         path, datestr, count = row
-        #opath = path
-        path = path[prefix_len:].strip().strip('/')
-
-        # can probably replace this with urlparse
-        qs = path.find('?')
-        if qs > -1:
-            path = path[:qs]
-        # anchors
-        qs = path.find('#')
-        if qs > -1:
-            path = path[:qs]
+        path = process_path(prefix, path)
 
         return {
             'views': int(count),
-            'date': str2dt(datestr),
+            'date': _str2dt(datestr),
             'identifier': path,
-            #'original': opath
         }
     return lmap(_process, rows)
 
@@ -73,8 +96,13 @@ def process_presspackages(rows):
 
 def aggregate(normalised_rows):
     "counts up the number of times each page was visited"
-    # list of (page.identifier, count) pairs
-    return [(None, 0)]
+    # group together the rows by id and date.
+    # it's possible after normalisation for two paths to exist on same date
+    idx = mkidx(normalised_rows, lambda row: (row['identifier'], row['date']))
+    # return single record for each group, replacing 'views' with the sum of views in the group
+    return [{"date": grp[0]['date'],
+             "identifier": grp[0]['identifier'],
+             "views": sum(map(get('views'), grp))} for grp in idx.values()]
 
 #
 #
@@ -129,8 +157,8 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     # until historical epochs are introduced, we only go back as far as
     # the beginning of the first time frame (elife 2.0)
     # start_date = start_date or settings.INCEPTION.date()
-    start_date = start_date or ptype_history['frames'][0]['start_date']
-    end_date = end_date or date.today()
+    start_date = tod(start_date or ptype_history['frames'][0]['starts'])
+    end_date = tod(end_date or date.today())
     table_id = settings.GA_TABLE_ID
 
     ensure(is_date(start_date), "bad start date")
@@ -197,7 +225,6 @@ def update_ptype(ptype):
         normalised_rows = process_response(ptype, response)
         counts = aggregate(normalised_rows)
         update_page_counts(ptype, counts)
-
 
 #
 #

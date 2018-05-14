@@ -1,6 +1,7 @@
 from . import base
 import os
 from metrics import utils
+from metrics.utils import tod
 from nametrics import logic, models
 from datetime import date
 from unittest.mock import patch
@@ -113,3 +114,26 @@ class Two(base.BaseCase):
         with patch('metrics.ga_metrics.core.output_path_from_results'):
             expected = []
             self.assertEqual(logic.process_response(models.EVENT, fixture), expected)
+
+class Three(base.BaseCase):
+
+    def test_aggregate(self):
+        def asmaps(rows):
+            return [dict(zip(['identifier', 'date', 'views'], row)) for row in rows]
+
+        normalised_rows = asmaps([
+            ("/events/foo", tod("2018-01-01"), 1),
+            ("/events/foo", tod("2018-01-02"), 2),
+
+            ("/events/foo", tod("2018-01-03"), 2),
+            ("/events/bar", tod("2018-01-03"), 1),
+            ("/events/foo", tod("2018-01-03"), 2),
+        ])
+
+        expected_result = asmaps([
+            ("/events/foo", tod("2018-01-01"), 1),
+            ("/events/foo", tod("2018-01-02"), 2),
+            ("/events/foo", tod("2018-01-03"), 4), # aggregated
+            ("/events/bar", tod("2018-01-03"), 1)
+        ])
+        self.assertCountEqual(logic.aggregate(normalised_rows), expected_result)
