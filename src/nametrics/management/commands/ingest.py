@@ -14,7 +14,6 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         try:
             cmds.ingest_command(options['just_type'])
-            sys.exit(0)
         except BaseException as err:
             LOG.error("uncaught exception calling command 'ingest': %s" % err, extra={'cli-args': options})
             sys.exit(1)
