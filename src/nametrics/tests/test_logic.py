@@ -118,10 +118,7 @@ class Two(base.BaseCase):
 class Three(base.BaseCase):
 
     def test_aggregate(self):
-        def asmaps(rows):
-            return [dict(zip(['identifier', 'date', 'views'], row)) for row in rows]
-
-        normalised_rows = asmaps([
+        normalised_rows = logic.asmaps([
             ("/events/foo", tod("2018-01-01"), 1),
             ("/events/foo", tod("2018-01-02"), 2),
 
@@ -130,10 +127,28 @@ class Three(base.BaseCase):
             ("/events/foo", tod("2018-01-03"), 2),
         ])
 
-        expected_result = asmaps([
+        expected_result = logic.asmaps([
             ("/events/foo", tod("2018-01-01"), 1),
             ("/events/foo", tod("2018-01-02"), 2),
             ("/events/foo", tod("2018-01-03"), 4), # aggregated
             ("/events/bar", tod("2018-01-03"), 1)
         ])
         self.assertCountEqual(logic.aggregate(normalised_rows), expected_result)
+
+    def test_insert(self):
+        self.assertEqual(models.Page.objects.count(), 0)
+        self.assertEqual(models.PageType.objects.count(), 0)
+        self.assertEqual(models.PageCount.objects.count(), 0)
+
+        aggregated_rows = logic.asmaps([
+            ("/events/foo", tod("2018-01-01"), 1),
+            ("/events/foo", tod("2018-01-02"), 2),
+            ("/events/foo", tod("2018-01-03"), 4),
+            ("/events/bar", tod("2018-01-03"), 1)
+        ])
+        results = logic.update_page_counts(models.EVENT, aggregated_rows)
+        self.assertEqual(len(results), len(aggregated_rows))
+
+        self.assertEqual(models.PageType.objects.count(), 1)
+        self.assertEqual(models.Page.objects.count(), 2)
+        self.assertEqual(models.PageCount.objects.count(), 4)

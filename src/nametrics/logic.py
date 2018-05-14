@@ -94,15 +94,18 @@ def process_presspackages(rows):
 #
 #
 
+def asmaps(rows):
+    "convenience, converts a list of rows into dicts"
+    return [dict(zip(['identifier', 'date', 'views'], row)) for row in rows]
+
 def aggregate(normalised_rows):
     "counts up the number of times each page was visited"
     # group together the rows by id and date.
     # it's possible after normalisation for two paths to exist on same date
     idx = mkidx(normalised_rows, lambda row: (row['identifier'], row['date']))
     # return single record for each group, replacing 'views' with the sum of views in the group
-    return [{"date": grp[0]['date'],
-             "identifier": grp[0]['identifier'],
-             "views": sum(map(get('views'), grp))} for grp in idx.values()]
+    rows = [(grp[0]['identifier'], grp[0]['date'], sum(map(get('views'), grp))) for grp in idx.values()]
+    return asmaps(rows)
 
 #
 #
@@ -198,8 +201,10 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
 # naive, will change
 def update_page_counts(ptype, page_counts):
     def do(row):
+        ptypeobj = first(create_or_update(models.PageType, {"name": ptype}, update=False))
+
         page_data = {
-            'type': ptype,
+            'type': ptypeobj,
             'identifier': row['identifier'],
         }
         pageobj = first(create_or_update(models.Page, page_data, update=False))
