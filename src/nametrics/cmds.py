@@ -9,7 +9,7 @@ LOG = logging.getLogger(__name__)
 
 def ingest_command(type_list):
     try:
-        supported_types = [t for t in type_list if t in models.PAGE_TYPES]
+        supported_types = [t for t in type_list if t in models.PAGE_TYPES] or models.PAGE_TYPES
         utils.lmap(logic.update_ptype, supported_types)
     except BaseException as err:
         LOG.exception(str(err))

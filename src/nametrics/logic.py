@@ -9,6 +9,7 @@ from django.db import transaction
 import json
 import os
 from kids.cache import cache as cached
+from functools import partial
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -69,32 +70,16 @@ def process_path(prefix, path):
 
     return path
 
-def process_blog(rows):
-    return []
-
-def process_event(rows):
-    # this logic may prove to be common across page types, we'll see
-    prefix = '/events'
-
+def process_object(prefix, rows):
     def _process(row):
         path, datestr, count = row
         path = process_path(prefix, path)
-
         return {
             'views': int(count),
             'date': _str2dt(datestr),
             'identifier': path,
         }
     return lmap(_process, rows)
-
-def process_interview(rows):
-    return []
-
-def process_labs(rows):
-    return []
-
-def process_presspackages(rows):
-    return []
 
 #
 #
@@ -123,16 +108,19 @@ def aggregate(normalised_rows):
 #
 #
 
-def process_response(ptype, response):
-    processors = {
-        'blog-article': process_blog,
-        'event': process_event,
-        'interview': process_interview,
-        'labs-post': process_labs,
-        'press-package': process_presspackages,
+def process_response(ptype, frame, response):
+    processor_map = {
+        # 'blog-article': process_blog,
+        # 'event': process_event,
+        # 'interview': process_interview,
+        # 'labs-post': process_labs,
+        # 'press-package': process_presspackages,
     }
-    ensure(ptype in processors, "no processfor for given ptype: %s" % ptype)
-    normalised = processors[ptype](response['rows'])
+    processor = processor_map.get(ptype)
+    if not processor:
+        ensure('prefix' in frame, "no processor for %r and no `prefix` key found in history - cannot process results" % ptype)
+        processor = partial(process_object, frame['prefix'])
+    normalised = processor(response.get('rows', []))
     return normalised
 
 def query_ga(ptype, query):
@@ -147,10 +135,15 @@ def query_ga(ptype, query):
     ga_core.write_results(raw_response, dump_path)
     return raw_response
 
+@cached
 def load_ptype_history(ptype):
     ptype_history = json.load(open(settings.GA_PTYPE_HISTORY_PATH, 'r'))
     ensure(ptype in ptype_history, "no historical data found: %s" % ptype, ValueError)
     return ptype_history[ptype]
+
+def generic_ga_filter(prefix):
+    "returns a generic GA pattern that handles `/prefix` and `/prefix/what/ever` patterns"
+    return "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$".format(prefix=prefix)
 
 def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     """queries GA per page-type, grouped by pagePath and date.
@@ -167,10 +160,10 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     starts Mar 21st, then the two-month chunk spanning Mar+Apr 2017 will
     become Mar(1st)+Mar(20th) and Mar(21st)+Apr"""
 
-    # note: this is not how `elife.metrics.ga_metrics` works!
+    # note: this is *not* how `elife.metrics.ga_metrics` works!
     # that module is doing a query for *every single day* since inception
 
-    ensure(is_ptype(ptype), "bad period type")
+    ensure(is_ptype(ptype), "bad page type")
 
     ptype_history = history or load_ptype_history(ptype)
 
@@ -208,11 +201,15 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     query_list = [merge(query_template, {"start_date": mgroup[0][0], "end_date": mgroup[-1][-1]}) for mgroup in chunked_months]
 
     # query list is still missing the pattern(s) that GA will query for.
-    # until historical epochs are supported, we just use the first entry.
+    # until historical epochs are supported, we just use the first frame.
     # (frames are ordered descendingly, latest to earliest)
-    ptype_filter = ptype_history['frames'][0]['ga_pattern']
-    query_list = [merge(q, {"filters": ptype_filter}) for q in query_list]
+    frame = ptype_history['frames'][0]
+    ptype_filter = frame.get('ga_pattern')
+    if not ptype_filter:
+        ensure('prefix' in frame, 'frame has no `ga_pattern` and no `prefix`, no query can be built')
+        ptype_filter = generic_ga_filter(frame['prefix'])
 
+    query_list = [(frame, merge(q, {"filters": ptype_filter})) for q in query_list]
     return query_list
 
 @cached
@@ -246,12 +243,15 @@ def update_page_counts(ptype, page_counts):
 # naive, will change
 def update_ptype(ptype):
     "glue code to query ga about a page-type and then processing and storing the results"
-    for query in build_ga_query(ptype):
-        response = query_ga(ptype, query)
-        normalised_rows = process_response(ptype, response)
-        counts = aggregate(normalised_rows)
-        LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
-        update_page_counts(ptype, counts)
+    try:
+        for frame, query in build_ga_query(ptype):
+            response = query_ga(ptype, query)
+            normalised_rows = process_response(ptype, frame, response)
+            counts = aggregate(normalised_rows)
+            LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
+            update_page_counts(ptype, counts)
+    except AssertionError as err:
+        LOG.error(err)
 
 #
 #
