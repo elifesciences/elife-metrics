@@ -5,8 +5,13 @@ from django.db.models import Sum
 from django.db.models.functions import TruncMonth
 from django.conf import settings
 from datetime import date, datetime
+from django.db import transaction
 import json
 import os
+from kids.cache import cache as cached
+import logging
+
+LOG = logging.getLogger(__name__)
 
 DAY, MONTH = 'day', 'month'
 
@@ -131,9 +136,12 @@ def process_response(ptype, response):
     return normalised
 
 def query_ga(ptype, query):
-    dump_path = ga_core.output_path(ptype, query['start_date'], query['end_date'])
+    sd, ed = query['start_date'], query['end_date']
+    LOG.info("querying GA for %ss between %s and %s" % (ptype, sd.date(), ed.date()))
+    dump_path = ga_core.output_path(ptype, sd, ed)
     if os.path.exists(dump_path):
         # temporary caching while I debug
+        LOG.debug("(cache hit)")
         return json.load(open(dump_path, 'r'))
     raw_response = ga_core.query_ga(query) # potentially 10k worth, but in actuality ...
     ga_core.write_results(raw_response, dump_path)
@@ -207,10 +215,14 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
 
     return query_list
 
-# naive, will change
+@cached
+def get_create_ptype(ptype):
+    return first(create_or_update(models.PageType, {"name": ptype}, update=False))
+
+@transaction.atomic
 def update_page_counts(ptype, page_counts):
     def do(row):
-        ptypeobj = first(create_or_update(models.PageType, {"name": ptype}, update=False))
+        ptypeobj = get_create_ptype(ptype)
 
         page_data = {
             'type': ptypeobj,
@@ -238,6 +250,7 @@ def update_ptype(ptype):
         response = query_ga(ptype, query)
         normalised_rows = process_response(ptype, response)
         counts = aggregate(normalised_rows)
+        LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
         update_page_counts(ptype, counts)
 
 #
