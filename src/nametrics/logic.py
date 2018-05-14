@@ -1,11 +1,12 @@
 from . import models
-from metrics.utils import ensure, lmap, create_or_update, first, merge, tod
+from metrics.utils import ensure, lmap, create_or_update, first, merge, tod, ymd
 from metrics.ga_metrics import core as ga_core, utils as ga_utils
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
 from django.conf import settings
 from datetime import date, datetime
 import json
+import os
 
 DAY, MONTH = 'day', 'month'
 
@@ -105,7 +106,13 @@ def aggregate(normalised_rows):
     idx = mkidx(normalised_rows, lambda row: (row['identifier'], row['date']))
     # return single record for each group, replacing 'views' with the sum of views in the group
     rows = [(grp[0]['identifier'], grp[0]['date'], sum(map(get('views'), grp))) for grp in idx.values()]
-    return asmaps(rows)
+    rows = asmaps(rows)
+
+    # sort rows by date and then path
+    # not necessary, but makes output nicer
+    rows = sorted(rows, key=lambda r: ymd(r['date']) + r['identifier'], reverse=True) # DESC
+
+    return rows
 
 #
 #
@@ -124,9 +131,11 @@ def process_response(ptype, response):
     return normalised
 
 def query_ga(ptype, query):
+    dump_path = ga_core.output_path(ptype, query['start_date'], query['end_date'])
+    if os.path.exists(dump_path):
+        # temporary caching while I debug
+        return json.load(open(dump_path, 'r'))
     raw_response = ga_core.query_ga(query) # potentially 10k worth, but in actuality ...
-    # dump the data, just for debugging
-    dump_path = ga_core.output_path_from_results(raw_response, ptype)
     ga_core.write_results(raw_response, dump_path)
     return raw_response
 
