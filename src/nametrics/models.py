@@ -14,7 +14,7 @@ class PageType(Model):
         return self.name
 
     def __repr__(self):
-        return '<PageType %r>' % self
+        return '<PageType %r>' % self.__str__()
 
 class Page(Model):
     type = ForeignKey(PageType, on_delete=CASCADE)
