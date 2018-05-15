@@ -60,6 +60,20 @@ class One(base.BaseCase):
         self.assertEqual(total, expected_sum)
         self.assertEqual(qobj.count(), expected_result_count)
 
+    def test_process_path(self):
+        cases = [
+            ("/pants/foobar", "foobar"),
+            ("/pants/foo/bar", "foo"),
+            ("https://sub.example.org/pants/foo/bar", "foo"),
+            ("/pants/foo?bar=baz", "foo"),
+            ("/pants/foo?bar=baz&bup=", "foo"),
+            ("/pants/foo#bar", "foo"),
+            ("/pants/foo#bar?baz=bup", "foo"),
+        ]
+        for given, expected in cases:
+            with self.subTest():
+                self.assertEqual(logic.process_path('/pants', given), expected)
+
 class Two(base.BaseCase):
     def setUp(self):
         self.tmpdir, self.tmpdir_killer = utils.tempdir()

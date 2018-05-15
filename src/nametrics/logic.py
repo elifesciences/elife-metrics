@@ -11,6 +11,7 @@ import os
 from kids.cache import cache as cached
 from functools import partial
 import logging
+from urllib.parse import urlparse
 
 LOG = logging.getLogger(__name__)
 
@@ -55,19 +56,11 @@ def get(k, d=None):
 #
 
 def process_path(prefix, path):
+    path = urlparse(path).path
+    # we could just dispense with the prefix and discard the first segment ...
     prefix_len = len(prefix)
     path = path[prefix_len:].strip().strip('/') # /events/foobar => foobar
-
-    # can probably replace this with urlparse
-    # anchors
-    qs = path.find('#')
-    if qs > -1:
-        path = path[:qs]
-
-    qs = path.find('?')
-    if qs > -1:
-        path = path[:qs]
-
+    path = path.split('/', 1)[0] # foobar/the-baz-in-bar-fooed-at-the-star => foobar
     return path
 
 def process_object(prefix, rows):
