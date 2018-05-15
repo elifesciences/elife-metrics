@@ -83,25 +83,26 @@ class Two(base.BaseCase):
 
     def test_build_ga_query(self):
         "the list of queries returned has the right shape"
-        jan18 = date(year=2018, month=1, day=1)
+        jan18 = date(year=2018, month=1, day=3) # non-minimum value to catch any minimising/maximising
+        dec18 = date(year=2018, month=12, day=25) # non-maximum value
         feb18 = date(year=2018, month=2, day=28)
-        dec18 = date(year=2018, month=12, day=31)
         ql = logic.build_ga_query(models.EVENT, jan18, dec18)
         self.assertEqual(len(ql), 6) # 6 * 2 month chunks
         query = 1 # frame = 0
         # the range is correct
-        self.assertEqual(ql[0][query]['start_date'].date(), jan18)
-        self.assertEqual(ql[-1][query]['end_date'].date(), dec18)
+        self.assertEqual(ql[0][query]['start_date'], jan18)
+        self.assertEqual(ql[-1][query]['end_date'], dec18)
         # the first chunk is correct
-        self.assertEqual(ql[0][query]['end_date'].date(), feb18)
+        self.assertEqual(ql[0][query]['end_date'], feb18)
 
     def test_build_ga_query_single(self):
+        "a query for a single day (no month range) is possible"
         jan18 = date(year=2018, month=1, day=1)
         ql = logic.build_ga_query(models.EVENT, jan18, jan18) # two start dates...
         query = 1 # frame = 0
         self.assertEqual(len(ql), 1)
-        self.assertEqual(ql[0][query]['start_date'].date(), jan18)
-        self.assertEqual(ql[0][query]['end_date'].date(), date(year=2018, month=1, day=31)) # end date maximised
+        self.assertEqual(ql[0][query]['start_date'], jan18)
+        self.assertEqual(ql[0][query]['end_date'], jan18)
 
     def test_load_ptype_history(self):
         logic.load_ptype_history(models.EVENT)
@@ -127,7 +128,12 @@ class Two(base.BaseCase):
 
     def test_ga_query(self):
         "if we have a query for a specific start/end date, those dates are not maximised/minimised to month borders"
-        self.fail()
+        midJan18 = date(2018, 1, 15)
+        midMar18 = date(2018, 3, 15)
+        ql = logic.build_ga_query(models.EVENT, midJan18, midMar18)
+        query = 1 # frame = 0
+        self.assertEqual(ql[0][query]['start_date'], midJan18)
+        self.assertEqual(ql[-1][query]['end_date'], midMar18)
 
     def test_process_response(self):
         "response is processed predictably, views are ints, dates are dates, results retain their order, etc"
@@ -150,11 +156,30 @@ class Two(base.BaseCase):
 
     def test_process_response_no_results(self):
         "a response with no results issues a warning but otherwise doesn't break"
-        self.fail()
+        frame = {'prefix': '/events'}
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        del fixture['rows']
+        processed_results = logic.process_response(models.EVENT, frame, fixture)
+        expected_results = []
+        self.assertEqual(processed_results, expected_results)
+        self.fail() # TODO: check warning issued
 
-    def test_process_response_one_bad_apple(self):
+    def test_process_response_bad_apples(self):
         "bad rows in response are discarded"
-        self.fail()
+        frame = {'prefix': '/events'}
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+
+        apple1 = 1
+        fixture['rows'][apple1] = [None, None, None] # it's a triple but quite useless
+        apple2 = 7
+        fixture['rows'][apple2] = 'how you like them apples?'
+
+        with patch('nametrics.logic.LOG') as mock:
+            processed_results = logic.process_response(models.EVENT, frame, fixture) # kaboom
+            expected_results = 122 - 2 # total non-aggregated results minus bad apples
+            self.assertEqual(len(processed_results), expected_results)
+            self.assertEqual(mock.exception.call_count, 2) # two unhandled errors for two bad apples
+
 
 class Three(base.BaseCase):
 
@@ -193,3 +218,20 @@ class Three(base.BaseCase):
         self.assertEqual(models.PageType.objects.count(), 1)
         self.assertEqual(models.Page.objects.count(), 2)
         self.assertEqual(models.PageCount.objects.count(), 4)
+
+    def test_update_ptype(self):
+        self.assertEqual(models.Page.objects.count(), 0)
+        self.assertEqual(models.PageType.objects.count(), 0)
+        self.assertEqual(models.PageCount.objects.count(), 0)
+
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+
+        frame = {'prefix': '/events'}
+        with patch('nametrics.logic.build_ga_query', return_value=[[frame, {}]]):
+            with patch('nametrics.logic.query_ga', return_value=fixture):
+                logic.update_ptype(models.EVENT)
+
+        self.assertEqual(models.Page.objects.count(), 11)
+        self.assertEqual(models.PageType.objects.count(), 1) # 'event'
+        # not the same as len(fixture.rows) because of aggregation
+        self.assertEqual(models.PageCount.objects.count(), 115)

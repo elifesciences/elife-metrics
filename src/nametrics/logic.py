@@ -65,14 +65,17 @@ def process_path(prefix, path):
 
 def process_object(prefix, rows):
     def _process(row):
-        path, datestr, count = row
-        path = process_path(prefix, path)
-        return {
-            'views': int(count),
-            'date': _str2dt(datestr),
-            'identifier': path,
-        }
-    return lmap(_process, rows)
+        try:
+            path, datestr, count = row
+            path = process_path(prefix, path)
+            return {
+                'views': int(count),
+                'date': _str2dt(datestr),
+                'identifier': path,
+            }
+        except BaseException as err:
+            LOG.exception("unhandled exception processing row: %s", str(err), extra={"row": row})
+    return list(filter(None, map(_process, rows)))
 
 #
 #
@@ -118,7 +121,7 @@ def process_response(ptype, frame, response):
 
 def query_ga(ptype, query):
     sd, ed = query['start_date'], query['end_date']
-    LOG.info("querying GA for %ss between %s and %s" % (ptype, sd.date(), ed.date()))
+    LOG.info("querying GA for %ss between %s and %s" % (ptype, sd, ed))
     dump_path = ga_core.output_path(ptype, sd, ed)
     if os.path.exists(dump_path):
         # temporary caching while I debug
@@ -164,7 +167,7 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     # the beginning of the first time frame (elife 2.0)
     # start_date = start_date or settings.INCEPTION.date()
     start_date = tod(start_date or ptype_history['frames'][0]['starts'])
-    end_date = tod(end_date or date.today())
+    end_date = tod(end_date or date.today()) # not a great default :(
     table_id = settings.GA_TABLE_ID
 
     ensure(is_date(start_date), "bad start date")
@@ -183,7 +186,9 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     }
 
     # get a single list of months from date A (start) to date B (end)
-    month_list = ga_utils.dt_month_range(start_date, end_date)
+    month_list = ga_utils.dt_month_range(start_date, end_date, preserve_caps=True)
+    # urgh. saves a bunch of .date()s downstream though
+    month_list = [(mmin.date(), mmax.date()) for mmin, mmax in month_list]
 
     # group the list into n-month chunks
     chunk_size = 2
@@ -205,15 +210,11 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     query_list = [(frame, merge(q, {"filters": ptype_filter})) for q in query_list]
     return query_list
 
-@cached
-def get_create_ptype(ptype):
-    return first(create_or_update(models.PageType, {"name": ptype}, update=False))
-
 @transaction.atomic
 def update_page_counts(ptype, page_counts):
-    def do(row):
-        ptypeobj = get_create_ptype(ptype)
+    ptypeobj = first(create_or_update(models.PageType, {"name": ptype}, update=False))
 
+    def do(row):
         page_data = {
             'type': ptypeobj,
             'identifier': row['identifier'],

@@ -24,11 +24,6 @@ def month_min_max(dt):
 def dt_range_gen(from_date, to_date):
     """returns series of datetime objects starting at from_date
     and ending on to_date inclusive."""
-    # unused, untested
-    # if not to_date:
-    #    to_date = from_date
-    # if from_date > to_date:
-    #    to_date, from_date = from_date, to_date
     diff = to_date - from_date
     for increment in range(0, diff.days + 1):
         dt = from_date + timedelta(days=increment)
@@ -37,19 +32,36 @@ def dt_range_gen(from_date, to_date):
 def dt_range(from_date, to_date):
     return list(dt_range_gen(from_date, to_date))
 
-def dt_month_range_gen(from_date, to_date):
+def dt_month_range_gen(from_date, to_date, preserve_caps=False):
+    from_date, to_date = d2dt(from_date), d2dt(to_date)
+
     # figure out a list of years and months the dates span
-    ym = set()
+    ym_range = set()
     for dt1, dt2 in dt_range(from_date, to_date):
-        ym.add((dt1.year, dt1.month))
+        ym_range.add((dt1.year, dt1.month))
+    ym_range = sorted(ym_range)
+
+    # trim the ends of the range we'll generate. we'll do those manually
+    if preserve_caps:
+        # [1, 2, 3][1:-1] => [2]
+        # [1, 2][1:-1] => [] (no range will be generated)
+        ym_range = ym_range[1:-1]
+
+        # return first pair of `from_date` + `from_date` maximum
+        yield (from_date, month_min_max(from_date)[1])
+
     # for each pair, generate a month max,min datetime pair
-    for year, month in sorted(ym):
+    for year, month in ym_range:
         mmin, mmax = calendar.monthrange(year, month)
         yield (datetime(year=year, month=month, day=1),
                datetime(year=year, month=month, day=mmax))
 
-def dt_month_range(from_date, to_date):
-    return list(dt_month_range_gen(from_date, to_date))
+    if preserve_caps:
+        # return the final pair of `to_date` minimum + `to_date`
+        yield (month_min_max(to_date)[0], to_date)
+
+def dt_month_range(from_date, to_date, preserve_caps=False):
+    return list(dt_month_range_gen(from_date, to_date, preserve_caps))
 
 def firstof(fn, x):
     for i in x:
@@ -75,3 +87,8 @@ def deplumpen(artid):
         msg = "unhandled exception attempting to parse given value %r" % str(artid)
         LOG.error(msg)
         raise ValueError(msg)
+
+def d2dt(d):
+    if isinstance(d, datetime):
+        return d
+    return datetime(year=d.year, month=d.month, day=d.day, hour=0, minute=0, second=0)
