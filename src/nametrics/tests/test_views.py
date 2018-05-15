@@ -19,3 +19,6 @@ class One(base.BaseCase):
                 for period in ['day', 'month']:
                     resp = self.c.get(url, {'period': period})
                     self.assertEqual(resp.status_code, 404)
+
+    def test_request(self):
+        self.fail()

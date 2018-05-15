@@ -76,11 +76,10 @@ class One(base.BaseCase):
 
 class Two(base.BaseCase):
     def setUp(self):
-        self.tmpdir, self.tmpdir_killer = utils.tempdir()
+        self.tmpdir, self.rm_tmpdir = utils.tempdir()
 
     def tearDown(self):
-        self.tmpdir_killer()
-        pass
+        self.rm_tmpdir()
 
     def test_build_ga_query(self):
         "the list of queries returned has the right shape"
@@ -89,18 +88,20 @@ class Two(base.BaseCase):
         dec18 = date(year=2018, month=12, day=31)
         ql = logic.build_ga_query(models.EVENT, jan18, dec18)
         self.assertEqual(len(ql), 6) # 6 * 2 month chunks
+        query = 1 # frame = 0
         # the range is correct
-        self.assertEqual(ql[0]['start_date'].date(), jan18)
-        self.assertEqual(ql[-1]['end_date'].date(), dec18)
+        self.assertEqual(ql[0][query]['start_date'].date(), jan18)
+        self.assertEqual(ql[-1][query]['end_date'].date(), dec18)
         # the first chunk is correct
-        self.assertEqual(ql[0]['end_date'].date(), feb18)
+        self.assertEqual(ql[0][query]['end_date'].date(), feb18)
 
     def test_build_ga_query_single(self):
         jan18 = date(year=2018, month=1, day=1)
         ql = logic.build_ga_query(models.EVENT, jan18, jan18) # two start dates...
+        query = 1 # frame = 0
         self.assertEqual(len(ql), 1)
-        self.assertEqual(ql[0]['start_date'].date(), jan18)
-        self.assertEqual(ql[0]['end_date'].date(), date(year=2018, month=1, day=31)) # end date maximised
+        self.assertEqual(ql[0][query]['start_date'].date(), jan18)
+        self.assertEqual(ql[0][query]['end_date'].date(), date(year=2018, month=1, day=31)) # end date maximised
 
     def test_load_ptype_history(self):
         logic.load_ptype_history(models.EVENT)
@@ -111,23 +112,49 @@ class Two(base.BaseCase):
     def test_query_ga(self):
         "a standard response from GA is handled as expected, a dump file is created etc"
         jan18 = date(year=2018, month=1, day=1)
-        q = logic.build_ga_query(models.EVENT, jan18, jan18)[0]
+        feb18 = date(year=2018, month=2, day=28)
+        frame, query = logic.build_ga_query(models.EVENT, jan18, feb18)[0]
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
         dumpfile = os.path.join(self.tmpdir, "pants.json")
-        with patch('metrics.ga_metrics.core.output_path_from_results', return_value=dumpfile):
+        with patch('metrics.ga_metrics.core.output_path', return_value=dumpfile):
             with patch('metrics.ga_metrics.core.query_ga', return_value=fixture):
-                result = logic.query_ga(models.EVENT, q)
-                self.assertEqual(result, fixture) # nametrics.logic.query_ga is just a thin wrapper for now
+                result = logic.query_ga(models.EVENT, query)
+                self.assertEqual(result, fixture)
                 # ensure the dump file was written for debugging/loading later
                 contents = os.listdir(self.tmpdir)
                 self.assertEqual(len(contents), 1)
                 self.assertEqual(json.load(open(dumpfile, 'r')), fixture)
 
+    def test_ga_query(self):
+        "if we have a query for a specific start/end date, those dates are not maximised/minimised to month borders"
+        self.fail()
+
     def test_process_response(self):
+        "response is processed predictably, views are ints, dates are dates, results retain their order, etc"
+        frame = {'prefix': '/events'}
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
-        with patch('metrics.ga_metrics.core.output_path_from_results'):
-            expected = []
-            self.assertEqual(logic.process_response(models.EVENT, fixture), expected)
+
+        processed_results = logic.process_response(models.EVENT, frame, fixture)
+        # for i, row in enumerate(processed_results):
+        #    print(i, row)
+
+        # list index, expected row
+        expected = [
+            (8, {'views': 4, 'identifier': '', 'date': date(2018, 1, 16)}),
+            (32, {'identifier': '843d8750', 'views': 245, 'date': date(2018, 1, 12)}),
+            (35, {'views': 437, 'identifier': '843d8750', 'date': date(2018, 1, 15)}),
+            (114, {'views': 12, 'identifier': 'c40798c3', 'date': date(2018, 1, 11)})
+        ]
+        for idx, expected_row in expected:
+            self.assertEqual(processed_results[idx], expected_row)
+
+    def test_process_response_no_results(self):
+        "a response with no results issues a warning but otherwise doesn't break"
+        self.fail()
+
+    def test_process_response_one_bad_apple(self):
+        "bad rows in response are discarded"
+        self.fail()
 
 class Three(base.BaseCase):
 

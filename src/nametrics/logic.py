@@ -34,7 +34,7 @@ def is_date(dt):
 #
 
 def _str2dt(string):
-    return datetime.strptime(string, "%Y%m%d")
+    return datetime.strptime(string, "%Y%m%d").date()
 
 def mkidx(rows, keyfn):
     idx = {}
