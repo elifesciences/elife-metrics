@@ -24,7 +24,8 @@ class Page(Model):
         unique_together = (('type', 'identifier'),)
 
     def __str__(self):
-        return "%s: %s" % (self.type, self.identifier) # ll: 'event: pants'
+        name = self.identifier or '[landing page]'
+        return "%s: %s" % (self.type, name) # ll: 'event: pants'
 
     def __repr__(self):
         return "<Page '%s:%s'>" % (self.type, self.identifier) # ll: <Page 'event:pants'>
