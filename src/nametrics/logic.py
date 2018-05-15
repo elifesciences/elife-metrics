@@ -1,7 +1,7 @@
 from . import models
 from metrics.utils import ensure, lmap, create_or_update, first, merge, tod, ymd
 from metrics.ga_metrics import core as ga_core, utils as ga_utils
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth
 from django.conf import settings
 from datetime import date, datetime
@@ -252,16 +252,19 @@ def update_ptype(ptype):
 #
 
 def daily_page_views(pobj):
-    qobj = pobj.pagecount_set.all() # daily is the finest grain we have
+    # create an alias 'date_field'.
+    # allows consistent chopping and sorting of results between daily and monthly
+    qobj = pobj.pagecount_set.all().annotate(date_field=F('date'))
     sums = qobj.aggregate(views_sum=Sum('views'))
     return sums['views_sum'] or 0, qobj
 
 def monthly_page_views(pobj):
     qobj = pobj.pagecount_set \
-        .annotate(month=TruncMonth('date')) \
-        .values('month') \
+        .annotate(date_field=TruncMonth('date')) \
+        .values('date_field') \
         .annotate(views_sum=Sum('views')) \
-        .values('month', 'views_sum')
+        .values('date_field', 'views_sum') \
+        .order_by()
     sums = pobj.pagecount_set.all().aggregate(views_sum=Sum('views'))
     return sums['views_sum'], qobj
 

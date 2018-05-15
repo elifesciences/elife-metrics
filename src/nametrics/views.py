@@ -15,6 +15,27 @@ LOG = logging.getLogger(__name__)
 # * msid is more strict than a pid
 # * doesn't capture a 'month' period, relying instead on SQL
 
+def serialise(total, sum_value, obj_list, period):
+    def do_day(obj):
+        return {
+            'period': obj.date.strftime('%Y-%m-%d'),
+            'value': obj.views
+        }
+
+    def do_month(obj):
+        return {
+            'period': obj['date_field'].strftime('%Y-%m'),
+            'value': obj['views_sum']
+        }
+
+    do = do_day if period == logic.DAY else do_month
+
+    return {
+        'totalPeriods': total,
+        'totalValue': sum_value,
+        'periods': [do(obj) for obj in obj_list],
+    }
+
 @api_view(["GET"])
 def metrics(request, ptype, pid=models.LANDING_PAGE):
     try:
@@ -23,7 +44,7 @@ def metrics(request, ptype, pid=models.LANDING_PAGE):
         get_object_or_404(models.Page, identifier=pid, type=ptype)
         sum_value, qobj = logic.page_views(pid, ptype, kwargs['period'])
         total_results, qpage = v2_logic.chop(qobj, **utils.exsubdict(kwargs, ['period']))
-        payload = v2.serialize(total_results, sum_value, qpage, 'page-views')
+        payload = serialise(total_results, sum_value, qpage, kwargs['period'])
         ctype = 'application/vnd.elife.metric-time-period+json;version=1'
         return Response(payload, content_type=ctype)
 

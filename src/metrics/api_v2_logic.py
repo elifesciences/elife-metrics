@@ -16,7 +16,7 @@ def chop(q, page, per_page, order):
         models.Article: 'doi',
         models.Metric: 'date',
         models.Citation: 'num',
-        nametrics.models.PageCount: 'date',
+        nametrics.models.PageCount: 'date_field',
     }
     order_by = order_by_idx[q.model]
 
