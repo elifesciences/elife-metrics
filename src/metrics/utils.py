@@ -109,7 +109,7 @@ def exsubdict(d, kl):
 def fmtdt(dt, fmt="%Y-%m-%d"):
     if not dt:
         dt = utcnow()
-    ensure(isinstance(dt, datetime), "datetime object expected, got %r" % type(dt))
+    ensure(isinstance(dt, datetime) or isinstance(dt, date), "date or datetime object expected, got %r" % type(dt))
     return dt.strftime(fmt)
 
 def ymdhms(dt=None):
