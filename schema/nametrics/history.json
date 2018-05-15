@@ -12,7 +12,7 @@
         "frames": [
             {
                 "ends": null,
-                "starts": "2017-01-01",
+                "starts": "2017-06-01",
                 "prefix": "/inside-elife"
             }
         ]
@@ -22,12 +22,12 @@
         "frames": [
             {
                 "ends": null, 
-                "starts": "2017-01-01",
+                "starts": "2017-06-01",
                 "prefix": "/events"
             }, 
             {
                 "pattern": "^/elife-news/events$", 
-                "ends": "2017-01-01", 
+                "ends": "2017-05-31", 
                 "ga_pattern": "ga:pagePath=~^/elife-news/events$", 
                 "starts": null
             }
@@ -40,7 +40,7 @@
     "interview": {
         "frames": [
             {
-                "starts": "2017-01-01",
+                "starts": "2017-06-01",
                 "ends": null,
                 "prefix": "/interviews"
             }
@@ -50,7 +50,7 @@
     "labs-post": {
         "frames": [
             {
-                "starts": "2017-01-01",
+                "starts": "2017-06-01",
                 "ends": null,
                 "prefix": "/labs"
             }
@@ -62,11 +62,11 @@
             {
                 "prefix": "/for-the-press",
                 "ends": null, 
-                "starts": "2017-01-01"
+                "starts": "2017-06-01"
             }, 
             {
                 "pattern": "^/elife-news/press-package-[a-z0-9-]+$|^/elife-news/researchers-uncover-more-about-why-and-when-hiv-rebounds-after-remission$|^/elife-news/new-test-for-ancient-dna-authenticity$|^/elife-news/generous-mothers-receive-less-nagging$|^/elife-news/social-yeast-cells-prefer-to-work-with-close-relatives-to-make-our-beer-bread-and-wine$|^/elife-news/hunger-hormone-is-boosted-by-restricted-meal-times$|^/elife-news/media-coverage-infant-brains-develop-years-faster-than-we-thought$|^/elife-news/early-hospitalisation-key-to-survival-for-ebola-victims-drc$|^/elife-news/new-way-to-fix-broken-heart$|^/elife-news/researchers-identify-potential-drug-that-could-help-treat-cystic-fibrosis$|^/elife-news/scientists-create-imaging-toolkit-to-help-identify-new-brain-tumour-drug-targets$|^/elife-news/press package-airport-screening-misses-half-of-disease-cases-but-could-be-improved-by-customising-to-pathogens$|^/elife-news/hummingbirds-rely-on-raw-power-not-physique-to-outmanoeuvre-rivals$|^/elife-news/first-insights-into-changes-to-developing-brain-caused-by-gene-associated-with-autism$|^/elife-news/new-species-of-human-relative-discovered-in-south-african-cave$|^/elife-news/drugs-from-dirt-scientists-develop-first-global-roadmap-for-drug-discovery$|^/elife-news/how-reward-daytime-sleep-boost-learning$|^/elife-news/golden-discovery-of-novel-imaging-technique-captures-beauty-of-metal-labeled-neurons-in-3d$|^/elife-news/midnight-munchies-mangle-memory$|^/elife-news/could-2016-be-a-bad-year-for-the-malaria-parasite-in-africa\\?$|^/elife-news/studies-explain-adolescents-vulnerability-to-addictive-drugs$|^/elife-news/anticancer-effects-of-drugs-overestimated-by-as-much-as-45%-in-animal-models$|^/elife-news/scientists-prove-key-aspect-of-evolutionary-theory$|^/elife-news/researchers-look-to-exploit-females-natural-resistance-to-infection$|^/elife-news/first-imagery-from-echolocation-reveals-elite-hunting-techniques-of-bats$|^/elife-news/researchers-map-areas-at-risk-of-ebola-outbreak$|^/elife-news/molecular-tweezer-targets-hiv-and-prevents-semen-from-promoting-infection$|^/elife-news/being-anxious-could-be-good-for-you-in-a-crisis$|^/elife-news/slime-can-see$|^/elife-news/scientists-robotically-driven-system-could-reduce-cost-of-discovering-drug-and-target-interactions$|^/elife-news/q-and-a-with-researchers-from-the-university-of-california-berkeley$|^/elife-news/scientists-warn-light-pollution-can-stop-coral-from-spawning$|^/elife-news/study-illuminates-new-design-strategies-for-optogenetic-tools$", 
-                "ends": "2017-01-01", 
+                "ends": "2017-05-31", 
                 "ga_pattern": "ga:pagePath=~^/elife-news/press-package-[a-z0-9-]+$,ga:pagePath=~^/elife-news/researchers-uncover-more-about-why-and-when-hiv-rebounds-after-remission$,ga:pagePath=~^/elife-news/new-test-for-ancient-dna-authenticity$,ga:pagePath=~^/elife-news/generous-mothers-receive-less-nagging$,ga:pagePath=~^/elife-news/social-yeast-cells-prefer-to-work-with-close-relatives-to-make-our-beer-bread-and-wine$,ga:pagePath=~^/elife-news/hunger-hormone-is-boosted-by-restricted-meal-times$,ga:pagePath=~^/elife-news/media-coverage-infant-brains-develop-years-faster-than-we-thought$,ga:pagePath=~^/elife-news/early-hospitalisation-key-to-survival-for-ebola-victims-drc$,ga:pagePath=~^/elife-news/new-way-to-fix-broken-heart$,ga:pagePath=~^/elife-news/researchers-identify-potential-drug-that-could-help-treat-cystic-fibrosis$,ga:pagePath=~^/elife-news/scientists-create-imaging-toolkit-to-help-identify-new-brain-tumour-drug-targets$,ga:pagePath=~^/elife-news/press package-airport-screening-misses-half-of-disease-cases-but-could-be-improved-by-customising-to-pathogens$,ga:pagePath=~^/elife-news/hummingbirds-rely-on-raw-power-not-physique-to-outmanoeuvre-rivals$,ga:pagePath=~^/elife-news/first-insights-into-changes-to-developing-brain-caused-by-gene-associated-with-autism$,ga:pagePath=~^/elife-news/new-species-of-human-relative-discovered-in-south-african-cave$,ga:pagePath=~^/elife-news/drugs-from-dirt-scientists-develop-first-global-roadmap-for-drug-discovery$,ga:pagePath=~^/elife-news/how-reward-daytime-sleep-boost-learning$,ga:pagePath=~^/elife-news/golden-discovery-of-novel-imaging-technique-captures-beauty-of-metal-labeled-neurons-in-3d$,ga:pagePath=~^/elife-news/midnight-munchies-mangle-memory$,ga:pagePath=~^/elife-news/could-2016-be-a-bad-year-for-the-malaria-parasite-in-africa\\?$,ga:pagePath=~^/elife-news/studies-explain-adolescents-vulnerability-to-addictive-drugs$,ga:pagePath=~^/elife-news/anticancer-effects-of-drugs-overestimated-by-as-much-as-45%-in-animal-models$,ga:pagePath=~^/elife-news/scientists-prove-key-aspect-of-evolutionary-theory$,ga:pagePath=~^/elife-news/researchers-look-to-exploit-females-natural-resistance-to-infection$,ga:pagePath=~^/elife-news/first-imagery-from-echolocation-reveals-elite-hunting-techniques-of-bats$,ga:pagePath=~^/elife-news/researchers-map-areas-at-risk-of-ebola-outbreak$,ga:pagePath=~^/elife-news/molecular-tweezer-targets-hiv-and-prevents-semen-from-promoting-infection$,ga:pagePath=~^/elife-news/being-anxious-could-be-good-for-you-in-a-crisis$,ga:pagePath=~^/elife-news/slime-can-see$,ga:pagePath=~^/elife-news/scientists-robotically-driven-system-could-reduce-cost-of-discovering-drug-and-target-interactions$,ga:pagePath=~^/elife-news/q-and-a-with-researchers-from-the-university-of-california-berkeley$,ga:pagePath=~^/elife-news/scientists-warn-light-pollution-can-stop-coral-from-spawning$,ga:pagePath=~^/elife-news/study-illuminates-new-design-strategies-for-optogenetic-tools$", 
                 "starts": null
             }
