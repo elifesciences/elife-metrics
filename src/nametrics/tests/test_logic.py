@@ -159,10 +159,11 @@ class Two(base.BaseCase):
         frame = {'prefix': '/events'}
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
         del fixture['rows']
-        processed_results = logic.process_response(models.EVENT, frame, fixture)
-        expected_results = []
-        self.assertEqual(processed_results, expected_results)
-        self.fail() # TODO: check warning issued
+        with patch('nametrics.logic.LOG') as mock:
+            processed_results = logic.process_response(models.EVENT, frame, fixture)
+            self.assertEqual(mock.warn.call_count, 1)
+            expected_results = []
+            self.assertEqual(processed_results, expected_results)
 
     def test_process_response_bad_apples(self):
         "bad rows in response are discarded"

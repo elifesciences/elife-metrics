@@ -105,6 +105,10 @@ def aggregate(normalised_rows):
 #
 
 def process_response(ptype, frame, response):
+    rows = response.get('rows')
+    if not rows:
+        LOG.warn("GA responded with no results", extra={'query': response['query'], 'ptype': ptype, 'frame': frame})
+        return []
     processor_map = {
         # 'blog-article': process_blog,
         # 'event': process_event,
@@ -116,7 +120,7 @@ def process_response(ptype, frame, response):
     if not processor:
         ensure('prefix' in frame, "no processor for %r and no `prefix` key found in history - cannot process results" % ptype)
         processor = partial(process_object, frame['prefix'])
-    normalised = processor(response.get('rows', []))
+    normalised = processor(rows)
     return normalised
 
 def query_ga(ptype, query):
