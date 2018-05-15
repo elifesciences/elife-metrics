@@ -4,6 +4,8 @@ PAGE_TYPES = BLOG, EVENT, INTERVIEW, LABS, PRESS = [
     'blog-article', 'event', 'interview', 'labs-post', 'press-package'
 ]
 
+LANDING_PAGE = ''
+
 def page_type_choices():
     return zip(PAGE_TYPES, PAGE_TYPES)
 

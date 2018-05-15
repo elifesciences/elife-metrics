@@ -4,6 +4,7 @@ from . import utils
 from .utils import ensure, rest, lmap
 from django.db.models import Sum, F, Max
 import logging
+import nametrics.models
 
 LOG = logging.getLogger(__name__)
 
@@ -15,6 +16,7 @@ def chop(q, page, per_page, order):
         models.Article: 'doi',
         models.Metric: 'date',
         models.Citation: 'num',
+        nametrics.models.PageCount: 'date',
     }
     order_by = order_by_idx[q.model]
 

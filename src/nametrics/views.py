@@ -16,12 +16,12 @@ LOG = logging.getLogger(__name__)
 # * doesn't capture a 'month' period, relying instead on SQL
 
 @api_view(["GET"])
-def metrics(request, ptype, pid):
+def metrics(request, ptype, pid=models.LANDING_PAGE):
     try:
         # /metrics/press-packages/12345/page-views?by=month
         kwargs = v2.request_args(request)
         get_object_or_404(models.Page, identifier=pid, type=ptype)
-        sum_value, qobj = logic.views(pid, ptype, kwargs['period'])
+        sum_value, qobj = logic.page_views(pid, ptype, kwargs['period'])
         total_results, qpage = v2_logic.chop(qobj, **utils.exsubdict(kwargs, ['period']))
         payload = v2.serialize(total_results, sum_value, qpage, 'page-views')
         ctype = 'application/vnd.elife.metric-time-period+json;version=1'
