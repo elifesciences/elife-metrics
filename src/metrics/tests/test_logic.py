@@ -1,8 +1,8 @@
 from . import base
 import os
-from metrics import utils
-from metrics.utils import tod
-from nametrics import logic, models
+from article_metrics import utils
+from article_metrics.utils import tod
+from metrics import logic, models
 from datetime import date
 from unittest.mock import patch
 import json

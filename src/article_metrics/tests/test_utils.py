@@ -1,4 +1,4 @@
-from metrics import utils
+from article_metrics import utils
 from . import base
 import pytz
 from datetime import datetime

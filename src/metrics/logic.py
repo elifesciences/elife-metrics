@@ -1,6 +1,6 @@
 from . import models
-from metrics.utils import ensure, lmap, create_or_update, first, merge, tod, ymd
-from metrics.ga_metrics import core as ga_core, utils as ga_utils
+from article_metrics.utils import ensure, lmap, create_or_update, first, merge, tod, ymd
+from article_metrics.ga_metrics import core as ga_core, utils as ga_utils
 from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth
 from django.conf import settings

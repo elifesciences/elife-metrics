@@ -1,6 +1,6 @@
 from . import base
 import os, json
-from nametrics import models, views, logic
+from metrics import models, views, logic
 from django.urls import reverse
 from django.test import Client
 

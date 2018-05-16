@@ -2,8 +2,8 @@ from os.path import join
 import json
 import responses
 from . import base
-from metrics.pm import citations
-from metrics import models
+from article_metrics.pm import citations
+from article_metrics import models
 
 class One(base.BaseCase):
     def setUp(self):

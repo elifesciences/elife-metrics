@@ -3,7 +3,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
-from metrics import logic, models
+from article_metrics import logic, models
 
 import logging
 LOG = logging.getLogger('debugger')

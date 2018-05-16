@@ -1,7 +1,7 @@
 from django.conf import settings
-from metrics.pm import bulkload_pmids
+from article_metrics.pm import bulkload_pmids
 from . import base
-from metrics import models
+from article_metrics import models
 from os.path import join
 
 class Load(base.BaseCase):

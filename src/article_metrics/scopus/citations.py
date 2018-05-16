@@ -1,8 +1,8 @@
 import requests
 import logging
 from django.conf import settings
-from metrics import models, handler
-from metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter, has_key, ParseError, ensure
+from article_metrics import models, handler
+from article_metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter, has_key, ParseError, ensure
 
 LOG = logging.getLogger(__name__)
 

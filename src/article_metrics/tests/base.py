@@ -1,7 +1,7 @@
 import os, json
 from django.test import TestCase as DjangoTestCase, TransactionTestCase
 import unittest
-from metrics import utils, models, logic
+from article_metrics import utils, models, logic
 from datetime import timedelta, datetime
 
 BASE_DATE = datetime(year=2001, month=1, day=1)

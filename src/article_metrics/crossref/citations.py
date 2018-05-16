@@ -1,5 +1,5 @@
 from dateutil.relativedelta import relativedelta
-from metrics import models, utils, handler
+from article_metrics import models, utils, handler
 from django.conf import settings
 import logging
 

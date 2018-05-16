@@ -1,7 +1,6 @@
 import sys
 from django.core.management.base import BaseCommand
-#from django.conf import settings
-from nametrics import cmds
+from metrics import cmds
 import logging
 LOG = logging.getLogger(__name__)
 

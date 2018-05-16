@@ -1,7 +1,7 @@
 import json
 from . import base
 from unittest.mock import patch, Mock
-from metrics import models, logic
+from article_metrics import models, logic
 from django.test import override_settings
 
 class One(base.TransactionBaseCase):

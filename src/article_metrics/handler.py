@@ -3,8 +3,8 @@ from os.path import join
 from django.conf import settings
 import inspect
 import uuid
-from metrics import utils
-from metrics.utils import ensure, lfilter
+from article_metrics import utils
+from article_metrics.utils import ensure, lfilter
 import requests, requests_cache
 import logging
 

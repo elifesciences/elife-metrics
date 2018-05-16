@@ -1,7 +1,7 @@
 import os
 from django.test import TestCase as DjangoTestCase
-from nametrics import models
-from metrics.utils import lmap
+from metrics import models
+from article_metrics.utils import lmap
 
 def insert_metrics(list_of_rows):
     def _insert(row):

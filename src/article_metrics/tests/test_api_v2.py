@@ -1,5 +1,5 @@
 import json
-from metrics import models, utils
+from article_metrics import models, utils
 from django.test import Client
 from . import base
 from django.core.urlresolvers import reverse

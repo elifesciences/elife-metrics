@@ -3,7 +3,7 @@ from django.http import Http404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
-from metrics import api_v2_views as v2, api_v2_logic as v2_logic, utils
+from article_metrics import api_v2_views as v2, api_v2_logic as v2_logic, utils
 from . import models, logic
 import logging
 

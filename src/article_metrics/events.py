@@ -1,4 +1,4 @@
-from metrics import models, utils
+from article_metrics import models, utils
 import json
 from django.conf import settings
 import boto3

@@ -1,10 +1,10 @@
 from unittest import mock
 from os.path import join
-from metrics import models, logic, utils
+from article_metrics import models, logic, utils
 from datetime import datetime
 from .base import BaseCase
 import json
-from metrics.scopus import citations as scopus_citations
+from article_metrics.scopus import citations as scopus_citations
 
 class One(BaseCase):
     def setUp(self):

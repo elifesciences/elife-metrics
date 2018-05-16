@@ -6,7 +6,7 @@ import os
 import json
 from os.path import join
 from django.conf import settings
-from metrics import handler, utils
+from article_metrics import handler, utils
 from . import base
 
 from requests.exceptions import Timeout

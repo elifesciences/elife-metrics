@@ -85,8 +85,8 @@ INSTALLED_APPS = (
     'rest_framework',
     'rest_framework_swagger', # gui for api
 
+    'article_metrics',
     'metrics',
-    'nametrics', # non-article metrics
 )
 
 MIDDLEWARE = (
@@ -195,8 +195,8 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [],
     'DEFAULT_PERMISSION_CLASSES': [],
     'DEFAULT_RENDERER_CLASSES': (
-        'metrics.negotiation.CitationVersion1',
-        'metrics.negotiation.MetricTimePeriodVersion1',
+        'article_metrics.negotiation.CitationVersion1',
+        'article_metrics.negotiation.MetricTimePeriodVersion1',
 
         'rest_framework.renderers.JSONRenderer',
         #'rest_framework.renderers.BrowsableAPIRenderer',
@@ -262,7 +262,6 @@ LOGGING = {
             'formatter': 'json',
         },
 
-        # entries here are meant
         'debugger.log': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
@@ -287,7 +286,7 @@ LOGGING = {
             'level': 'WARN',
             'handlers': ['debugger.log', 'stderr'],
         },
-        'publisher.management.commands.import_article': {
+        'article_metrics.management.commands.import_article': {
             'level': 'INFO',
             'handlers': ['stderr'],
         },

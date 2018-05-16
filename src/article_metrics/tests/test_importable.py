@@ -1,8 +1,6 @@
 from datetime import datetime
-from metrics import logic
+from article_metrics import logic
 from .base import BaseCase
-#import os
-#from os.path import join
 
 class TestAllImportable(BaseCase):
     def setUp(self):

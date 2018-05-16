@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import metrics.models
+import article_metrics.models
 
 
 class Migration(migrations.Migration):
@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='article',
             name='doi',
-            field=models.CharField(help_text='article identifier', max_length=255, unique=True, validators=[metrics.models.validate_doi]),
+            field=models.CharField(help_text='article identifier', max_length=255, unique=True, validators=[article_metrics.models.validate_doi]),
         ),
         migrations.AlterField(
             model_name='citation',

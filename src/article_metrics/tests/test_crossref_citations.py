@@ -1,7 +1,7 @@
 from . import base
 from unittest.mock import patch
-from metrics.crossref import citations as crossref
-from metrics import utils
+from article_metrics.crossref import citations as crossref
+from article_metrics import utils
 import responses
 
 class One(base.BaseCase):

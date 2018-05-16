@@ -3,7 +3,7 @@
 # this module brings it all back locally
 
 from . import logic, models
-from metrics import utils
+from article_metrics import utils
 import logging
 LOG = logging.getLogger(__name__)
 

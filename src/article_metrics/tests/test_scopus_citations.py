@@ -1,13 +1,13 @@
 import time
 import json
 from os.path import join
-from metrics import utils
+from article_metrics import utils
 import responses
 from unittest.mock import patch
 from . import base
-from metrics.scopus import citations
+from article_metrics.scopus import citations
 from django.conf import settings
-from metrics.utils import lmap
+from article_metrics.utils import lmap
 
 class One(base.BaseCase):
     def setUp(self):

@@ -2,8 +2,8 @@ import sys
 import pprint
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from metrics import ga_metrics
-from metrics.ga_metrics import utils
+from article_metrics import ga_metrics
+from article_metrics.ga_metrics import utils
 
 import logging
 LOG = logging.getLogger(__name__)

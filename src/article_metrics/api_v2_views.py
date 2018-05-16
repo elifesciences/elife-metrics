@@ -1,4 +1,4 @@
-from metrics import models
+from article_metrics import models
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.conf import settings

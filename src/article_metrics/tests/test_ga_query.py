@@ -2,8 +2,8 @@ from os.path import join
 from . import base
 import json
 from datetime import datetime, timedelta
-from metrics import utils
-from metrics.ga_metrics import core
+from article_metrics import utils
+from article_metrics.ga_metrics import core
 from collections import Counter
 from unittest.mock import patch
 

@@ -1,6 +1,6 @@
 """PMC provide a CSV of it's DB via FTP."""
-from metrics import models
-from metrics.utils import create_or_update, lmap, ensure
+from article_metrics import models
+from article_metrics.utils import create_or_update, lmap, ensure
 from django.conf import settings
 from django.db import transaction
 import csv
