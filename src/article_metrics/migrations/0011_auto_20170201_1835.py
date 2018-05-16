@@ -14,6 +14,9 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='article',
-            options={'ordering': ('-doi',)},
+            options={
+                'db_table': 'metrics_article',
+                'ordering': ('-doi',)
+            },
         ),
     ]

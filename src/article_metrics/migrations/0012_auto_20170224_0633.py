@@ -14,6 +14,9 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='citation',
-            options={'ordering': ('-num',)},
+            options={
+                'db_table': 'metrics_citation',
+                'ordering': ('-num',)
+            },
         ),
     ]

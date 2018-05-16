@@ -13,6 +13,8 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelOptions(
             name='gametric',
-            options={'ordering': ('date',)},
+            options={
+                'db_table': 'metrics_metric',
+                'ordering': ('date',)}
         ),
     ]
