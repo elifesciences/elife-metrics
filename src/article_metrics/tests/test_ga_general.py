@@ -1,5 +1,5 @@
 from . import base
-from metrics.ga_metrics import general, utils
+from article_metrics.ga_metrics import general, utils
 from datetime import datetime
 from collections import OrderedDict
 

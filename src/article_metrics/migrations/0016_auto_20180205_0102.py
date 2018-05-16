@@ -9,7 +9,7 @@ import article_metrics.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metrics', '0015_auto_20170517_0554'),
+        ('article_metrics', '0015_auto_20170517_0554'),
     ]
 
     operations = [

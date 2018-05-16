@@ -1,7 +1,7 @@
 import calendar
 from datetime import datetime, timedelta
 import logging
-from metrics.utils import ensure, isint, msid2doi
+from article_metrics.utils import ensure, isint, msid2doi
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)

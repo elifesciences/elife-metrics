@@ -12,7 +12,7 @@ class One(base.BaseCase):
         self.rmdir()
 
     @responses.activate
-    @patch('metrics.handler.LOG')
+    @patch('article_metrics.handler.LOG')
     def test_fetch_401_response(self, mock):
         "not authorised"
 

@@ -160,7 +160,7 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
     starts Mar 21st, then the two-month chunk spanning Mar+Apr 2017 will
     become Mar(1st)+Mar(20th) and Mar(21st)+Apr"""
 
-    # note: this is *not* how `elife.metrics.ga_metrics` works!
+    # note: this is *not* how `article_metrics.ga_metrics` works!
     # that module is doing a query for *every single day* since inception
 
     ensure(is_ptype(ptype), "bad page type")

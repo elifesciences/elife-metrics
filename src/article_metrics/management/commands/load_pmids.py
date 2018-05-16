@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from metrics.pm import bulkload_pmids
+from article_metrics.pm import bulkload_pmids
 
 import logging
 LOG = logging.getLogger(__name__)

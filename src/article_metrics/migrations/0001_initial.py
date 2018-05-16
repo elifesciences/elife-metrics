@@ -16,6 +16,9 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('doi', models.CharField(help_text=b'article identifier', max_length=255)),
             ],
+            options={
+                'db_table': 'metrics_article',
+            },
         ),
         migrations.CreateModel(
             name='GAMetric',
@@ -27,8 +30,12 @@ class Migration(migrations.Migration):
                 ('abstract', models.PositiveSmallIntegerField(help_text=b'article abstract page views')),
                 ('digest', models.PositiveSmallIntegerField(help_text=b'article digest page views')),
                 ('pdf', models.PositiveSmallIntegerField(help_text=b'pdf downloads')),
-                ('article', models.ForeignKey(to='metrics.Article')),
+                ('article', models.ForeignKey(to='article_metrics.Article')),
             ],
+            options={
+                'db_table': 'metrics_metric',
+            },
+
         ),
         migrations.AlterUniqueTogether(
             name='gametric',

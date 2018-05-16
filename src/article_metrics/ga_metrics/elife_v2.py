@@ -4,7 +4,7 @@
 # we can reuse these functions
 from . import elife_v1
 from .elife_v1 import group_results
-from metrics.utils import lfilter
+from article_metrics.utils import lfilter
 import re
 import logging
 

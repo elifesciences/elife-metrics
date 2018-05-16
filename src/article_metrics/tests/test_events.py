@@ -28,7 +28,7 @@ class One(base.TransactionBaseCase):
             "metric": "views-downloads"
         })
         mock = Mock()
-        with patch('metrics.events.event_bus_conn', return_value=mock):
+        with patch('article_metrics.events.event_bus_conn', return_value=mock):
             logic.insert_row(view_data)
             logic.recently_updated_article_notifications()
             mock.publish.assert_called_once_with(Message=expected_event)
@@ -49,7 +49,7 @@ class One(base.TransactionBaseCase):
             "metric": "citations"
         })
         mock = Mock()
-        with patch('metrics.events.event_bus_conn', return_value=mock):
+        with patch('article_metrics.events.event_bus_conn', return_value=mock):
             logic.insert_citation(citation_data)
             logic.recently_updated_article_notifications()
             mock.publish.assert_called_once_with(Message=expected_event)

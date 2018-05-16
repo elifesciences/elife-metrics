@@ -1,5 +1,5 @@
 from . import base
-from metrics.ga_metrics import core
+from article_metrics.ga_metrics import core
 from apiclient import errors
 
 import logging

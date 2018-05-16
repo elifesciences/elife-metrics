@@ -2,7 +2,7 @@ import os, json
 from os.path import join
 from . import base
 from datetime import datetime
-from metrics.ga_metrics import core, utils
+from article_metrics.ga_metrics import core, utils
 from django.conf import settings
 
 class TestUtils(base.SimpleBaseCase):

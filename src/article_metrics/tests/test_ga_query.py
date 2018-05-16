@@ -55,8 +55,8 @@ class Two(base.SimpleBaseCase):
 
     def test_elife_v4_excludes_bad_paths(self):
         from_dt, to_dt = datetime(2017, 10, 1), datetime(2017, 10, 31)
-        with patch('metrics.ga_metrics.core.query_ga_write_results', return_value=(self.fixture, self.fixture_path)):
-            with patch('metrics.ga_metrics.core.output_path', return_value=self.fixture_path):
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(self.fixture, self.fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path', return_value=self.fixture_path):
                 results = core.article_views('0xdeadbeef', from_dt, to_dt, cached=False, only_cached=False)
                 # total raw results = 4501
                 # after filtering bad eggs and aggregation: 4491

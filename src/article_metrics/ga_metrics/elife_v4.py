@@ -11,7 +11,7 @@ the urls become greatly simplified. no more volumes, no content types, no abstra
 from . import elife_v1
 # these seemingly unused imports are actually used
 from .elife_v1 import group_results
-from metrics.utils import lfilter
+from article_metrics.utils import lfilter
 import re
 import logging
 

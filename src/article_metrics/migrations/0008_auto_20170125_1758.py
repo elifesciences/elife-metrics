@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metrics', '0007_auto_20150925_1630'),
+        ('article_metrics', '0007_auto_20150925_1630'),
     ]
 
     operations = [
@@ -20,9 +20,10 @@ class Migration(migrations.Migration):
                 ('num', models.PositiveIntegerField()),
                 ('source', models.CharField(choices=[(b'scopus', b"Elsevier's Scopus"), (b'crossref', b'Crossref'), (b'pubmed', b'PubMed Central')], max_length=10)),
                 ('source_id', models.CharField(max_length=255)),
-                ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='metrics.Article')),
+                ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='article_metrics.Article')),
             ],
             options={
+                'db_table': 'metrics_citation',
                 'ordering': ('source',),
             },
         ),

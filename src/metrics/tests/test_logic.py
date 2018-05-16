@@ -117,8 +117,8 @@ class Two(base.BaseCase):
         frame, query = logic.build_ga_query(models.EVENT, jan18, feb18)[0]
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
         dumpfile = os.path.join(self.tmpdir, "pants.json")
-        with patch('metrics.ga_metrics.core.output_path', return_value=dumpfile):
-            with patch('metrics.ga_metrics.core.query_ga', return_value=fixture):
+        with patch('article_metrics.ga_metrics.core.output_path', return_value=dumpfile):
+            with patch('article_metrics.ga_metrics.core.query_ga', return_value=fixture):
                 result = logic.query_ga(models.EVENT, query)
                 self.assertEqual(result, fixture)
                 # ensure the dump file was written for debugging/loading later
@@ -159,7 +159,7 @@ class Two(base.BaseCase):
         frame = {'prefix': '/events'}
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
         del fixture['rows']
-        with patch('nametrics.logic.LOG') as mock:
+        with patch('metrics.logic.LOG') as mock:
             processed_results = logic.process_response(models.EVENT, frame, fixture)
             self.assertEqual(mock.warn.call_count, 1)
             expected_results = []
@@ -175,7 +175,7 @@ class Two(base.BaseCase):
         apple2 = 7
         fixture['rows'][apple2] = 'how you like them apples?'
 
-        with patch('nametrics.logic.LOG') as mock:
+        with patch('metrics.logic.LOG') as mock:
             processed_results = logic.process_response(models.EVENT, frame, fixture) # kaboom
             expected_results = 122 - 2 # total non-aggregated results minus bad apples
             self.assertEqual(len(processed_results), expected_results)
@@ -228,8 +228,8 @@ class Three(base.BaseCase):
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
 
         frame = {'prefix': '/events'}
-        with patch('nametrics.logic.build_ga_query', return_value=[[frame, {}]]):
-            with patch('nametrics.logic.query_ga', return_value=fixture):
+        with patch('metrics.logic.build_ga_query', return_value=[[frame, {}]]):
+            with patch('metrics.logic.query_ga', return_value=fixture):
                 logic.update_ptype(models.EVENT)
 
         self.assertEqual(models.Page.objects.count(), 11)

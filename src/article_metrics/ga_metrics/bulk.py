@@ -3,7 +3,7 @@ __description__ = """Bulk loading of eLife metrics from Google Analytics."""
 import os
 from . import core
 from . import utils
-from metrics.utils import lmap, lfilter
+from article_metrics.utils import lmap, lfilter
 from .core import ymd
 from datetime import datetime, timedelta
 import logging

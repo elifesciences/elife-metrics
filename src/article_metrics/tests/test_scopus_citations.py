@@ -28,7 +28,7 @@ class One(base.BaseCase):
 
     def test_scopus_parse_bad_entry(self):
         "entries with bad values are written to disk to be inspected later"
-        with patch('metrics.handler.writefile') as mock:
+        with patch('article_metrics.handler.writefile') as mock:
             entry = self.good_entry
             # skitch entry so it's bad
             entry['prism:doi'] = 'PAAAAAANTS'
@@ -38,7 +38,7 @@ class One(base.BaseCase):
 
     def test_scopus_unparseable_entry(self):
         "unparseable entries have a different return type"
-        with patch('metrics.handler.writefile') as mock:
+        with patch('article_metrics.handler.writefile') as mock:
             entry = self.good_entry
             # skitch entry so it's bad
             del entry['prism:doi']
@@ -52,7 +52,7 @@ class One(base.BaseCase):
         these dumps are slightly different from raw scopus results pages"""
         response_fixtures = utils.listfiles(join(self.fixture_dir, 'scopus-responses', 'dumps'))
         for response in response_fixtures:
-            with patch('metrics.handler.capture_parse_error', return_value=lambda fn: fn):
+            with patch('article_metrics.handler.capture_parse_error', return_value=lambda fn: fn):
                 try:
                     fixture = json.load(open(response, 'r'))['data']
                     utils.lmap(citations.parse_entry, fixture)
@@ -85,7 +85,7 @@ class One(base.BaseCase):
         response1 = obj('json', {'search-results': {'opensearch:totalResults': 2, 'entry': []}})
         response2 = obj('json', {'search-results': json.load(open(join(self.fixture_dir, 'scopus-responses', 'dodgy-scopus-results.json')))})
 
-        with patch('metrics.scopus.citations.fetch_page', side_effect=[response1, response2]):
+        with patch('article_metrics.scopus.citations.fetch_page', side_effect=[response1, response2]):
             # we get something for all of our entries
             results = citations.all_todays_entries()
             self.assertEqual(25, len(results))
@@ -103,7 +103,7 @@ class One(base.BaseCase):
             'status': 200,
             'content_type': 'text/plain'})
 
-        with patch('metrics.handler.requests_get') as mock:
+        with patch('article_metrics.handler.requests_get') as mock:
             start = time.time()
             # attempt to do more per-second than allowed
             for i in range(0, citations.MAX_PER_SECOND + 1):

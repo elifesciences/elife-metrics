@@ -1,6 +1,6 @@
 from .base import BaseCase
 from datetime import timedelta
-from metrics.ga_metrics import core
+from article_metrics.ga_metrics import core
 from collections import Counter
 
 class TestQueryResults(BaseCase):

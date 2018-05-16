@@ -25,6 +25,7 @@ class Article(models.Model):
     pmcid = CharField(max_length=10, unique=True, blank=True, null=True)
 
     class Meta:
+        db_table = 'metrics_article'
         ordering = ('-doi',)
 
     def __str__(self):
@@ -74,6 +75,7 @@ class Metric(models.Model):
         return self.abstract + self.full + self.digest
 
     class Meta:
+        db_table = 'metrics_metric'
         unique_together = ('article', 'date', 'period', 'source')
         ordering = ('date',)
 
@@ -124,6 +126,7 @@ class Citation(models.Model):
         return SOURCE_CHOICES_IDX.get(self.source)
 
     class Meta:
+        db_table = 'metrics_citation'
         # an article may only have one instance of a source
         unique_together = ('article', 'source')
         ordering = ('-num',)

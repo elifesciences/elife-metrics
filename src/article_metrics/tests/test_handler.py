@@ -18,7 +18,7 @@ class One(base.BaseCase):
     def tearDown(self):
         self.rmdir()
 
-    @patch('metrics.handler.LOG')
+    @patch('article_metrics.handler.LOG')
     def test_error_caught(self, mock):
         "the handler logger records the exception (but doesn't swallow it)"
         with self.settings(DUMP_PATH=self.tempdir):
@@ -28,7 +28,7 @@ class One(base.BaseCase):
             # mock.exception.assert_called_once()
             self.assertEqual(1, mock.exception.call_count)
 
-    @patch('metrics.handler.LOG')
+    @patch('article_metrics.handler.LOG')
     def test_error_captured(self, mock):
         "the handler writes a file on a bad request with details of the request and response"
         with self.settings(DUMP_PATH=self.tempdir):

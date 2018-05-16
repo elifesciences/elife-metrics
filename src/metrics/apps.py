@@ -1,5 +1,5 @@
 from django.apps import AppConfig
 
 
-class NametricsConfig(AppConfig):
-    name = 'nametrics'
+class MetricsConfig(AppConfig):
+    name = 'metrics'

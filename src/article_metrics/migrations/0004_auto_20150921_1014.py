@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('metrics', '0003_rename_metric_type'),
+        ('article_metrics', '0003_rename_metric_type'),
     ]
 
     operations = [
