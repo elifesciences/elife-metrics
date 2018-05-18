@@ -14,6 +14,8 @@ def norm_table_id(table_id):
 
 def ymd(dt):
     "returns a yyyy-mm-dd version of the given datetime object"
+    if isinstance(dt, str):
+        return dt
     return dt.strftime("%Y-%m-%d")
 
 def month_min_max(dt):

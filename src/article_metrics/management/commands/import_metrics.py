@@ -5,6 +5,8 @@ from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from article_metrics import logic, models
 
+from metrics import logic as na_logic
+
 import logging
 LOG = logging.getLogger('debugger')
 
@@ -59,11 +61,13 @@ class Command(BaseCommand):
         # print 'use cached? %r only cached? %r' % (use_cached, only_cached)
 
         GA_DAILY, GA_MONTHLY = 'ga-daily', 'ga-monthly'
+        NA_METRICS = 'non-article-metrics'
 
         # the mapping of sources and how to call them.
         # date ranges and caching arguments don't matter to citations right now
         # caching is feasible, but only crossref supports querying citations by date range
         sources = OrderedDict([
+            (NA_METRICS, (na_logic.update_all_ptypes,)),
             (GA_DAILY, (logic.import_ga_metrics, 'daily', from_date, to_date, use_cached, only_cached)),
             (GA_MONTHLY, (logic.import_ga_metrics, 'monthly', n_months_ago, to_date, use_cached, only_cached)),
             (models.CROSSREF, (logic.import_crossref_citations,)),

@@ -4,10 +4,6 @@
 # Analytics API:
 # https://developers.google.com/analytics/devguides/reporting/core/v3/reference
 
-__author__ = [
-    'Luke Skibinski <l.skibinski@elifesciences.org>',
-]
-
 from os.path import join
 import os, json, time, random
 from datetime import datetime, timedelta
@@ -16,7 +12,7 @@ from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
-from .utils import ymd, firstof, month_min_max
+from .utils import ymd, firstof, month_min_max, d2dt
 from kids.cache import cache
 import logging
 
@@ -113,10 +109,9 @@ def query_ga(query_map, num_attempts=5):
     if isinstance(query_map, dict):
 
         # clean up query, dates to strings, etc
-        if isinstance(query_map['start_date'], datetime):
-            query_map['start_date'] = ymd(query_map['start_date'])
-        if isinstance(query_map['end_date'], datetime):
-            query_map['end_date'] = ymd(query_map['end_date'])
+        query_map['start_date'] = ymd(query_map['start_date'])
+        query_map['end_date'] = ymd(query_map['end_date'])
+
         if not query_map['ids'].startswith('ga:'):
             query_map['ids'] = 'ga:%s' % query_map['ids']
 
@@ -174,8 +169,8 @@ def output_path(results_type, from_date, to_date):
     if isinstance(from_date, str): # given strings
         #from_date_dt = datetime.strptime(from_date, "%Y-%m-%d")
         to_date_dt = datetime.strptime(to_date, "%Y-%m-%d")
-    else: # given dt objects
-        to_date_dt = to_date
+    else: # given date/datetime objects
+        to_date_dt = d2dt(to_date)
         from_date, to_date = ymd(from_date), ymd(to_date)
 
     now, now_dt = ymd(datetime.now()), datetime.now()

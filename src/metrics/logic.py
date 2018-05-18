@@ -238,7 +238,6 @@ def update_page_counts(ptype, page_counts):
 #
 #
 
-# naive, will change
 def update_ptype(ptype):
     "glue code to query ga about a page-type and then processing and storing the results"
     try:
@@ -250,6 +249,9 @@ def update_ptype(ptype):
             update_page_counts(ptype, counts)
     except AssertionError as err:
         LOG.error(err)
+
+def update_all_ptypes():
+    lmap(update_ptype, models.PAGE_TYPES)
 
 #
 #
