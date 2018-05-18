@@ -1,7 +1,7 @@
 from django.db.models import Model, CharField, ForeignKey, PositiveIntegerField, DateField, CASCADE
 
-PAGE_TYPES = BLOG, EVENT, INTERVIEW, LABS, PRESS = [
-    'blog-article', 'event', 'interview', 'labs-post', 'press-package'
+PAGE_TYPES = BLOG, EVENT, INTERVIEW, LABS, PRESS, COLLECTION = [
+    'blog-article', 'event', 'interview', 'labs-post', 'press-package', 'collection'
 ]
 
 LANDING_PAGE = ''
