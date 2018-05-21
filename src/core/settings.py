@@ -5,7 +5,7 @@ example settings can be found in /path/to/lax/elife.cfg
 
 ./install.sh will create a symlink from dev.cfg -> lax.cfg if lax.cfg not found."""
 
-import os
+import os, sys
 from os.path import join
 from datetime import datetime
 import configparser
@@ -126,6 +126,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 # Testing
+TESTING = 'test' in sys.argv
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 TEST_OUTPUT_DIR = 'xml'
 

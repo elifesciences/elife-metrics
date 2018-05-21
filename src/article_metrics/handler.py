@@ -8,14 +8,15 @@ from article_metrics.utils import ensure, lfilter
 import requests, requests_cache
 import logging
 
-requests_cache.install_cache(**{
-    'cache_name': join(settings.OUTPUT_PATH, 'db'),
-    'backend': 'sqlite',
-    'fast_save': True,
-    'extension': '.sqlite3',
-    # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
-    'expire_after': timedelta(hours=24 * settings.CACHE_EXPIRY)
-})
+if not settings.TESTING:
+    requests_cache.install_cache(**{
+        'cache_name': join(settings.OUTPUT_PATH, 'db'),
+        'backend': 'sqlite',
+        'fast_save': True,
+        'extension': '.sqlite3',
+        # https://requests-cache.readthedocs.io/en/latest/user_guide.html#expiration
+        'expire_after': timedelta(hours=24 * settings.CACHE_EXPIRY)
+    })
 
 def clear_cache():
     requests_cache.clear()
