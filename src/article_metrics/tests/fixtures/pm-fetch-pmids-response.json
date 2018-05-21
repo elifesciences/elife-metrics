@@ -1,0 +1,18 @@
+{
+    "responseDate": "2018-05-20 23:26:36",
+    "request": "email=it-admin%40elifesciences.org;format=json;ids=10.7554%2FeLife.09560;tool=elife-metrics",
+    "status": "ok",
+    "records": [
+        {
+            "pmid": "26354291",
+            "versions": [
+                {
+                    "current": "true",
+                    "pmcid": "PMC4559886.1"
+                }
+            ],
+            "doi": "10.7554/eLife.09560",
+            "pmcid": "PMC4559886"
+        }
+    ]
+}

@@ -6,28 +6,29 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+PM_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
+PMID_URL = "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/"
+
+MAX_PER_PAGE = 200 # we can actually go as high as ~800
+
 def norm_pmcid(pmcid):
     "returns the integer form of a pmc id, stripping any leading 'pmc' prefix."
     if str(pmcid).lower().startswith('pmc'):
         return pmcid[3:]
     return str(pmcid)
 
-MAX_PER_PAGE = 200 # we can actually go as high as ~800
-
-
 def _fetch_pmids(doi):
     # article doesn't have a pmcid for whatever reason
     # go fetch one using doi
     # https://www.ncbi.nlm.nih.gov/pmc/tools/id-converter-api/
     LOG.info("fetching pmcid for doi %s" % doi)
-    url = "https://www.ncbi.nlm.nih.gov/pmc/utils/idconv/v1.0/"
     params = {
         'ids': doi,
         'tool': 'elife-metrics',
         'email': settings.CONTACT_EMAIL,
         'format': 'json',
     }
-    resp = requests.get(url, params=params)
+    resp = requests.get(PMID_URL, params=params)
     resp.raise_for_status()
 
     data = resp.json()
@@ -69,7 +70,7 @@ PM_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
 
 def fetch(pmcid_list):
     ensure(len(pmcid_list) <= MAX_PER_PAGE,
-           "no more than %s can be processed per-request. requested: %s" % (MAX_PER_PAGE, len(pmcid_list)))
+           "no more than %s results can be processed per-request. requested: %s" % (MAX_PER_PAGE, len(pmcid_list)))
     headers = {
         'accept': 'application/json'
     }
