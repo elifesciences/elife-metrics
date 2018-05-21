@@ -1,11 +1,9 @@
-from django.conf.urls import include, url
-from rest_framework_swagger.views import get_swagger_view
-from . import views
+from django.conf.urls import url
+from . import views, models
+
+page_type_str = '|'.join(models.PAGE_TYPES)
 
 urlpatterns = [
-    url(r'^api/docs/', get_swagger_view(title='Article Metrics API')),
-    url(r'^api/v2/', include('metrics.api_v2_urls', namespace='v2')),
-    url(r'^api/v1/', include('metrics.api_v1_urls')),
-
-    url(r'^$', views.index, name='index'),
+    url(r'^(?P<ptype>(' + page_type_str + '))/page-views$', views.metrics, name='nam'),
+    url(r'^(?P<ptype>(' + page_type_str + '))/(?P<pid>\w+)/page-views$', views.metrics, name='nam'),
 ]
