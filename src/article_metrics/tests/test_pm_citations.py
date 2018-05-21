@@ -82,15 +82,13 @@ class One(base.BaseCase):
         })
         art.save()
 
-        # TODO: this doesn't appear to actually be doing anything ...
-        # fixture = join(self.fixture_dir, 'pm-citation-request-response-09560.json')
-        # expected_body_content = json.load(open(fixture, 'r'))
-        # responses.add(responses.GET, citations.PM_URL, **{
-        #    'json': expected_body_content,
-        #    'status': 200,
-        #    'content_type': 'application/json'})
+        fixture = join(self.fixture_dir, 'pm-citation-request-response-09560.json')
+        expected_body_content = json.load(open(fixture, 'r'))
+        responses.add(responses.GET, citations.PM_URL, **{
+            'json': expected_body_content,
+            'status': 200,
+            'content_type': 'application/json'})
 
-        # TODO: and this is a lame test
         citations.citations_for_all_articles()
 
     @responses.activate
