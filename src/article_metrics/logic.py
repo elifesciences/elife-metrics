@@ -39,11 +39,12 @@ def notify(obj):
         events.notify(obj)
 
 def recently_updated_citations(td):
-    "all articles whose associated metrics/citations have been updated in the last hour"
+    "all citations updated in the last given duration"
     since = utils.utcnow() - td
     return models.Citation.objects.filter(datetime_record_updated__gte=since).order_by('-article__doi')
 
 def recently_updated_metrics(td):
+    "all metrics updated in the last given duration"
     since = utils.utcnow() - td
     return models.Metric.objects.filter(datetime_record_updated__gte=since).order_by('-article__doi')
 
@@ -52,6 +53,19 @@ def recently_updated_article_notifications(**kwargs):
     td = timedelta(**kwargs)
     lmap(notify, recently_updated_citations(td))
     lmap(notify, recently_updated_metrics(td))
+
+#
+#
+#
+
+def get_create_article(data):
+    "single point for accessing/creating Articles. returns None on bad data"
+    try:
+        'doi' in data and utils.doi2msid(data['doi'], allow_subresource=False)
+        return first(create_or_update(models.Article, data, ['doi'], create=True, update=False))
+    except AssertionError as err:
+        # it shouldn't get to this point!
+        LOG.warn("refusing to fetch/create bad article: %s" % err, extra={'article-data': data})
 
 #
 #
@@ -72,7 +86,10 @@ def create_row(doi, period, views, downloads):
     return row
 
 def _insert_row(data):
-    article_obj = first(create_or_update(models.Article, {'doi': data['doi']}, ['doi'], create=True, update=False))
+    article_obj = get_create_article({'doi': data['doi']})
+    if not article_obj:
+        LOG.warn("refusing to insert bad metric", extra={'row-data': data})
+        return
     row = utils.exsubdict(data, ['doi'])
     row['article'] = article_obj
     key = utils.subdict(row, ['article', 'date', 'period', 'source'])
@@ -92,7 +109,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
     "import metrics from GA between the two given dates or from inception"
     ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
 
-    table_id = 'ga:%s' % settings.GA_TABLE_ID
+    table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
     the_beginning = ga_metrics.core.VIEWS_INCEPTION
     yesterday = datetime.now() - timedelta(days=1)
 
@@ -123,8 +140,10 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
 #
 
 def insert_citation(data, aid='doi'):
-    # ll: ... = first(create_or_update(models.Article, {'doi': data['doi']}, ['doi'], create=True, update=False))
-    article_obj = first(create_or_update(models.Article, {aid: data[aid]}, [aid], create=True, update=False))
+    article_obj = get_create_article({aid: data[aid]})
+    if not article_obj:
+        LOG.warn("refusing to insert bad citation", extra={'citation-data': data})
+        return
     row = utils.exsubdict(data, [aid])
     row['article'] = article_obj
     key = utils.subdict(row, ['article', 'source'])
@@ -132,9 +151,10 @@ def insert_citation(data, aid='doi'):
 
 def countable(triple):
     "if the citation has been created or modified, return the object"
-    citation, created, updated = triple
-    if created or updated:
-        return citation
+    if triple:
+        citation, created, updated = triple
+        if created or updated:
+            return citation
 
 def import_scopus_citations():
     from .scopus.citations import all_todays_entries

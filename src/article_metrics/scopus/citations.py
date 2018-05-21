@@ -1,7 +1,7 @@
 import requests
 import logging
 from django.conf import settings
-from article_metrics import models, handler
+from article_metrics import models, handler, utils
 from article_metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter, has_key, ParseError, ensure
 
 LOG = logging.getLogger(__name__)
@@ -86,19 +86,23 @@ def parse_entry(entry):
         citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
         ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
         ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
+        utils.doi2msid(entry['prism:doi'], allow_subresource=False) # throws AssertionError
 
-        # don't swallow these, bad values are different from bad structure
-        # we may be able to recover from a dodgy doi
-        ensure(entry['prism:doi'].startswith(settings.DOI_PREFIX), 'entry has an unknown DOI prefix: %r' % entry['prism:doi'])
         return {
             'doi': entry['prism:doi'],
             'num': int(entry['citedby-count']),
             'source': models.SCOPUS,
             'source_id': citedby_link['@href']
         }
+
+    # errors handled here won't be caught by handler.capture_parse_error
+
+    except AssertionError:
+        LOG.warn("discarding scopus citation: failed to parse doi", extra={'response': entry})
+        return {'bad': entry}
+
     except ParseError:
-        # these won't be caught by handler.capture_parse_error
-        LOG.warn("discarding scopus citation: failed to parse response", extra={'response': entry})
+        LOG.warn("discarding scopus citation: failed to parse entry", extra={'response': entry})
         return {'bad': entry}
 
 def parse_results(search_result):

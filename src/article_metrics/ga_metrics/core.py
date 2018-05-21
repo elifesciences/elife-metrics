@@ -6,7 +6,7 @@
 
 from os.path import join
 import os, json, time, random
-from datetime import datetime, timedelta
+from datetime import datetime
 from googleapiclient import errors
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
@@ -325,18 +325,3 @@ def article_metrics(table_id, from_date, to_date, cached=False, only_cached=Fals
 
     # keep the two separate until we introduce POAs? or just always
     return {'views': views, 'downloads': downloads}
-
-
-#
-# bootstrap
-#
-
-def main(table_id):
-    to_date = from_date = datetime.now() - timedelta(days=1)
-    # use cache if available. use cache exclusively if the client-secrets.json file not found
-    #use_cached, use_only_cached = True, not os.path.exists('client-secrets.json')
-    use_cached, use_only_cached = True, not oauth_secrets()
-    print(('cached?', use_cached))
-    print(('only cached?', use_only_cached))
-    #use_cached = use_only_cached = False
-    return article_metrics(table_id, from_date, to_date, use_cached, use_only_cached)
