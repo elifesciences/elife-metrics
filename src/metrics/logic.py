@@ -51,6 +51,13 @@ def get(k, d=None):
         return lambda d: get(k, d)
     return d.get(k)
 
+
+#@cached # just while debugging
+def load_ptype_history(ptype):
+    ptype_history = json.load(open(settings.GA_PTYPE_HISTORY_PATH, 'r'))
+    ensure(ptype in ptype_history, "no historical data found: %s" % ptype, ValueError)
+    return ptype_history[ptype]
+
 #
 #
 #
@@ -135,11 +142,6 @@ def query_ga(ptype, query):
     ga_core.write_results(raw_response, dump_path)
     return raw_response
 
-@cached
-def load_ptype_history(ptype):
-    ptype_history = json.load(open(settings.GA_PTYPE_HISTORY_PATH, 'r'))
-    ensure(ptype in ptype_history, "no historical data found: %s" % ptype, ValueError)
-    return ptype_history[ptype]
 
 def generic_ga_filter(prefix):
     "returns a generic GA pattern that handles `/prefix` and `/prefix/what/ever` patterns"

@@ -1,80 +1,30 @@
 from copy import deepcopy
+from article_metrics.utils import merge
+from schema import Schema, And, Or, Use as Cast, Optional
+from datetime import date
+from functools import partial
 
-#
-# history loading and parsing
-#
+type_optional_date = Or(date, None)
+type_str = And(str, len) # non-empty string
 
-'''
-            {
-                "ends": null,
-                "starts": "2017-06-01",
-                "prefix": "/collections"
-            },
-            {
-                "ends": "2017-05-31", 
-                "starts": null,
-                "prefix": "/collections",
-                "path_list": [
-                    "chemical-biology",
-                    "tropical-disease",
-                    "paleontology",
-                    "human-genetics",
-                    "natural-history-model-organisms",
-                    "reproducibility-project-cancer-biology",
-                    "plain-language-summaries"
-                ]
-            }
+_frame0 = {'starts': type_optional_date, 'ends': type_optional_date}
+_only_one = lambda d: d['starts'] or d['ends']
+frame0 = And(_frame0, _only_one) # we can't merge Schemas, which sucks
 
-            {
-                "ends": "2017-05-31", 
-                "pattern": "ga:pagePath=~^/elife-news/events$", 
-                "starts": null
-            }
-'''
+_frame1 = merge(_frame0, {'prefix': type_str})
+frame1 = And(_frame1, _only_one)
 
-type_string = {'type': 'string'}
-type_list_of_strings = {'type': 'list', 'schema': type_string}
-type_nullable_date = {'type': 'date', 'nullable': True}
+_frame2 = merge(_frame1, {'path-list': [type_str]})
+frame2 = And(_frame2, _only_one)
 
-# all variations need a start and end date
-frame0 = {
-    'type': 'dict',
-    'schema': {
-        'starts': type_nullable_date,
-        'ends': type_nullable_date,
-    }
-}
+_frame3 = merge(_frame0, {'pattern': type_str})
+frame3 = And(_frame3, _only_one)
 
-# good for current era (2.0) objects where we can derive a pattern from just a prefix
-frame1 = deepcopy(frame0)
-frame1['schema']['prefix'] = type_string
+type_frame = Or(frame0, frame1, frame2, frame3)
 
-# prefix is followed by a list of paths
-# good for fixed lists of things
-frame2 = deepcopy(frame1)
-frame2['schema']['path_list'] = type_list_of_strings
+type_object = Schema({
+    'frames': [type_frame],
+    Optional('examples'): [type_str]
+})
 
-# explicit pattern to pass to GA
-frame3 = deepcopy(frame0)
-frame3['schema']['pattern'] = type_string
-
-# multiple explicit patterns for GA
-# query is OR'd before sending to GA
-frame4 = deepcopy(frame0)
-frame4['schema']['pattern'] = type_list_of_strings
-
-type_list_of_frames = {'type': 'list', 'anyof': [frame1, frame2, frame3, frame4]}
-
-type_object = {
-    'type': 'dict',
-    'schema': {
-        'frames': type_list_of_frames,
-        'examples': type_list_of_strings,
-    }
-}
-
-# final definition of our history map
-schema = {
-    'type': 'dict',
-    'schema': type_object
-}
+type_history = Schema({type_str: type_object})
