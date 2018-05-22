@@ -1,8 +1,6 @@
-from copy import deepcopy
 from article_metrics.utils import merge
-from schema import Schema, And, Or, Use as Cast, Optional
+from schema import Schema, And, Or, Optional
 from datetime import date
-from functools import partial
 
 type_optional_date = Or(date, None)
 type_str = And(str, len) # non-empty string

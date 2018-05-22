@@ -9,7 +9,7 @@ class One(base.BaseCase):
             (history.frame0, {'starts': None, 'ends': today}),
             (history.frame0, {'starts': today, 'ends': None}),
             (history.frame0, {'starts': today, 'ends': today}),
-            
+
             (history.frame1, {'starts': today, 'ends': None, 'prefix': '/pants'}),
             (history.frame1, {'starts': None, 'ends': today, 'prefix': '/pants'}),
 

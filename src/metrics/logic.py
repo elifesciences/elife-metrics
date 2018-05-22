@@ -52,7 +52,7 @@ def get(k, d=None):
     return d.get(k)
 
 
-#@cached # just while debugging
+@cached
 def load_ptype_history(ptype):
     ptype_history = json.load(open(settings.GA_PTYPE_HISTORY_PATH, 'r'))
     ensure(ptype in ptype_history, "no historical data found: %s" % ptype, ValueError)
