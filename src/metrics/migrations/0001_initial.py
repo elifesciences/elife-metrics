@@ -3,13 +3,18 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models, connection
-from django.db.utils import OperationalError
+from django.db.utils import OperationalError, ProgrammingError
 import django.db.models.deletion
 from core import settings
 from pathlib import Path
 import logging
 
 LOG = logging.getLogger(__name__)
+
+#
+# piggybacking off of migrations because this update is awkward.
+# temporary, remove once all databases updated
+#
 
 FLAG = Path(settings.PROJECT_DIR, ".migrations-table-updated.flag")
 if not FLAG.exists():
@@ -21,11 +26,13 @@ if not FLAG.exists():
             sql = "update django_migrations set app='article_metrics' where app = 'metrics'"
             cursor.execute(sql)
             FLAG.touch()
-        except OperationalError as err:
-            msg = str(err)
+        except (OperationalError, ProgrammingError) as err:
+            msg = str(err).splitlines()[0]
 
             # case: brand new database, no old data to migrate
-            if msg == 'no such table: django_migrations':
+            sqlite = 'no such table: django_migrations'
+            psql = 'relation "django_migrations" does not exist'
+            if msg in [sqlite, psql]:
                 # no migrations? no problems
                 FLAG.touch()
 
@@ -34,8 +41,12 @@ if not FLAG.exists():
                 raise
 
     except BaseException as err:
-        LOG.exception("unhandled exception attempting to update django_migrations.app values")
+        LOG.error("unhandled exception attempting to update django_migrations.app values")
         raise
+
+#
+#
+#
 
 class Migration(migrations.Migration):
 
