@@ -52,7 +52,7 @@ def _fetch_pmids(doi):
     # ]
     #}
     ensure(data['status'] == 'ok', "response is not ok! %s" % data)
-    return subdict(data['records'][0], ['doi', 'pmid', 'pmcid'])
+    return subdict(data['records'][0], ['pmid', 'pmcid'])
 
 def resolve_pmcid(artobj):
     pmcid = artobj.pmcid
@@ -60,13 +60,13 @@ def resolve_pmcid(artobj):
         LOG.debug("no pmcid fetch necessary")
         return pmcid
     data = _fetch_pmids(artobj.doi)
-    return first(utils.create_or_update(models.Article, data, ['doi'], create=False, update=True)).pmcid
+    data['doi'] = artobj.doi # don't use doi from response, prefer the doi we already have
+    artobj = first(utils.create_or_update(models.Article, data, ['doi'], create=False, update=True))
+    return artobj.pmcid
 
 #
 #
 #
-
-PM_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/elink.fcgi"
 
 def fetch(pmcid_list):
     ensure(len(pmcid_list) <= MAX_PER_PAGE,

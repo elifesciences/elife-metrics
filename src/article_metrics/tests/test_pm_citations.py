@@ -33,7 +33,7 @@ class One(base.BaseCase):
             'content_type': 'application/json'})
 
         expected = {
-            'doi': '10.7554/eLife.09560',
+            # 'doi': '10.7554/eLife.09560', # removed from response, prefer the doi we already have
             'pmid': '26354291',
             'pmcid': 'PMC4559886'
         }
