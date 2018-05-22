@@ -31,10 +31,13 @@ class One(BaseCase):
         fixture = scopus_citations.parse_results(search_results)
         with mock.patch("article_metrics.scopus.citations.all_todays_entries", return_value=fixture):
             logic.import_scopus_citations()
-            bad_eggs = 3
-            expected = len(fixture) - bad_eggs
-            self.assertEqual(expected, models.Article.objects.count())
 
+            unparseable_entries = 2
+            unknown_doi_prefixes = 1
+            subresource_dois = 2
+            bad_eggs = unparseable_entries + unknown_doi_prefixes + subresource_dois
+            expected = len(fixture) - bad_eggs
+            self.assertEqual(models.Article.objects.count(), expected)
 
 class TestGAImport(BaseCase):
     def setUp(self):
@@ -66,13 +69,13 @@ class TestGAImport(BaseCase):
             'digest': 0,
             'period': 'day',
             'date': '2001-01-01',
-            'doi': '10.7554/DUMMY',
+            'doi': '10.7554/elife.1',
             'source': models.GA,
         }
         logic.insert_row(ds1)
         self.assertEqual(1, models.Article.objects.count())
         self.assertEqual(1, models.Metric.objects.count())
-        clean_metric = models.Metric.objects.get(article__doi='10.7554/DUMMY')
+        clean_metric = models.Metric.objects.get(article__doi='10.7554/elife.1')
         self.assertEqual(0, clean_metric.pdf)
 
         expected_update = {
@@ -82,10 +85,10 @@ class TestGAImport(BaseCase):
             'digest': 0,
             'period': 'day',
             'date': '2001-01-01',
-            'doi': '10.7554/DUMMY',
+            'doi': '10.7554/elife.1',
             'source': models.GA,
         }
         logic.insert_row(expected_update)
         self.assertEqual(1, models.Metric.objects.count())
-        clean_metric = models.Metric.objects.get(article__doi='10.7554/DUMMY')
+        clean_metric = models.Metric.objects.get(article__doi='10.7554/elife.1')
         self.assertEqual(1, clean_metric.pdf)

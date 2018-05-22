@@ -26,16 +26,6 @@ class One(base.BaseCase):
         expected_entries = per_page * len(response_fixtures)
         self.assertEqual(expected_entries, len(res))
 
-    def test_scopus_parse_bad_entry(self):
-        "entries with bad values are written to disk to be inspected later"
-        with patch('article_metrics.handler.writefile') as mock:
-            entry = self.good_entry
-            # skitch entry so it's bad
-            entry['prism:doi'] = 'PAAAAAANTS'
-            result = citations.parse_entry(entry)
-            self.assertTrue('bad' in result) # ll: {'bad': ...}
-            self.assertTrue(mock.called)
-
     def test_scopus_unparseable_entry(self):
         "unparseable entries have a different return type"
         with patch('article_metrics.handler.writefile') as mock:
@@ -88,10 +78,16 @@ class One(base.BaseCase):
         with patch('article_metrics.scopus.citations.fetch_page', side_effect=[response1, response2]):
             # we get something for all of our entries
             results = citations.all_todays_entries()
-            self.assertEqual(25, len(results))
-            # and some entries have been marked as badly formed
-            bad_eggs = 3
-            self.assertEqual(25 - bad_eggs, len([r for r in results if 'bad' not in r]))
+            total_results = 25
+            self.assertEqual(len(results), total_results)
+
+            unparseable_entries = 2
+            unknown_doi_prefixes = 1
+            subresource_dois = 2
+            bad_eggs = unparseable_entries + unknown_doi_prefixes + subresource_dois
+
+            expected = len([r for r in results if 'bad' not in r])
+            self.assertEqual(total_results - bad_eggs, expected)
 
     @responses.activate
     def test_many_scopus_requests(self):
