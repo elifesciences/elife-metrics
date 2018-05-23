@@ -1,6 +1,7 @@
 from datetime import date
 from . import base
 from metrics import history, models
+from django.conf import settings
 
 class One(base.BaseCase):
     def test_frame(self):
@@ -43,6 +44,27 @@ class One(base.BaseCase):
             }
         }
         history.type_history.validate(case)
+
+    def test_history_gets_dates_capped(self):
+        case = {
+            'judgement-day': {
+                'frames': [
+                    {'starts': date(year=1997, month=8, day=29),
+                     'ends': None, # becomes date.today()
+                     'pattern': '.*$'},
+                    {'starts': None, # becomes settings.INCEPTION
+                     'ends': date(year=1997, month=8, day=28),
+                     'pattern': 'life-as-we-know-it'}
+                ],
+                'examples': [
+                    'terminator',
+                    't2: judgement day',
+                ]
+            }
+        }
+        results = history.type_history.validate(case)
+        self.assertEqual(results['judgement-day']['frames'][0]['ends'], date.today())
+        self.assertEqual(results['judgement-day']['frames'][-1]['starts'], settings.INCEPTION.date())
 
     def test_default_history_file(self):
         history.load_from_file() # no SchemaError errors thrown

@@ -1,7 +1,6 @@
 from article_metrics.utils import merge
 from schema import Schema, And, Or, Use as Coerce, Optional, SchemaError
-from datetime import datetime
-#from kids.cache import cache as cached
+from datetime import datetime, date
 from django.conf import settings
 import json
 import logging
@@ -9,12 +8,21 @@ from article_metrics.utils import ensure
 
 LOG = logging.getLogger(__name__)
 
-def to_date(v):
+def date_wrangler(v):
     if isinstance(v, str):
         return datetime.strptime(v, "%Y-%m-%d").date()
     return v
 
-type_optional_date = Or(Coerce(to_date), None)
+def frames_wrangler(frame_list):
+    incept_date = settings.INCEPTION.date() # morphology, longevity
+    frame_list = sorted(frame_list, key=lambda f: f['starts'] or incept_date)
+    if not frame_list[0]['ends']:
+        frame_list[0]['ends'] = date.today()
+    if not frame_list[-1]['starts']:
+        frame_list[-1]['starts'] = incept_date
+    return frame_list
+
+type_optional_date = Or(Coerce(date_wrangler), None)
 type_str = And(str, len) # non-empty string
 
 _frame0 = {'starts': type_optional_date, 'ends': type_optional_date}
@@ -33,14 +41,13 @@ frame3 = And(_frame3, _only_one)
 type_frame = Or(frame1, frame2, frame3)
 
 type_object = Schema({
-    'frames': [type_frame],
+    'frames': And([type_frame], Coerce(frames_wrangler)),
     Optional('examples'): [type_str]
 })
 
 type_history = Schema({type_str: type_object})
 
 
-#@cached
 def load_from_file(history_path=None):
     history_path = history_path or settings.GA_PTYPE_HISTORY_PATH
     try:
@@ -52,6 +59,5 @@ def load_from_file(history_path=None):
 
 def ptype_history(ptype, history=None):
     history = history or load_from_file()
-    # TODO: enshrine this rule in the schema somehow
     ensure(ptype in history, "no historical data found: %s" % ptype, ValueError)
     return history[ptype]
