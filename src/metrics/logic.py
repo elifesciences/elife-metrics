@@ -1,4 +1,4 @@
-from . import models
+from . import models, history
 from article_metrics.utils import ensure, lmap, create_or_update, first, merge, tod, ymd
 from article_metrics.ga_metrics import core as ga_core, utils as ga_utils
 from django.db.models import Sum, F
@@ -8,7 +8,6 @@ from datetime import date, datetime
 from django.db import transaction
 import json
 import os
-from kids.cache import cache as cached
 from functools import partial
 import logging
 from urllib.parse import urlparse
@@ -50,13 +49,6 @@ def get(k, d=None):
     if not d:
         return lambda d: get(k, d)
     return d.get(k)
-
-
-@cached
-def load_ptype_history(ptype):
-    ptype_history = json.load(open(settings.GA_PTYPE_HISTORY_PATH, 'r'))
-    ensure(ptype in ptype_history, "no historical data found: %s" % ptype, ValueError)
-    return ptype_history[ptype]
 
 #
 #
@@ -147,7 +139,7 @@ def generic_ga_filter(prefix):
     "returns a generic GA pattern that handles `/prefix` and `/prefix/what/ever` patterns"
     return "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$".format(prefix=prefix)
 
-def build_ga_query(ptype, start_date=None, end_date=None, history=None):
+def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
     """queries GA per page-type, grouped by pagePath and date.
     each result will return 10k results max and there is no pagination.
     If every page of a given type is visited once a day for a year, then
@@ -167,7 +159,7 @@ def build_ga_query(ptype, start_date=None, end_date=None, history=None):
 
     ensure(is_ptype(ptype), "bad page type")
 
-    ptype_history = history or load_ptype_history(ptype)
+    ptype_history = history_data or history.ptype_history(ptype)
 
     # until historical epochs are introduced, we only go back as far as
     # the beginning of the first time frame (elife 2.0)

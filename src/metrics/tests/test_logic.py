@@ -104,12 +104,6 @@ class Two(base.BaseCase):
         self.assertEqual(ql[0][query]['start_date'], jan18)
         self.assertEqual(ql[0][query]['end_date'], jan18)
 
-    def test_load_ptype_history(self):
-        logic.load_ptype_history(models.EVENT)
-
-    def test_load_missing_ptype_history(self):
-        self.assertRaises(ValueError, logic.load_ptype_history, "pants")
-
     def test_query_ga(self):
         "a standard response from GA is handled as expected, a dump file is created etc"
         jan18 = date(year=2018, month=1, day=1)

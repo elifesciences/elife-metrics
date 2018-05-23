@@ -1,6 +1,6 @@
 from datetime import date
 from . import base
-from metrics import history
+from metrics import history, models
 
 class One(base.BaseCase):
     def test_frame(self):
@@ -23,9 +23,10 @@ class One(base.BaseCase):
             with self.subTest():
                 schema.validate(case)
 
-        # all of the above variations are collected under `history.frame`
-        for case in map(lambda p: p[1], cases):
-            history.type_frame.validate(case)
+        # all of the above variations (except frame0) are collected under `history.frame`
+        for case in map(lambda p: p[1], cases[3:]):
+            with self.subTest(case):
+                history.type_frame.validate(case)
 
     def test_history(self):
         case = {
@@ -42,3 +43,12 @@ class One(base.BaseCase):
             }
         }
         history.type_history.validate(case)
+
+    def test_default_history_file(self):
+        history.load_from_file() # no SchemaError errors thrown
+
+    def test_load_ptype_history(self):
+        history.ptype_history(models.EVENT)
+
+    def test_load_missing_ptype_history(self):
+        self.assertRaises(ValueError, history.ptype_history, "pants")
