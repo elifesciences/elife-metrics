@@ -66,6 +66,34 @@ class One(base.BaseCase):
         self.assertEqual(results['judgement-day']['frames'][0]['ends'], date.today())
         self.assertEqual(results['judgement-day']['frames'][-1]['starts'], settings.INCEPTION.date())
 
+    def test_history_frames_sorted(self):
+        d1 = date(year=2018, month=1, day=1)
+        d2 = date(year=2018, month=2, day=2)
+        d3 = date(year=2018, month=3, day=3)
+        d4 = date(year=2018, month=4, day=4)
+
+        f1 = {'starts': d1, 'ends': d2, 'pattern': 'na'}
+        f2 = {'starts': d2, 'ends': d3, 'pattern': 'na'}
+        f3 = {'starts': d3, 'ends': d4, 'pattern': 'na'}
+
+        case = {'foo': {'frames': [f2, f3, f1]}}
+        results = history.type_history.validate(case)
+        self.assertEqual(results['foo']['frames'][0]['starts'], d1)
+        self.assertEqual(results['foo']['frames'][-1]['ends'], d4)
+
+    def test_history_frames_sorted_uncapped(self):
+        d2 = date(year=2018, month=2, day=2)
+        d3 = date(year=2018, month=3, day=3)
+
+        f1 = {'starts': None, 'ends': d2, 'pattern': 'na'}
+        f2 = {'starts': d2, 'ends': d3, 'pattern': 'na'}
+        f3 = {'starts': d3, 'ends': None, 'pattern': 'na'}
+
+        case = {'foo': {'frames': [f2, f3, f1]}}
+        results = history.type_history.validate(case)
+        self.assertEqual(results['foo']['frames'][0]['starts'], settings.INCEPTION.date())
+        self.assertEqual(results['foo']['frames'][-1]['ends'], date.today())
+
     def test_default_history_file(self):
         history.load_from_file() # no SchemaError errors thrown
 

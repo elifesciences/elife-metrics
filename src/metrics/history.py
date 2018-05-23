@@ -1,4 +1,4 @@
-from article_metrics.utils import merge
+from article_metrics.utils import merge, lmap
 from schema import Schema, And, Or, Use as Coerce, Optional, SchemaError
 from datetime import datetime, date
 from django.conf import settings
@@ -14,12 +14,17 @@ def date_wrangler(v):
     return v
 
 def frames_wrangler(frame_list):
-    incept_date = settings.INCEPTION.date() # morphology, longevity
-    frame_list = sorted(frame_list, key=lambda f: f['starts'] or incept_date)
-    if not frame_list[0]['ends']:
-        frame_list[0]['ends'] = date.today()
-    if not frame_list[-1]['starts']:
-        frame_list[-1]['starts'] = incept_date
+
+    def fill_empties(frame):
+        frame['starts'] = frame['starts'] or settings.INCEPTION.date()
+        frame['ends'] = frame['ends'] or date.today()
+        return frame
+
+    frame_list = lmap(fill_empties, frame_list)
+    frame_list = sorted(frame_list, key=lambda f: f['starts']) # ASC
+
+    # TODO: ensure no overlaps between frames
+
     return frame_list
 
 type_optional_date = Or(Coerce(date_wrangler), None)
