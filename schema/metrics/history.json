@@ -2,11 +2,13 @@
     "collection": {
         "frames": [
             {
+                "id": 2,
                 "ends": null,
                 "starts": "2017-06-01",
                 "prefix": "/collections"
             },
             {
+                "id": 1,
                 "ends": "2017-05-31", 
                 "starts": null,
                 "prefix": "/collections",
@@ -26,6 +28,7 @@
     "blog-article": {
         "frames": [
             {
+                "id": 1,
                 "ends": null,
                 "starts": "2017-06-01",
                 "prefix": "/inside-elife"
@@ -36,11 +39,13 @@
     "event": {
         "frames": [
             {
+                "id": 2,
                 "ends": null, 
                 "starts": "2017-06-01",
                 "prefix": "/events"
             }, 
             {
+                "id": 1,
                 "ends": "2017-05-31", 
                 "pattern": "ga:pagePath=~^/elife-news/events$", 
                 "starts": null
@@ -54,6 +59,7 @@
     "interview": {
         "frames": [
             {
+                "id": 1,
                 "starts": "2017-06-01",
                 "ends": null,
                 "prefix": "/interviews"
@@ -64,6 +70,7 @@
     "labs-post": {
         "frames": [
             {
+                "id": 1,
                 "starts": "2017-06-01",
                 "ends": null,
                 "prefix": "/labs"
@@ -74,11 +81,13 @@
     "press-package": {
         "frames": [
             {
+                "id": 2,
                 "prefix": "/for-the-press",
                 "ends": null, 
                 "starts": "2017-06-01"
             }, 
             {
+                "id": 1,
                 "ends": "2017-05-31", 
                 "pattern": "ga:pagePath=~^/elife-news/press-package-[a-z0-9-]+$,ga:pagePath=~^/elife-news/researchers-uncover-more-about-why-and-when-hiv-rebounds-after-remission$,ga:pagePath=~^/elife-news/new-test-for-ancient-dna-authenticity$,ga:pagePath=~^/elife-news/generous-mothers-receive-less-nagging$,ga:pagePath=~^/elife-news/social-yeast-cells-prefer-to-work-with-close-relatives-to-make-our-beer-bread-and-wine$,ga:pagePath=~^/elife-news/hunger-hormone-is-boosted-by-restricted-meal-times$,ga:pagePath=~^/elife-news/media-coverage-infant-brains-develop-years-faster-than-we-thought$,ga:pagePath=~^/elife-news/early-hospitalisation-key-to-survival-for-ebola-victims-drc$,ga:pagePath=~^/elife-news/new-way-to-fix-broken-heart$,ga:pagePath=~^/elife-news/researchers-identify-potential-drug-that-could-help-treat-cystic-fibrosis$,ga:pagePath=~^/elife-news/scientists-create-imaging-toolkit-to-help-identify-new-brain-tumour-drug-targets$,ga:pagePath=~^/elife-news/press package-airport-screening-misses-half-of-disease-cases-but-could-be-improved-by-customising-to-pathogens$,ga:pagePath=~^/elife-news/hummingbirds-rely-on-raw-power-not-physique-to-outmanoeuvre-rivals$,ga:pagePath=~^/elife-news/first-insights-into-changes-to-developing-brain-caused-by-gene-associated-with-autism$,ga:pagePath=~^/elife-news/new-species-of-human-relative-discovered-in-south-african-cave$,ga:pagePath=~^/elife-news/drugs-from-dirt-scientists-develop-first-global-roadmap-for-drug-discovery$,ga:pagePath=~^/elife-news/how-reward-daytime-sleep-boost-learning$,ga:pagePath=~^/elife-news/golden-discovery-of-novel-imaging-technique-captures-beauty-of-metal-labeled-neurons-in-3d$,ga:pagePath=~^/elife-news/midnight-munchies-mangle-memory$,ga:pagePath=~^/elife-news/could-2016-be-a-bad-year-for-the-malaria-parasite-in-africa\\?$,ga:pagePath=~^/elife-news/studies-explain-adolescents-vulnerability-to-addictive-drugs$,ga:pagePath=~^/elife-news/anticancer-effects-of-drugs-overestimated-by-as-much-as-45%-in-animal-models$,ga:pagePath=~^/elife-news/scientists-prove-key-aspect-of-evolutionary-theory$,ga:pagePath=~^/elife-news/researchers-look-to-exploit-females-natural-resistance-to-infection$,ga:pagePath=~^/elife-news/first-imagery-from-echolocation-reveals-elite-hunting-techniques-of-bats$,ga:pagePath=~^/elife-news/researchers-map-areas-at-risk-of-ebola-outbreak$,ga:pagePath=~^/elife-news/molecular-tweezer-targets-hiv-and-prevents-semen-from-promoting-infection$,ga:pagePath=~^/elife-news/being-anxious-could-be-good-for-you-in-a-crisis$,ga:pagePath=~^/elife-news/slime-can-see$,ga:pagePath=~^/elife-news/scientists-robotically-driven-system-could-reduce-cost-of-discovering-drug-and-target-interactions$,ga:pagePath=~^/elife-news/q-and-a-with-researchers-from-the-university-of-california-berkeley$,ga:pagePath=~^/elife-news/scientists-warn-light-pollution-can-stop-coral-from-spawning$,ga:pagePath=~^/elife-news/study-illuminates-new-design-strategies-for-optogenetic-tools$", 
                 "starts": null
