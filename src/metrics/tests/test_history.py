@@ -7,18 +7,18 @@ class One(base.BaseCase):
     def test_frame(self):
         today = date.today()
         cases = [
-            (history.frame0, {'starts': None, 'ends': today}),
-            (history.frame0, {'starts': today, 'ends': None}),
-            (history.frame0, {'starts': today, 'ends': today}),
+            (history.frame0, {'id': 1, 'starts': None, 'ends': today}),
+            (history.frame0, {'id': 1, 'starts': today, 'ends': None}),
+            (history.frame0, {'id': 1, 'starts': today, 'ends': today}),
 
-            (history.frame1, {'starts': today, 'ends': None, 'prefix': '/pants'}),
-            (history.frame1, {'starts': None, 'ends': today, 'prefix': '/pants'}),
+            (history.frame1, {'id': 1, 'starts': today, 'ends': None, 'prefix': '/pants'}),
+            (history.frame1, {'id': 1, 'starts': None, 'ends': today, 'prefix': '/pants'}),
 
-            (history.frame2, {'starts': today, 'ends': None, 'prefix': '/pants', 'path-list': ['p1']}),
-            (history.frame2, {'starts': None, 'ends': today, 'prefix': '/pants', 'path-list': ['p2']}),
+            (history.frame2, {'id': 1, 'starts': today, 'ends': None, 'prefix': '/pants', 'path-list': ['p1']}),
+            (history.frame2, {'id': 1, 'starts': None, 'ends': today, 'prefix': '/pants', 'path-list': ['p2']}),
 
-            (history.frame3, {'starts': today, 'ends': None, 'pattern': 'party'}),
-            (history.frame3, {'starts': None, 'ends': today, 'pattern': 'party'}),
+            (history.frame3, {'id': 1, 'starts': today, 'ends': None, 'pattern': 'party'}),
+            (history.frame3, {'id': 1, 'starts': None, 'ends': today, 'pattern': 'party'}),
         ]
         for schema, case in cases:
             with self.subTest():
@@ -33,7 +33,8 @@ class One(base.BaseCase):
         case = {
             'judgement-day': {
                 'frames': [
-                    {'starts': date(year=1997, month=8, day=29),
+                    {'id': 1,
+                     'starts': date(year=1997, month=8, day=29),
                      'ends': None,
                      'pattern': '.*$'}
                 ],
@@ -49,10 +50,12 @@ class One(base.BaseCase):
         case = {
             'judgement-day': {
                 'frames': [
-                    {'starts': date(year=1997, month=8, day=29),
+                    {'id': 1,
+                     'starts': date(year=1997, month=8, day=29),
                      'ends': None, # becomes date.today()
                      'pattern': '.*$'},
-                    {'starts': None, # becomes settings.INCEPTION
+                    {'id': 2,
+                     'starts': None, # becomes settings.INCEPTION
                      'ends': date(year=1997, month=8, day=28),
                      'pattern': 'life-as-we-know-it'}
                 ],
@@ -72,9 +75,9 @@ class One(base.BaseCase):
         d3 = date(year=2018, month=3, day=3)
         d4 = date(year=2018, month=4, day=4)
 
-        f1 = {'starts': d1, 'ends': d2, 'pattern': 'na'}
-        f2 = {'starts': d2, 'ends': d3, 'pattern': 'na'}
-        f3 = {'starts': d3, 'ends': d4, 'pattern': 'na'}
+        f1 = {'id': 'f1', 'starts': d1, 'ends': d2, 'pattern': 'na'}
+        f2 = {'id': 'f2', 'starts': d2, 'ends': d3, 'pattern': 'na'}
+        f3 = {'id': 'f3', 'starts': d3, 'ends': d4, 'pattern': 'na'}
 
         case = {'foo': {'frames': [f2, f3, f1]}}
         results = history.type_history.validate(case)
@@ -85,9 +88,9 @@ class One(base.BaseCase):
         d2 = date(year=2018, month=2, day=2)
         d3 = date(year=2018, month=3, day=3)
 
-        f1 = {'starts': None, 'ends': d2, 'pattern': 'na'}
-        f2 = {'starts': d2, 'ends': d3, 'pattern': 'na'}
-        f3 = {'starts': d3, 'ends': None, 'pattern': 'na'}
+        f1 = {'id': 'f1', 'starts': None, 'ends': d2, 'pattern': 'na'}
+        f2 = {'id': 'f2', 'starts': d2, 'ends': d3, 'pattern': 'na'}
+        f3 = {'id': 'f3', 'starts': d3, 'ends': None, 'pattern': 'na'}
 
         case = {'foo': {'frames': [f2, f3, f1]}}
         results = history.type_history.validate(case)

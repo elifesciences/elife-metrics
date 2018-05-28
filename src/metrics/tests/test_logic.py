@@ -1,9 +1,9 @@
 from . import base
 import os
 from article_metrics import utils
-from article_metrics.utils import tod
+from article_metrics.utils import tod, lmap, first
 from metrics import logic, models
-from datetime import date
+from datetime import date, timedelta
 from unittest.mock import patch
 import json
 
@@ -83,32 +83,49 @@ class Two(base.BaseCase):
 
     def test_build_ga_query(self):
         "the list of queries returned has the right shape"
-        jan18 = date(year=2018, month=1, day=3) # non-minimum value to catch any minimising/maximising
-        dec18 = date(year=2018, month=12, day=25) # non-maximum value
-        feb18 = date(year=2018, month=2, day=28)
-        ql = logic.build_ga_query(models.EVENT, jan18, dec18)
-        self.assertEqual(len(ql), 6) # 6 * 2 month chunks
-        query = 1 # frame = 0
+        start = date(year=2017, month=6, day=3) # non-minimum value to catch any minimising/maximising
+        end = date(year=2017, month=12, day=25) # non-maximum value
+        result0 = date(year=2017, month=7, day=31) # end of first two-month chunk
+
+        frame_query_list = logic.build_ga_query(models.EVENT, start, end)
+
+        frame, ql = frame_query_list[0]
+
+        # 4 queries over 6 months:
+        #  2017-6, 2017-7
+        #  2017-8, 2017-9
+        #  2017-10, 2017-11
+        #  2017-12
+        self.assertEqual(len(ql), 4)
+
         # the range is correct
-        self.assertEqual(ql[0][query]['start_date'], jan18)
-        self.assertEqual(ql[-1][query]['end_date'], dec18)
+        self.assertEqual(ql[0]['start_date'], start)
+        self.assertEqual(ql[-1]['end_date'], end)
         # the first chunk is correct
-        self.assertEqual(ql[0][query]['end_date'], feb18)
+        self.assertEqual(ql[0]['end_date'], result0)
 
     def test_build_ga_query_single(self):
         "a query for a single day (no month range) is possible"
-        jan18 = date(year=2018, month=1, day=1)
-        ql = logic.build_ga_query(models.EVENT, jan18, jan18) # two start dates...
-        query = 1 # frame = 0
-        self.assertEqual(len(ql), 1)
-        self.assertEqual(ql[0][query]['start_date'], jan18)
-        self.assertEqual(ql[0][query]['end_date'], jan18)
+        start = end = date(year=2018, month=1, day=1)
+        frame_query_list = logic.build_ga_query(models.EVENT, start, end)
+
+        # one result. each result is a (frame, query_list) pair
+        self.assertEqual(len(frame_query_list), 1)
+
+        frame, ql = frame_query_list[0]
+
+        self.assertEqual(ql[0]['start_date'], start)
+        self.assertEqual(ql[0]['end_date'], end)
 
     def test_query_ga(self):
         "a standard response from GA is handled as expected, a dump file is created etc"
         jan18 = date(year=2018, month=1, day=1)
         feb18 = date(year=2018, month=2, day=28)
-        frame, query = logic.build_ga_query(models.EVENT, jan18, feb18)[0]
+
+        frame_query_list = logic.build_ga_query(models.EVENT, jan18, feb18)
+        frame, query_list = frame_query_list[0]
+        query = query_list[0]
+
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
         dumpfile = os.path.join(self.tmpdir, "pants.json")
         with patch('article_metrics.ga_metrics.core.output_path', return_value=dumpfile):
@@ -124,10 +141,10 @@ class Two(base.BaseCase):
         "if we have a query for a specific start/end date, those dates are not maximised/minimised to month borders"
         midJan18 = date(2018, 1, 15)
         midMar18 = date(2018, 3, 15)
-        ql = logic.build_ga_query(models.EVENT, midJan18, midMar18)
-        query = 1 # frame = 0
-        self.assertEqual(ql[0][query]['start_date'], midJan18)
-        self.assertEqual(ql[-1][query]['end_date'], midMar18)
+        frame_query_list = logic.build_ga_query(models.EVENT, midJan18, midMar18)
+        frame, ql = frame_query_list[0]
+        self.assertEqual(ql[0]['start_date'], midJan18)
+        self.assertEqual(ql[-1]['end_date'], midMar18)
 
     def test_process_response(self):
         "response is processed predictably, views are ints, dates are dates, results retain their order, etc"
@@ -230,3 +247,55 @@ class Three(base.BaseCase):
         self.assertEqual(models.PageType.objects.count(), 1) # 'event'
         # not the same as len(fixture.rows) because of aggregation
         self.assertEqual(models.PageCount.objects.count(), 115)
+
+class Four(base.BaseCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_build_ga_query_multiple_frames(self):
+        "a query for a date range that overlaps epochs generates the correct queries"
+        midJan18 = date(year=2018, month=1, day=15)
+        midDec17 = date(year=2017, month=12, day=15)
+        one_day = timedelta(days=1)
+        to_day = date.today()
+
+        history_data = {
+            'frames': [
+                {'id': 2,
+                 'starts': midJan18,
+                 'ends': None,
+                 'prefix': '/new/pants'},
+                {'id': 1,
+                 'starts': midDec17,
+                 'ends': midJan18 - one_day,
+                 'prefix': '/old/pants'}
+            ]
+        }
+
+        starts = midDec17
+        ends = midJan18 # ending on a frame boundary is unreasonable but entirely possible
+
+        ql = logic.build_ga_query__frame_month_range(models.EVENT, starts, ends, history_data)
+
+        frame_list = lmap(first, ql) # just the frame and not the query for now
+
+        # frames are not modified after being validated/coerced
+        expected_frames = [
+            {'id': '1', 'starts': midDec17, 'ends': midJan18 - one_day, 'prefix': '/old/pants'},
+            {'id': '2', 'starts': midJan18, 'ends': to_day, 'prefix': '/new/pants'}
+        ]
+        self.assertEqual(frame_list, expected_frames)
+
+        # month ranges for a frame *are* truncated/capped to align with explicit start/end dates
+        month_lists = [ml for f, ml in ql]
+
+        expected_month_lists = [
+            # frame 1
+            [(midDec17, date(2017, 12, 31)), (date(2018, 1, 1), midJan18 - one_day)],
+            # frame 2
+            [(midJan18, midJan18)]
+        ]
+        self.assertEqual(month_lists, expected_month_lists)

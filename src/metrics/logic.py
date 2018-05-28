@@ -1,5 +1,5 @@
 from . import models, history
-from article_metrics.utils import ensure, lmap, create_or_update, first, merge, tod, ymd
+from article_metrics.utils import ensure, lmap, create_or_update, first, merge, ymd, lfilter
 from article_metrics.ga_metrics import core as ga_core, utils as ga_utils
 from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth
@@ -11,6 +11,7 @@ import os
 from functools import partial
 import logging
 from urllib.parse import urlparse
+import importlib
 
 LOG = logging.getLogger(__name__)
 
@@ -49,6 +50,22 @@ def get(k, d=None):
     if not d:
         return lambda d: get(k, d)
     return d.get(k)
+
+def load_fn(dotted_path):
+    try:
+        package, funcname = dotted_path.rsplit('.', 1) # 'os.path.join' => 'os.path', 'join'
+        package = importlib.import_module(package)
+        ensure(hasattr(package, funcname),
+               "could not find function %r in package %r for given path: %s" % (funcname, package, dotted_path))
+        return getattr(package, funcname)
+    except ImportError as err:
+        # package doesn't exist
+        LOG.warn(str(err))
+
+    except AssertionError as err:
+        # package exists but not function
+        LOG.warn(str(err))
+    return None
 
 #
 #
@@ -134,12 +151,27 @@ def query_ga(ptype, query):
     ga_core.write_results(raw_response, dump_path)
     return raw_response
 
-
 def generic_ga_filter(prefix):
     "returns a generic GA pattern that handles `/prefix` and `/prefix/what/ever` patterns"
     return "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$".format(prefix=prefix)
 
-def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
+#
+#
+#
+
+def generic_query_processor(ptype, frame, query_list):
+    ptype_filter = frame.get('pattern')
+    if not ptype_filter:
+        ensure('prefix' in frame, 'frame has no `pattern` and no `prefix`, no query can be built')
+        ptype_filter = generic_ga_filter(frame['prefix'])
+    query_list = [merge(q, {"filters": ptype_filter}) for q in query_list]
+    return query_list
+
+#
+#
+#
+
+def build_ga_query__frame_month_range(ptype, start_date=None, end_date=None, history_data=None):
     """queries GA per page-type, grouped by pagePath and date.
     each result will return 10k results max and there is no pagination.
     If every page of a given type is visited once a day for a year, then
@@ -154,25 +186,70 @@ def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
     starts Mar 21st, then the two-month chunk spanning Mar+Apr 2017 will
     become Mar(1st)+Mar(20th) and Mar(21st)+Apr"""
 
-    # note: this is *not* how `article_metrics.ga_metrics` works!
-    # that module is doing a query for *every single day* since inception
-
     ensure(is_ptype(ptype), "bad page type")
 
+    # if dates given, ensure they are date objects
+    start_date and ensure(is_date(start_date), "bad start date")
+    end_date and ensure(is_date(end_date), "bad end date")
+
+    # if history data provided, ensure it validates
+    if history_data:
+        history_data = history.type_object.validate(history_data)
+
+    # extract just the page type we're after
     ptype_history = history_data or history.ptype_history(ptype)
+    frame_list = ptype_history['frames']
 
-    # until historical epochs are introduced, we only go back as far as
-    # the beginning of the first time frame (elife 2.0)
-    # start_date = start_date or settings.INCEPTION.date()
-    start_date = tod(start_date or ptype_history['frames'][0]['starts'])
-    end_date = tod(end_date or date.today()) # not a great default :(
-    table_id = settings.GA_TABLE_ID
+    # frames are ordered oldest to newest (asc)
+    earliest_date = frame_list[0]['starts']
+    latest_date = frame_list[-1]['ends']
 
-    ensure(is_date(start_date), "bad start date")
-    ensure(is_date(end_date), "bad end date")
+    start_date = start_date or earliest_date
+    end_date = end_date or latest_date
+    ensure(start_date <= end_date, "start date %r cannot be greater than end date %r" % (start_date, end_date))
+
+    def between(s, e, d):
+        return d >= s and d <= e
+
+    def interesting_frames(frame):
+        "do the start or end dates cross the frame boundary? if so, we're interested in it"
+        return between(frame['starts'], frame['ends'], start_date) or between(frame['starts'], frame['ends'], end_date)
+
+    # only those frames that overlap our start/end dates
+    frame_list = lfilter(interesting_frames, frame_list)
+
+    def frame_month_range(frame):
+        "returns a (frame, month list) pair. month list is capped to start and end dates"
+        r_start = start_date if start_date >= frame['starts'] else frame['starts']
+        r_end = end_date if end_date <= frame['ends'] else frame['ends']
+        month_list = ga_utils.dt_month_range(r_start, r_end, preserve_caps=True)
+        # saves some datetime wrangling later and prevents further changes
+        month_list = [(mmin.date(), mmax.date()) for mmin, mmax in month_list]
+        return (frame, month_list)
+
+    # expand each frame (f):
+    # [(f1, [(d1, d2), (d3, d4), (d5, d6)]),
+    #  (f2, [(d7, d8)]),
+    #  (fN, [...])]
+    month_list = lmap(frame_month_range, frame_list)
+
+    print('month lists:', month_list)
+    print()
+
+    # we now have a solid datastructure to generate queries from
+    # [(f1, [(d1, d2), (d3, d4), (d5, d6)]), (f2, [(d7, d8)]), (fN, [...])]
+
+    return month_list
+
+def build_ga_query__queries_for_frame(ptype, frame, month_list):
+    "within a frame's month list we can safely chunk results without overlapping other frames"
+
+    # re-group the list into n-month chunks
+    chunk_size = 2
+    chunked_months = [month_list[i:i + chunk_size] for i in range(0, len(month_list), chunk_size)]
 
     query_template = {
-        'ids': table_id,
+        'ids': settings.GA_TABLE_ID,
         'max_results': 10000, # 10k is the max GA will ever return
         'start_date': None, # set later
         'end_date': None, # set later
@@ -183,29 +260,39 @@ def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
         'include_empty_rows': False
     }
 
-    # get a single list of months from date A (start) to date B (end)
-    month_list = ga_utils.dt_month_range(start_date, end_date, preserve_caps=True)
-    # urgh. saves a bunch of .date()s downstream though
-    month_list = [(mmin.date(), mmax.date()) for mmin, mmax in month_list]
-
-    # group the list into n-month chunks
-    chunk_size = 2
-    chunked_months = [month_list[i:i + chunk_size] for i in range(0, len(month_list), chunk_size)]
-
-    # generate a list of queries we'll feed GA
     # use the start date from the first group, end date from the last group
     query_list = [merge(query_template, {"start_date": mgroup[0][0], "end_date": mgroup[-1][-1]}) for mgroup in chunked_months]
 
-    # query list is still missing the pattern(s) that GA will query for.
-    # until historical epochs are supported, we just use the first frame.
-    # (frames are ordered descendingly, latest to earliest)
-    frame = ptype_history['frames'][0]
-    ptype_filter = frame.get('ga_pattern')
-    if not ptype_filter:
-        ensure('prefix' in frame, 'frame has no `ga_pattern` and no `prefix`, no query can be built')
-        ptype_filter = generic_ga_filter(frame['prefix'])
+    # look for the "query_processor_frame_foo" function ...
+    path = "metrics.{ptype}.query_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
+    # ... and use the generic query processor if not found.
+    query_processor = load_fn(path) or generic_query_processor
 
-    query_list = [(frame, merge(q, {"filters": ptype_filter})) for q in query_list]
+    # update the query list with per-type, per-frame patterns
+    return query_processor(ptype, frame, query_list)
+
+def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
+
+    # gives us a list of pairs:
+    # [(frame1, [(month1-min, month1-max), (m2-min, m2-max), (m3-min, m3-max)]),
+    #  (frame2, [(...), ...])]
+    frame_month_list = build_ga_query__frame_month_range(ptype, start_date, end_date, history_data)
+
+    # each time frame will require it's own pattern generation, post processing and normalisation
+    # we can generate 90% of that query here:
+    query_list = [(frame, build_ga_query__queries_for_frame(ptype, frame, month_list)) for frame, month_list in frame_month_list]
+
+    # TODO: just the per-type, per-frame dispatch to go
+    # I'm thinking:
+    # query_list = ptype.preprocessor(frame, query)"
+
+    # the output should be a list of queries to run.
+    # we can supplement that list of queries with a processor function or whatever
+
+    # each frame has an optional ID value that we can use to find a pre and post processor function
+    # if frame is missing this ID, attempt default processing of results
+    # ideally, everything prior to 2.0 should have an ID
+
     return query_list
 
 @transaction.atomic
