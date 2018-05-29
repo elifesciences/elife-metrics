@@ -157,6 +157,7 @@ def generic_ga_filter(prefix):
 
 def generic_ga_filter_w_paths(prefix, path_list):
     stub = "ga:pagePath=~^{prefix}".format(prefix=prefix)
+
     def mk(path):
         return (stub + "/{path}$").format(path=path)
     ql = ",".join(map(mk, path_list))

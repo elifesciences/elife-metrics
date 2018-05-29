@@ -13,8 +13,8 @@
                 "starts": null,
                 "prefix": "/collections",
                 "path-list": [
-                    "chemical-biology$",
-                    "tropical-disease$",
+                    "chemical-biology",
+                    "tropical-disease",
                     "paleontology",
                     "human-genetics",
                     "natural-history-model-organisms",

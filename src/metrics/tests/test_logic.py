@@ -2,7 +2,7 @@ from . import base
 import os
 from article_metrics import utils
 from article_metrics.utils import tod, lmap, first
-from metrics import logic, models
+from metrics import logic, models, history
 from datetime import date, timedelta
 from unittest.mock import patch
 import json
@@ -323,3 +323,20 @@ class Four(base.BaseCase):
         frame = {'prefix': prefix, 'path-list': ['foo', 'bar', 'baz']}
         expected = [{'filters': "ga:pagePath=~^/pants$,ga:pagePath=~^/pants/foo$,ga:pagePath=~^/pants/bar$,ga:pagePath=~^/pants/baz$"}]
         self.assertEqual(logic.generic_query_processor('', frame, [{}]), expected)
+
+    def test_generic_query_prefix_list__collections(self):
+        "essentially a duplicate test, but using actual data"
+        collection = history.ptype_history(models.COLLECTION)
+        frame = collection['frames'][0]
+        # I do not endorse this official-but-awful method of string concatenation
+        expected = 'ga:pagePath=~^/collections$' \
+                   ',ga:pagePath=~^/collections/chemical-biology$' \
+                   ',ga:pagePath=~^/collections/tropical-disease$' \
+                   ',ga:pagePath=~^/collections/paleontology$' \
+                   ',ga:pagePath=~^/collections/human-genetics$' \
+                   ',ga:pagePath=~^/collections/natural-history-model-organisms$' \
+                   ',ga:pagePath=~^/collections/reproducibility-project-cancer-biology$' \
+                   ',ga:pagePath=~^/collections/plain-language-summaries$'
+        expected = [{'filters': expected}]
+        actual = logic.generic_query_processor(models.COLLECTION, frame, [{}])
+        self.assertEqual(actual, expected)
