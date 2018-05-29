@@ -233,9 +233,6 @@ def build_ga_query__frame_month_range(ptype, start_date=None, end_date=None, his
     #  (fN, [...])]
     month_list = lmap(frame_month_range, frame_list)
 
-    print('month lists:', month_list)
-    print()
-
     # we now have a solid datastructure to generate queries from
     # [(f1, [(d1, d2), (d3, d4), (d5, d6)]), (f2, [(d7, d8)]), (fN, [...])]
 

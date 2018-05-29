@@ -108,14 +108,61 @@ class Two(base.BaseCase):
         "a query for a single day (no month range) is possible"
         start = end = date(year=2018, month=1, day=1)
         frame_query_list = logic.build_ga_query(models.EVENT, start, end)
+        frame, ql = frame_query_list[0]
 
         # one result. each result is a (frame, query_list) pair
         self.assertEqual(len(frame_query_list), 1)
-
-        frame, ql = frame_query_list[0]
-
         self.assertEqual(ql[0]['start_date'], start)
         self.assertEqual(ql[0]['end_date'], end)
+
+    def test_build_ga_query_multiple_frames(self):
+        "a query for a date range that overlaps epochs generates the correct queries"
+        midJan18 = date(year=2018, month=1, day=15)
+        midDec17 = date(year=2017, month=12, day=15)
+        one_day = timedelta(days=1)
+        to_day = date.today()
+
+        history_data = {
+            'frames': [
+                {'id': 2,
+                 'starts': midJan18,
+                 'ends': None,
+                 'prefix': '/new/pants'},
+                {'id': 1,
+                 'starts': midDec17,
+                 'ends': midJan18 - one_day,
+                 'prefix': '/old/pants'}
+            ]
+        }
+
+        starts = midDec17
+        ends = midJan18 # ending on a frame boundary is unreasonable but entirely possible
+
+        ql = logic.build_ga_query__frame_month_range(models.EVENT, starts, ends, history_data)
+
+        frame_list = lmap(first, ql) # just the frame and not the query for now
+
+        # frames are not modified after being validated/coerced
+        expected_frames = [
+            {'id': '1', 'starts': midDec17, 'ends': midJan18 - one_day, 'prefix': '/old/pants'},
+            {'id': '2', 'starts': midJan18, 'ends': to_day, 'prefix': '/new/pants'}
+        ]
+        self.assertEqual(frame_list, expected_frames)
+
+        # month ranges for a frame *are* truncated/capped to align with explicit start/end dates
+        month_lists = [ml for f, ml in ql]
+
+        expected_month_lists = [
+            # frame 1
+            [(midDec17, date(2017, 12, 31)), (date(2018, 1, 1), midJan18 - one_day)],
+            # frame 2
+            [(midJan18, midJan18)]
+        ]
+        self.assertEqual(month_lists, expected_month_lists)
+
+    #
+    #
+    #
 
     def test_query_ga(self):
         "a standard response from GA is handled as expected, a dump file is created etc"
@@ -146,14 +193,16 @@ class Two(base.BaseCase):
         self.assertEqual(ql[0]['start_date'], midJan18)
         self.assertEqual(ql[-1]['end_date'], midMar18)
 
+    #
+    #
+    #
+
     def test_process_response(self):
         "response is processed predictably, views are ints, dates are dates, results retain their order, etc"
         frame = {'prefix': '/events'}
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
 
         processed_results = logic.process_response(models.EVENT, frame, fixture)
-        # for i, row in enumerate(processed_results):
-        #    print(i, row)
 
         # list index, expected row
         expected = [
@@ -255,47 +304,14 @@ class Four(base.BaseCase):
     def tearDown(self):
         pass
 
-    def test_build_ga_query_multiple_frames(self):
-        "a query for a date range that overlaps epochs generates the correct queries"
-        midJan18 = date(year=2018, month=1, day=15)
-        midDec17 = date(year=2017, month=12, day=15)
-        one_day = timedelta(days=1)
-        to_day = date.today()
+    def test_generic_query_pattern(self):
+        "the generic pattern generator is used when a 'pattern' is present and no other special handling"
+        self.fail()
 
-        history_data = {
-            'frames': [
-                {'id': 2,
-                 'starts': midJan18,
-                 'ends': None,
-                 'prefix': '/new/pants'},
-                {'id': 1,
-                 'starts': midDec17,
-                 'ends': midJan18 - one_day,
-                 'prefix': '/old/pants'}
-            ]
-        }
+    def test_generic_query_prefix(self):
+        "the generic pattern generator is used when a 'prefix' is present and no other special handling "
+        self.fail()
 
-        starts = midDec17
-        ends = midJan18 # ending on a frame boundary is unreasonable but entirely possible
-
-        ql = logic.build_ga_query__frame_month_range(models.EVENT, starts, ends, history_data)
-
-        frame_list = lmap(first, ql) # just the frame and not the query for now
-
-        # frames are not modified after being validated/coerced
-        expected_frames = [
-            {'id': '1', 'starts': midDec17, 'ends': midJan18 - one_day, 'prefix': '/old/pants'},
-            {'id': '2', 'starts': midJan18, 'ends': to_day, 'prefix': '/new/pants'}
-        ]
-        self.assertEqual(frame_list, expected_frames)
-
-        # month ranges for a frame *are* truncated/capped to align with explicit start/end dates
-        month_lists = [ml for f, ml in ql]
-
-        expected_month_lists = [
-            # frame 1
-            [(midDec17, date(2017, 12, 31)), (date(2018, 1, 1), midJan18 - one_day)],
-            # frame 2
-            [(midJan18, midJan18)]
-        ]
-        self.assertEqual(month_lists, expected_month_lists)
+    def test_generic_query_prefix_list(self):
+        "the generic pattern generator is used when a 'prefix' and a 'path-list' is present and no other special handling"
+        self.fail()
