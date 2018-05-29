@@ -30,9 +30,12 @@ def frames_wrangler(frame_list):
 type_optional_date = Or(Coerce(date_wrangler), None)
 type_str = And(str, len) # non-empty string
 
-_frame0 = {'starts': type_optional_date,
-           'ends': type_optional_date,
-           'id': And(Coerce(str), type_str)}
+_frame0 = {
+    'starts': type_optional_date,
+    'ends': type_optional_date,
+    'id': And(Coerce(str), type_str),
+    Optional('comment'): type_str
+}
 _only_one = lambda d: d['starts'] or d['ends']
 frame0 = And(_frame0, _only_one) # we can't merge Schemas, which sucks
 

@@ -46,9 +46,10 @@
             }, 
             {
                 "id": 1,
-                "ends": "2017-05-31", 
-                "pattern": "ga:pagePath=~^/elife-news/events$", 
-                "starts": null
+                "ends": "2017-05-31",
+                "starts": null,
+                "pattern": "ga:pagePath=~^/elife-news/events$,ga:pagePath=~^/events$,ga:pagePath=~^/events/.*$",
+                "comment": "same as frame2, but we also need to capture '/elife-news/events'"
             }
         ],
         "examples": [
