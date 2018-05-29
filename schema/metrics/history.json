@@ -11,16 +11,18 @@
                 "id": 1,
                 "ends": "2017-05-31", 
                 "starts": null,
-                "prefix": "/collections",
-                "path-list": [
-                    "chemical-biology",
-                    "tropical-disease",
-                    "paleontology",
-                    "human-genetics",
-                    "natural-history-model-organisms",
-                    "reproducibility-project-cancer-biology",
-                    "plain-language-summaries"
-                ]
+                "path-mapping": {
+                    "/collections/chemical-biology": "/collections/0b5a36bb",
+                    "/collections/tropical-disease": "/collections/2d2e35c4",
+                    "/collections/paleontology": "/collections/2df5cbe1",
+                    "/collections/human-genetics": "/collections/7eac161a",
+                    "/interviews/working-lives": "/collections/88b9994b",
+                    "/collections/natural-history-model-organisms": "/collections/8de90445",
+                    "/natural-history-of-model-organisms": "/collections/8de90445",
+                    "/collections/reproducibility-project-cancer-biology": "/collections/9b1e83d1",
+                    "/collections/plain-language-summaries": "/collections/9e8f4a49",
+                    "/interviews/early-career-researchers": "/collections/fecda514"
+                }
             }
         ]
     },

@@ -335,14 +335,16 @@ class Four(base.BaseCase):
         collection = history.ptype_history(models.COLLECTION)
         frame = collection['frames'][0]
         # I do not endorse this official-but-awful method of string concatenation
-        expected = 'ga:pagePath=~^/collections$' \
-                   ',ga:pagePath=~^/collections/chemical-biology$' \
+        expected = 'ga:pagePath=~^/collections/chemical-biology$' \
                    ',ga:pagePath=~^/collections/tropical-disease$' \
                    ',ga:pagePath=~^/collections/paleontology$' \
                    ',ga:pagePath=~^/collections/human-genetics$' \
+                   ',ga:pagePath=~^/interviews/working-lives$' \
                    ',ga:pagePath=~^/collections/natural-history-model-organisms$' \
+                   ',ga:pagePath=~^/natural-history-of-model-organisms$' \
                    ',ga:pagePath=~^/collections/reproducibility-project-cancer-biology$' \
-                   ',ga:pagePath=~^/collections/plain-language-summaries$'
+                   ',ga:pagePath=~^/collections/plain-language-summaries$' \
+                   ',ga:pagePath=~^/interviews/early-career-researchers$'
         expected = [{'filters': expected}]
         actual = logic.generic_query_processor(models.COLLECTION, frame, [{}])
         self.assertEqual(actual, expected)
