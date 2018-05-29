@@ -53,6 +53,7 @@ def get(k, d=None):
 
 def load_fn(dotted_path):
     try:
+        dotted_path = dotted_path.strip().lower().replace('-', '_') # basic path normalisation
         package, funcname = dotted_path.rsplit('.', 1) # 'os.path.join' => 'os.path', 'join'
         package = importlib.import_module(package)
         ensure(hasattr(package, funcname),
@@ -80,6 +81,7 @@ def between(start, end, dt):
 
 def process_path(prefix, path):
     path = urlparse(path).path
+    ensure(path.startswith(prefix), "path does not start with given prefix (%r): %s" % (prefix, path), ValueError)
     # we could just dispense with the prefix and discard the first segment ...
     prefix_len = len(prefix)
     path = path[prefix_len:].strip().strip('/') # /events/foobar => foobar
@@ -87,6 +89,7 @@ def process_path(prefix, path):
     return path
 
 def generic_results_processor(ptype, frame, rows):
+    ensure('prefix' in frame, "generic results processing requires a 'prefix' key.")
     prefix = frame['prefix']
 
     def _process(row):
@@ -98,6 +101,8 @@ def generic_results_processor(ptype, frame, rows):
                 'date': _str2dt(datestr),
                 'identifier': path,
             }
+        except ValueError as err:
+            LOG.info("skipping row, bad value: %s" % str(err))
         except BaseException as err:
             LOG.exception("unhandled exception processing row: %s", str(err), extra={"row": row})
     return list(filter(None, map(_process, rows)))
@@ -128,12 +133,15 @@ def process_response(ptype, frame, response):
         return []
 
     # look for the "results_processor_frame_foo" function ...
-    path = "metrics.{ptype}.results_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
+    path = "metrics.{ptype}_type.results_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
 
     # ... and use the generic processor if not found.
     results_processor = load_fn(path) or generic_results_processor
 
     normalised = results_processor(ptype, frame, rows)
+
+    # todo: schema check normalised rows. should be easy
+
     return normalised
 
 #
@@ -325,12 +333,13 @@ def update_page_counts(ptype, page_counts):
 def update_ptype(ptype):
     "glue code to query ga about a page-type and then processing and storing the results"
     try:
-        for frame, query in build_ga_query(ptype):
-            response = query_ga(ptype, query)
-            normalised_rows = process_response(ptype, frame, response)
-            counts = aggregate(normalised_rows)
-            LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
-            update_page_counts(ptype, counts)
+        for frame, query_list in build_ga_query(ptype):
+            for i, query in enumerate(query_list):
+                response = query_ga(ptype, query)
+                normalised_rows = process_response(ptype, frame, response)
+                counts = aggregate(normalised_rows)
+                LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
+                update_page_counts(ptype, counts)
     except AssertionError as err:
         LOG.error(err)
 

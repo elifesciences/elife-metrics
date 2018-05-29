@@ -24,7 +24,7 @@ class One(base.BaseCase):
 class Two(base.BaseCase):
     def setUp(self):
         # populate db
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
         frame = {'id': '2', 'prefix': '/events'}
         rows = logic.aggregate(logic.process_response(models.EVENT, frame, fixture))
         logic.update_page_counts(models.EVENT, rows)

@@ -173,7 +173,7 @@ class Two(base.BaseCase):
         frame, query_list = frame_query_list[0]
         query = query_list[0]
 
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
         dumpfile = os.path.join(self.tmpdir, "pants.json")
         with patch('article_metrics.ga_metrics.core.output_path', return_value=dumpfile):
             with patch('article_metrics.ga_metrics.core.query_ga', return_value=fixture):
@@ -197,10 +197,10 @@ class Two(base.BaseCase):
     #
     #
 
-    def test_process_response(self):
+    def test_process_response_generic_processor(self):
         "response is processed predictably, views are ints, dates are dates, results retain their order, etc"
         frame = {'id': '2', 'prefix': '/events'}
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
 
         processed_results = logic.process_response(models.EVENT, frame, fixture)
 
@@ -214,10 +214,14 @@ class Two(base.BaseCase):
         for idx, expected_row in expected:
             self.assertEqual(processed_results[idx], expected_row)
 
+    def test_process_response_special_processor(self):
+        "special handling of results may be necessary for specific time frames"
+        self.fail()
+
     def test_process_response_no_results(self):
         "a response with no results issues a warning but otherwise doesn't break"
         frame = {'id': '2', 'prefix': '/events'}
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
         del fixture['rows']
         with patch('metrics.logic.LOG') as mock:
             processed_results = logic.process_response(models.EVENT, frame, fixture)
@@ -228,18 +232,19 @@ class Two(base.BaseCase):
     def test_process_response_bad_apples(self):
         "bad rows in response are discarded"
         frame = {'id': '2', 'prefix': '/events'}
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
 
         apple1 = 1
-        fixture['rows'][apple1] = [None, None, None] # it's a triple but quite useless
+        fixture['rows'][apple1] = [None, None, None] # it's a triple but quite useless (ValueError)
         apple2 = 7
-        fixture['rows'][apple2] = 'how you like them apples?'
+        fixture['rows'][apple2] = 'how you like them apples?' # unhandled (BaseException)
 
         with patch('metrics.logic.LOG') as mock:
             processed_results = logic.process_response(models.EVENT, frame, fixture) # kaboom
             expected_results = 122 - 2 # total non-aggregated results minus bad apples
             self.assertEqual(len(processed_results), expected_results)
-            self.assertEqual(mock.exception.call_count, 2) # two unhandled errors for two bad apples
+            self.assertEqual(mock.exception.call_count, 1) # one unhandled error
+            self.assertEqual(mock.info.call_count, 1) # one handled error
 
 
 class Three(base.BaseCase):
@@ -285,10 +290,11 @@ class Three(base.BaseCase):
         self.assertEqual(models.PageType.objects.count(), 0)
         self.assertEqual(models.PageCount.objects.count(), 0)
 
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
 
         frame = {'id': '2', 'prefix': '/events'}
-        with patch('metrics.logic.build_ga_query', return_value=[[frame, {}]]):
+        frame_query_list = [(frame, [{}])]
+        with patch('metrics.logic.build_ga_query', return_value=frame_query_list):
             with patch('metrics.logic.query_ga', return_value=fixture):
                 logic.update_ptype(models.EVENT)
 
