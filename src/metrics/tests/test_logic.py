@@ -199,7 +199,7 @@ class Two(base.BaseCase):
 
     def test_process_response(self):
         "response is processed predictably, views are ints, dates are dates, results retain their order, etc"
-        frame = {'prefix': '/events'}
+        frame = {'id': '2', 'prefix': '/events'}
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
 
         processed_results = logic.process_response(models.EVENT, frame, fixture)
@@ -216,7 +216,7 @@ class Two(base.BaseCase):
 
     def test_process_response_no_results(self):
         "a response with no results issues a warning but otherwise doesn't break"
-        frame = {'prefix': '/events'}
+        frame = {'id': '2', 'prefix': '/events'}
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
         del fixture['rows']
         with patch('metrics.logic.LOG') as mock:
@@ -227,7 +227,7 @@ class Two(base.BaseCase):
 
     def test_process_response_bad_apples(self):
         "bad rows in response are discarded"
-        frame = {'prefix': '/events'}
+        frame = {'id': '2', 'prefix': '/events'}
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
 
         apple1 = 1
@@ -287,7 +287,7 @@ class Three(base.BaseCase):
 
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
 
-        frame = {'prefix': '/events'}
+        frame = {'id': '2', 'prefix': '/events'}
         with patch('metrics.logic.build_ga_query', return_value=[[frame, {}]]):
             with patch('metrics.logic.query_ga', return_value=fixture):
                 logic.update_ptype(models.EVENT)
@@ -340,14 +340,3 @@ class Four(base.BaseCase):
         expected = [{'filters': expected}]
         actual = logic.generic_query_processor(models.COLLECTION, frame, [{}])
         self.assertEqual(actual, expected)
-
-class Five(base.BaseCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test_generic_results_processor(self):
-        "the generic results processor will be used in the absence of a per-type and per-frame processor"
-        self.fail()

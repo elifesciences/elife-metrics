@@ -86,7 +86,6 @@ def process_path(prefix, path):
     path = path.split('/', 1)[0] # foobar/the-baz-in-bar-fooed-at-the-star => foobar
     return path
 
-# def process_object(prefix, rows):
 def generic_results_processor(ptype, frame, rows):
     prefix = frame['prefix']
 
@@ -128,12 +127,13 @@ def process_response(ptype, frame, response):
         LOG.warn("GA responded with no results", extra={'query': response['query'], 'ptype': ptype, 'frame': frame})
         return []
 
-    processor = generic_results_processor
+    # look for the "results_processor_frame_foo" function ...
+    path = "metrics.{ptype}.results_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
 
-    # todo: custom processor dispatch
+    # ... and use the generic processor if not found.
+    results_processor = load_fn(path) or generic_results_processor
 
-    normalised = processor(ptype, frame, rows)
-
+    normalised = results_processor(ptype, frame, rows)
     return normalised
 
 #
