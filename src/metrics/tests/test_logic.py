@@ -305,13 +305,21 @@ class Four(base.BaseCase):
         pass
 
     def test_generic_query_pattern(self):
-        "the generic pattern generator is used when a 'pattern' is present and no other special handling"
-        self.fail()
+        "dead simple usecase when you want full control of query to GA"
+        frame = {'pattern': '/pants'} # this would be shooting yourself in the foot however
+        expected = [{'filters': '/pants'}] # a list of GA queries typically, but we can get away with the bare minimum
+        self.assertEqual(logic.generic_query_processor('', frame, [{}]), expected)
 
     def test_generic_query_prefix(self):
-        "the generic pattern generator is used when a 'prefix' is present and no other special handling "
-        self.fail()
+        "a simple 'prefix' and nothing else will get you a basic 'landing page and sub-contents' type query"
+        prefix = '/pants'
+        frame = {'prefix': prefix}
+        expected = [{'filters': logic.generic_ga_filter('/pants')}] # ll: "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$"
+        self.assertEqual(logic.generic_query_processor('', frame, [{}]), expected)
 
     def test_generic_query_prefix_list(self):
-        "the generic pattern generator is used when a 'prefix' and a 'path-list' is present and no other special handling"
-        self.fail()
+        "a 'prefix' and a list of subpaths will get you a landing page and enumerated sub-paths query"
+        prefix = '/pants'
+        frame = {'prefix': prefix, 'path-list': ['foo', 'bar', 'baz']}
+        expected = [{'filters': "ga:pagePath=~^/pants$,ga:pagePath=~^/pants/foo$,ga:pagePath=~^/pants/bar$,ga:pagePath=~^/pants/baz$"}]
+        self.assertEqual(logic.generic_query_processor('', frame, [{}]), expected)

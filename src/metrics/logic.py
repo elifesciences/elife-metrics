@@ -155,15 +155,25 @@ def generic_ga_filter(prefix):
     "returns a generic GA pattern that handles `/prefix` and `/prefix/what/ever` patterns"
     return "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$".format(prefix=prefix)
 
+def generic_ga_filter_w_paths(prefix, path_list):
+    stub = "ga:pagePath=~^{prefix}".format(prefix=prefix)
+    def mk(path):
+        return (stub + "/{path}$").format(path=path)
+    ql = ",".join(map(mk, path_list))
+    return "{landing}$,{enum}".format(landing=stub, enum=ql)
+
 #
 #
 #
 
 def generic_query_processor(ptype, frame, query_list):
+    # NOTE: ptype is unused here here, it's just to match a query processor function's signature
     ptype_filter = frame.get('pattern')
-    if not ptype_filter:
-        ensure('prefix' in frame, 'frame has no `pattern` and no `prefix`, no query can be built')
+    if frame.get('prefix') and frame.get('path-list'):
+        ptype_filter = generic_ga_filter_w_paths(frame['prefix'], frame['path-list'])
+    elif frame.get('prefix'):
         ptype_filter = generic_ga_filter(frame['prefix'])
+
     query_list = [merge(q, {"filters": ptype_filter}) for q in query_list]
     return query_list
 
