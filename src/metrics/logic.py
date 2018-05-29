@@ -8,10 +8,10 @@ from datetime import date, datetime
 from django.db import transaction
 import json
 import os
-from functools import partial
 import logging
 from urllib.parse import urlparse
 import importlib
+from functools import partial
 
 LOG = logging.getLogger(__name__)
 
@@ -67,6 +67,13 @@ def load_fn(dotted_path):
         LOG.warn(str(err))
     return None
 
+def asmaps(rows):
+    "convenience, converts a list of GA result rows into dicts"
+    return [dict(zip(['identifier', 'date', 'views'], row)) for row in rows]
+
+def between(start, end, dt):
+    return dt >= start and dt <= end
+
 #
 #
 #
@@ -79,7 +86,10 @@ def process_path(prefix, path):
     path = path.split('/', 1)[0] # foobar/the-baz-in-bar-fooed-at-the-star => foobar
     return path
 
-def process_object(prefix, rows):
+# def process_object(prefix, rows):
+def generic_results_processor(ptype, frame, rows):
+    prefix = frame['prefix']
+
     def _process(row):
         try:
             path, datestr, count = row
@@ -97,10 +107,6 @@ def process_object(prefix, rows):
 #
 #
 
-def asmaps(rows):
-    "convenience, converts a list of rows into dicts"
-    return [dict(zip(['identifier', 'date', 'views'], row)) for row in rows]
-
 def aggregate(normalised_rows):
     "counts up the number of times each page was visited"
     # group together the rows by id and date.
@@ -116,28 +122,23 @@ def aggregate(normalised_rows):
 
     return rows
 
-#
-#
-#
-
 def process_response(ptype, frame, response):
     rows = response.get('rows')
     if not rows:
         LOG.warn("GA responded with no results", extra={'query': response['query'], 'ptype': ptype, 'frame': frame})
         return []
-    processor_map = {
-        # 'blog-article': process_blog,
-        # 'event': process_event,
-        # 'interview': process_interview,
-        # 'labs-post': process_labs,
-        # 'press-package': process_presspackages,
-    }
-    processor = processor_map.get(ptype)
-    if not processor:
-        ensure('prefix' in frame, "no processor for %r and no `prefix` key found in history - cannot process results" % ptype)
-        processor = partial(process_object, frame['prefix'])
-    normalised = processor(rows)
+
+    processor = generic_results_processor
+
+    # todo: custom processor dispatch
+
+    normalised = processor(ptype, frame, rows)
+
     return normalised
+
+#
+#
+#
 
 def query_ga(ptype, query):
     sd, ed = query['start_date'], query['end_date']
@@ -151,6 +152,10 @@ def query_ga(ptype, query):
     ga_core.write_results(raw_response, dump_path)
     return raw_response
 
+#
+#
+#
+
 def generic_ga_filter(prefix):
     "returns a generic GA pattern that handles `/prefix` and `/prefix/what/ever` patterns"
     return "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$".format(prefix=prefix)
@@ -162,10 +167,6 @@ def generic_ga_filter_w_paths(prefix, path_list):
         return (stub + "/{path}$").format(path=path)
     ql = ",".join(map(mk, path_list))
     return "{landing}$,{enum}".format(landing=stub, enum=ql)
-
-#
-#
-#
 
 def generic_query_processor(ptype, frame, query_list):
     # NOTE: ptype is unused here here, it's just to match a query processor function's signature
@@ -183,20 +184,7 @@ def generic_query_processor(ptype, frame, query_list):
 #
 
 def build_ga_query__frame_month_range(ptype, start_date=None, end_date=None, history_data=None):
-    """queries GA per page-type, grouped by pagePath and date.
-    each result will return 10k results max and there is no pagination.
-    If every page of a given type is visited once a day for a year, then
-    a single query with 10k results will service 27 pages.
-    A safer number is 164, which means 6 queries per page-type per year.
-
-    As we go further back in history the query will change as known epochs
-    overlap. These overlaps will truncate the current period to the epoch
-    boundaries. For example: if we chunk Jan-Dec 2017 into two-month chunks,
-    Jan+Feb, Mar+Apr, etc, and an epoch where the 'news' page-type with
-    pattern '/elife-news/.../' ends on Mar 20th and the current '/news/...'
-    starts Mar 21st, then the two-month chunk spanning Mar+Apr 2017 will
-    become Mar(1st)+Mar(20th) and Mar(21st)+Apr"""
-
+    "returns a list of frame+month-range pairs. each month-range is itself a pair of start-date+end-date"
     ensure(is_ptype(ptype), "bad page type")
 
     # if dates given, ensure they are date objects
@@ -219,12 +207,10 @@ def build_ga_query__frame_month_range(ptype, start_date=None, end_date=None, his
     end_date = end_date or latest_date
     ensure(start_date <= end_date, "start date %r cannot be greater than end date %r" % (start_date, end_date))
 
-    def between(s, e, d):
-        return d >= s and d <= e
-
     def interesting_frames(frame):
         "do the start or end dates cross the frame boundary? if so, we're interested in it"
-        return between(frame['starts'], frame['ends'], start_date) or between(frame['starts'], frame['ends'], end_date)
+        date_in_frame = partial(between, frame['starts'], frame['ends'])
+        return date_in_frame(start_date) or date_in_frame(end_date)
 
     # only those frames that overlap our start/end dates
     frame_list = lfilter(interesting_frames, frame_list)
@@ -273,15 +259,31 @@ def build_ga_query__queries_for_frame(ptype, frame, month_list):
 
     # look for the "query_processor_frame_foo" function ...
     path = "metrics.{ptype}.query_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
+
     # ... and use the generic query processor if not found.
     query_processor = load_fn(path) or generic_query_processor
 
-    # update the query list with per-type, per-frame patterns
+    # update the list of queries with a 'filters' value appropriate to type and frame
     return query_processor(ptype, frame, query_list)
 
 def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
+    """queries GA per page-type, grouped by pagePath and date.
+    each result will return 10k results max and there is no pagination.
+    If every page of a given type is visited once a day for a year, then
+    a single query with 10k results will service 27 pages.
+    A safer number is 164, which means 6 queries per page-type per year.
 
-    # gives us a list of pairs:
+    As we go further back in history the query will change as known epochs
+    overlap. These overlaps will truncate the current period to the epoch
+    boundaries. For example: if we chunk Jan-Dec 2017 into two-month chunks,
+    Jan+Feb, Mar+Apr, etc, and an epoch where the 'news' page-type with
+    pattern '/elife-news/.../' ends on Mar 20th and the current '/news/...'
+    starts Mar 21st, then the two-month chunk spanning Mar+Apr 2017 will
+    become Mar(1st)+Mar(20th) and Mar(21st)+Apr"""
+
+    # glue code as original function became huge
+
+    # returns a list of pairs:
     # [(frame1, [(month1-min, month1-max), (m2-min, m2-max), (m3-min, m3-max)]),
     #  (frame2, [(...), ...])]
     frame_month_list = build_ga_query__frame_month_range(ptype, start_date, end_date, history_data)
@@ -290,18 +292,11 @@ def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
     # we can generate 90% of that query here:
     query_list = [(frame, build_ga_query__queries_for_frame(ptype, frame, month_list)) for frame, month_list in frame_month_list]
 
-    # TODO: just the per-type, per-frame dispatch to go
-    # I'm thinking:
-    # query_list = ptype.preprocessor(frame, query)"
-
-    # the output should be a list of queries to run.
-    # we can supplement that list of queries with a processor function or whatever
-
-    # each frame has an optional ID value that we can use to find a pre and post processor function
-    # if frame is missing this ID, attempt default processing of results
-    # ideally, everything prior to 2.0 should have an ID
-
     return query_list
+
+#
+#
+#
 
 @transaction.atomic
 def update_page_counts(ptype, page_counts):

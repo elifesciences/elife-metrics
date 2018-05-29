@@ -340,3 +340,14 @@ class Four(base.BaseCase):
         expected = [{'filters': expected}]
         actual = logic.generic_query_processor(models.COLLECTION, frame, [{}])
         self.assertEqual(actual, expected)
+
+class Five(base.BaseCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_generic_results_processor(self):
+        "the generic results processor will be used in the absence of a per-type and per-frame processor"
+        self.fail()
