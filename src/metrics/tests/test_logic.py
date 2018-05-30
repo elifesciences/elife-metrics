@@ -216,7 +216,11 @@ class Two(base.BaseCase):
 
     def test_process_response_special_processor(self):
         "special handling of results may be necessary for specific time frames"
-        self.fail()
+        frame = {'id': '1', 'prefix': '/events'}
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
+        with patch('metrics.event_type.results_processor_frame_1') as mock:
+            logic.process_response(models.EVENT, frame, fixture)
+            self.assertTrue(mock.called)
 
     def test_process_response_no_results(self):
         "a response with no results issues a warning but otherwise doesn't break"
