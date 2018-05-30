@@ -12,6 +12,7 @@ import logging
 from urllib.parse import urlparse
 import importlib
 from functools import partial
+from collections import OrderedDict
 
 LOG = logging.getLogger(__name__)
 ORPHAN_LOG = logging.getLogger('orphans')
@@ -79,6 +80,23 @@ def between(start, end, dt):
 def normalise_path(path):
     return urlparse(path).path
 
+def parse_map_file(ptype, prefix, contents=None):
+    def _parse_line(line):
+        "the file is a simple 'cat nginx-redirect-file | grep prefix > outfile'"
+        line = line.strip()
+        if not line:
+            return
+        path, redirect = line.split("' '")
+        path = path.strip(" '")
+        redirect = redirect.strip(" ';")
+        ensure(redirect.startswith(prefix), "redirect doesn't start with prefix: %s" % line)
+        # /inside-elife/foobar => foobar
+        redirect = redirect.strip('/').split('/', 1)[1]
+        return (path, redirect)
+    path = os.path.join(settings.GA_PTYPE_SCHEMA_PATH, "%s-path-map.txt" % ptype)
+    contents = (contents and contents.splitlines()) or open(path, 'r').readlines()
+    return OrderedDict(lfilter(None, lmap(_parse_line, contents)))
+
 #
 #
 #
@@ -102,6 +120,9 @@ def generic_results_processor(ptype, frame, rows):
         path_processor = partial(process_prefixed_path, frame['prefix'])
     elif 'path-map' in frame:
         path_processor = partial(process_mapped_path, frame['path-map'])
+    elif 'path-map-file' in frame:
+        mapping = parse_map_file(ptype, frame['prefix'])
+        path_processor = partial(process_mapped_path, mapping)
 
     ensure(path_processor, "generic results processing requires a 'prefix' or 'path-map' key.")
 
@@ -283,7 +304,7 @@ def build_ga_query__queries_for_frame(ptype, frame, month_list):
     query_list = [merge(query_template, {"start_date": mgroup[0][0], "end_date": mgroup[-1][-1]}) for mgroup in chunked_months]
 
     # look for the "query_processor_frame_foo" function ...
-    path = "metrics.{ptype}.query_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
+    path = "metrics.{ptype}_type.query_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
 
     # ... and use the generic query processor if not found.
     query_processor = load_fn(path) or generic_query_processor
@@ -353,6 +374,7 @@ def update_ptype(ptype):
         for frame, query_list in build_ga_query(ptype):
             for i, query in enumerate(query_list):
                 response = query_ga(ptype, query)
+                # TODO: issue an alert/notice when size of results gets within 1k of the max 10k
                 normalised_rows = process_response(ptype, frame, response)
                 counts = aggregate(normalised_rows)
                 LOG.info("inserting/updating %s %ss" % (len(counts), ptype))

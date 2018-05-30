@@ -30,10 +30,17 @@
     "blog-article": {
         "frames": [
             {
-                "id": 1,
+                "id": 2,
                 "ends": null,
                 "starts": "2017-06-01",
                 "prefix": "/inside-elife"
+            },
+            {
+                "id": 1,
+                "ends": "2017-05-31",
+                "starts": null,
+                "prefix": "/inside-elife",
+                "path-map-file": "blog-article-path-map.txt"
             }
         ]
     },

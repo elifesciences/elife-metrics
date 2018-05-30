@@ -5,6 +5,7 @@ from article_metrics.utils import tod, lmap, first
 from metrics import logic, models, history
 from datetime import date, timedelta
 from unittest.mock import patch
+from collections import OrderedDict
 import json
 
 class One(base.BaseCase):
@@ -382,3 +383,18 @@ class Four(base.BaseCase):
         expected = [{'filters': expected}]
         actual = logic.generic_query_processor(models.COLLECTION, frame, [{}])
         self.assertEqual(actual, expected)
+
+class Five(base.BaseCase):
+    def test_parse_redirect_map(self):
+        prefix = '/inside-elife'
+        contents = '''
+            '/new-study-1-in-4-sharks-and-rays-threatened-with-extinction-national-geographic' '/inside-elife/fbbb5b76';
+            '/u-k-panel-backs-open-access-for-all-publicly-funded-research-papers' '/inside-elife/fbbcdd2b';
+            '/elife-news/uk-panel-backs-open-access-all-publicly-funded-research-papers' '/inside-elife/fbbcdd2b';
+        '''
+        results = logic.parse_map_file('', prefix, contents)
+        expected = OrderedDict([
+            ('/new-study-1-in-4-sharks-and-rays-threatened-with-extinction-national-geographic', 'fbbb5b76'),
+            ('/u-k-panel-backs-open-access-for-all-publicly-funded-research-papers', 'fbbcdd2b'),
+            ('/elife-news/uk-panel-backs-open-access-all-publicly-funded-research-papers', 'fbbcdd2b')])
+        self.assertEqual(results, expected)

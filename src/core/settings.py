@@ -49,7 +49,8 @@ OUTPUT_PATH = join(PROJECT_DIR, 'output')
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
 GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
 GA_TABLE_ID = cfg('ga.table-id')
-GA_PTYPE_HISTORY_PATH = join(PROJECT_DIR, 'schema', 'metrics', 'history.json')
+GA_PTYPE_SCHEMA_PATH = join(PROJECT_DIR, 'schema', 'metrics')
+GA_PTYPE_HISTORY_PATH = join(GA_PTYPE_SCHEMA_PATH, 'history.json')
 
 SCOPUS_KEY = cfg('scopus.api-key')
 
