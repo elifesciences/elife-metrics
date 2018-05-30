@@ -38,7 +38,7 @@
             {
                 "id": 1,
                 "ends": "2017-05-31",
-                "starts": null,
+                "starts": "2014-02-01",
                 "prefix": "/inside-elife",
                 "path-map-file": "blog-article-path-map.txt"
             }
