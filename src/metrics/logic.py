@@ -63,11 +63,11 @@ def load_fn(dotted_path):
         return getattr(package, funcname)
     except ImportError as err:
         # package doesn't exist
-        LOG.warn(str(err))
+        LOG.debug(str(err))
 
     except AssertionError as err:
         # package exists but not function
-        LOG.warn(str(err))
+        LOG.debug(str(err))
     return None
 
 def asmaps(rows):
@@ -78,7 +78,7 @@ def between(start, end, dt):
     return dt >= start and dt <= end
 
 def normalise_path(path):
-    return urlparse(path).path
+    return urlparse(path).path.lower()
 
 def parse_map_file(ptype, prefix, contents=None):
     def _parse_line(line):
@@ -91,7 +91,8 @@ def parse_map_file(ptype, prefix, contents=None):
         redirect = redirect.strip(" ';")
         ensure(redirect.startswith(prefix), "redirect doesn't start with prefix: %s" % line)
         # /inside-elife/foobar => foobar
-        redirect = redirect.strip('/').split('/', 1)[1]
+        bits = redirect.strip('/').split('/', 1)
+        redirect = models.LANDING_PAGE if len(bits) == 1 else bits[1]
         return (path, redirect)
     path = os.path.join(settings.GA_PTYPE_SCHEMA_PATH, "%s-path-map.txt" % ptype)
     contents = (contents and contents.splitlines()) or open(path, 'r').readlines()
@@ -116,13 +117,13 @@ def process_mapped_path(mapping, path):
     return mapping.get(path)
 
 def generic_results_processor(ptype, frame, rows):
-    if 'prefix' in frame:
+    if 'path-map-file' in frame:
+        mapping = parse_map_file(ptype, frame['prefix'])
+        path_processor = partial(process_mapped_path, mapping)
+    elif 'prefix' in frame:
         path_processor = partial(process_prefixed_path, frame['prefix'])
     elif 'path-map' in frame:
         path_processor = partial(process_mapped_path, frame['path-map'])
-    elif 'path-map-file' in frame:
-        mapping = parse_map_file(ptype, frame['prefix'])
-        path_processor = partial(process_mapped_path, mapping)
 
     ensure(path_processor, "generic results processing requires a 'prefix' or 'path-map' key.")
 
@@ -130,6 +131,8 @@ def generic_results_processor(ptype, frame, rows):
         try:
             path, datestr, count = row
             identifier = path_processor(path)
+            if not identifier:
+                return # raise ValueError?
             return {
                 'views': int(count),
                 'date': _str2dt(datestr),
@@ -212,18 +215,22 @@ def generic_ga_filter_w_paths(prefix, path_list):
         return "{landing}$,{enum}".format(landing=stub, enum=ql)
     return ql
 
+def apply_query_to_list(ptype_filter, query_list):
+    query_list = [merge(query, {"filters": ptype_filter}) for query in query_list]
+    return query_list
+
 def generic_query_processor(ptype, frame, query_list):
     # NOTE: ptype is unused here here, it's just to match a query processor function's signature
     ptype_filter = frame.get('pattern')
+    if frame.get('pattern'):
+        ptype_filter = frame.get('pattern')
     if frame.get('prefix') and frame.get('path-list'):
         ptype_filter = generic_ga_filter_w_paths(frame['prefix'], frame['path-list'])
     elif frame.get('prefix'):
         ptype_filter = generic_ga_filter(frame['prefix'])
     elif frame.get('path-map'):
         ptype_filter = generic_ga_filter_w_paths('', frame['path-map'].keys())
-
-    query_list = [merge(q, {"filters": ptype_filter}) for q in query_list]
-    return query_list
+    return apply_query_to_list(ptype_filter, query_list)
 
 #
 #
@@ -281,6 +288,11 @@ def build_ga_query__frame_month_range(ptype, start_date=None, end_date=None, his
 
     return month_list
 
+# sigh: I've just discovered GA *does* have pagination. it uses 'start-index' and 'max-results'
+# I wonder why I never questioned my assumption it didn't?
+# chunking by month to reduce result count still works nicely, but transparent pagination would be nicer
+# update: it's also keeping transaction size (and thus memory size) down when we get into thousands of views per-month.
+# I could partition transaction size on num objects though ...
 def build_ga_query__queries_for_frame(ptype, frame, month_list):
     "within a frame's month list we can safely chunk results without overlapping other frames"
 
