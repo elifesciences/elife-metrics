@@ -80,7 +80,8 @@ def between(start, end, dt):
 def normalise_path(path):
     return urlparse(path).path.lower()
 
-def parse_map_file(ptype, prefix, contents=None):
+def parse_map_file(ptype, frame, contents=None):
+
     def _parse_line(line):
         "the file is a simple 'cat nginx-redirect-file | grep prefix > outfile'"
         line = line.strip()
@@ -89,12 +90,17 @@ def parse_map_file(ptype, prefix, contents=None):
         path, redirect = line.split("' '")
         path = path.strip(" '")
         redirect = redirect.strip(" ';")
-        ensure(redirect.startswith(prefix), "redirect doesn't start with prefix: %s" % line)
+
+        # TODO: the frame prefix is being overloaded here.
+        # it's preventing frames that could have a simple query generated
+        # use 'redirect-prefix' or similar instead
+        prefix = frame['redirect-prefix']
+        ensure(redirect.startswith(prefix), "redirect doesn't start with redirect-prefix: %s" % line)
         # /inside-elife/foobar => foobar
         bits = redirect.strip('/').split('/', 1)
         redirect = models.LANDING_PAGE if len(bits) == 1 else bits[1]
         return (path, redirect)
-    path = os.path.join(settings.GA_PTYPE_SCHEMA_PATH, "%s-path-map.txt" % ptype)
+    path = os.path.join(settings.GA_PTYPE_SCHEMA_PATH, frame['path-map-file'])
     contents = (contents and contents.splitlines()) or open(path, 'r').readlines()
     return OrderedDict(lfilter(None, lmap(_parse_line, contents)))
 
@@ -118,7 +124,7 @@ def process_mapped_path(mapping, path):
 
 def generic_results_processor(ptype, frame, rows):
     if 'path-map-file' in frame:
-        mapping = parse_map_file(ptype, frame['prefix'])
+        mapping = parse_map_file(ptype, frame)
         path_processor = partial(process_mapped_path, mapping)
     elif 'prefix' in frame:
         path_processor = partial(process_prefixed_path, frame['prefix'])
@@ -222,8 +228,6 @@ def apply_query_to_list(ptype_filter, query_list):
 def generic_query_processor(ptype, frame, query_list):
     # NOTE: ptype is unused here here, it's just to match a query processor function's signature
     ptype_filter = frame.get('pattern')
-    if frame.get('pattern'):
-        ptype_filter = frame.get('pattern')
     if frame.get('prefix') and frame.get('path-list'):
         ptype_filter = generic_ga_filter_w_paths(frame['prefix'], frame['path-list'])
     elif frame.get('prefix'):
