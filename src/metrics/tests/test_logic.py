@@ -60,7 +60,8 @@ class One(base.BaseCase):
         self.assertEqual(total, expected_sum)
         self.assertEqual(qobj.count(), expected_result_count)
 
-    def test_process_path(self):
+    def test_process_results_prefixed_path(self):
+        "a prefix is stripped from a path and the first of any remaining path segments is returned"
         cases = [
             ("/pants/foobar", "foobar"),
             ("/pants/foo/bar", "foo"),
@@ -72,7 +73,35 @@ class One(base.BaseCase):
         ]
         for given, expected in cases:
             with self.subTest():
-                self.assertEqual(logic.process_path('/pants', given), expected)
+                self.assertEqual(logic.process_prefixed_path('/pants', given), expected)
+
+    def test_process_results_mapped_path(self):
+        "a mapping of path->identifier will return the identifier"
+        mapping = {
+            '/pants/foo': 'bar',
+            '/party/baz': 'bar',
+        }
+        cases = [
+            "/pants/foo",
+            "/party/baz",
+            "https://sub.example.org/pants/foo",
+            "/pants/foo?bar=baz",
+            "/pants/foo?bar=baz&bup=",
+            "/pants/foo#bar",
+            "/pants/foo#bar?baz=bup",
+        ]
+        expected = 'bar'
+        for given in cases:
+            with self.subTest():
+                self.assertEqual(logic.process_mapped_path(mapping, given), expected, "failed on %s" % given)
+
+    def test_process_results_mapped_path_no_match(self):
+        "an orphan is recorded when a given path fails to match the mapping."
+        with patch('metrics.logic.ORPHAN_LOG') as mock:
+            mapping = {}
+            expected = None
+            self.assertEqual(logic.process_mapped_path(mapping, '/foo'), expected)
+            self.assertTrue(mock.info.called)
 
 class Two(base.BaseCase):
     def setUp(self):
@@ -338,6 +367,7 @@ class Four(base.BaseCase):
         "essentially a duplicate test, but using actual data"
         collection = history.ptype_history(models.COLLECTION)
         frame = collection['frames'][0]
+        print(frame)
         # I do not endorse this official-but-awful method of string concatenation
         expected = 'ga:pagePath=~^/collections/chemical-biology$' \
                    ',ga:pagePath=~^/collections/tropical-disease$' \

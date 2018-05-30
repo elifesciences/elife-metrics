@@ -14,6 +14,7 @@ import importlib
 from functools import partial
 
 LOG = logging.getLogger(__name__)
+ORPHAN_LOG = logging.getLogger('orphans')
 
 DAY, MONTH = 'day', 'month'
 
@@ -75,31 +76,43 @@ def asmaps(rows):
 def between(start, end, dt):
     return dt >= start and dt <= end
 
+def normalise_path(path):
+    return urlparse(path).path
+
 #
 #
 #
 
-def process_path(prefix, path):
-    path = urlparse(path).path
+def process_prefixed_path(prefix, path):
+    path = normalise_path(path)
     ensure(path.startswith(prefix), "path does not start with given prefix (%r): %s" % (prefix, path), ValueError)
     # we could just dispense with the prefix and discard the first segment ...
     prefix_len = len(prefix)
     path = path[prefix_len:].strip().strip('/') # /events/foobar => foobar
-    path = path.split('/', 1)[0] # foobar/the-baz-in-bar-fooed-at-the-star => foobar
-    return path
+    identifier = path.split('/', 1)[0] # foobar/the-baz-in-bar-fooed-at-the-star => foobar
+    return identifier
+
+def process_mapped_path(mapping, path):
+    path = normalise_path(path)
+    path in mapping or ORPHAN_LOG.info(path)
+    return mapping.get(path)
 
 def generic_results_processor(ptype, frame, rows):
-    ensure('prefix' in frame, "generic results processing requires a 'prefix' key.")
-    prefix = frame['prefix']
+    if 'prefix' in frame:
+        path_processor = partial(process_prefixed_path, frame['prefix'])
+    elif 'path-map' in frame:
+        path_processor = partial(process_mapped_path, frame['path-map'])
+
+    ensure(path_processor, "generic results processing requires a 'prefix' or 'path-map' key.")
 
     def _process(row):
         try:
             path, datestr, count = row
-            path = process_path(prefix, path)
+            identifier = path_processor(path)
             return {
                 'views': int(count),
                 'date': _str2dt(datestr),
-                'identifier': path,
+                'identifier': identifier,
             }
         except ValueError as err:
             LOG.info("skipping row, bad value: %s" % str(err))
@@ -172,9 +185,11 @@ def generic_ga_filter_w_paths(prefix, path_list):
     stub = "ga:pagePath=~^{prefix}".format(prefix=prefix)
 
     def mk(path):
-        return (stub + "/{path}$").format(path=path)
+        return (stub + "/{path}$").format(path=path.lstrip('/'))
     ql = ",".join(map(mk, path_list))
-    return "{landing}$,{enum}".format(landing=stub, enum=ql)
+    if prefix:
+        return "{landing}$,{enum}".format(landing=stub, enum=ql)
+    return ql
 
 def generic_query_processor(ptype, frame, query_list):
     # NOTE: ptype is unused here here, it's just to match a query processor function's signature
@@ -183,6 +198,8 @@ def generic_query_processor(ptype, frame, query_list):
         ptype_filter = generic_ga_filter_w_paths(frame['prefix'], frame['path-list'])
     elif frame.get('prefix'):
         ptype_filter = generic_ga_filter(frame['prefix'])
+    elif frame.get('path-map'):
+        ptype_filter = generic_ga_filter_w_paths('', frame['path-map'].keys())
 
     query_list = [merge(q, {"filters": ptype_filter}) for q in query_list]
     return query_list

@@ -53,7 +53,7 @@ frame3 = And(_frame3, _only_one)
 
 # similar to prefix+path-list, the keys are used in the query and the
 # values are used in the results processing
-_frame4 = merge(_frame0, {'path-mapping': {type_str: type_str}})
+_frame4 = merge(_frame0, {'path-map': {type_str: type_str}})
 frame4 = And(_frame4, _only_one)
 
 type_frame = Or(frame1, frame2, frame3, frame4)
