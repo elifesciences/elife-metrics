@@ -49,7 +49,7 @@
         "frames": [
             {
                 "id": 2,
-                "ends": null, 
+                "ends": null,
                 "starts": "2017-06-01",
                 "prefix": "/events"
             }, 
@@ -69,10 +69,17 @@
     "interview": {
         "frames": [
             {
-                "id": 1,
-                "starts": "2017-06-01",
+                "id": 2,
                 "ends": null,
+                "starts": "2017-06-01",
                 "prefix": "/interviews"
+            },
+            {
+                "id": 1,
+                "ends": "2017-05-31",
+                "starts": null,
+                "prefix": "/interviews",
+                "path-map-file": "interview-path-map.txt"
             }
         ]
     },
