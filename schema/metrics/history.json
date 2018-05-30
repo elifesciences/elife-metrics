@@ -91,6 +91,27 @@
                 "starts": "2017-06-01",
                 "ends": null,
                 "prefix": "/labs"
+            },
+            {
+                "id": 2,
+                "ends": "2017-05-31",
+                "starts": "2015-08-01",
+                "path-map": {
+                    "/elife-news/labs": "",
+                    "/elife-news/writing-scholarly-documents-manuscripts": "0f2f45d5",
+                    "/elife-news/what-is-manuscripts": "0f2f45d5",
+                    "/elife-news/elife-labs-what-manuscripts": "0f2f45d5",
+                    "/elife-news/introducing-our-new-experiment-lens-writer": "417bcedc",
+                    "/elife-news/introducing-lens-writer": "417bcedc",
+                    "/elife-news/authoring-online-lens-writer": "417bcedc",
+                    "/elife-news/colab-instant-messaging-scientists": "75edb315",
+                    "/elife-news/toward-publishing-reproducible-computation-binder": "a7d53a88",
+                    "/elife-news/proteopedia-sharing-macromolecule-concepts-online": "a9c66d96",
+                    "/elife-news/elife-labs-presenting-proteopedia-sharing-macromolecule-concepts-online": "a9c66d96",
+                    "/elife-news/international-image-interoperability-framework-iiif-science-publishers": "aabe94cd",
+                    "/elife-news/composing-reproducible-manuscripts-using-r-markdown": "cad57bcf",
+                    "/elife-news/hack-cambridge-recurse-entries-explore-knowledge-direct-scichat": "cb73dd25"
+                }
             }
         ]
     },  
