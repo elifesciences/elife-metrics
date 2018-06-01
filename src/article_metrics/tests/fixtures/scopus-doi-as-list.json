@@ -1,0 +1,55 @@
+{
+  "args": [],
+  "data": {
+    "link": [
+      {
+        "@ref": "self",
+        "@_fa": "true",
+        "@href": "https://api.elsevier.com/content/abstract/scopus_id/"
+      },
+      {
+        "@ref": "author-affiliation",
+        "@_fa": "true",
+        "@href": "https://api.elsevier.com/content/abstract/scopus_id/?field=author,affiliation"
+      },
+      {
+        "@ref": "scopus",
+        "@_fa": "true",
+        "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=&origin=inward"
+      },
+      {
+        "@ref": "scopus-citedby",
+        "@_fa": "true",
+        "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=&origin=inward"
+      }
+    ],
+    "pubmed-id": "23256047",
+    "prism:coverDisplayDate": "18 December 2012",
+    "prism:coverDate": "2012-12-18",
+    "source-id": "21100242814",
+    "prism:pageRange": null,
+    "prism:issueIdentifier": "1",
+    "dc:title": "How does doxorubicin work?",
+    "subtypeDescription": "Article",
+    "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/",
+    "prism:eIssn": "2050084X",
+    "subtype": "ar",
+    "prism:volume": "2012",
+    "openaccessFlag": true,
+    "citedby-count": "22",
+    "prism:doi": [
+      {
+        "$": "10.7554/eLife.00387"
+      },
+      {
+        "$": "2-s2.0-84878982435"
+      }
+    ],
+    "article-number": "e00387",
+    "prism:aggregationType": "Journal",
+    "@_fa": "true",
+    "prism:publicationName": "eLife",
+    "openaccess": "1"
+  },
+  "kwargs": {}
+}

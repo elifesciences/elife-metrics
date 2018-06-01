@@ -86,6 +86,15 @@ def parse_entry(entry):
         citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
         ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
         ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
+
+        if isinstance(entry['prism:doi'], list):
+            weird_key = "$"
+            for struct in entry['prism:doi']:
+                doi = struct[weird_key]
+                if utils.doi2msid(doi, safe=True, allow_subresource=False):
+                    entry['prism:doi'] = doi
+                    break
+
         utils.doi2msid(entry['prism:doi'], allow_subresource=False) # throws AssertionError
 
         return {
