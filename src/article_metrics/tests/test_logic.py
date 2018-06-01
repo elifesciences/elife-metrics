@@ -39,6 +39,21 @@ class One(BaseCase):
             expected = len(fixture) - bad_eggs
             self.assertEqual(models.Article.objects.count(), expected)
 
+class Two(BaseCase):
+    def test_get_create_article(self):
+        "article is created if doesn't exist"
+        cases = [
+            {'doi': '10.7554/eLife.01234'},
+            {'doi': '10.7554/elife.01234'},
+            {'doi': '10.7554/ELIFE.01234'},
+        ]
+        self.assertEqual(models.Article.objects.count(), 0)
+        for row in cases:
+            artobj = logic.get_create_article(row)
+            self.assertEqual(artobj.doi, '10.7554/eLife.01234')
+        self.assertEqual(models.Article.objects.count(), 1)
+
+
 class TestGAImport(BaseCase):
     def setUp(self):
         pass
@@ -69,13 +84,13 @@ class TestGAImport(BaseCase):
             'digest': 0,
             'period': 'day',
             'date': '2001-01-01',
-            'doi': '10.7554/elife.1',
+            'doi': '10.7554/eLife.00001',
             'source': models.GA,
         }
         logic.insert_row(ds1)
         self.assertEqual(1, models.Article.objects.count())
         self.assertEqual(1, models.Metric.objects.count())
-        clean_metric = models.Metric.objects.get(article__doi='10.7554/elife.1')
+        clean_metric = models.Metric.objects.get(article__doi='10.7554/eLife.00001')
         self.assertEqual(0, clean_metric.pdf)
 
         expected_update = {
@@ -85,10 +100,10 @@ class TestGAImport(BaseCase):
             'digest': 0,
             'period': 'day',
             'date': '2001-01-01',
-            'doi': '10.7554/elife.1',
+            'doi': '10.7554/eLife.00001',
             'source': models.GA,
         }
         logic.insert_row(expected_update)
         self.assertEqual(1, models.Metric.objects.count())
-        clean_metric = models.Metric.objects.get(article__doi='10.7554/elife.1')
+        clean_metric = models.Metric.objects.get(article__doi='10.7554/eLife.00001')
         self.assertEqual(1, clean_metric.pdf)
