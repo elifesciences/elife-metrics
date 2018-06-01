@@ -61,7 +61,9 @@ def recently_updated_article_notifications(**kwargs):
 def get_create_article(data):
     "single point for accessing/creating Articles. returns None on bad data"
     try:
-        'doi' in data and utils.doi2msid(data['doi'], allow_subresource=False)
+        if 'doi' in data:
+            msid = utils.doi2msid(data['doi'], allow_subresource=False)
+            data['doi'] = utils.msid2doi(msid) # temporary, until doi field is replaced with msid field
         return first(create_or_update(models.Article, data, ['doi'], create=True, update=False))
     except AssertionError as err:
         # it shouldn't get to this point!

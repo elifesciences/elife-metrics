@@ -105,7 +105,7 @@ def doi2msid(doi, safe=False, allow_subresource=True):
         raise
 
 def msid2doi(msid):
-    assert isint(msid), "given msid must be an integer: %r" % msid
+    ensure(isint(msid), "given msid must be an integer: %r" % msid)
     return '10.7554/eLife.%05d' % int(msid)
 
 def subdict(d, kl):
@@ -179,9 +179,11 @@ def create_or_update(Model, orig_data, key_list=None, create=True, update=True, 
     data.update(orig_data)
     data.update(overrides)
     key_list = key_list or data.keys()
+    key_list = subdict(data, key_list)
     try:
         # try and find an entry of Model using the key fields in the given data
-        inst = Model.objects.get(**subdict(data, key_list))
+        ensure(keys, "refusing to fetch %s with empty keys: %s" % (str(Model), key_list))
+        inst = Model.objects.get(**key_list)
         # object exists, otherwise DoesNotExist would have been raised
 
         # test if objects needs updating
