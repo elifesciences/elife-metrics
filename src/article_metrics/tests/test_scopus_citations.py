@@ -26,6 +26,13 @@ class One(base.BaseCase):
         expected_entries = per_page * len(response_fixtures)
         self.assertEqual(expected_entries, len(res))
 
+    def test_scopus_parse_entry_multiple_dois(self):
+        fixture = json.load(open(join(self.fixture_dir, "scopus-doi-as-list.json"), 'r'))
+        entry = fixture['data']
+        result = citations.parse_entry(entry)
+        expected = "10.7554/eLife.00387"
+        self.assertEqual(result['doi'], expected)
+
     def test_scopus_unparseable_entry(self):
         "unparseable entries have a different return type"
         with patch('article_metrics.handler.writefile') as mock:
