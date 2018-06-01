@@ -103,6 +103,8 @@ class TestUtils(base.BaseCase):
             '10.7554/eLife.0000000000000000000',
 
             '10.7555/eLife.09560', # bad prefix
+
+            [], {}, 1, # non-strings
         ]
         for badegg in cases:
             self.assertRaises(AssertionError, utils.doi2msid, badegg)
