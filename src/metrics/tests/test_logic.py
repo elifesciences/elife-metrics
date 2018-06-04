@@ -142,16 +142,14 @@ class Two(base.BaseCase):
         "the list of queries returned has the right shape"
         start = date(year=2017, month=6, day=3) # non-minimum value to catch any minimising/maximising
         end = date(year=2017, month=12, day=25) # non-maximum value
-
         frame_query_list = logic.build_ga_query(models.EVENT, start, end)
-
         frame, query = frame_query_list[0]
 
         self.assertEqual(query['start_date'], start)
         self.assertEqual(query['end_date'], end)
 
     def test_build_ga_query_single(self):
-        "a query for a single day (no month range) is possible"
+        "a query for a single day is possible"
         start = end = date(year=2018, month=1, day=1)
         frame_query_list = logic.build_ga_query(models.EVENT, start, end)
         frame, query = frame_query_list[0]
@@ -213,6 +211,9 @@ class Two(base.BaseCase):
     #
     #
 
+    def test_query_ga_pagination(self):
+        self.fail()
+
     def test_query_ga(self):
         "a standard response from GA is handled as expected, a dump file is created etc"
         jan18 = date(year=2018, month=1, day=1)
@@ -231,15 +232,6 @@ class Two(base.BaseCase):
                 contents = os.listdir(self.tmpdir)
                 self.assertEqual(len(contents), 1)
                 self.assertEqual(json.load(open(dumpfile, 'r')), fixture)
-
-    def test_ga_query(self):
-        "if we have a query for a specific start/end date, those dates are not maximised/minimised to month borders"
-        midJan18 = date(2018, 1, 15)
-        midMar18 = date(2018, 3, 15)
-        frame_query_list = logic.build_ga_query(models.EVENT, midJan18, midMar18)
-        frame, query = frame_query_list[0]
-        self.assertEqual(query['start_date'], midJan18)
-        self.assertEqual(query['end_date'], midMar18)
 
     #
     #

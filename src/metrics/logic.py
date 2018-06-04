@@ -192,17 +192,32 @@ def process_response(ptype, frame, response):
 #
 #
 
-def query_ga(ptype, query):
+def query_ga(ptype, query, results_pp=10000):
     sd, ed = query['start_date'], query['end_date']
     LOG.info("querying GA for %ss between %s and %s" % (ptype, sd, ed))
     dump_path = ga_core.output_path(ptype, sd, ed)
     if os.path.exists(dump_path):
-        # temporary caching while I debug
         LOG.debug("(cache hit)")
         return json.load(open(dump_path, 'r'))
-    raw_response = ga_core.query_ga(query) # potentially 10k worth, but in actuality ...
-    ga_core.write_results(raw_response, dump_path)
-    return raw_response
+
+    query['max_results'] = results_pp
+    query['start_index'] = 1
+
+    page, results = 1, []
+    while True:
+        LOG.info("requesting page %s for query %s" % (page, query['filters']))
+        response = ga_core.query_ga(query)
+        results.extend(response.get('rows') or [])
+        if (results_pp * page) >= response['totalResults']:
+            break # no more pages to fetch
+        query['start_index'] += results_pp # 1, 2001, 4001, etc
+        page += 1
+
+    # use the last response given but with all of the results
+    response['rows'] = results
+    response['totalPages'] = page
+    ga_core.write_results(response, dump_path)
+    return response
 
 #
 #
@@ -341,14 +356,12 @@ def update_page_counts(ptype, page_counts):
 def update_ptype(ptype):
     "glue code to query ga about a page-type and then processing and storing the results"
     try:
-        for frame, query_list in build_ga_query(ptype):
-            for i, query in enumerate(query_list):
-                response = query_ga(ptype, query)
-                # TODO: issue an alert/notice when size of results gets within 1k of the max 10k
-                normalised_rows = process_response(ptype, frame, response)
-                counts = aggregate(normalised_rows)
-                LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
-                update_page_counts(ptype, counts)
+        for frame, query in build_ga_query(ptype):
+            response = query_ga(ptype, query)
+            normalised_rows = process_response(ptype, frame, response)
+            counts = aggregate(normalised_rows)
+            LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
+            update_page_counts(ptype, counts)
     except AssertionError as err:
         LOG.error(err)
 
