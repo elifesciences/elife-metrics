@@ -1,7 +1,7 @@
 from article_metrics.utils import lmap
-from .logic import generic_ga_filter, apply_query_to_list
+from .logic import generic_ga_filter
 
-def query_processor_frame_1(ptype, frame, query_list):
+def query_processor_frame_1(ptype, frame):
 
     # TODO: read from file, exclude interviews, generate below from mapping keys
 
@@ -35,4 +35,4 @@ def query_processor_frame_1(ptype, frame, query_list):
     ]
 
     query = ",".join(interviews + adhoc)
-    return apply_query_to_list(query, query_list)
+    return query

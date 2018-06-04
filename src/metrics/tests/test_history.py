@@ -38,10 +38,6 @@ class One(base.BaseCase):
                      'ends': None,
                      'pattern': '.*$'}
                 ],
-                'examples': [
-                    'terminator',
-                    't2: judgement day',
-                ]
             }
         }
         history.type_history.validate(case)
@@ -59,10 +55,6 @@ class One(base.BaseCase):
                      'ends': date(year=1997, month=8, day=28),
                      'pattern': 'life-as-we-know-it'}
                 ],
-                'examples': [
-                    'terminator',
-                    't2: judgement day',
-                ]
             }
         }
         results = history.type_history.validate(case)
