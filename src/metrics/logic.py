@@ -15,7 +15,6 @@ from functools import partial
 from collections import OrderedDict
 
 LOG = logging.getLogger(__name__)
-ORPHAN_LOG = logging.getLogger('orphans')
 
 DAY, MONTH = 'day', 'month'
 
@@ -123,7 +122,6 @@ def process_prefixed_path(prefix, path):
 
 def process_mapped_path(mapping, path):
     path = normalise_path(path)
-    path in mapping or ORPHAN_LOG.info(path)
     return mapping.get(path)
 
 def generic_results_processor(ptype, frame, rows):

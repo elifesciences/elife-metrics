@@ -225,10 +225,8 @@ API_OPTS = render_item({
 }, _load_api_raml(API_PATH))
 
 LOG_FILE = join(PROJECT_DIR, 'elife-metrics.log')
-ORPHAN_LOG_FILE = join(PROJECT_DIR, 'orphans.log')
 if ENV != DEV:
     LOG_FILE = join('/var/log/', 'elife-metrics.log')
-    ORPHAN_LOG_FILE = join('/var/log/', 'orphans.log')
 
 DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log')
 
@@ -237,7 +235,7 @@ def writable(path):
     os.system('touch ' + path)
     # https://docs.python.org/2/library/os.html
     assert os.access(path, os.W_OK), "file doesn't exist or isn't writable: %s" % path
-list(map(writable, [LOG_FILE, DEBUG_LOG_FILE, ORPHAN_LOG_FILE]))
+list(map(writable, [LOG_FILE, DEBUG_LOG_FILE]))
 
 ATTRS = ['asctime', 'created', 'levelname', 'message', 'filename', 'funcName', 'lineno', 'module', 'pathname']
 FORMAT_STR = ' '.join(['%(' + v + ')s' for v in ATTRS])
@@ -271,13 +269,6 @@ LOGGING = {
             'formatter': 'json',
         },
 
-        'orphans.log': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': ORPHAN_LOG_FILE,
-            'formatter': 'json',
-        },
-
         'stderr': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -294,10 +285,6 @@ LOGGING = {
         'debugger': {
             'level': 'WARN',
             'handlers': ['debugger.log', 'stderr'],
-        },
-        'orphans': {
-            'level': 'INFO',
-            'handlers': ['orphans.log', 'stderr'],
         },
         'article_metrics.management.commands.import_article': {
             'level': 'INFO',

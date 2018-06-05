@@ -3,8 +3,6 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-ORPHAN_LOG = logging.getLogger('orphans')
-
 FRAME1_MAP = {
     '': models.LANDING_PAGE,
     'webinar-invitation-elife-peer-review-explained-randy-schekman': '0ec94dac',
@@ -31,10 +29,9 @@ def results_processor_frame_1(ptype, frame, rows):
         try:
             row['identifier'] = FRAME1_MAP[row['identifier']]
         except KeyError:
-            ORPHAN_LOG.info(row['identifier'], extra={'row': row})
             row['identifier'] = exclude_me
 
-    # remove any uncountable/orphan rows
+    # remove any uncountable rows
     results2 = [row for row in results2 if row['identifier'] != exclude_me]
 
     return results1 + results2

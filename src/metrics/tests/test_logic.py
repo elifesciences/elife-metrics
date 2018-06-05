@@ -97,14 +97,6 @@ class One(base.BaseCase):
             with self.subTest():
                 self.assertEqual(logic.process_mapped_path(mapping, given), expected, "failed on %s" % given)
 
-    def test_process_results_mapped_path_no_match(self):
-        "an orphan is recorded when a given path fails to match the mapping."
-        with patch('metrics.logic.ORPHAN_LOG') as mock:
-            mapping = {}
-            expected = None
-            self.assertEqual(logic.process_mapped_path(mapping, '/foo'), expected)
-            self.assertTrue(mock.info.called)
-
 class Two(base.BaseCase):
     def setUp(self):
         self.tmpdir, self.rm_tmpdir = utils.tempdir()
