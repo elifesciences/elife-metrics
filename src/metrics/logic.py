@@ -242,13 +242,16 @@ def generic_ga_filter_w_paths(prefix, path_list):
 
 def generic_query_processor(ptype, frame):
     # NOTE: ptype is unused here here, it's just to match a query processor function's signature
-    ptype_filter = frame.get('pattern')
-    if frame.get('prefix') and frame.get('path-list'):
+    ptype_filter = None
+    if frame.get('pattern'):
+        ptype_filter = frame['pattern']
+    elif frame.get('prefix') and frame.get('path-list'):
         ptype_filter = generic_ga_filter_w_paths(frame['prefix'], frame['path-list'])
     elif frame.get('prefix'):
         ptype_filter = generic_ga_filter(frame['prefix'])
     elif frame.get('path-map'):
         ptype_filter = generic_ga_filter_w_paths('', frame['path-map'].keys())
+    ensure(ptype_filter, "bad frame data")
     return ptype_filter
 
 #

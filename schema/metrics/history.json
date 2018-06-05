@@ -39,6 +39,7 @@
                 "id": 1,
                 "ends": "2017-05-31",
                 "starts": "2014-02-01",
+                "pattern": "ga:pagePath=~^/[a-z0-9-]+$,ga:pagePath==/elife-news,ga:pagePath=~^/elife-news/.*",
                 "redirect-prefix": "/inside-elife",
                 "path-map-file": "blog-article-path-map.txt"
             }
