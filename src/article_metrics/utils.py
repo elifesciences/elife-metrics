@@ -168,6 +168,11 @@ def utcnow():
     # there is a datetime.utcnow(), but it doesn't attach a timezone object
     return datetime.now(pytz.utc).replace(microsecond=0)
 
+def renkeys(d, keypair_list):
+    for old_key, new_key in keypair_list:
+        d[new_key] = d[old_key]
+        del d[old_key]
+
 #
 # django utils
 #

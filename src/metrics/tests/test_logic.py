@@ -1,11 +1,12 @@
 from . import base
 import os
 from article_metrics import utils
-from article_metrics.utils import tod, lmap, first
+from article_metrics.utils import tod, lmap, first, second, subdict
 from metrics import logic, models, history
 from datetime import date, timedelta
 from unittest.mock import patch
 from collections import OrderedDict
+from django.test import override_settings
 import json
 
 class One(base.BaseCase):
@@ -96,14 +97,6 @@ class One(base.BaseCase):
             with self.subTest():
                 self.assertEqual(logic.process_mapped_path(mapping, given), expected, "failed on %s" % given)
 
-    def test_process_results_mapped_path_no_match(self):
-        "an orphan is recorded when a given path fails to match the mapping."
-        with patch('metrics.logic.ORPHAN_LOG') as mock:
-            mapping = {}
-            expected = None
-            self.assertEqual(logic.process_mapped_path(mapping, '/foo'), expected)
-            self.assertTrue(mock.info.called)
-
 class Two(base.BaseCase):
     def setUp(self):
         self.tmpdir, self.rm_tmpdir = utils.tempdir()
@@ -111,97 +104,153 @@ class Two(base.BaseCase):
     def tearDown(self):
         self.rm_tmpdir()
 
+    def test_interesting_frames(self):
+        one_day = timedelta(days=1)
+        one_moonth = timedelta(days=28)
+        a = date(year=2017, month=1, day=1)
+        b = a + one_moonth
+        c = b + one_moonth
+        d = c + one_moonth
+        e = d + one_moonth
+        f = e + one_moonth
+
+        starts, ends = b + one_day, e - one_day
+
+        frames = [
+            {'starts': a, 'ends': b}, # outside of scope
+            {'starts': b, 'ends': c}, # partially in scope
+            {'starts': c, 'ends': d}, # completely in scope
+            {'starts': d, 'ends': e}, # partiall in scope
+            {'starts': e, 'ends': f}, # outside of scope
+        ]
+
+        expected_frames = [
+            {'starts': b, 'ends': c}, # partially in scope
+            {'starts': c, 'ends': d}, # completely in scope
+            {'starts': d, 'ends': e}, # partially in scope
+        ]
+        self.assertEqual(logic.interesting_frames(starts, ends, frames), expected_frames)
+
     def test_build_ga_query(self):
         "the list of queries returned has the right shape"
         start = date(year=2017, month=6, day=3) # non-minimum value to catch any minimising/maximising
         end = date(year=2017, month=12, day=25) # non-maximum value
-        result0 = date(year=2017, month=7, day=31) # end of first two-month chunk
-
         frame_query_list = logic.build_ga_query(models.EVENT, start, end)
+        frame, query = frame_query_list[0]
 
-        frame, ql = frame_query_list[0]
-
-        # 4 queries over 6 months:
-        #  2017-6, 2017-7
-        #  2017-8, 2017-9
-        #  2017-10, 2017-11
-        #  2017-12
-        self.assertEqual(len(ql), 4)
-
-        # the range is correct
-        self.assertEqual(ql[0]['start_date'], start)
-        self.assertEqual(ql[-1]['end_date'], end)
-        # the first chunk is correct
-        self.assertEqual(ql[0]['end_date'], result0)
+        self.assertEqual(query['start_date'], start)
+        self.assertEqual(query['end_date'], end)
 
     def test_build_ga_query_single(self):
-        "a query for a single day (no month range) is possible"
+        "a query for a single day is possible"
         start = end = date(year=2018, month=1, day=1)
         frame_query_list = logic.build_ga_query(models.EVENT, start, end)
-        frame, ql = frame_query_list[0]
+        frame, query = frame_query_list[0]
 
         # one result. each result is a (frame, query_list) pair
         self.assertEqual(len(frame_query_list), 1)
-        self.assertEqual(ql[0]['start_date'], start)
-        self.assertEqual(ql[0]['end_date'], end)
+        self.assertEqual(query['start_date'], start)
+        self.assertEqual(query['end_date'], end)
 
     def test_build_ga_query_multiple_frames(self):
         "a query for a date range that overlaps epochs generates the correct queries"
         midJan18 = date(year=2018, month=1, day=15)
         midDec17 = date(year=2017, month=12, day=15)
         one_day = timedelta(days=1)
+        two_days = timedelta(days=2)
         to_day = date.today()
 
         history_data = {
             'frames': [
                 {'id': 2,
-                 'starts': midJan18,
                  'ends': None,
-                 'prefix': '/new/pants'},
+                 'starts': midJan18,
+                 'pattern': '/new/pants'},
                 {'id': 1,
-                 'starts': midDec17,
                  'ends': midJan18 - one_day,
-                 'prefix': '/old/pants'}
+                 'starts': midDec17,
+                 'pattern': '/old/pants'}
             ]
         }
 
-        starts = midDec17
-        ends = midJan18 # ending on a frame boundary is unreasonable but entirely possible
+        # starts/ends just outside frame boundaries
+        starts = midDec17 - two_days
+        ends = midJan18 + two_days
 
-        ql = logic.build_ga_query__frame_month_range(models.EVENT, starts, ends, history_data)
+        ql = logic.build_ga_query(models.EVENT, starts, ends, history_data)
 
-        frame_list = lmap(first, ql) # just the frame and not the query for now
+        frame_list = lmap(first, ql) # just the frames and not the queries for now
 
         # frames are not modified after being validated/coerced
         expected_frames = [
-            {'id': '1', 'starts': midDec17, 'ends': midJan18 - one_day, 'prefix': '/old/pants'},
-            {'id': '2', 'starts': midJan18, 'ends': to_day, 'prefix': '/new/pants'}
+            {'id': '1', 'starts': midDec17, 'ends': midJan18 - one_day, 'pattern': '/old/pants'},
+            {'id': '2', 'starts': midJan18, 'ends': to_day, 'pattern': '/new/pants'}
         ]
         self.assertEqual(frame_list, expected_frames)
 
-        # month ranges for a frame *are* truncated/capped to align with explicit start/end dates
-        month_lists = [ml for f, ml in ql]
+        expected_query_dates = [
+            # first query: starts and ends on frame boundaries, ignoring explicit start date
+            {'start_date': midDec17, 'end_date': midJan18 - one_day, 'pattern': '/old/pants'}, # id=1
 
-        expected_month_lists = [
-            # frame 1
-            [(midDec17, date(2017, 12, 31)), (date(2018, 1, 1), midJan18 - one_day)],
-            # frame 2
-            [(midJan18, midJan18)]
+            # second query: starts on frame boundary and ends on explicit end date
+            {'start_date': midJan18, 'end_date': ends, 'pattern': '/new/pants'}, # id=2
         ]
-        self.assertEqual(month_lists, expected_month_lists)
+        for expected, query in zip(expected_query_dates, lmap(second, ql)):
+            subquery = subdict(query, ['start_date', 'end_date', 'filters'])
+            utils.renkeys(subquery, [('filters', 'pattern')])
+            self.assertEqual(subquery, expected)
 
     #
     #
     #
 
+    def test_query_ga_pagination(self):
+        "paginated GA queries behave as expected"
+        total_results = 8
+        query = {
+            'start_date': '2012-01-01',
+            'end_date': '2013-01-01',
+            'filters': 'ga:pagePath==/pants',
+        }
+        # https://developers.google.com/analytics/devguides/reporting/core/v3/reference#data_response
+        response_template = {
+            'totalResults': total_results,
+            'rows': [], # doesn't matter, rows are not consulted
+            'itemsPerPage': None, # set during test
+            'query': query
+        }
+        cases = [
+            # items per-page, expected pages
+            (1, 8),
+            (2, 4),
+            (3, 3),
+            (4, 2),
+            (5, 2),
+            (6, 2),
+            (7, 2),
+            (8, 1),
+            (9, 1),
+        ]
+        for items_pp, expected_pages in cases:
+            response_list = [response_template] * expected_pages
+            with patch('article_metrics.ga_metrics.core.query_ga', side_effect=response_list) as mock:
+                response = logic.query_ga(models.EVENT, query, items_pp)
+                self.assertEqual(response['totalPages'], expected_pages)
+                self.assertEqual(mock.call_count, expected_pages)
+
+    def test_query_ga_pagination_bad_pp(self):
+        cases = [0, 10001, 99999999, "", "pants", {}, []]
+        for case in cases:
+            self.assertRaises(AssertionError, logic.query_ga, models.EVENT, {}, case)
+
+    @override_settings(TESTING=False) # urgh, caching in elife-metrics needs an overhaul
     def test_query_ga(self):
         "a standard response from GA is handled as expected, a dump file is created etc"
         jan18 = date(year=2018, month=1, day=1)
         feb18 = date(year=2018, month=2, day=28)
 
         frame_query_list = logic.build_ga_query(models.EVENT, jan18, feb18)
-        frame, query_list = frame_query_list[0]
-        query = query_list[0]
+        frame, query = frame_query_list[0]
 
         fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
         dumpfile = os.path.join(self.tmpdir, "pants.json")
@@ -213,15 +262,6 @@ class Two(base.BaseCase):
                 contents = os.listdir(self.tmpdir)
                 self.assertEqual(len(contents), 1)
                 self.assertEqual(json.load(open(dumpfile, 'r')), fixture)
-
-    def test_ga_query(self):
-        "if we have a query for a specific start/end date, those dates are not maximised/minimised to month borders"
-        midJan18 = date(2018, 1, 15)
-        midMar18 = date(2018, 3, 15)
-        frame_query_list = logic.build_ga_query(models.EVENT, midJan18, midMar18)
-        frame, ql = frame_query_list[0]
-        self.assertEqual(ql[0]['start_date'], midJan18)
-        self.assertEqual(ql[-1]['end_date'], midMar18)
 
     #
     #
@@ -347,22 +387,22 @@ class Four(base.BaseCase):
     def test_generic_query_pattern(self):
         "dead simple usecase when you want full control of query to GA"
         frame = {'pattern': '/pants'} # this would be shooting yourself in the foot however
-        expected = [{'filters': '/pants'}] # a list of GA queries typically, but we can get away with the bare minimum
-        self.assertEqual(logic.generic_query_processor('', frame, [{}]), expected)
+        expected = '/pants' # a list of GA queries typically, but we can get away with the bare minimum
+        self.assertEqual(logic.generic_query_processor('', frame), expected)
 
     def test_generic_query_prefix(self):
         "a simple 'prefix' and nothing else will get you a basic 'landing page and sub-contents' type query"
         prefix = '/pants'
         frame = {'prefix': prefix}
-        expected = [{'filters': logic.generic_ga_filter('/pants')}] # ll: "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$"
-        self.assertEqual(logic.generic_query_processor('', frame, [{}]), expected)
+        expected = logic.generic_ga_filter('/pants') # ll: "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$"
+        self.assertEqual(logic.generic_query_processor('', frame), expected)
 
     def test_generic_query_prefix_list(self):
         "a 'prefix' and a list of subpaths will get you a landing page and enumerated sub-paths query"
         prefix = '/pants'
         frame = {'prefix': prefix, 'path-list': ['foo', 'bar', 'baz']}
-        expected = [{'filters': "ga:pagePath=~^/pants$,ga:pagePath=~^/pants/foo$,ga:pagePath=~^/pants/bar$,ga:pagePath=~^/pants/baz$"}]
-        self.assertEqual(logic.generic_query_processor('', frame, [{}]), expected)
+        expected = "ga:pagePath=~^/pants$,ga:pagePath=~^/pants/foo$,ga:pagePath=~^/pants/bar$,ga:pagePath=~^/pants/baz$"
+        self.assertEqual(logic.generic_query_processor('', frame), expected)
 
     def test_generic_query_prefix_list__collections(self):
         "essentially a duplicate test, but using actual data"
@@ -380,19 +420,20 @@ class Four(base.BaseCase):
                    ',ga:pagePath=~^/collections/reproducibility-project-cancer-biology$' \
                    ',ga:pagePath=~^/collections/plain-language-summaries$' \
                    ',ga:pagePath=~^/interviews/early-career-researchers$'
-        expected = [{'filters': expected}]
-        actual = logic.generic_query_processor(models.COLLECTION, frame, [{}])
+        actual = logic.generic_query_processor(models.COLLECTION, frame)
         self.assertEqual(actual, expected)
 
 class Five(base.BaseCase):
     def test_parse_redirect_map(self):
-        prefix = '/inside-elife'
+        frame = {
+            'redirect-prefix': '/inside-elife',
+        }
         contents = '''
             '/new-study-1-in-4-sharks-and-rays-threatened-with-extinction-national-geographic' '/inside-elife/fbbb5b76';
             '/u-k-panel-backs-open-access-for-all-publicly-funded-research-papers' '/inside-elife/fbbcdd2b';
             '/elife-news/uk-panel-backs-open-access-all-publicly-funded-research-papers' '/inside-elife/fbbcdd2b';
         '''
-        results = logic.parse_map_file('', prefix, contents)
+        results = logic.parse_map_file(frame, contents)
         expected = OrderedDict([
             ('/new-study-1-in-4-sharks-and-rays-threatened-with-extinction-national-geographic', 'fbbb5b76'),
             ('/u-k-panel-backs-open-access-for-all-publicly-funded-research-papers', 'fbbcdd2b'),

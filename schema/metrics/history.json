@@ -125,6 +125,7 @@
                 "id": 1,
                 "ends": "2017-05-31",
                 "starts": null,
+                "prefix": "/elife-news",
                 "path-map-file": "press-package-path-map.txt",
                 "redirect-prefix": "/for-the-press"
             }
