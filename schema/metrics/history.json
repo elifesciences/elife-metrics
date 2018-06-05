@@ -59,7 +59,15 @@
                 "ends": "2017-05-31",
                 "starts": null,
                 "pattern": "ga:pagePath=~^/elife-news/events$,ga:pagePath=~^/events$,ga:pagePath=~^/events/.*$",
-                "comment": "same as frame2, but we also need to capture '/elife-news/events'"
+                "path-map": {
+                    "/elife-news/events": "",
+                    "/events/webinar-invitation-elife-peer-review-explained-randy-schekman": "0ec94dac",
+                    "/events/secure-your-space-elife-peer-review-workshop-harvard-th-chan-school-public-health": "6a9313db",
+                    
+                    "/events/apply-now-attend-elifestem-cell-reports-peer-review-workshop-isscr-2017": "6a9313db",
+                    "/events/apply-now-attend-elife-peer-review-workshop-harvard-th-chan-school-public-health": "6a9313db",
+                    "/events/still-time-apply-elifestem-cell-reports-peer-review-workshop-isscr-2017": "6a9313db"
+                }
             }
         ]
     },

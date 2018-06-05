@@ -1,4 +1,4 @@
-from article_metrics.utils import merge, lmap
+from article_metrics.utils import lmap
 from schema import Schema, And, Or, Use as Coerce, Optional, SchemaError
 from datetime import datetime, date
 from django.conf import settings
@@ -31,38 +31,35 @@ def frames_wrangler(frame_list):
 type_optional_date = Or(Coerce(date_wrangler), None)
 type_str = And(str, len) # non-empty string
 
-_frame0 = {
+only_one_optional_date = lambda d: d['starts'] or d['ends']
+no_lonesome_redirect_prefix = lambda data: ('path-map' in data or 'path-map-file' in data) if 'redirect-prefix' in data else True
+
+def exactly_one(d, *keys):
+    return [k in d for k in keys].count(True) == 1
+
+def exactly_one_if_any(d, *keys):
+    r = [k in d for k in keys]
+    return r.count(True) in [0, 1]
+
+def path_map_or_file_not_both(data):
+    return exactly_one_if_any(data, 'path-map', 'path-map-file')
+
+type_frame = {
     'starts': type_optional_date,
     'ends': type_optional_date,
     'id': And(Coerce(str), type_str),
-    Optional('comment'): type_str
+    Optional('comment'): type_str,
+
+    # request processing
+    Optional('prefix'): type_str,
+    Optional('pattern'): type_str,
+
+    # response processing
+    Optional('path-map'): {type_str: str}, # allow empty strings here (landing pages)
+    Optional('path-map-file'): type_str,
+    Optional('redirect-prefix'): type_str,
 }
-_only_one = lambda d: d['starts'] or d['ends']
-frame0 = And(_frame0, _only_one) # we can't merge Schemas, which sucks
-
-_frame1 = merge(_frame0, {'prefix': type_str})
-frame1 = And(_frame1, _only_one)
-
-# a prefix+path-list lets us generate a query for a finite number of paths
-_frame2 = merge(_frame1, {'path-list': [type_str]})
-frame2 = And(_frame2, _only_one)
-
-# an explicit pattern to pass to GA as-is
-_frame3 = merge(_frame0, {'pattern': type_str})
-frame3 = And(_frame3, _only_one)
-
-# similar to prefix+path-list, the keys are used in the query and the
-# values are used in the results processing
-_frame4 = merge(_frame0, {'path-map': {type_str: str}}) # we allow empty strings here (landing pages)
-frame4 = And(_frame4, _only_one)
-
-# similar to path-map, the redirects are read in from a text file
-# while `path-map` uses an explicit map of path->ids, 'redirect-prefix' is used here to parse out an `id`.
-_frame5 = merge(_frame0, {'path-map-file': type_str, 'redirect-prefix': type_str,
-                          Optional('prefix'): type_str, Optional('pattern'): type_str})
-frame5 = And(_frame5, _only_one)
-
-type_frame = Or(frame1, frame2, frame3, frame4, frame5)
+type_frame = And(type_frame, only_one_optional_date, no_lonesome_redirect_prefix, path_map_or_file_not_both)
 
 type_object = Schema({
     'frames': And([type_frame], Coerce(frames_wrangler))

@@ -3,8 +3,6 @@ from .logic import generic_ga_filter
 
 def query_processor_frame_1(ptype, frame):
 
-    # TODO: read from file, exclude interviews, generate below from mapping keys
-
     adhoc = lmap(lambda path: "ga:pagePath==%s" % path, [
         "/from-ancient-dna-to-decay-an-interview-with-jessica-metcalf",
         "/food-for-thought-an-interview-with-ana-domingos",
