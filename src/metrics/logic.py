@@ -31,6 +31,9 @@ def is_period(period):
 def is_date(dt):
     return isinstance(dt, date)
 
+def is_inrange(v, a, b):
+    return isinstance(v, int) and v >= a and v <= b
+
 #
 # utils
 #
@@ -192,11 +195,13 @@ def process_response(ptype, frame, response):
 #
 #
 
-def query_ga(ptype, query, results_pp=10000):
+MAX_GA_RESULTS = 10000
+def query_ga(ptype, query, results_pp=MAX_GA_RESULTS):
+    ensure(is_inrange(results_pp, 1, MAX_GA_RESULTS), "`results_pp` must be an integer between 1 and 10000")
     sd, ed = query['start_date'], query['end_date']
     LOG.info("querying GA for %ss between %s and %s" % (ptype, sd, ed))
     dump_path = ga_core.output_path(ptype, sd, ed)
-    if os.path.exists(dump_path):
+    if os.path.exists(dump_path) and not settings.TESTING:
         LOG.debug("(cache hit)")
         return json.load(open(dump_path, 'r'))
 
@@ -216,7 +221,7 @@ def query_ga(ptype, query, results_pp=10000):
     # use the last response given but with all of the results
     response['rows'] = results
     response['totalPages'] = page
-    ga_core.write_results(response, dump_path)
+    not settings.TESTING and ga_core.write_results(response, dump_path)
     return response
 
 #

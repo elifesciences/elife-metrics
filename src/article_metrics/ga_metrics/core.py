@@ -32,6 +32,7 @@ SECRETS_LOCATIONS = [
     '/etc/elife-ga-metrics/client-secrets.json'
 ]
 
+# TODO: dodgy, unused, remove
 def output_dir():
     root = os.path.dirname(os.path.dirname(__file__))
     if os.environ.get('TESTING'):
@@ -209,7 +210,6 @@ def write_results(results, path):
     if not os.path.exists(dirname):
         assert os.system("mkdir -p %s" % dirname) == 0, "failed to make output dir %r" % dirname
     LOG.info("writing %r", path)
-    #json.dump(results, open(path + '.raw', 'w'), indent=4, sort_keys=True)
     json.dump(sanitize_ga_response(results), open(path, 'w'), indent=4, sort_keys=True)
     return path
 

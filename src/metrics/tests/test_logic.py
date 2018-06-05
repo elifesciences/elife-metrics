@@ -6,6 +6,7 @@ from metrics import logic, models, history
 from datetime import date, timedelta
 from unittest.mock import patch
 from collections import OrderedDict
+from django.test import override_settings
 import json
 
 class One(base.BaseCase):
@@ -212,8 +213,45 @@ class Two(base.BaseCase):
     #
 
     def test_query_ga_pagination(self):
-        self.fail()
+        "paginated GA queries behave as expected"
+        total_results = 8
+        query = {
+            'start_date': '2012-01-01',
+            'end_date': '2013-01-01',
+            'filters': 'ga:pagePath==/pants',
+        }
+        # https://developers.google.com/analytics/devguides/reporting/core/v3/reference#data_response
+        response_template = {
+            'totalResults': total_results,
+            'rows': [], # doesn't matter, rows are not consulted
+            'itemsPerPage': None, # set during test
+            'query': query
+        }
+        cases = [
+            # items per-page, expected pages
+            (1, 8),
+            (2, 4),
+            (3, 3),
+            (4, 2),
+            (5, 2),
+            (6, 2),
+            (7, 2),
+            (8, 1),
+            (9, 1),
+        ]
+        for items_pp, expected_pages in cases:
+            response_list = [response_template] * expected_pages
+            with patch('article_metrics.ga_metrics.core.query_ga', side_effect=response_list) as mock:
+                response = logic.query_ga(models.EVENT, query, items_pp)
+                self.assertEqual(response['totalPages'], expected_pages)
+                self.assertEqual(mock.call_count, expected_pages)
 
+    def test_query_ga_pagination_bad_pp(self):
+        cases = [0, 10001, 99999999, "", "pants", {}, []]
+        for case in cases:
+            self.assertRaises(AssertionError, logic.query_ga, models.EVENT, {}, case)
+
+    @override_settings(TESTING=False) # urgh, caching in elife-metrics needs an overhaul
     def test_query_ga(self):
         "a standard response from GA is handled as expected, a dump file is created etc"
         jan18 = date(year=2018, month=1, day=1)
