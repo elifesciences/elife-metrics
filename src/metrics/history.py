@@ -38,8 +38,7 @@ def exactly_one(d, *keys):
     return [k in d for k in keys].count(True) == 1
 
 def exactly_one_if_any(d, *keys):
-    r = [k in d for k in keys]
-    return r.count(True) in [0, 1]
+    return [k in d for k in keys].count(True) in [0, 1]
 
 def path_map_or_file_not_both(data):
     return exactly_one_if_any(data, 'path-map', 'path-map-file')

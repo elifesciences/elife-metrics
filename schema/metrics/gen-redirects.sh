@@ -2,9 +2,6 @@
 set -e
 redirects_file=etc-nginx-traits.d-redirect-existing-paths.conf
 
-
-outfile="$ptype-path-map.txt"
-
 # interview
 cat $redirects_file | awk '{$1=$1};1' - | grep " '/interviews" | sort > interview-path-map.txt
 

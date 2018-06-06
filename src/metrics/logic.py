@@ -18,6 +18,8 @@ LOG = logging.getLogger(__name__)
 
 DAY, MONTH = 'day', 'month'
 
+MAX_GA_RESULTS = 10000
+
 def is_pid(pid):
     return isinstance(pid, str) and len(pid) < 256
 
@@ -88,16 +90,11 @@ def parse_map_file(frame, contents=None):
         if not line:
             return
         path, redirect = line.split("' '")
-        path = path.strip(" '")
-        redirect = redirect.strip(" ';")
-
-        # TODO: the frame prefix is being overloaded here.
-        # it's preventing frames that could have a simple query generated
-        # use 'redirect-prefix' or similar instead
+        path, redirect = path.strip(" '"), redirect.strip(" ';")
         prefix = frame['redirect-prefix']
         ensure(redirect.startswith(prefix), "redirect doesn't start with redirect-prefix: %s" % line)
         # /inside-elife/foobar => foobar
-        bits = redirect.strip('/').split('/', 1)
+        bits = redirect.strip('/').split('/', 1) # '/inside-elife/foobar' -> 'inside-elife/foobar' -> ['inside-elife, 'foobar']
         redirect = models.LANDING_PAGE if len(bits) == 1 else bits[1]
         return (path, redirect)
     if contents:
@@ -193,9 +190,8 @@ def process_response(ptype, frame, response):
 #
 #
 
-MAX_GA_RESULTS = 10000
 def query_ga(ptype, query, results_pp=MAX_GA_RESULTS):
-    ensure(is_inrange(results_pp, 1, MAX_GA_RESULTS), "`results_pp` must be an integer between 1 and 10000")
+    ensure(is_inrange(results_pp, 1, MAX_GA_RESULTS), "`results_pp` must be an integer between 1 and %s" % MAX_GA_RESULTS)
     sd, ed = query['start_date'], query['end_date']
     LOG.info("querying GA for %ss between %s and %s" % (ptype, sd, ed))
     dump_path = ga_core.output_path(ptype, sd, ed)
@@ -241,7 +237,7 @@ def generic_ga_filter_w_paths(prefix, path_list):
     return ql
 
 def generic_query_processor(ptype, frame):
-    # NOTE: ptype is unused here here, it's just to match a query processor function's signature
+    # NOTE: ptype is unused, it's just to match a query processor function's signature
     ptype_filter = None
     if frame.get('pattern'):
         ptype_filter = frame['pattern']
@@ -261,7 +257,7 @@ def generic_query_processor(ptype, frame):
 def build_ga_query__queries_for_frame(ptype, frame, start_date, end_date):
     query = {
         'ids': settings.GA_TABLE_ID,
-        'max_results': 10000, # 10k is the max GA will ever return
+        'max_results': MAX_GA_RESULTS,
         'metrics': 'ga:sessions', # *not* pageviews
         'dimensions': 'ga:pagePath,ga:date',
         'sort': 'ga:pagePath,ga:date',
@@ -280,7 +276,7 @@ def build_ga_query__queries_for_frame(ptype, frame, start_date, end_date):
     # ... and use the generic query processor if not found.
     query_processor = load_fn(path) or generic_query_processor
 
-    # update the list of queries with a 'filters' value appropriate to type and frame
+    # update the query with a 'filters' value appropriate to type and frame
     query['filters'] = query_processor(ptype, frame)
 
     return query
