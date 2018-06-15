@@ -45,6 +45,12 @@ def dt_month_range_gen(from_date, to_date, preserve_caps=False):
 
     # trim the ends of the range we'll generate. we'll do those manually
     if preserve_caps:
+        if len(ym_range) == 1:
+            # very edge case:
+            # two dates for a month range, both in same year and month, preserve_caps=True
+            yield (from_date, to_date)
+            return
+
         # [1, 2, 3][1:-1] => [2]
         # [1, 2][1:-1] => [] (no range will be generated)
         ym_range = ym_range[1:-1]

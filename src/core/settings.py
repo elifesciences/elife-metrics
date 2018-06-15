@@ -49,7 +49,8 @@ OUTPUT_PATH = join(PROJECT_DIR, 'output')
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
 GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
 GA_TABLE_ID = cfg('ga.table-id')
-GA_PTYPE_HISTORY_PATH = join(PROJECT_DIR, 'schema', 'metrics', 'history.json')
+GA_PTYPE_SCHEMA_PATH = join(PROJECT_DIR, 'schema', 'metrics')
+GA_PTYPE_HISTORY_PATH = join(GA_PTYPE_SCHEMA_PATH, 'history.json')
 
 SCOPUS_KEY = cfg('scopus.api-key')
 
@@ -223,11 +224,9 @@ API_OPTS = render_item({
     'order_direction': [p('order.default')],
 }, _load_api_raml(API_PATH))
 
-
-LOG_NAME = '%s.log' % PROJECT_NAME # ll: lax.log
-LOG_FILE = join(PROJECT_DIR, LOG_NAME) # ll: /path/to/lax/log/lax.log
+LOG_FILE = join(PROJECT_DIR, 'elife-metrics.log')
 if ENV != DEV:
-    LOG_FILE = join('/var/log/', LOG_NAME) # ll: /var/log/lax.log
+    LOG_FILE = join('/var/log/', 'elife-metrics.log')
 
 DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log')
 

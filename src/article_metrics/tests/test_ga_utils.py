@@ -74,6 +74,22 @@ class TestUtils(base.SimpleBaseCase):
         end_dt = datetime(year=2015, month=3, day=12)
         self.assertEqual(expected_output, list(utils.dt_month_range(start_dt, end_dt)))
 
+    def test_month_range_single_month(self):
+        "when the given range falls within the same year+month"
+        start_dt = end_dt = datetime(year=2014, month=12, day=15)
+        expected_output = [
+            (datetime(year=2014, month=12, day=1), datetime(year=2014, month=12, day=31)),
+        ]
+        self.assertEqual(list(utils.dt_month_range(start_dt, end_dt)), expected_output)
+
+    def test_month_range_single_month_preserve_caps(self):
+        "when the given range falls within the same year+month and the capping dates must be preserved"
+        start_dt = end_dt = datetime(year=2014, month=12, day=15)
+        expected_output = [
+            (datetime(year=2014, month=12, day=15), datetime(year=2014, month=12, day=15)),
+        ]
+        self.assertEqual(list(utils.dt_month_range(start_dt, end_dt, preserve_caps=True)), expected_output)
+
     # output path
 
     def test_output_path_for_view_results(self):

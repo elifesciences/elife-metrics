@@ -1,10 +1,13 @@
 from . import base
 import os
 from article_metrics import utils
-from article_metrics.utils import tod
-from metrics import logic, models
-from datetime import date
+from article_metrics.utils import tod, lmap, first, second, subdict
+from metrics import logic, models, history
+from datetime import date, timedelta
+from unittest import skip
 from unittest.mock import patch
+from collections import OrderedDict
+from django.test import override_settings
 import json
 
 class One(base.BaseCase):
@@ -60,7 +63,8 @@ class One(base.BaseCase):
         self.assertEqual(total, expected_sum)
         self.assertEqual(qobj.count(), expected_result_count)
 
-    def test_process_path(self):
+    def test_process_results_prefixed_path(self):
+        "a prefix is stripped from a path and the first of any remaining path segments is returned"
         cases = [
             ("/pants/foobar", "foobar"),
             ("/pants/foo/bar", "foo"),
@@ -72,7 +76,27 @@ class One(base.BaseCase):
         ]
         for given, expected in cases:
             with self.subTest():
-                self.assertEqual(logic.process_path('/pants', given), expected)
+                self.assertEqual(logic.process_prefixed_path('/pants', given), expected)
+
+    def test_process_results_mapped_path(self):
+        "a mapping of path->identifier will return the identifier"
+        mapping = {
+            '/pants/foo': 'bar',
+            '/party/baz': 'bar',
+        }
+        cases = [
+            "/pants/foo",
+            "/party/baz",
+            "https://sub.example.org/pants/foo",
+            "/pants/foo?bar=baz",
+            "/pants/foo?bar=baz&bup=",
+            "/pants/foo#bar",
+            "/pants/foo#bar?baz=bup",
+        ]
+        expected = 'bar'
+        for given in cases:
+            with self.subTest():
+                self.assertEqual(logic.process_mapped_path(mapping, given), expected, "failed on %s" % given)
 
 class Two(base.BaseCase):
     def setUp(self):
@@ -81,41 +105,155 @@ class Two(base.BaseCase):
     def tearDown(self):
         self.rm_tmpdir()
 
+    def test_interesting_frames(self):
+        one_day = timedelta(days=1)
+        one_moonth = timedelta(days=28)
+        a = date(year=2017, month=1, day=1)
+        b = a + one_moonth
+        c = b + one_moonth
+        d = c + one_moonth
+        e = d + one_moonth
+        f = e + one_moonth
+
+        starts, ends = b + one_day, e - one_day
+
+        frames = [
+            {'starts': a, 'ends': b}, # outside of scope
+            {'starts': b, 'ends': c}, # partially in scope
+            {'starts': c, 'ends': d}, # completely in scope
+            {'starts': d, 'ends': e}, # partiall in scope
+            {'starts': e, 'ends': f}, # outside of scope
+        ]
+
+        expected_frames = [
+            {'starts': b, 'ends': c}, # partially in scope
+            {'starts': c, 'ends': d}, # completely in scope
+            {'starts': d, 'ends': e}, # partially in scope
+        ]
+        self.assertEqual(logic.interesting_frames(starts, ends, frames), expected_frames)
+
     def test_build_ga_query(self):
         "the list of queries returned has the right shape"
-        jan18 = date(year=2018, month=1, day=3) # non-minimum value to catch any minimising/maximising
-        dec18 = date(year=2018, month=12, day=25) # non-maximum value
-        feb18 = date(year=2018, month=2, day=28)
-        ql = logic.build_ga_query(models.EVENT, jan18, dec18)
-        self.assertEqual(len(ql), 6) # 6 * 2 month chunks
-        query = 1 # frame = 0
-        # the range is correct
-        self.assertEqual(ql[0][query]['start_date'], jan18)
-        self.assertEqual(ql[-1][query]['end_date'], dec18)
-        # the first chunk is correct
-        self.assertEqual(ql[0][query]['end_date'], feb18)
+        start = date(year=2017, month=6, day=3) # non-minimum value to catch any minimising/maximising
+        end = date(year=2017, month=12, day=25) # non-maximum value
+        frame_query_list = logic.build_ga_query(models.EVENT, start, end)
+        frame, query = frame_query_list[0]
+
+        self.assertEqual(query['start_date'], start)
+        self.assertEqual(query['end_date'], end)
 
     def test_build_ga_query_single(self):
-        "a query for a single day (no month range) is possible"
-        jan18 = date(year=2018, month=1, day=1)
-        ql = logic.build_ga_query(models.EVENT, jan18, jan18) # two start dates...
-        query = 1 # frame = 0
-        self.assertEqual(len(ql), 1)
-        self.assertEqual(ql[0][query]['start_date'], jan18)
-        self.assertEqual(ql[0][query]['end_date'], jan18)
+        "a query for a single day is possible"
+        start = end = date(year=2018, month=1, day=1)
+        frame_query_list = logic.build_ga_query(models.EVENT, start, end)
+        frame, query = frame_query_list[0]
 
-    def test_load_ptype_history(self):
-        logic.load_ptype_history(models.EVENT)
+        # one result. each result is a (frame, query_list) pair
+        self.assertEqual(len(frame_query_list), 1)
+        self.assertEqual(query['start_date'], start)
+        self.assertEqual(query['end_date'], end)
 
-    def test_load_missing_ptype_history(self):
-        self.assertRaises(ValueError, logic.load_ptype_history, "pants")
+    def test_build_ga_query_multiple_frames(self):
+        "a query for a date range that overlaps epochs generates the correct queries"
+        midJan18 = date(year=2018, month=1, day=15)
+        midDec17 = date(year=2017, month=12, day=15)
+        one_day = timedelta(days=1)
+        two_days = timedelta(days=2)
+        to_day = date.today()
 
+        history_data = {
+            'frames': [
+                {'id': 2,
+                 'ends': None,
+                 'starts': midJan18,
+                 'pattern': '/new/pants'},
+                {'id': 1,
+                 'ends': midJan18 - one_day,
+                 'starts': midDec17,
+                 'pattern': '/old/pants'}
+            ]
+        }
+
+        # starts/ends just outside frame boundaries
+        starts = midDec17 - two_days
+        ends = midJan18 + two_days
+
+        ql = logic.build_ga_query(models.EVENT, starts, ends, history_data)
+
+        frame_list = lmap(first, ql) # just the frames and not the queries for now
+
+        # frames are not modified after being validated/coerced
+        expected_frames = [
+            {'id': '1', 'starts': midDec17, 'ends': midJan18 - one_day, 'pattern': '/old/pants'},
+            {'id': '2', 'starts': midJan18, 'ends': to_day, 'pattern': '/new/pants'}
+        ]
+        self.assertEqual(frame_list, expected_frames)
+
+        expected_query_dates = [
+            # first query: starts and ends on frame boundaries, ignoring explicit start date
+            {'start_date': midDec17, 'end_date': midJan18 - one_day, 'pattern': '/old/pants'}, # id=1
+
+            # second query: starts on frame boundary and ends on explicit end date
+            {'start_date': midJan18, 'end_date': ends, 'pattern': '/new/pants'}, # id=2
+        ]
+        for expected, query in zip(expected_query_dates, lmap(second, ql)):
+            subquery = subdict(query, ['start_date', 'end_date', 'filters'])
+            utils.renkeys(subquery, [('filters', 'pattern')])
+            self.assertEqual(subquery, expected)
+
+    #
+    #
+    #
+
+    def test_query_ga_pagination(self):
+        "paginated GA queries behave as expected"
+        total_results = 8
+        query = {
+            'start_date': '2012-01-01',
+            'end_date': '2013-01-01',
+            'filters': 'ga:pagePath==/pants',
+        }
+        # https://developers.google.com/analytics/devguides/reporting/core/v3/reference#data_response
+        response_template = {
+            'totalResults': total_results,
+            'rows': [], # doesn't matter, rows are not consulted
+            'itemsPerPage': None, # set during test
+            'query': query
+        }
+        cases = [
+            # items per-page, expected pages
+            (1, 8),
+            (2, 4),
+            (3, 3),
+            (4, 2),
+            (5, 2),
+            (6, 2),
+            (7, 2),
+            (8, 1),
+            (9, 1),
+        ]
+        for items_pp, expected_pages in cases:
+            response_list = [response_template] * expected_pages
+            with patch('article_metrics.ga_metrics.core.query_ga', side_effect=response_list) as mock:
+                response = logic.query_ga(models.EVENT, query, items_pp)
+                self.assertEqual(response['totalPages'], expected_pages)
+                self.assertEqual(mock.call_count, expected_pages)
+
+    def test_query_ga_pagination_bad_pp(self):
+        cases = [0, 10001, 99999999, "", "pants", {}, []]
+        for case in cases:
+            self.assertRaises(AssertionError, logic.query_ga, models.EVENT, {}, case)
+
+    @override_settings(TESTING=False) # urgh, caching in elife-metrics needs an overhaul
     def test_query_ga(self):
         "a standard response from GA is handled as expected, a dump file is created etc"
         jan18 = date(year=2018, month=1, day=1)
         feb18 = date(year=2018, month=2, day=28)
-        frame, query = logic.build_ga_query(models.EVENT, jan18, feb18)[0]
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+
+        frame_query_list = logic.build_ga_query(models.EVENT, jan18, feb18)
+        frame, query = frame_query_list[0]
+
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
         dumpfile = os.path.join(self.tmpdir, "pants.json")
         with patch('article_metrics.ga_metrics.core.output_path', return_value=dumpfile):
             with patch('article_metrics.ga_metrics.core.query_ga', return_value=fixture):
@@ -126,23 +264,16 @@ class Two(base.BaseCase):
                 self.assertEqual(len(contents), 1)
                 self.assertEqual(json.load(open(dumpfile, 'r')), fixture)
 
-    def test_ga_query(self):
-        "if we have a query for a specific start/end date, those dates are not maximised/minimised to month borders"
-        midJan18 = date(2018, 1, 15)
-        midMar18 = date(2018, 3, 15)
-        ql = logic.build_ga_query(models.EVENT, midJan18, midMar18)
-        query = 1 # frame = 0
-        self.assertEqual(ql[0][query]['start_date'], midJan18)
-        self.assertEqual(ql[-1][query]['end_date'], midMar18)
+    #
+    #
+    #
 
-    def test_process_response(self):
+    def test_process_response_generic_processor(self):
         "response is processed predictably, views are ints, dates are dates, results retain their order, etc"
-        frame = {'prefix': '/events'}
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        frame = {'id': '2', 'prefix': '/events'}
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
 
         processed_results = logic.process_response(models.EVENT, frame, fixture)
-        # for i, row in enumerate(processed_results):
-        #    print(i, row)
 
         # list index, expected row
         expected = [
@@ -154,10 +285,19 @@ class Two(base.BaseCase):
         for idx, expected_row in expected:
             self.assertEqual(processed_results[idx], expected_row)
 
+    @skip('no special results processors anymore')
+    def test_process_response_special_processor(self):
+        "special handling of results may be necessary for specific time frames"
+        frame = {'id': '1', 'prefix': '/events'}
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
+        with patch('metrics.event_type.results_processor_frame_1') as mock:
+            logic.process_response(models.EVENT, frame, fixture)
+            self.assertTrue(mock.called)
+
     def test_process_response_no_results(self):
         "a response with no results issues a warning but otherwise doesn't break"
-        frame = {'prefix': '/events'}
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        frame = {'id': '2', 'prefix': '/events'}
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
         del fixture['rows']
         with patch('metrics.logic.LOG') as mock:
             processed_results = logic.process_response(models.EVENT, frame, fixture)
@@ -167,19 +307,20 @@ class Two(base.BaseCase):
 
     def test_process_response_bad_apples(self):
         "bad rows in response are discarded"
-        frame = {'prefix': '/events'}
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        frame = {'id': '2', 'prefix': '/events'}
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
 
         apple1 = 1
-        fixture['rows'][apple1] = [None, None, None] # it's a triple but quite useless
+        fixture['rows'][apple1] = [None, None, None] # it's a triple but quite useless (ValueError)
         apple2 = 7
-        fixture['rows'][apple2] = 'how you like them apples?'
+        fixture['rows'][apple2] = 'how you like them apples?' # unhandled (BaseException)
 
         with patch('metrics.logic.LOG') as mock:
             processed_results = logic.process_response(models.EVENT, frame, fixture) # kaboom
             expected_results = 122 - 2 # total non-aggregated results minus bad apples
             self.assertEqual(len(processed_results), expected_results)
-            self.assertEqual(mock.exception.call_count, 2) # two unhandled errors for two bad apples
+            self.assertEqual(mock.exception.call_count, 1) # one unhandled error
+            self.assertEqual(mock.info.call_count, 1) # one handled error
 
 
 class Three(base.BaseCase):
@@ -225,10 +366,11 @@ class Three(base.BaseCase):
         self.assertEqual(models.PageType.objects.count(), 0)
         self.assertEqual(models.PageCount.objects.count(), 0)
 
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events.json'), 'r'))
+        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
 
-        frame = {'prefix': '/events'}
-        with patch('metrics.logic.build_ga_query', return_value=[[frame, {}]]):
+        frame = {'id': '2', 'prefix': '/events'}
+        frame_query_list = [(frame, [{}])]
+        with patch('metrics.logic.build_ga_query', return_value=frame_query_list):
             with patch('metrics.logic.query_ga', return_value=fixture):
                 logic.update_ptype(models.EVENT)
 
@@ -236,3 +378,65 @@ class Three(base.BaseCase):
         self.assertEqual(models.PageType.objects.count(), 1) # 'event'
         # not the same as len(fixture.rows) because of aggregation
         self.assertEqual(models.PageCount.objects.count(), 115)
+
+class Four(base.BaseCase):
+    def setUp(self):
+        pass
+
+    def tearDown(self):
+        pass
+
+    def test_generic_query_pattern(self):
+        "dead simple usecase when you want full control of query to GA"
+        frame = {'pattern': '/pants'} # this would be shooting yourself in the foot however
+        expected = '/pants' # a list of GA queries typically, but we can get away with the bare minimum
+        self.assertEqual(logic.generic_query_processor('', frame), expected)
+
+    def test_generic_query_prefix(self):
+        "a simple 'prefix' and nothing else will get you a basic 'landing page and sub-contents' type query"
+        prefix = '/pants'
+        frame = {'prefix': prefix}
+        expected = logic.generic_ga_filter('/pants') # ll: "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$"
+        self.assertEqual(logic.generic_query_processor('', frame), expected)
+
+    def test_generic_query_prefix_list(self):
+        "a 'prefix' and a list of subpaths will get you a landing page and enumerated sub-paths query"
+        prefix = '/pants'
+        frame = {'prefix': prefix, 'path-list': ['foo', 'bar', 'baz']}
+        expected = "ga:pagePath=~^/pants$,ga:pagePath=~^/pants/foo$,ga:pagePath=~^/pants/bar$,ga:pagePath=~^/pants/baz$"
+        self.assertEqual(logic.generic_query_processor('', frame), expected)
+
+    def test_generic_query_prefix_list__collections(self):
+        "essentially a duplicate test, but using actual data"
+        collection = history.ptype_history(models.COLLECTION)
+        frame = collection['frames'][0]
+        # I do not endorse this official-but-awful method of string concatenation
+        expected = 'ga:pagePath=~^/collections/chemical-biology$' \
+                   ',ga:pagePath=~^/collections/tropical-disease$' \
+                   ',ga:pagePath=~^/collections/paleontology$' \
+                   ',ga:pagePath=~^/collections/human-genetics$' \
+                   ',ga:pagePath=~^/interviews/working-lives$' \
+                   ',ga:pagePath=~^/collections/natural-history-model-organisms$' \
+                   ',ga:pagePath=~^/natural-history-of-model-organisms$' \
+                   ',ga:pagePath=~^/collections/reproducibility-project-cancer-biology$' \
+                   ',ga:pagePath=~^/collections/plain-language-summaries$' \
+                   ',ga:pagePath=~^/interviews/early-career-researchers$'
+        actual = logic.generic_query_processor(models.COLLECTION, frame)
+        self.assertEqual(actual, expected)
+
+class Five(base.BaseCase):
+    def test_parse_redirect_map(self):
+        frame = {
+            'redirect-prefix': '/inside-elife',
+        }
+        contents = '''
+            '/new-study-1-in-4-sharks-and-rays-threatened-with-extinction-national-geographic' '/inside-elife/fbbb5b76';
+            '/u-k-panel-backs-open-access-for-all-publicly-funded-research-papers' '/inside-elife/fbbcdd2b';
+            '/elife-news/uk-panel-backs-open-access-all-publicly-funded-research-papers' '/inside-elife/fbbcdd2b';
+        '''
+        results = logic.parse_map_file(frame, contents)
+        expected = OrderedDict([
+            ('/new-study-1-in-4-sharks-and-rays-threatened-with-extinction-national-geographic', 'fbbb5b76'),
+            ('/u-k-panel-backs-open-access-for-all-publicly-funded-research-papers', 'fbbcdd2b'),
+            ('/elife-news/uk-panel-backs-open-access-all-publicly-funded-research-papers', 'fbbcdd2b')])
+        self.assertEqual(results, expected)
