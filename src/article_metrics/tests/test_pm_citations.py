@@ -114,7 +114,7 @@ class One(base.BaseCase):
         self.assertEqual(results, expected)
 
     @responses.activate
-    def test_count_for_blah(self):
+    def test_count_response(self):
         art = models.Article(**{
             'doi': self.doi,
             'pmid': self.pmid,

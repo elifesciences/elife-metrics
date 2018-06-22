@@ -64,7 +64,7 @@ def get_create_article(data):
         if 'doi' in data:
             msid = utils.doi2msid(data['doi'], allow_subresource=False)
             data['doi'] = utils.msid2doi(msid) # temporary, until doi field is replaced with msid field
-        return first(create_or_update(models.Article, data, ['doi'], create=True, update=False))
+        return first(create_or_update(models.Article, data, create=True, update=False))
     except AssertionError as err:
         # it shouldn't get to this point!
         LOG.warn("refusing to fetch/create bad article: %s" % err, extra={'article-data': data})

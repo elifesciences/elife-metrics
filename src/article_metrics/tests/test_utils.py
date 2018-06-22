@@ -1,4 +1,4 @@
-from article_metrics import utils
+from article_metrics import utils, models
 from . import base
 import pytz
 from datetime import datetime
@@ -9,6 +9,16 @@ class TestUtils(base.BaseCase):
 
     def tearDown(self):
         pass
+
+    def test_create_or_update(self):
+        obj, created, updated = utils.create_or_update(models.Article, {'doi': '10.7554/eLife.1234'})
+        self.assertTrue(obj)
+        self.assertEqual(True, created)
+        self.assertEqual(False, updated)
+
+    def test_create_or_update_bad_keylist(self):
+        utils.create_or_update(models.Article, {'doi': '10.7554/eLife.1234', 'pmid': 1})
+        self.assertRaises(AssertionError, utils.create_or_update, models.Article, {'pmid': 1}, key_list=['???'])
 
     def test_isint(self):
         int_list = [
