@@ -19,7 +19,10 @@ class One(base.BaseCase):
 
     def test_scopus_parse_entry(self):
         "citations.parse_entry can handle all known fixtures"
-        response_fixtures = utils.listfiles(join(self.fixture_dir, 'scopus-responses'))
+        response_fixtures = [
+            join(self.fixture_dir, 'scopus-responses/search-p1.json'),
+            join(self.fixture_dir, 'scopus-responses/search-p2.json')
+        ]
         response_fixtures = lmap(lambda path: json.load(open(path, 'r')), response_fixtures)
         res = citations.all_entries(response_fixtures)
         per_page = 25
@@ -85,10 +88,10 @@ class One(base.BaseCase):
         with patch('article_metrics.scopus.citations.fetch_page', side_effect=[response1, response2]):
             # we get something for all of our entries
             results = citations.all_todays_entries()
-            total_results = 25
+            total_results = 26
             self.assertEqual(len(results), total_results)
 
-            unparseable_entries = 2
+            unparseable_entries = 3
             unknown_doi_prefixes = 1
             subresource_dois = 2
             bad_eggs = unparseable_entries + unknown_doi_prefixes + subresource_dois

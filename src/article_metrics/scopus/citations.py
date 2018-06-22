@@ -2,7 +2,7 @@ import requests
 import logging
 from django.conf import settings
 from article_metrics import models, handler, utils
-from article_metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter, has_key, ParseError, ensure
+from article_metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter, isint, ParseError, ensure
 
 LOG = logging.getLogger(__name__)
 
@@ -63,7 +63,8 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 
                 # find the first entry in the search results with a 'citedby-count'.
                 # this is typically the first but we have results where it's missing
-                entry = first(lfilter(has_key('citedby-count'), data['search-results']['entry']))
+                fltrfn = lambda d: 'citedby-count' in d and isint(d['citedby-count'])
+                entry = first(lfilter(fltrfn, data['search-results']['entry']))
 
                 # exit early if we start hitting 0 results
                 if entry and int(entry['citedby-count']) == 0:
@@ -86,6 +87,7 @@ def parse_entry(entry):
         citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
         ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
         ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
+        ensure(isint(entry['citedby-count']), "citedby count isn't an integer", ParseError)
 
         if isinstance(entry['prism:doi'], list):
             weird_key = "$"
