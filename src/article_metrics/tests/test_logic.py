@@ -53,6 +53,21 @@ class Two(BaseCase):
             self.assertEqual(artobj.doi, '10.7554/eLife.01234')
         self.assertEqual(models.Article.objects.count(), 1)
 
+    def test_get_create_article_no_doi(self):
+        "non-doi identifiers can be used"
+        # one perfect article
+        art1 = logic.get_create_article({'doi': '10.7554/eLife.01234', 'pmid': 1, 'pmcid': 2})
+        self.assertEqual(1, models.Article.objects.count())
+
+        # attempt to get/create same article
+        art2 = logic.get_create_article({'pmid': 1})
+        self.assertEqual(1, models.Article.objects.count())
+
+        art3 = logic.get_create_article({'pmcid': 2})
+        self.assertEqual(1, models.Article.objects.count())
+        
+        self.assertEqual(art1.id, art2.id)
+        self.assertEqual(art2.id, art3.id)
 
 class TestGAImport(BaseCase):
     def setUp(self):

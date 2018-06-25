@@ -187,7 +187,7 @@ def create_or_update(Model, orig_data, key_list=None, create=True, update=True, 
     key_list = subdict(data, key_list)
     try:
         # try and find an entry of Model using the key fields in the given data
-        ensure(keys, "refusing to fetch %s with empty keys: %s" % (str(Model), key_list))
+        ensure(key_list, "refusing to fetch %s with empty keys: %s" % (str(Model), key_list))
         inst = Model.objects.get(**key_list)
         # object exists, otherwise DoesNotExist would have been raised
 
