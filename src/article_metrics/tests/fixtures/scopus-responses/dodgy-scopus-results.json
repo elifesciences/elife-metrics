@@ -1452,7 +1452,67 @@
             "prism:volume": "2013",
             "openaccess": "1",
             "prism:publicationName": "eLife"
-        }
+        },
+        {
+            "prism:doi": "10.7554/eLife.04550",
+            "pubmed-id": "25723966",
+            "prism:issueIdentifier": "4",
+            "subtypeDescription": "Article",
+            "affiliation": [
+              {
+                "affiliation-country": "United Kingdom",
+                "@_fa": "true",
+                "affilname": "The Sainsbury Laboratory",
+                "affiliation-city": "Norwich"
+              },
+              {
+                "affiliation-country": "United Kingdom",
+                "@_fa": "true",
+                "affilname": "Earlham Institute",
+                "affiliation-city": "Norwich"
+              }
+            ],
+            "prism:eIssn": "2050084X",
+            "openaccessFlag": true,
+            "link": [
+              {
+                "@href": "https://api.elsevier.com/content/abstract/scopus_id/85003042811",
+                "@ref": "self",
+                "@_fa": "true"
+              },
+              {
+                "@href": "https://api.elsevier.com/content/abstract/scopus_id/85003042811?field=author,affiliation",
+                "@ref": "author-affiliation",
+                "@_fa": "true"
+              },
+              {
+                "@href": "https://www.scopus.com/inward/record.uri?partnerID=HzOxMe3b&scp=85003042811&origin=inward",
+                "@ref": "scopus",
+                "@_fa": "true"
+              },
+              {
+                "@href": "https://www.scopus.com/inward/citedby.uri?partnerID=HzOxMe3b&scp=85003042811&origin=inward",
+                "@ref": "scopus-citedby",
+                "@_fa": "true"
+              }
+            ],
+            "prism:coverDate": "2015-02-27",
+            "citedby-count": "Heidelberg",
+            "prism:pageRange": null,
+            "dc:creator": "McMullan M.",
+            "dc:identifier": "SCOPUS_ID:85003042811",
+            "@_fa": "true",
+            "subtype": "ar",
+            "prism:aggregationType": "Journal",
+            "source-id": "21100242814",
+            "openaccess": "1",
+            "prism:url": "https://api.elsevier.com/content/abstract/scopus_id/85003042811",
+            "prism:publicationName": "eLife",
+            "eid": "2-s2.0-85003042811",
+            "dc:title": "Evidence for suppression of immunity as a driver for genomic introgressions and host range expansion in races of Albugo candida, a generalist parasite",
+            "prism:volume": "2015",
+            "prism:coverDisplayDate": "27 February 2015"
+      }
     ],
     "opensearch:Query": {
         "@searchTerms": "DOI(\"10.7554/*\")",

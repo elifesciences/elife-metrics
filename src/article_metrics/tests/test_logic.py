@@ -32,7 +32,7 @@ class One(BaseCase):
         with mock.patch("article_metrics.scopus.citations.all_todays_entries", return_value=fixture):
             logic.import_scopus_citations()
 
-            unparseable_entries = 2
+            unparseable_entries = 3
             unknown_doi_prefixes = 1
             subresource_dois = 2
             bad_eggs = unparseable_entries + unknown_doi_prefixes + subresource_dois
