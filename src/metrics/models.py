@@ -37,6 +37,9 @@ class PageCount(Model):
     views = PositiveIntegerField()
     date = DateField()
 
+    class Meta:
+        unique_together = (('page', 'date'),) # one result per-page, per-date
+
     def __str__(self):
         return "%s: %d views" % (self.date.strftime('%Y-%m-%d'), self.views) # ll: '2018-01-01: 12 views'
 
