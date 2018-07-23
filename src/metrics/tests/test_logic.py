@@ -52,7 +52,7 @@ class One(base.BaseCase):
     def test_monthly_metrics(self):
         "logic.page_views returns the sum of all monthly hits (same as sum of all daily hits) and a chop'able queryset"
         fixture = [
-            ('pants', 'event', '2016-01-31', 1),
+            ('pants', 'event', '2016-01-30', 1),
             ('pants', 'event', '2016-01-31', 2),
             ('pants', 'event', '2016-02-01', 3),
         ]
