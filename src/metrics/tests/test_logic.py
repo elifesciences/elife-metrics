@@ -7,6 +7,7 @@ from datetime import date, timedelta
 from unittest import skip
 from unittest.mock import patch
 from collections import OrderedDict
+from django.db.models import Sum
 from django.test import override_settings
 import json
 
@@ -121,7 +122,7 @@ class Two(base.BaseCase):
             {'starts': a, 'ends': b}, # outside of scope
             {'starts': b, 'ends': c}, # partially in scope
             {'starts': c, 'ends': d}, # completely in scope
-            {'starts': d, 'ends': e}, # partiall in scope
+            {'starts': d, 'ends': e}, # partially in scope
             {'starts': e, 'ends': f}, # outside of scope
         ]
 
@@ -361,7 +362,43 @@ class Three(base.BaseCase):
         self.assertEqual(models.Page.objects.count(), 2)
         self.assertEqual(models.PageCount.objects.count(), 4)
 
+    def test_double_insert(self):
+        aggregated_rows = logic.asmaps([
+            ("/events/foo", tod("2018-01-01"), 1),
+            ("/events/foo", tod("2018-01-02"), 2),
+            ("/events/foo", tod("2018-01-03"), 4),
+            ("/events/bar", tod("2018-01-03"), 1)
+        ])
+        results = logic.update_page_counts(models.EVENT, aggregated_rows)
+        self.assertEqual(len(results), len(aggregated_rows))
+        self.assertEqual(models.PageType.objects.count(), 1)
+        self.assertEqual(models.Page.objects.count(), 2)
+        self.assertEqual(models.PageCount.objects.count(), 4)
+        expected_total = 8
+        actual_total = lambda: models.PageCount.objects.aggregate(total=Sum('views'))['total']
+        self.assertEqual(expected_total, actual_total())
+
+        # increase the view count, insert again.
+        aggregated_rows = logic.asmaps([
+            ("/events/foo", tod("2018-01-01"), 2),
+            ("/events/foo", tod("2018-01-02"), 4),
+            ("/events/foo", tod("2018-01-03"), 8),
+            ("/events/bar", tod("2018-01-03"), 2)
+        ])
+        results = logic.update_page_counts(models.EVENT, aggregated_rows)
+        self.assertEqual(len(results), len(aggregated_rows))
+
+        # these numbers should have stayed the same
+        self.assertEqual(models.PageType.objects.count(), 1)
+        self.assertEqual(models.Page.objects.count(), 2)
+        self.assertEqual(models.PageCount.objects.count(), 4)
+
+        # but this should reflect the new total
+        expected_total = 16
+        self.assertEqual(expected_total, actual_total())
+
     def test_update_ptype(self):
+        "`update_ptype` convenience function behaves as expected"
         self.assertEqual(models.Page.objects.count(), 0)
         self.assertEqual(models.PageType.objects.count(), 0)
         self.assertEqual(models.PageCount.objects.count(), 0)

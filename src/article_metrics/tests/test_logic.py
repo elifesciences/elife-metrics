@@ -65,7 +65,7 @@ class Two(BaseCase):
 
         art3 = logic.get_create_article({'pmcid': 2})
         self.assertEqual(1, models.Article.objects.count())
-        
+
         self.assertEqual(art1.id, art2.id)
         self.assertEqual(art2.id, art3.id)
 

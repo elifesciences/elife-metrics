@@ -347,7 +347,8 @@ def update_page_counts(ptype, page_counts):
             'views': row['views'],
             'date': row['date']
         }
-        pagecountobj = first(create_or_update(models.PageCount, pagecount_data, update=False))
+        key_list = ['page', 'date']
+        pagecountobj = first(create_or_update(models.PageCount, pagecount_data, key_list, update=True))
         return pagecountobj
     return lmap(do, page_counts)
 
