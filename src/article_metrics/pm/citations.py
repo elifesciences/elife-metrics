@@ -33,7 +33,7 @@ def _fetch_pmids(doi):
 
     data = resp.json()
     # ll:
-    #{
+    # {
     # "status": "ok",
     # "responseDate": "2017-01-31 13:35:10",
     # "request": "ids=10.7554%2FeLife.09560;format=json",
@@ -50,7 +50,7 @@ def _fetch_pmids(doi):
     #    ]
     #   }
     # ]
-    #}
+    # }
     ensure(data['status'] == 'ok', "response is not ok! %s" % data)
     return subdict(data['records'][0], ['pmid', 'pmcid'])
 
@@ -96,7 +96,7 @@ def parse_result(result):
         'source': models.PUBMED,
         'source_id': "https://www.ncbi.nlm.nih.gov/pmc/articles/%s/" % pmcid,
         'num': len(cited_by),
-        #'links': cited_by # PMC ids of articles linking to this one
+        # 'links': cited_by # PMC ids of articles linking to this one
     }
 
 #
