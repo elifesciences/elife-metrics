@@ -15,9 +15,9 @@ def fetch_page(api_key, doi_prefix, page=0, per_page=25):
     "fetches a page of scopus search results"
     params = {
         'query': 'DOI("%s/*")' % doi_prefix,
-        #'query': 'DOI("10.7554/eLife.00471")',
-        #'field': 'citedby-count', # not too useful unless we combine it with other fields
-        #'view': 'COMPLETE' # verboten
+        # 'query': 'DOI("10.7554/eLife.00471")',
+        # 'field': 'citedby-count', # not too useful unless we combine it with other fields
+        # 'view': 'COMPLETE' # verboten
         'start': page, # a 400 is thrown when we page out
         'count': per_page,
         'sort': 'citedby-count',

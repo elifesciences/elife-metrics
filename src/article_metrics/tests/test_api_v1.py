@@ -35,7 +35,7 @@ class TestAPI(BaseCase):
                 'daily': OrderedDict({}),
                 'monthly': OrderedDict({
                     this_month: {
-                        #'full': 525,
+                        # 'full': 525,
                         'full': 604, # introduction of POA as full text views
                         'abstract': 9,
                         'digest': 46,
@@ -74,16 +74,16 @@ class TestAPI(BaseCase):
                     # 2015-09-12: {
                     #    ....
                     #
-                    #}
+                    # }
                 }),
                 'monthly': OrderedDict({}),
-                #'total': {
+                # 'total': {
                 #    '2015-09-11': {
                 #        'full': ....,
                 #        'abstract': ...,
                 #        'digest': ...,
                 #    },
-                #},
+                # },
             },
         }
 

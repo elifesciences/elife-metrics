@@ -17,7 +17,7 @@ class DummyQuery(object):
         attrs = {
             'reason': 'dummy reason',
             'status': raises,
-            #'data': {'error': {'message': None}},
+            # 'data': {'error': {'message': None}},
         }
         [setattr(self.resp, key, val) for key, val in attrs.items()]
 
