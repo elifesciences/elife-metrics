@@ -146,11 +146,11 @@ def todt(val):
         LOG.debug("encountered naive timestamp %r from %r. UTC assumed.", dt, val)
         return pytz.utc.localize(dt)
 
-    else:
-        # ensure tz is UTC
-        if dt.tzinfo != pytz.utc:
-            LOG.debug("converting an aware dt that isn't in utc TO utc: %r", dt)
-            return dt.astimezone(pytz.utc)
+    # ensure tz is UTC
+    if dt.tzinfo != pytz.utc:
+        LOG.debug("converting an aware dt that isn't in utc TO utc: %r", dt)
+        return dt.astimezone(pytz.utc)
+
     return dt
 
 def tod(val):
