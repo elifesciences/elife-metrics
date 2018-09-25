@@ -3,7 +3,7 @@ boto3==1.5.22
 coverage==4.5
 cryptography==2.1.4
 decorator==4.2.1
-Django==1.11.10
+Django==1.11.15
 django-annoying==0.10.4
 django-markdown2==0.3.0
 django-rest-swagger==2.1.2
@@ -30,3 +30,4 @@ responses==0.8.1
 schema==0.6.7
 unittest-xml-reporting==2.1.0
 uWSGI==2.0.15
+sqlparse==0.2.4
