@@ -27,6 +27,7 @@ LOG.level = logging.INFO
 
 #OUTPUT_SUBDIR = 'output'
 
+# TODO: shift this into app.cfg
 SECRETS_LOCATIONS = [
     'client-secrets.json',
     '/etc/elife-ga-metrics/client-secrets.json'

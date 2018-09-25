@@ -30,6 +30,7 @@ class One(base.BaseCase):
         for bad_pid in [1, {}, [], etc]:
             for bad_ptype in [1, 'foo', {}, [], etc]:
                 for bad_period in [1, 'foo', {}, [], etc]:
+                    # TODO: revisit this test, why isn't bad_period being used?
                     self.assertRaises(ValueError, logic.page_views, bad_pid, bad_ptype)
 
     def test_daily_metrics(self):
