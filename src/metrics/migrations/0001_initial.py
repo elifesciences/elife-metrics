@@ -40,7 +40,7 @@ if not FLAG.exists():
             else:
                 raise
 
-    except BaseException as err:
+    except BaseException:
         LOG.error("unhandled exception attempting to update django_migrations.app values")
         raise
 

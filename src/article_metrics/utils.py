@@ -99,7 +99,7 @@ def doi2msid(doi, safe=False, allow_subresource=True):
         stripped = bits[0]
         ensure(isint(stripped), "unparseable elife doi, manuscript ID is not an integer")
         return int(stripped)
-    except AssertionError as err:
+    except AssertionError:
         if safe:
             return None
         raise
