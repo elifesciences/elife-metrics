@@ -1,6 +1,7 @@
 from . import base
 import os, json
-from metrics import models, views, logic
+from metrics import models, views, logic, history
+from article_metrics import utils
 from django.urls import reverse
 from django.test import Client
 
@@ -70,3 +71,22 @@ class Two(base.BaseCase):
             'totalValue': 34
         }
         self.assertEqual(resp.json(), expected)
+
+class Three(base.BaseCase):
+    def setUp(self):
+        self.c = Client()
+        self.spec_content_types = history.load_from_file().keys()
+        # create a page "asdf" for every content type in history file
+        # this itself may fail if models.PAGE_TYPES hasn't been updated
+        self.dummy_id = "asdf"
+        for sct in self.spec_content_types:
+            ptype, _, _ = utils.create_or_update(models.PageType, {"name": sct}, update=False)
+            utils.create_or_update(models.Page, {"type": ptype, "identifier": self.dummy_id})
+
+    def test_content_types(self):
+        "ensure all content types in history schema"
+        expected_result = {'periods': [], 'totalPeriods': 0, 'totalValue': 0}
+        for sct in self.spec_content_types:
+            resp = self.c.get(reverse(views.metrics, kwargs={'ptype': sct, 'pid': self.dummy_id}))
+            self.assertEqual(resp.status_code, 200)
+            self.assertEqual(resp.json(), expected_result)

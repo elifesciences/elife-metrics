@@ -1,8 +1,13 @@
 from django.db.models import Model, CharField, ForeignKey, PositiveIntegerField, DateField, CASCADE
+from . import history
 
-PAGE_TYPES = BLOG, EVENT, INTERVIEW, LABS, PRESS, COLLECTION = [
-    'blog-article', 'event', 'interview', 'labs-post', 'press-package', 'collection'
-]
+# avoid this
+# PAGE_TYPES = BLOG, EVENT, INTERVIEW, LABS, PRESS, COLLECTION, DIGEST = [
+#    'blog-article', 'event', 'interview', 'labs-post', 'press-package', 'collection', 'digest'
+# ]
+
+PAGE_TYPES = history.load_from_file().keys()
+EVENT, COLLECTION = 'event', 'collection' # avoid these
 
 LANDING_PAGE = ''
 
