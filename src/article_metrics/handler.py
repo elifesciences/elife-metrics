@@ -141,7 +141,7 @@ def requests_get(*args, **kwargs):
         LOG.exception("unhandled network exception fetching request: %s" % err, extra=ctx)
         raise
 
-    except BaseException as err:
+    except BaseException:
         LOG.exception("unhandled exception", extra=ctx)
         raise
 

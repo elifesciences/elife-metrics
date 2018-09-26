@@ -99,7 +99,7 @@ def doi2msid(doi, safe=False, allow_subresource=True):
         stripped = bits[0]
         ensure(isint(stripped), "unparseable elife doi, manuscript ID is not an integer")
         return int(stripped)
-    except AssertionError as err:
+    except AssertionError:
         if safe:
             return None
         raise
@@ -146,11 +146,11 @@ def todt(val):
         LOG.debug("encountered naive timestamp %r from %r. UTC assumed.", dt, val)
         return pytz.utc.localize(dt)
 
-    else:
-        # ensure tz is UTC
-        if dt.tzinfo != pytz.utc:
-            LOG.debug("converting an aware dt that isn't in utc TO utc: %r", dt)
-            return dt.astimezone(pytz.utc)
+    # ensure tz is UTC
+    if dt.tzinfo != pytz.utc:
+        LOG.debug("converting an aware dt that isn't in utc TO utc: %r", dt)
+        return dt.astimezone(pytz.utc)
+
     return dt
 
 def tod(val):

@@ -102,7 +102,7 @@ class Command(BaseCommand):
             print('quitting')
             exit(1)
 
-        except BaseException as err:
+        except BaseException:
             msg = "unhandled exception calling the import-metrics command."
             LOG.exception(msg) # capture a stacktrace
             LOG.critical(msg) # we can't recover, this command must exit
