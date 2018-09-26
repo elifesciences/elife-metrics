@@ -139,5 +139,16 @@
                 "redirect-prefix": "/for-the-press"
             }
         ]
+    },
+
+    "digest": {
+        "frames": [
+            {
+                "id": 1,
+                "ends": null,
+                "starts": "2017-09-01",
+                "prefix": "/digests"
+            }
+        ]
     }
 }
