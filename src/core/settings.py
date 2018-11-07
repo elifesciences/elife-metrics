@@ -82,7 +82,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'rest_framework_swagger', # gui for api
 
     'article_metrics',
     'metrics',
@@ -169,11 +168,6 @@ DUMP_PATH = os.path.join('/tmp/', PROJECT_NAME)
 STATICFILES_DIRS = (
     os.path.join(SRC_DIR, "static"),
 )
-
-SWAGGER_SETTINGS = {
-    'api_version': '1',
-    'exclude_namespaces': ['proxied'], # swagger docs are broken, but this gives them the right namespace
-}
 
 EVENT_BUS = {
     'region': cfg('bus.region'),

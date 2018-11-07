@@ -5,8 +5,6 @@ cryptography==2.3.1
 decorator==4.3.0
 Django==1.11.15
 django-annoying==0.10.4
-django-markdown2==0.3.1
-django-rest-swagger==2.2.0
 djangorestframework==3.8.2
 et3==1.5.1
 google-api-python-client==1.7.4
