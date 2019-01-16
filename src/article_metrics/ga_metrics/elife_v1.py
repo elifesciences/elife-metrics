@@ -99,7 +99,7 @@ TYPE_MAP = {
     'abstract-1': 'abstract',
     'abstract-2': 'digest'
 }
-SPLITTER = re.compile('\.|/')
+SPLITTER = re.compile(r'\.|/')
 
 def path_count(pair):
     "figures out the type of the given path using the suffix (if one available)"
