@@ -88,6 +88,9 @@ class One(base.BaseCase):
             mk = Mock()
             handler.requests_get(bad_url, opid=opid, opts={499: mk})
             self.assertTrue(mk.called)
+            # 2019-03-11: pylint upgrade to 2.3.0 introduces this false positive
+            # https://docs.python.org/3/library/unittest.mock.html#unittest.mock.Mock.call_args
+            # pylint: disable=unsubscriptable-object
             resp_opid, resp_err = mk.call_args[0]
             self.assertEqual(resp_opid, opid)
             self.assertEqual(resp_err.response.status_code, 499)
