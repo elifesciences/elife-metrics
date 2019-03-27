@@ -77,7 +77,7 @@ class TestAPI(BaseCase):
 
         doi = '10.7554/eLife.09560'
 
-        # hack.
+        # hack. the v1 api only queries the last 30 days and is not variable
         metric = models.Metric.objects.get(article__doi=doi)
         yesterday = ymd(datetime.now() - timedelta(days=1))
         metric.date = yesterday

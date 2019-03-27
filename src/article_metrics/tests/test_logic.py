@@ -91,7 +91,7 @@ class TestGAImport(BaseCase):
         # we know this day reveals this many articles
         # expected_article_count = 1090 # changed when we introduced POA articles
         #expected_article_count = 1119
-        #expected_article_count = 1122 # ah - this day in history keeps getting more popular it seems.
+        # expected_article_count = 1122 # ah - this day in history keeps getting more popular it seems.
         # 2017-01-18: I've put the results of this day into the fixtures so that
         # when it changes again in the future we can  see just what it changing
         # 2019-03-27: I've run the test without caching, grabbed what GA was returning and compared the two - identical.
