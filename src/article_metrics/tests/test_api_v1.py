@@ -19,8 +19,18 @@ class TestAPI(BaseCase):
     def test_monthly_data(self):
         self.assertEqual(0, models.Article.objects.count())
         self.assertEqual(0, models.Metric.objects.count())
-        month_to_import = datetime(year=2015, month=8, day=0o1)
-        logic.import_ga_metrics('monthly', from_date=month_to_import, to_date=month_to_import)
+        month_to_import = datetime(year=2015, month=8, day=1)
+
+        def test_output_path(result_type, from_date, to_date):
+            # ignore whatever dates given, return path to fixture
+            if result_type == 'views':
+                return join(self.fixture_dir, 'test_import_ga_monthly_stats', 'views', '2015-08-01_2015-08-31.json')
+            if result_type == 'downloads':
+                return join(self.fixture_dir, 'test_import_ga_monthly_stats', 'downloads', '2015-08-01_2015-08-31.json')
+
+        with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
+            logic.import_ga_metrics('monthly', from_date=month_to_import, to_date=month_to_import, use_only_cached=True)
+
         expected = 1649
         self.assertEqual(expected, models.Article.objects.count())
         self.assertEqual(expected, models.Metric.objects.count())
