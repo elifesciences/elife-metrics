@@ -11,42 +11,9 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-#
-# piggybacking off of migrations because this update is awkward.
-# temporary, remove once all databases updated
-#
-
-FLAG = Path(settings.PROJECT_DIR, ".migrations-table-updated.flag")
-if not FLAG.exists():
-    try:
-        try:
-            # case: pre-existing database
-            LOG.info("flag %s not found, updating django_migrations.app values from 'metrics' to 'article_metrics'", FLAG)
-            cursor = connection.cursor()
-            sql = "update django_migrations set app='article_metrics' where app = 'metrics'"
-            cursor.execute(sql)
-            FLAG.touch()
-        except (OperationalError, ProgrammingError) as err:
-            msg = str(err).splitlines()[0]
-
-            # case: brand new database, no old data to migrate
-            sqlite = 'no such table: django_migrations'
-            psql = 'relation "django_migrations" does not exist'
-            if msg in [sqlite, psql]:
-                # no migrations? no problems
-                FLAG.touch()
-
-            # case: unhandled
-            else:
-                raise
-
-    except BaseException:
-        LOG.error("unhandled exception attempting to update django_migrations.app values")
-        raise
-
-#
-#
-#
+# lsh 2019-03-27: delete once the flag is absent
+OLD_FLAG = Path(settings.PROJECT_DIR, ".migrations-table-updated.flag")
+OLD_FLAG.exists() and OLD_FLAG.delete()
 
 class Migration(migrations.Migration):
 
