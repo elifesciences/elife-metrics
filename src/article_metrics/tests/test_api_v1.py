@@ -27,6 +27,7 @@ class TestAPI(BaseCase):
                 return join(self.fixture_dir, 'test_import_ga_monthly_stats', 'views', '2015-08-01_2015-08-31.json')
             if result_type == 'downloads':
                 return join(self.fixture_dir, 'test_import_ga_monthly_stats', 'downloads', '2015-08-01_2015-08-31.json')
+            raise ValueError(result_type)
 
         with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
             logic.import_ga_metrics('monthly', from_date=month_to_import, to_date=month_to_import, use_only_cached=True)
@@ -71,6 +72,7 @@ class TestAPI(BaseCase):
                 return join(self.fixture_dir, 'test_import_ga_daily_stats', 'ga-output', 'views', '2015-09-11.json')
             if result_type == 'downloads':
                 return join(self.fixture_dir, 'test_import_ga_daily_stats', 'ga-output', 'downloads', '2015-09-11.json')
+            raise ValueError(result_type)
 
         with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
             logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import, use_only_cached=True)

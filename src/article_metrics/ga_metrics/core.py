@@ -167,7 +167,8 @@ def query_ga(query_map, num_attempts=5):
 
 def output_path(results_type, from_date, to_date):
     "generates a path for results of the given type"
-    #assert results_type in ['views', 'downloads'], "results type must be either 'views' or 'downloads'"
+    # `output_path` now used by non-article metrics app to create a cache path for *their* ga responses
+    #assert results_type in ['views', 'downloads'], "results type must be either 'views' or 'downloads', not %r" % results_type
     if isinstance(from_date, str): # given strings
         #from_date_dt = datetime.strptime(from_date, "%Y-%m-%d")
         to_date_dt = datetime.strptime(to_date, "%Y-%m-%d")
