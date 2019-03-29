@@ -80,13 +80,25 @@ class TestGAImport(BaseCase):
         "ensure that a basic import of a day's worth of metrics happens correctly"
         self.assertEqual(0, models.Article.objects.count())
         day_to_import = datetime(year=2015, month=9, day=11)
-        logic.import_ga_metrics(from_date=day_to_import, to_date=day_to_import)
+
+        def test_output_path(result_type, from_date, to_date):
+            # ignore whatever dates given, return path to fixture
+            fixture = join(self.fixture_dir, 'test_import_ga_daily_stats', 'ga-output', 'views', '2015-09-11.json')
+            return fixture
+
+        with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
+            logic.import_ga_metrics(from_date=day_to_import, to_date=day_to_import, use_only_cached=True)
         # we know this day reveals this many articles
         # expected_article_count = 1090 # changed when we introduced POA articles
         #expected_article_count = 1119
-        expected_article_count = 1122 # ah - this day in history keeps getting more popular it seems.
+        # expected_article_count = 1122 # ah - this day in history keeps getting more popular it seems.
         # 2017-01-18: I've put the results of this day into the fixtures so that
         # when it changes again in the future we can  see just what it changing
+        # 2019-03-27: I've run the test without caching, grabbed what GA was returning and compared the two - identical.
+        # it's a testamount to GA accuracy but doesn't explain what is happening here.
+        # setting use_only_cached=True will stop the old code talking to GA.
+        # returning the path to the fixture ensures only known data is being looked at
+        expected_article_count = 1119
         self.assertEqual(expected_article_count, models.Article.objects.count())
 
     def test_partial_data_is_updated(self):

@@ -1,3 +1,5 @@
+from os.path import join
+from unittest import mock
 from collections import OrderedDict
 from django.test import Client
 from django.core.urlresolvers import reverse
@@ -17,8 +19,19 @@ class TestAPI(BaseCase):
     def test_monthly_data(self):
         self.assertEqual(0, models.Article.objects.count())
         self.assertEqual(0, models.Metric.objects.count())
-        month_to_import = datetime(year=2015, month=8, day=0o1)
-        logic.import_ga_metrics('monthly', from_date=month_to_import, to_date=month_to_import)
+        month_to_import = datetime(year=2015, month=8, day=1)
+
+        def test_output_path(result_type, from_date, to_date):
+            # ignore whatever dates given, return path to fixture
+            if result_type == 'views':
+                return join(self.fixture_dir, 'test_import_ga_monthly_stats', 'views', '2015-08-01_2015-08-31.json')
+            if result_type == 'downloads':
+                return join(self.fixture_dir, 'test_import_ga_monthly_stats', 'downloads', '2015-08-01_2015-08-31.json')
+            raise ValueError(result_type)
+
+        with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
+            logic.import_ga_metrics('monthly', from_date=month_to_import, to_date=month_to_import, use_only_cached=True)
+
         expected = 1649
         self.assertEqual(expected, models.Article.objects.count())
         self.assertEqual(expected, models.Metric.objects.count())
@@ -52,11 +65,21 @@ class TestAPI(BaseCase):
     def test_daily_data(self):
         "a very simple set of data returns the expected daily and monthly data in the expected structure"
         day_to_import = datetime(year=2015, month=9, day=11)
-        logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import)
+
+        def test_output_path(result_type, from_date, to_date):
+            # ignore whatever dates given, return path to fixture
+            if result_type == 'views':
+                return join(self.fixture_dir, 'test_import_ga_daily_stats', 'ga-output', 'views', '2015-09-11.json')
+            if result_type == 'downloads':
+                return join(self.fixture_dir, 'test_import_ga_daily_stats', 'ga-output', 'downloads', '2015-09-11.json')
+            raise ValueError(result_type)
+
+        with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
+            logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import, use_only_cached=True)
 
         doi = '10.7554/eLife.09560'
 
-        # hack.
+        # hack. the v1 api only queries the last 30 days and is not variable
         metric = models.Metric.objects.get(article__doi=doi)
         yesterday = ymd(datetime.now() - timedelta(days=1))
         metric.date = yesterday
@@ -95,10 +118,22 @@ class TestAPI(BaseCase):
     def test_multiple_daily_data(self):
         from_date = datetime(year=2015, month=9, day=11)
         to_date = from_date + timedelta(days=1)
-        logic.import_ga_metrics('daily', from_date, to_date)
+
+        def test_output_path(result_type, from_date, to_date):
+            # from-date and to-date only differ on monthly requests
+            assert from_date == to_date, "assumption about dates failed!"
+            dt = ymd(from_date)
+            if result_type == 'views':
+                return join(self.fixture_dir, 'test_import_ga_multiple_daily_stats', 'views', dt + '.json')
+            if result_type == 'downloads':
+                return join(self.fixture_dir, 'test_import_ga_multiple_daily_stats', 'downloads', dt + '.json')
+
+        with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
+            logic.import_ga_metrics('daily', from_date, to_date, use_only_cached=True)
+
         doi = '10.7554/eLife.09560'
 
-        # hack.
+        # hack. the v1 api only queries the last 30 days and is not variable
         yesterday = str(ymd(datetime.now() - timedelta(days=1)))
         day_before = str(ymd(datetime.now() - timedelta(days=2)))
         m1, m2 = models.Metric.objects.filter(article__doi=doi)
