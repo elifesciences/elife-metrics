@@ -9,10 +9,6 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-# lsh 2019-03-27: delete once the flag is absent
-OLD_FLAG = Path(settings.PROJECT_DIR, ".migrations-table-updated.flag")
-OLD_FLAG.exists() and OLD_FLAG.unlink()
-
 class Migration(migrations.Migration):
 
     initial = True
