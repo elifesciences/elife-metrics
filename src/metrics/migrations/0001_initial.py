@@ -3,8 +3,6 @@
 from __future__ import unicode_literals
 from django.db import migrations, models
 import django.db.models.deletion
-from core import settings
-from pathlib import Path
 import logging
 
 LOG = logging.getLogger(__name__)
