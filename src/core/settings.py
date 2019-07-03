@@ -24,9 +24,10 @@ PROJECT_DIR = os.path.dirname(SRC_DIR)
 
 EXT_DIR = "/ext/elife-metrics" # not available in all environments
 USE_EXT = False
-if os.path.isdir("/ext") and not os.path.isdir(EXT_DIR):
+if os.path.isdir("/ext"):
     USE_EXT = True
-    os.makedirs(EXT_DIR)
+    if not os.path.isdir(EXT_DIR):
+        os.makedirs(EXT_DIR)
 
 # cfg handling
 
