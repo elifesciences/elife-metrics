@@ -20,6 +20,16 @@ PROJECT_NAME = 'elife-metrics'
 SRC_DIR = os.path.dirname(os.path.dirname(__file__)) # ll: /path/to/app/src/
 PROJECT_DIR = os.path.dirname(SRC_DIR)
 
+# /ext handling
+
+EXT_DIR = "/ext/elife-metrics" # not available in all environments
+USE_EXT = False
+if os.path.isdir("/ext") and not os.path.isdir(EXT_DIR):
+    USE_EXT = True
+    os.makedirs(EXT_DIR)
+
+# cfg handling
+
 CFG_NAME = 'app.cfg'
 DYNCONFIG = configparser.SafeConfigParser(**{
     'allow_no_value': True,
@@ -44,7 +54,7 @@ DOI_PREFIX = cfg('journal.doi-prefix')
 USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
 CONTACT_EMAIL = "it-admin@elifesciences.org"
 
-OUTPUT_PATH = join(PROJECT_DIR, 'output')
+OUTPUT_PATH = join(EXT_DIR if USE_EXT else PROJECT_DIR, 'output')
 
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
 GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
