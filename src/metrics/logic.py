@@ -258,7 +258,7 @@ def build_ga_query__queries_for_frame(ptype, frame, start_date, end_date):
     query = {
         'ids': settings.GA_TABLE_ID,
         'max_results': MAX_GA_RESULTS,
-        'metrics': 'ga:sessions', # *not* pageviews
+        'metrics': 'ga:uniquePageviews', # *not* sessions, nor regular pageviews
         'dimensions': 'ga:pagePath,ga:date',
         'sort': 'ga:pagePath,ga:date',
         'include_empty_rows': False,

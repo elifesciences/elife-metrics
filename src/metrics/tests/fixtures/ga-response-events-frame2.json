@@ -13,7 +13,7 @@
         {
             "columnType": "METRIC",
             "dataType": "INTEGER",
-            "name": "ga:sessions"
+            "name": "ga:uniquePageviews"
         }
     ],
     "containsSampledData": false,
@@ -25,7 +25,7 @@
         "filters": "ga:pagePath=~^/events$,ga:pagePath=~^/events/.*$",
         "max-results": 10000,
         "metrics": [
-            "ga:sessions"
+            "ga:uniquePageviews"
         ],
         "sort": [
             "ga:pagePath",
@@ -37,8 +37,18 @@
     "rows": [
         [
             "/events",
+            "20180102",
+            "3"
+        ],
+        [
+            "/events",
+            "20180103",
+            "1"
+        ],
+        [
+            "/events",
             "20180104",
-            "2"
+            "5"
         ],
         [
             "/events",
@@ -48,37 +58,42 @@
         [
             "/events",
             "20180108",
-            "1"
+            "2"
         ],
         [
             "/events",
             "20180109",
-            "2"
+            "3"
         ],
         [
             "/events",
             "20180110",
-            "2"
+            "3"
         ],
         [
             "/events",
             "20180111",
-            "6"
+            "10"
         ],
         [
             "/events",
             "20180112",
-            "1"
-        ],
-        [
-            "/events",
-            "20180115",
             "2"
         ],
         [
             "/events",
+            "20180115",
+            "3"
+        ],
+        [
+            "/events",
             "20180116",
-            "4"
+            "7"
+        ],
+        [
+            "/events",
+            "20180117",
+            "2"
         ],
         [
             "/events",
@@ -87,18 +102,28 @@
         ],
         [
             "/events",
-            "20180123",
+            "20180119",
             "3"
         ],
         [
             "/events",
-            "20180124",
+            "20180122",
             "1"
         ],
         [
             "/events",
+            "20180123",
+            "4"
+        ],
+        [
+            "/events",
+            "20180124",
+            "6"
+        ],
+        [
+            "/events",
             "20180125",
-            "3"
+            "5"
         ],
         [
             "/events",
@@ -108,27 +133,42 @@
         [
             "/events",
             "20180129",
-            "1"
+            "9"
         ],
         [
             "/events",
             "20180130",
-            "2"
+            "5"
         ],
         [
             "/events",
             "20180131",
+            "2"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180102",
+            "1"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180104",
+            "1"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180109",
             "1"
         ],
         [
             "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
             "20180110",
-            "8"
+            "9"
         ],
         [
             "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
             "20180111",
-            "2"
+            "4"
         ],
         [
             "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
@@ -143,12 +183,12 @@
         [
             "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
             "20180116",
-            "4"
+            "6"
         ],
         [
             "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
             "20180117",
-            "1"
+            "4"
         ],
         [
             "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
@@ -158,6 +198,51 @@
         [
             "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
             "20180119",
+            "3"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180123",
+            "1"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180124",
+            "1"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180125",
+            "3"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180126",
+            "2"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180127",
+            "1"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180129",
+            "2"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180130",
+            "2"
+        ],
+        [
+            "/events/2c3f1a46/ecrwednesday-webinar-alternate-career-options-for-researchers",
+            "20180131",
+            "2"
+        ],
+        [
+            "/events/65c295a9/ecrwednesday-webinar-making-science-reproducible",
+            "20180107",
             "1"
         ],
         [
@@ -191,29 +276,54 @@
             "1"
         ],
         [
-            "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
-            "20180111",
+            "/events/7fa2430d/ecrwednesday-webinar-addressing-the-career-challenges-of-bioinformaticians",
+            "20180104",
+            "1"
+        ],
+        [
+            "/events/7fa2430d/ecrwednesday-webinar-addressing-the-career-challenges-of-bioinformaticians",
+            "20180109",
+            "1"
+        ],
+        [
+            "/events/7fa2430d/ecrwednesday-webinar-addressing-the-career-challenges-of-bioinformaticians",
+            "20180116",
+            "1"
+        ],
+        [
+            "/events/7fa2430d/ecrwednesday-webinar-addressing-the-career-challenges-of-bioinformaticians",
+            "20180119",
+            "1"
+        ],
+        [
+            "/events/7fa2430d/ecrwednesday-webinar-addressing-the-career-challenges-of-bioinformaticians",
+            "20180125",
             "1"
         ],
         [
             "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
+            "20180111",
+            "6"
+        ],
+        [
+            "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
             "20180112",
-            "245"
+            "247"
         ],
         [
             "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
             "20180113",
-            "133"
+            "134"
         ],
         [
             "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
             "20180114",
-            "87"
+            "89"
         ],
         [
             "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
             "20180115",
-            "437"
+            "446"
         ],
         [
             "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
@@ -223,7 +333,7 @@
         [
             "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
             "20180117",
-            "34"
+            "35"
         ],
         [
             "/events/843d8750/reddit-ask-me-anything-prof-steven-strogatz-on-applied-mathematics",
@@ -328,42 +438,42 @@
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180103",
-            "5"
+            "7"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180104",
-            "11"
+            "12"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180105",
-            "8"
+            "10"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180106",
-            "7"
+            "8"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180108",
-            "22"
+            "24"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180109",
-            "17"
+            "21"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180110",
-            "7"
+            "9"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180111",
-            "17"
+            "19"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
@@ -378,27 +488,27 @@
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180114",
-            "4"
+            "5"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180115",
-            "12"
+            "14"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180116",
-            "20"
+            "22"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180117",
-            "3"
+            "5"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180118",
-            "40"
+            "41"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
@@ -418,27 +528,27 @@
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180122",
-            "4"
+            "6"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180123",
-            "52"
+            "53"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180124",
-            "56"
+            "60"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180125",
-            "17"
+            "19"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180126",
-            "4"
+            "5"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
@@ -448,22 +558,22 @@
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180128",
-            "6"
+            "5"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180129",
-            "14"
+            "18"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180130",
-            "14"
+            "19"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist",
             "20180131",
-            "33"
+            "37"
         ],
         [
             "/events/b6f28e5d/ecrwednesday-webinar-how-to-be-a-medic-and-a-scientist?lipi=urn:li:page:d_flagship3_profile_view_base_recent_activity_details_all;kOS6eQytS52hMSnInwDrew==",
@@ -478,17 +588,17 @@
         [
             "/events/c40798c3/elife-innovation-sprint-2018",
             "20180129",
-            "57"
+            "62"
         ],
         [
             "/events/c40798c3/elife-innovation-sprint-2018",
             "20180130",
-            "53"
+            "54"
         ],
         [
             "/events/c40798c3/elife-innovation-sprint-2018",
             "20180131",
-            "39"
+            "40"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
@@ -498,17 +608,17 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180103",
-            "11"
+            "12"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180104",
-            "9"
+            "11"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180105",
-            "7"
+            "8"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
@@ -528,7 +638,7 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180110",
-            "2"
+            "5"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
@@ -538,7 +648,7 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180112",
-            "1"
+            "2"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
@@ -558,7 +668,7 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180116",
-            "2"
+            "3"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
@@ -568,7 +678,7 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180118",
-            "2"
+            "3"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
@@ -588,7 +698,7 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180123",
-            "2"
+            "3"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
@@ -598,7 +708,17 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
             "20180125",
-            "2"
+            "4"
+        ],
+        [
+            "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
+            "20180126",
+            "1"
+        ],
+        [
+            "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint",
+            "20180129",
+            "3"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint?mc_cid=7dce7efa97&mc_eid=[UNIQID]",
@@ -608,7 +728,7 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint?mc_cid=7dce7efa97&mc_eid=[UNIQID]",
             "20180111",
-            "12"
+            "13"
         ],
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint?mc_cid=7dce7efa97&mc_eid=[UNIQID]",
@@ -623,6 +743,11 @@
         [
             "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint?open-sesame=",
             "20180129",
+            "2"
+        ],
+        [
+            "/events/c40798c3/save-the-date-for-the-elife-innovation-sprint?opensesame=",
+            "20180125",
             "1"
         ],
         [
@@ -646,8 +771,9 @@
             "1"
         ]
     ],
-    "totalResults": 122,
+    "totalPages": 1,
+    "totalResults": 147,
     "totalsForAllResults": {
-        "ga:sessions": "1869"
+        "ga:uniquePageviews": "2040"
     }
 }
