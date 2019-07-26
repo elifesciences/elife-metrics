@@ -200,9 +200,8 @@ def query_ga(ptype, query, results_pp=MAX_GA_RESULTS, replace_cache_files=False)
         if not replace_cache_files:
             LOG.info("(cache hit)")
             return json.load(open(dump_path, 'r'))
-        else:
-            # cache file will be replaced with results
-            pass
+        # cache file will be replaced with results
+        pass
 
     query['max_results'] = results_pp
     query['start_index'] = 1
@@ -211,10 +210,10 @@ def query_ga(ptype, query, results_pp=MAX_GA_RESULTS, replace_cache_files=False)
     while True:
         LOG.info("requesting page %s for query %s" % (page, query['filters']))
         # requests_cache + ga query service makes expiring individual urls difficult
-        #if replace_cache_files:
+        # if replace_cache_files:
         #    with requests_cache.disabled():
         #        response = ga_core.query_ga(query)
-        #else:
+        # else:
         #    response = ga_core.query_ga(query)
         response = ga_core.query_ga(query)
         results.extend(response.get('rows') or [])
