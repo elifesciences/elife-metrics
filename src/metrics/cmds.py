@@ -7,12 +7,15 @@ from datetime import date
 from . import logic, models
 from article_metrics import utils
 import logging
+from functools import partial
+
 LOG = logging.getLogger(__name__)
 
-def ingest_command(type_list):
+def ingest_command(type_list, replace_cache_files=False):
     try:
         supported_types = [t for t in type_list if t in models.PAGE_TYPES] or models.PAGE_TYPES
-        utils.lmap(logic.update_ptype, supported_types)
+        update_ptype = partial(logic.update_ptype, replace_cache_files=replace_cache_files)
+        utils.lmap(update_ptype, supported_types)
     except BaseException as err:
         LOG.exception(str(err))
 
