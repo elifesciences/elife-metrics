@@ -140,7 +140,6 @@ class Two(base.BaseCase):
         end = date(year=2017, month=12, day=25) # non-maximum value
         frame_query_list = logic.build_ga_query(models.EVENT, start, end)
         frame, query = frame_query_list[0]
-
         self.assertEqual(query['start_date'], start)
         self.assertEqual(query['end_date'], end)
 
@@ -279,13 +278,13 @@ class Two(base.BaseCase):
 
         # list index, expected row
         expected = [
-            (8, {'views': 4, 'identifier': '', 'date': date(2018, 1, 16)}),
-            (32, {'identifier': '843d8750', 'views': 245, 'date': date(2018, 1, 12)}),
-            (35, {'views': 437, 'identifier': '843d8750', 'date': date(2018, 1, 15)}),
-            (114, {'views': 12, 'identifier': 'c40798c3', 'date': date(2018, 1, 11)})
+            (10, {'views': 7, 'identifier': '', 'date': date(2018, 1, 16)}),
+            (54, {'identifier': '843d8750', 'views': 247, 'date': date(2018, 1, 12)}),
+            (57, {'views': 446, 'identifier': '843d8750', 'date': date(2018, 1, 15)}),
+            (121, {'views': 2, 'identifier': 'c40798c3', 'date': date(2018, 1, 11)})
         ]
         for idx, expected_row in expected:
-            self.assertEqual(processed_results[idx], expected_row)
+            self.assertEqual(expected_row, processed_results[idx])
 
     @skip('no special results processors anymore')
     def test_process_response_special_processor(self):
@@ -315,11 +314,11 @@ class Two(base.BaseCase):
         apple1 = 1
         fixture['rows'][apple1] = [None, None, None] # it's a triple but quite useless (ValueError)
         apple2 = 7
-        fixture['rows'][apple2] = 'how you like them apples?' # unhandled (BaseException)
+        fixture['rows'][apple2] = 'how you like dem apples?' # unhandled (BaseException)
 
         with patch('metrics.logic.LOG') as mock:
             processed_results = logic.process_response(models.EVENT, frame, fixture) # kaboom
-            expected_results = 122 - 2 # total non-aggregated results minus bad apples
+            expected_results = 147 - 2 # total non-aggregated results minus bad apples
             self.assertEqual(len(processed_results), expected_results)
             self.assertEqual(mock.exception.call_count, 1) # one unhandled error
             self.assertEqual(mock.info.call_count, 1) # one handled error
@@ -412,10 +411,10 @@ class Three(base.BaseCase):
             with patch('metrics.logic.query_ga', return_value=fixture):
                 logic.update_ptype(models.EVENT)
 
-        self.assertEqual(models.Page.objects.count(), 11)
+        self.assertEqual(models.Page.objects.count(), 13)
         self.assertEqual(models.PageType.objects.count(), 1) # 'event'
         # not the same as len(fixture.rows) because of aggregation
-        self.assertEqual(models.PageCount.objects.count(), 115)
+        self.assertEqual(models.PageCount.objects.count(), 138)
 
 class Four(base.BaseCase):
     def setUp(self):

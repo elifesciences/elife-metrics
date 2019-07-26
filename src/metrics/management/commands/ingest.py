@@ -9,10 +9,11 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--type', nargs='+', dest='just_type', type=str, default=[])
+        parser.add_argument('--replace-cache-files', dest='replace_cache_files', action='store_const', const=True, default=False)
 
     def handle(self, *args, **options):
         try:
-            cmds.ingest_command(options['just_type'])
+            cmds.ingest_command(type_list=options['just_type'], replace_cache_files=options['replace_cache_files'])
         except BaseException as err:
             LOG.error("uncaught exception calling command 'ingest': %s" % err, extra={'cli-args': options})
             sys.exit(1)

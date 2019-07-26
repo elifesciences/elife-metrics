@@ -190,14 +190,18 @@ def process_response(ptype, frame, response):
 #
 #
 
-def query_ga(ptype, query, results_pp=MAX_GA_RESULTS):
+def query_ga(ptype, query, results_pp=MAX_GA_RESULTS, replace_cache_files=False):
     ensure(is_inrange(results_pp, 1, MAX_GA_RESULTS), "`results_pp` must be an integer between 1 and %s" % MAX_GA_RESULTS)
     sd, ed = query['start_date'], query['end_date']
     LOG.info("querying GA for %ss between %s and %s" % (ptype, sd, ed))
     dump_path = ga_core.output_path(ptype, sd, ed)
+    # TODO: this settings.TESTING check is a code smell.
     if os.path.exists(dump_path) and not settings.TESTING:
-        LOG.debug("(cache hit)")
-        return json.load(open(dump_path, 'r'))
+        if not replace_cache_files:
+            LOG.info("(cache hit)")
+            return json.load(open(dump_path, 'r'))
+        # cache file will be replaced with results
+        pass
 
     query['max_results'] = results_pp
     query['start_index'] = 1
@@ -205,6 +209,12 @@ def query_ga(ptype, query, results_pp=MAX_GA_RESULTS):
     page, results = 1, []
     while True:
         LOG.info("requesting page %s for query %s" % (page, query['filters']))
+        # requests_cache + ga query service makes expiring individual urls difficult
+        # if replace_cache_files:
+        #    with requests_cache.disabled():
+        #        response = ga_core.query_ga(query)
+        # else:
+        #    response = ga_core.query_ga(query)
         response = ga_core.query_ga(query)
         results.extend(response.get('rows') or [])
         if (results_pp * page) >= response['totalResults']:
@@ -258,7 +268,7 @@ def build_ga_query__queries_for_frame(ptype, frame, start_date, end_date):
     query = {
         'ids': settings.GA_TABLE_ID,
         'max_results': MAX_GA_RESULTS,
-        'metrics': 'ga:sessions', # *not* pageviews
+        'metrics': 'ga:uniquePageviews', # *not* sessions, nor regular pageviews
         'dimensions': 'ga:pagePath,ga:date',
         'sort': 'ga:pagePath,ga:date',
         'include_empty_rows': False,
@@ -356,11 +366,11 @@ def update_page_counts(ptype, page_counts):
 #
 #
 
-def update_ptype(ptype):
-    "glue code to query ga about a page-type and then processing and storing the results"
+def update_ptype(ptype, replace_cache_files=False):
+    "glue code to query GA about a page-type and then processing and storing the results"
     try:
         for frame, query in build_ga_query(ptype):
-            response = query_ga(ptype, query)
+            response = query_ga(ptype, query, replace_cache_files=replace_cache_files)
             normalised_rows = process_response(ptype, frame, response)
             counts = aggregate(normalised_rows)
             LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
