@@ -18,7 +18,12 @@ if not settings.TESTING:
         'expire_after': timedelta(hours=24 * settings.CACHE_EXPIRY)
     })
 
+def clear_expired():
+    requests_cache.core.remove_expired_responses()
+    return(join(settings.OUTPUT_PATH, 'db.sqlite3'))
+
 def clear_cache():
+    # completely empties the requests-cache database, probably not what you intended
     requests_cache.clear()
 
 LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
