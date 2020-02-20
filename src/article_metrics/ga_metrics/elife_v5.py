@@ -1,5 +1,5 @@
 """
-elife_v5, the addition of /figures and /executable paths
+elife_v5, the addition of /executable paths
 
 opted for a new era rather than modifying the last three years worth of metrics data
 
@@ -28,15 +28,12 @@ def path_counts_query(table_id, from_date, to_date):
         # ga:pagePath=~^/articles/50101$
         r'ga:pagePath=~^/articles/[0-9]+$', # note: GA doesn't support {n,m} syntax
 
-        # ga:pagePath=~^/articles/50101/figures$
-        r'ga:pagePath=~^/articles/[0-9]+/figures$',
-
         # ga:pagePath=~^/articles/50101/executable$
         r'ga:pagePath=~^/articles/[0-9]+/executable$',
     ])
     return new_query
 
-REGEX = r"/articles/(?P<artid>\d{1,5})(/figures|/executable)?$" # python does support {n,m} though, so we can filter bad eggs in post
+REGEX = r"/articles/(?P<artid>\d{1,5})(/executable)?$" # python *does* support {n,m} though, so we can filter bad eggs in post
 PATH_RE = re.compile(REGEX, re.IGNORECASE)
 
 def path_count(pair):

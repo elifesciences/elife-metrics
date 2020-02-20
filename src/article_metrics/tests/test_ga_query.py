@@ -7,7 +7,7 @@ from article_metrics.ga_metrics import core
 from collections import Counter
 from unittest.mock import patch
 
-class TestQueryResults(base.SimpleBaseCase):
+class V3V4Transition(base.SimpleBaseCase):
     def setUp(self):
         pass
 
@@ -38,7 +38,7 @@ class TestQueryResults(base.SimpleBaseCase):
         for key, expected_val in expected.items():
             self.assertEqual(expected_val, counts[key])
 
-class Two(base.SimpleBaseCase):
+class V4(base.SimpleBaseCase):
     def setUp(self):
         self.fixture_path = join(self.fixture_dir, '2017-10-01_2017-10-31.json.partial')
         self.fixture = json.load(open(self.fixture_path, 'r'))
@@ -67,3 +67,30 @@ class Two(base.SimpleBaseCase):
         for path in dict(self.bad_eggs).values():
             doi = utils.pad_msid(path.rsplit('/', 1)[-1])
             self.assertTrue(doi not in final_doi_list)
+
+
+class V5(base.SimpleBaseCase):
+    def setUp(self):
+        pass
+
+    # daily:
+    # v4 tests continue to work
+    # v4 + /executable are calculated correctly
+
+    # monthly:
+    # v4 tests continue to work
+    # v4 + /executable are calculated correctly
+
+    def test_v5_daily(self):
+
+        fixture_path = join(self.fixture_dir, 'v5--views--2020-02-22.json')
+        fixture = json.load(open(fixture_path, 'r'))
+
+        from_dt = to_dt = datetime(2020, 2, 22) # daily
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+                results = core.article_views('0xdeadbeef', from_dt, to_dt, cached=False, only_cached=False)
+                # total raw results =
+                # after filtering bad eggs and aggregation:
+                expected = 4491
+                self.assertEqual(expected, len(results))
