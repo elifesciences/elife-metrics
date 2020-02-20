@@ -15,7 +15,7 @@ class One(base.SimpleBaseCase):
         expectations = [
             # on the big day, we still use v1 of the urls
             (core.SITE_SWITCH, elife_v1),
-            # previous to the switchover, we used v1
+            # prior to the switchover, we used v1
             (core.SITE_SWITCH - d1, elife_v1),
             # after switchover, we now use v2
             (core.SITE_SWITCH + d1, elife_v2),

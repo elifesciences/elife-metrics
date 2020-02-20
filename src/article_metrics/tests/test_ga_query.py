@@ -70,9 +70,6 @@ class V4(base.SimpleBaseCase):
 
 
 class V5(base.SimpleBaseCase):
-    def setUp(self):
-        pass
-
     # daily:
     # v4 tests continue to work
     # v4 + /executable are calculated correctly
@@ -82,7 +79,7 @@ class V5(base.SimpleBaseCase):
     # v4 + /executable are calculated correctly
 
     def test_v5_daily(self):
-
+        "the daily `/article/123` and `/article/123/executable` sums add up"
         fixture_path = join(self.fixture_dir, 'v5--views--2020-02-22.json')
         fixture = json.load(open(fixture_path, 'r'))
 
@@ -90,7 +87,5 @@ class V5(base.SimpleBaseCase):
         with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
             with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
                 results = core.article_views('0xdeadbeef', from_dt, to_dt, cached=False, only_cached=False)
-                # total raw results =
-                # after filtering bad eggs and aggregation:
                 expected = 4491
                 self.assertEqual(expected, len(results))
