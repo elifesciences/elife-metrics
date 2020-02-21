@@ -138,6 +138,14 @@ def path_count(pair):
         #LOG.warn("skpping unhandled path %s (%r)", pair, e)
         LOG.warn("skpping unhandled path %s", pair)
 
+def count_counter_list(counter_lst):
+    "takes a list of Counter objects and returns a single aggregate Counter object"
+    def update(a, b):
+        # https://docs.python.org/2/library/collections.html#collections.Counter.update
+        a.update(b)
+        return a
+    return reduce(update, counter_lst)
+
 def group_results(triplet_list):
     # for each path, build a list of path_type: value
     article_groups = {}
@@ -151,13 +159,8 @@ def group_results(triplet_list):
         group.append(Counter({art_type: count}))
         article_groups[art] = group
 
-    # take our list of Counter objects and count them up
-    def update(a, b):
-        # https://docs.python.org/2/library/collections.html#collections.Counter.update
-        a.update(b)
-        return a
+    return {utils.enplumpen(art): count_counter_list(group) for art, group in article_groups.items()}
 
-    return {utils.enplumpen(art): reduce(update, group) for art, group in list(article_groups.items())}
 
 def path_counts(path_count_pairs):
     """takes raw path data from GA and groups by article, returning a
