@@ -3,11 +3,11 @@ from . import base
 import json
 from datetime import datetime, timedelta
 from article_metrics import utils
-from article_metrics.ga_metrics import core
+from article_metrics.ga_metrics import core, elife_v1
 from collections import Counter
 from unittest.mock import patch
 
-class TestQueryResults(base.SimpleBaseCase):
+class V3V4Transition(base.SimpleBaseCase):
     def setUp(self):
         pass
 
@@ -38,7 +38,7 @@ class TestQueryResults(base.SimpleBaseCase):
         for key, expected_val in expected.items():
             self.assertEqual(expected_val, counts[key])
 
-class Two(base.SimpleBaseCase):
+class V4(base.SimpleBaseCase):
     def setUp(self):
         self.fixture_path = join(self.fixture_dir, '2017-10-01_2017-10-31.json.partial')
         self.fixture = json.load(open(self.fixture_path, 'r'))
@@ -67,3 +67,62 @@ class Two(base.SimpleBaseCase):
         for path in dict(self.bad_eggs).values():
             doi = utils.pad_msid(path.rsplit('/', 1)[-1])
             self.assertTrue(doi not in final_doi_list)
+
+
+class V5(base.SimpleBaseCase):
+    "v5 era is the same as v4, except /executable is added to list of article paths to include."
+
+    def test_v5_daily(self):
+        "the daily `/article/123` and `/article/123/executable` sums add up"
+        fixture_path = join(self.fixture_dir, 'v5--views--2020-02-22.json')
+        fixture = json.load(open(fixture_path, 'r'))
+
+        from_dt = to_dt = datetime(2020, 2, 22) # daily
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+                ga_table_id = '0xdeadbeef'
+                results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
+                expected_total_results = 4491 # total results after counting (not rows in fixture)
+                expected_total = Counter(full=379200, abstract=0, digest=0) # total of all results
+
+                # mix of `/article` and `/article/executable`
+                expected_sample = {
+                    48: Counter(full=48, abstract=0, digest=0),
+                    68: Counter(full=2, abstract=0, digest=0),
+                    78: Counter(full=30, abstract=0, digest=0),
+
+                    90: Counter(full=38, abstract=0, digest=0)
+                }
+
+                self.assertEqual(expected_total_results, len(results))
+                self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
+                for msid, expected_count in expected_sample.items():
+                    self.assertEqual(expected_count, results[utils.msid2doi(msid)])
+
+    def test_v5_monthly(self):
+        "the monthly `/article/123` and `/article/123/executable` sums add up"
+        fixture_path = join(self.fixture_dir, 'v5--views--2020-03-01_2020-03-31.json')
+        fixture = json.load(open(fixture_path, 'r'))
+
+        from_dt, to_dt = datetime(2020, 3, 1), datetime(2020, 3, 31) # monthly
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+                ga_table_id = '0xdeadbeef'
+                results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
+
+                expected_total_results = 4491 # total results after counting (not rows in fixture)
+                expected_total = Counter(full=379200, abstract=0, digest=0) # total of all results
+
+                # mix of `/article` and `/article/executable`
+                expected_sample = {
+                    48: Counter(full=48, abstract=0, digest=0),
+                    68: Counter(full=2, abstract=0, digest=0),
+                    78: Counter(full=30, abstract=0, digest=0),
+
+                    90: Counter(full=38, abstract=0, digest=0)
+                }
+
+                self.assertEqual(expected_total_results, len(results))
+                self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
+                for msid, expected_count in expected_sample.items():
+                    self.assertEqual(expected_count, results[utils.msid2doi(msid)])

@@ -19,7 +19,7 @@ import logging
 from django.conf import settings
 
 
-from . import elife_v1, elife_v2, elife_v3, elife_v4
+from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)
@@ -53,6 +53,9 @@ VERSIONLESS_URLS_MONTH = month_min_max(VERSIONLESS_URLS)
 
 # when we first started using 2.0 urls
 SITE_SWITCH_v2 = datetime(year=2017, month=6, day=1)
+
+# when we added /executable
+RDS_ADDITION = datetime(year=2020, month=2, day=21)
 
 #
 # utils
@@ -230,6 +233,9 @@ def module_picker(from_date, to_date):
     "determine which module we should be using for scraping this date range"
     daily = from_date == to_date
     if daily:
+        if from_date >= RDS_ADDITION:
+            return elife_v5
+
         if from_date >= SITE_SWITCH_v2:
             return elife_v4
 
@@ -241,6 +247,9 @@ def module_picker(from_date, to_date):
 
     # monthly/arbitrary range
     else:
+        if from_date >= RDS_ADDITION:
+            return elife_v5
+
         if from_date >= SITE_SWITCH_v2:
             return elife_v4
 
