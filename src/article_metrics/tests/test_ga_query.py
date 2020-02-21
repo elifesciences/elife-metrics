@@ -84,7 +84,7 @@ class V5(base.SimpleBaseCase):
                 results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
                 expected_total_results = 4491 # total results after counting (not rows in fixture)
                 expected_total = Counter(full=379200, abstract=0, digest=0) # total of all results
-                
+
                 # mix of `/article` and `/article/executable`
                 expected_sample = {
                     48: Counter(full=48, abstract=0, digest=0),
@@ -99,7 +99,6 @@ class V5(base.SimpleBaseCase):
                 for msid, expected_count in expected_sample.items():
                     self.assertEqual(expected_count, results[utils.msid2doi(msid)])
 
-                
     def test_v5_monthly(self):
         "the monthly `/article/123` and `/article/123/executable` sums add up"
         fixture_path = join(self.fixture_dir, 'v5--views--2020-03-01_2020-03-31.json')
