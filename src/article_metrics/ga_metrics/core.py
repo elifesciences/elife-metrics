@@ -104,7 +104,10 @@ def ga_service():
     credentials = ServiceAccountCredentials.from_json_keyfile_name(settings_file, scopes=[scope])
     http = Http()
     credentials.authorize(http) # does this 'put' back into the credentials file??
-    service = build(service_name, 'v3', http=http)
+    # `cache_discovery=False`:
+    # - https://github.com/googleapis/google-api-python-client/issues/299
+    # - https://github.com/googleapis/google-api-python-client/issues/345
+    service = build(service_name, 'v3', http=http, cache_discovery=False)
     return service
 
 def query_ga(query_map, num_attempts=5):
