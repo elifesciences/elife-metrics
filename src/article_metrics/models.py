@@ -53,7 +53,8 @@ def metric_source_list():
     ]
 
 class Metric(models.Model):
-    article = ForeignKey(Article)
+    # when Article is deleted, delete it's metrics
+    article = ForeignKey(Article, on_delete=models.CASCADE)
     date = CharField(max_length=10, blank=True, null=True, help_text="the date this metric is for in YYYY-MM-DD, YYYY-MM and YYYY formats or None for 'all time'")
     period = CharField(max_length=10, choices=metric_period_list())
     source = CharField(max_length=2, choices=metric_source_list())
@@ -112,7 +113,8 @@ class CitationManager(models.Manager):
         return super(CitationManager, self).get_queryset().select_related('article')
 
 class Citation(models.Model):
-    article = ForeignKey(Article)
+    # when an Article is deleted, delete it's citations
+    article = ForeignKey(Article, on_delete=models.CASCADE)
     num = PositiveIntegerField()
     source = CharField(max_length=10, choices=SOURCE_CHOICES) # scopus, crossref, pubmed, etc
     source_id = CharField(max_length=255) # a link back to this article for given source

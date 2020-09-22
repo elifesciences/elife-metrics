@@ -11,7 +11,6 @@ class DownstreamCachine(TestCase):
     def test_cache_headers_in_response(self):
         expected_headers = [
             'vary',
-            'etag',
             'cache-control'
         ]
         resp = self.c.get(self.url)

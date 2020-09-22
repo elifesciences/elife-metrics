@@ -2,7 +2,7 @@ import json
 from article_metrics import models, utils
 from django.test import Client
 from . import base
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 class ApiV2(base.BaseCase):
     def setUp(self):

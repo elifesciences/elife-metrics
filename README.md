@@ -12,7 +12,6 @@ the [Django web framework](https://www.djangoproject.com/) and a
 API documentation can be found here:
 
 * [code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/api_v2_urls.py)
-* [Swagger](/api/docs/) (your local version)
 
 For example, the [Homo Naledi](https://dx.doi.org/10.7554/eLife.09560) article:
 
