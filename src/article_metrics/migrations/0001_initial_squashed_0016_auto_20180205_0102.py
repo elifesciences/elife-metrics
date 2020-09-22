@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             name='Article',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('doi', models.CharField(help_text=b'article identifier', max_length=255)),
+                ('doi', models.CharField(help_text='article identifier', max_length=255)),
             ],
             options={
                 'db_table': 'metrics_article',
@@ -30,12 +30,12 @@ class Migration(migrations.Migration):
             name='GAMetric',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('date', models.CharField(blank=True, help_text=b"the date this metric is for in YYYY-MM-DD, YYYY-MM and YYYY formats or None for 'all time'", max_length=10, null=True)),
-                ('type', models.CharField(choices=[(b'day', b'Daily'), (b'month', b'Monthly'), (b'year', b'Yearly'), (b'ever', b'All time')], max_length=10)),
-                ('full', models.PositiveSmallIntegerField(help_text=b'article page views')),
-                ('abstract', models.PositiveSmallIntegerField(help_text=b'article abstract page views')),
-                ('digest', models.PositiveSmallIntegerField(help_text=b'article digest page views')),
-                ('pdf', models.PositiveSmallIntegerField(help_text=b'pdf downloads')),
+                ('date', models.CharField(blank=True, help_text="the date this metric is for in YYYY-MM-DD, YYYY-MM and YYYY formats or None for 'all time'", max_length=10, null=True)),
+                ('type', models.CharField(choices=[('day', 'Daily'), ('month', 'Monthly'), ('year', 'Yearly'), ('ever', 'All time')], max_length=10)),
+                ('full', models.PositiveSmallIntegerField(help_text='article page views')),
+                ('abstract', models.PositiveSmallIntegerField(help_text='article abstract page views')),
+                ('digest', models.PositiveSmallIntegerField(help_text='article digest page views')),
+                ('pdf', models.PositiveSmallIntegerField(help_text='pdf downloads')),
                 ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='article_metrics.Article')),
             ],
             options={
@@ -58,12 +58,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='gametric',
             name='source',
-            field=models.CharField(choices=[(b'ga', b'Google Analytics'), (b'hw', b'Highwire')], default=b'ga', max_length=2),
+            field=models.CharField(choices=[('ga', 'Google Analytics'), ('hw', 'Highwire')], default='ga', max_length=2),
         ),
         migrations.AlterField(
             model_name='gametric',
             name='period',
-            field=models.CharField(choices=[(b'day', b'Daily'), (b'month', b'Monthly'), (b'ever', b'All time')], max_length=10),
+            field=models.CharField(choices=[('day', 'Daily'), ('month', 'Monthly'), ('ever', 'All time')], max_length=10),
         ),
         migrations.RenameModel(
             old_name='gametric',
@@ -72,27 +72,27 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='metric',
             name='source',
-            field=models.CharField(choices=[(b'ga', b'Google Analytics'), (b'hw', b'Highwire')], max_length=2),
+            field=models.CharField(choices=[('ga', 'Google Analytics'), ('hw', 'Highwire')], max_length=2),
         ),
         migrations.AlterField(
             model_name='metric',
             name='abstract',
-            field=models.PositiveIntegerField(help_text=b'article abstract page views'),
+            field=models.PositiveIntegerField(help_text='article abstract page views'),
         ),
         migrations.AlterField(
             model_name='metric',
             name='digest',
-            field=models.PositiveIntegerField(help_text=b'article digest page views'),
+            field=models.PositiveIntegerField(help_text='article digest page views'),
         ),
         migrations.AlterField(
             model_name='metric',
             name='full',
-            field=models.PositiveIntegerField(help_text=b'article page views'),
+            field=models.PositiveIntegerField(help_text='article page views'),
         ),
         migrations.AlterField(
             model_name='metric',
             name='pdf',
-            field=models.PositiveIntegerField(help_text=b'pdf downloads'),
+            field=models.PositiveIntegerField(help_text='pdf downloads'),
         ),
         migrations.AddField(
             model_name='metric',
@@ -119,7 +119,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('num', models.PositiveIntegerField()),
-                ('source', models.CharField(choices=[(b'scopus', b"Elsevier's Scopus"), (b'crossref', b'Crossref'), (b'pubmed', b'PubMed Central')], max_length=10)),
+                ('source', models.CharField(choices=[('scopus', "Elsevier's Scopus"), ('crossref', 'Crossref'), ('pubmed', 'PubMed Central')], max_length=10)),
                 ('source_id', models.CharField(max_length=255)),
                 ('article', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='article_metrics.Article')),
             ],
@@ -145,7 +145,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='article',
             name='doi',
-            field=models.CharField(help_text=b'article identifier', max_length=255, unique=True),
+            field=models.CharField(help_text='article identifier', max_length=255, unique=True),
         ),
         migrations.AlterModelOptions(
             name='article',
@@ -158,7 +158,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='article',
             name='doi',
-            field=models.CharField(help_text=b'article identifier', max_length=255, unique=True, validators=[article_metrics.models.validate_doi]),
+            field=models.CharField(help_text='article identifier', max_length=255, unique=True, validators=[article_metrics.models.validate_doi]),
         ),
         migrations.AddField(
             model_name='citation',
@@ -174,7 +174,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='citation',
             name='source',
-            field=models.CharField(choices=[(b'crossref', b'Crossref'), (b'pubmed', b'PubMed Central'), (b'scopus', b'Scopus')], max_length=10),
+            field=models.CharField(choices=[('crossref', 'Crossref'), ('pubmed', 'PubMed Central'), ('scopus', 'Scopus')], max_length=10),
         ),
         migrations.AlterField(
             model_name='article',
