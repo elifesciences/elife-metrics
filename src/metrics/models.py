@@ -24,6 +24,7 @@ class PageType(Model):
         return '<PageType %r>' % self.__str__()
 
 class Page(Model):
+    # when a PageType is deleted, delete it's pages
     type = ForeignKey(PageType, on_delete=CASCADE)
     identifier = CharField(max_length=255, blank=True) # blank ('') is the landing page
 
@@ -38,6 +39,7 @@ class Page(Model):
         return "<Page '%s:%s'>" % (self.type, self.identifier) # ll: <Page 'event:pants'>
 
 class PageCount(Model):
+    # when a Page is deleted, delete it's page counts
     page = ForeignKey(Page, on_delete=CASCADE)
     views = PositiveIntegerField()
     date = DateField()

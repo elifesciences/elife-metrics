@@ -104,7 +104,6 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
@@ -166,8 +165,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-USE_ETAGS = True
-
 STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 
@@ -217,7 +214,7 @@ API_PATH = join(SCHEMA_PATH, 'api.raml')
 def _load_api_raml(path):
     # load the api.raml file, ignoring any "!include" commands
     yaml.add_multi_constructor('', lambda *args: '[disabled]')
-    return yaml.load(open(path, 'r'))['traits']['paged']['queryParameters']
+    return yaml.load(open(path, 'r'), Loader=yaml.FullLoader)['traits']['paged']['queryParameters']
 
 API_OPTS = render_item({
     'per_page': [p('per-page.default'), int],

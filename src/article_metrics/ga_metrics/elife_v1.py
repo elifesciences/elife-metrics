@@ -62,9 +62,9 @@ def path_counts_query(table_id, from_date, to_date):
 
     # regular expression suffixes (escape special chars)
     suffix_list = [
-        '\.full',
-        '\.abstract',
-        '\.short',
+        r'\.full',
+        r'\.abstract',
+        r'\.short',
         '/abstract-1',
         '/abstract-2',
     ]
@@ -99,7 +99,7 @@ TYPE_MAP = {
     'abstract-1': 'abstract',
     'abstract-2': 'digest'
 }
-SPLITTER = re.compile('\.|/')
+SPLITTER = re.compile(r'\.|/')
 
 def path_count(pair):
     "figures out the type of the given path using the suffix (if one available)"

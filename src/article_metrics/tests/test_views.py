@@ -1,5 +1,5 @@
 from . import base
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import Client
 
 class Views(base.BaseCase):
