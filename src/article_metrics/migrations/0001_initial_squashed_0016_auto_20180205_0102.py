@@ -10,7 +10,7 @@ import django.utils.timezone
 
 class Migration(migrations.Migration):
 
-    #replaces = [('article_metrics', '0001_initial'), ('article_metrics', '0002_auto_20150918_1516'), ('article_metrics', '0003_rename_metric_type'), ('article_metrics', '0004_auto_20150921_1014'), ('article_metrics', '0005_auto_20150921_1541'), ('article_metrics', '0006_auto_20150921_1545'), ('article_metrics', '0007_auto_20150925_1630'), ('article_metrics', '0008_auto_20170125_1758'), ('article_metrics', '0009_auto_20170130_1756'), ('article_metrics', '0010_auto_20170131_1854'), ('article_metrics', '0011_auto_20170201_1835'), ('article_metrics', '0012_auto_20170224_0633'), ('article_metrics', '0013_auto_20170322_0339'), ('article_metrics', '0014_auto_20170516_0531'), ('article_metrics', '0015_auto_20170517_0554'), ('article_metrics', '0016_auto_20180205_0102')]
+    replaces = [('article_metrics', '0001_initial'), ('article_metrics', '0002_auto_20150918_1516'), ('article_metrics', '0003_rename_metric_type'), ('article_metrics', '0004_auto_20150921_1014'), ('article_metrics', '0005_auto_20150921_1541'), ('article_metrics', '0006_auto_20150921_1545'), ('article_metrics', '0007_auto_20150925_1630'), ('article_metrics', '0008_auto_20170125_1758'), ('article_metrics', '0009_auto_20170130_1756'), ('article_metrics', '0010_auto_20170131_1854'), ('article_metrics', '0011_auto_20170201_1835'), ('article_metrics', '0012_auto_20170224_0633'), ('article_metrics', '0013_auto_20170322_0339'), ('article_metrics', '0014_auto_20170516_0531'), ('article_metrics', '0015_auto_20170517_0554'), ('article_metrics', '0016_auto_20180205_0102')]
 
     dependencies = [
     ]
