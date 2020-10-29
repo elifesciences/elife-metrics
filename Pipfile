@@ -8,7 +8,7 @@ python_version = "3.6"
 
 [packages]
 boto3 = "~=1.9"
-cryptography = "~=2.3"
+cryptography = "~=3.2"
 django-annoying = "~=0.10"
 djangorestframework = "~=3.9"
 et3 = "~=1.5"
