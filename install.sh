@@ -18,6 +18,7 @@ fi
 find src/ -name '*.py[c|~]' -delete
 find src/ -regex "\(.*__pycache__.*\|*.py[co]\)" -delete
 
+pip install pip wheel --upgrade
 pip install -r requirements.txt
 python src/manage.py migrate --no-input
 
