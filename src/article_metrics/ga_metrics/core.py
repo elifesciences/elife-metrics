@@ -33,6 +33,8 @@ SECRETS_LOCATIONS = [
     '/etc/elife-ga-metrics/client-secrets.json'
 ]
 
+MAX_GA_RESULTS = 10000
+
 # TODO: dodgy, unused, remove
 def output_dir():
     root = os.path.dirname(os.path.dirname(__file__))
@@ -110,7 +112,31 @@ def ga_service():
     service = build(service_name, 'v3', http=http, cache_discovery=False)
     return service
 
-def query_ga(query_map, num_attempts=5):
+# copied from non-article metrics logic.py
+def query_ga(query, num_attempts=5):
+    """performs given query but fetches any further pages.
+    concatenated results are returned in the response as 'rows'"""
+    results_pp = query.get('max_results', MAX_GA_RESULTS)
+    query['max_results'] = results_pp
+    query['start_index'] = 1
+
+    page, results = 1, []
+    while True:
+        LOG.info("requesting page %s for query %s" % (page, query['filters']))
+        response = _query_ga(query, num_attempts)
+        results.extend(response.get('rows') or [])
+        if (results_pp * page) >= response['totalResults']:
+            break # no more pages to fetch
+        query['start_index'] += results_pp # 1, 2001, 4001, etc
+        page += 1
+
+    # use the last response given but with all of the results
+    response['rows'] = results
+    response['totalPages'] = page
+
+    return response
+
+def _query_ga(query_map, num_attempts=5):
     "talks to google with the given query, applying exponential back-off if rate limited"
 
     # build the query

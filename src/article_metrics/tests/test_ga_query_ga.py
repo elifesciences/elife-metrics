@@ -33,4 +33,4 @@ class TestQueryGA(base.SimpleBaseCase):
 
     def test_exponential_backoff_applied_on_rate_limit(self):
         query = DummyQuery(raises=503)
-        self.assertRaises(AssertionError, core.query_ga, query, num_attempts=1)
+        self.assertRaises(AssertionError, core._query_ga, query, num_attempts=1)
