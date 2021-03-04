@@ -205,27 +205,9 @@ def query_ga(ptype, query, results_pp=MAX_GA_RESULTS, replace_cache_files=False)
 
     query['max_results'] = results_pp
     query['start_index'] = 1
-
-    page, results = 1, []
-    while True:
-        LOG.info("requesting page %s for query %s" % (page, query['filters']))
-        # requests_cache + ga query service makes expiring individual urls difficult
-        # if replace_cache_files:
-        #    with requests_cache.disabled():
-        #        response = ga_core.query_ga(query)
-        # else:
-        #    response = ga_core.query_ga(query)
-        response = ga_core.query_ga(query)
-        results.extend(response.get('rows') or [])
-        if (results_pp * page) >= response['totalResults']:
-            break # no more pages to fetch
-        query['start_index'] += results_pp # 1, 2001, 4001, etc
-        page += 1
-
-    # use the last response given but with all of the results
-    response['rows'] = results
-    response['totalPages'] = page
-    not settings.TESTING and ga_core.write_results(response, dump_path)
+    response = ga_core.query_ga(query)
+    if not settings.TESTING:
+        ga_core.write_results(response, dump_path)
     return response
 
 #

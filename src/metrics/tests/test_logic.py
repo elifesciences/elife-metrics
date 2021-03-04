@@ -235,7 +235,7 @@ class Two(base.BaseCase):
         ]
         for items_pp, expected_pages in cases:
             response_list = [response_template] * expected_pages
-            with patch('article_metrics.ga_metrics.core.query_ga', side_effect=response_list) as mock:
+            with patch('article_metrics.ga_metrics.core._query_ga', side_effect=response_list) as mock:
                 response = logic.query_ga(models.EVENT, query, items_pp)
                 self.assertEqual(response['totalPages'], expected_pages)
                 self.assertEqual(mock.call_count, expected_pages)
