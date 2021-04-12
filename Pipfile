@@ -29,7 +29,7 @@ Django = "==2.2.*"
 Markdown = "~=3.0"
 #pyOpenSSL = "==18.0.0"
 PyYAML = "~=5.3"
-uWSGI = "*"
+uWSGI = "~=2.0"
 
 [dev-packages]
 autopep8 = "~=1.3"
