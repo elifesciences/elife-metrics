@@ -70,6 +70,7 @@ CROSSREF_PASS = cfg('crossref.pass')
 
 # time in days before the cached requests expires
 CACHE_EXPIRY = 2 # days
+CACHE_NAME = join(OUTPUT_PATH, 'db.sqlite3')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')

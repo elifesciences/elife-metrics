@@ -14,7 +14,7 @@ if not settings.TESTING:
         # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/patcher.py#L19
         # this is where 'cache_name' becomes the sqlite backend's 'db_name':
         # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/session.py#L39
-        'cache_name': join(settings.OUTPUT_PATH, 'db.sqlite3'),
+        'cache_name': settings.CACHE_NAME,
         'backend': 'sqlite',
         'expire_after': timedelta(hours=24 * settings.CACHE_EXPIRY),
 
@@ -24,8 +24,8 @@ if not settings.TESTING:
     })
 
 def clear_expired():
-    requests_cache.core.remove_expired_responses()
-    return(join(settings.OUTPUT_PATH, 'db.sqlite3'))
+    requests_cache.remove_expired_responses()
+    return settings.CACHE_NAME
 
 def clear_cache():
     # completely empties the requests-cache database, probably not what you intended
