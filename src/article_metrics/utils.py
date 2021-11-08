@@ -249,9 +249,13 @@ def lossy_json_dumps(obj, **kwargs):
     return json.dumps(obj, default=_handler, **kwargs)
 
 def mkdirs(path):
+    """attempts to create given `path` including all subdirs.
+    Returns `True` is the directory exists or the series of directories were successfully created."""
     # lsh@2021-11-08: worked well enough but is failing mysteriously now.
     # switching to `os.makedirs` see if that helps yield a better error.
     #os.system('mkdir -p %s' % path)
+    if os.path.exists(path):
+        return True
     os.makedirs(path)
     return os.path.exists(path)
 
