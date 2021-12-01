@@ -28,12 +28,12 @@ def path_counts_query(table_id, from_date, to_date):
         "("
         # literal '?' matches the beginning of the url parameters
         # but because they're so mangled we also need to optionally match '&'
-        "(\?|&){1}"
+        "(\\?|&){1}"
         # non-greedy match of any other url parameter(s) between the start of the section and the ones we're looking for.
         ".*?"
         # match any of the patterns below at least once.
         "(twclid|utm_campaign|utm_source=content_alert)+"
-        # non-greedy match of any other url parameter(s) between the end of our match and the end of the url 
+        # non-greedy match of any other url parameter(s) between the end of our match and the end of the url
         ".*?"
         # optional section for matching url parameters should be matched zero or one times
         ")?"
@@ -41,7 +41,7 @@ def path_counts_query(table_id, from_date, to_date):
         # if we don't stop the matching here it goes on to match anything.
         "$"
     )
-    ga_filter = "ga:pagePath=~^/articles/[0-9]+(/executable)?((\?|&){1}.*?(twclid|utm_campaign|utm_source=content_alert)+.*?)?$"
+    ga_filter = "ga:pagePath=~^/articles/[0-9]+(/executable)?((\\?|&){1}.*?(twclid|utm_campaign|utm_source=content_alert)+.*?)?$"
     assert ga_filter == explanation
 
     new_query['filters'] = ga_filter
@@ -50,7 +50,7 @@ def path_counts_query(table_id, from_date, to_date):
 # ...python *does* support {n,m} though, so we can filter bad article IDs in post
 # lsh@2021-11-30: still true.
 # parse the article ID from a path that may include an optional '/executable'.
-REGEX = r"/articles/(?P<artid>\d{1,5})(/executable)?$"
+REGEX = r"/articles/(?P<artid>\d{1,5})"
 PATH_RE = re.compile(REGEX, re.IGNORECASE)
 
 def path_count(pair):
