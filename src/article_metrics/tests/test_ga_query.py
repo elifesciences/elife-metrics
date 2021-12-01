@@ -134,7 +134,7 @@ class V6(base.SimpleBaseCase):
         fixture_path = join(self.fixture_dir, 'v6--views--2021-11-30.json')
         fixture = json.load(open(fixture_path, 'r'))
 
-        from_dt = to_dt = datetime(2021, 11, 30) # daily
+        from_dt = to_dt = datetime(2021, 12, 1) # daily
         with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
             with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
                 ga_table_id = '0xdeadbeef'
