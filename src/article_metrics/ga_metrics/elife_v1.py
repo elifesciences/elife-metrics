@@ -139,11 +139,14 @@ def path_count(pair):
         LOG.warn("skpping unhandled path %s", pair)
 
 def count_counter_list(counter_lst):
-    "takes a list of Counter objects and returns a single aggregate Counter object"
+    """takes a list of Counter objects and returns a single aggregate Counter object.
+    note: this is immutable and doesn't modify the input like `Counter.update` ordinarily would."""
     def update(a, b):
         # https://docs.python.org/2/library/collections.html#collections.Counter.update
-        a.update(b)
-        return a
+        c = Counter({})
+        c.update(a)
+        c.update(b)
+        return c
     return reduce(update, counter_lst)
 
 def group_results(triplet_list):
