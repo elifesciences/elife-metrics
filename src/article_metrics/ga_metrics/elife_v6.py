@@ -14,9 +14,7 @@ event_counts = elife_v1.event_counts
 
 def path_counts_query(table_id, from_date, to_date):
     "returns a query specific to this era that we can send to Google Analytics"
-    # use the v1 query as a template
     new_query = elife_v1.path_counts_query(table_id, from_date, to_date)
-
     explanation = (
         # non-regex GA prefix where '=~' means 'match regex'
         "ga:pagePath=~"
@@ -42,7 +40,7 @@ def path_counts_query(table_id, from_date, to_date):
         "$"
     )
     ga_filter = "ga:pagePath=~^/articles/[0-9]+(/executable)?((\\?|&){1}.*?(twclid|utm_campaign|utm_source=content_alert)+.*?)?$"
-    assert ga_filter == explanation
+    assert ga_filter == explanation, "explanation of filter differs from the actual filter."
 
     new_query['filters'] = ga_filter
     return new_query
@@ -66,7 +64,7 @@ def path_count(pair):
     return data['artid'], count_type, int(count)
 
 def path_counts(path_count_pairs):
-    """takes raw path data from GA and groups by article, returning a
-    list of (artid, count-type, count)"""
+    """takes raw path data from GA and groups by msid, returning a
+    list of (msid, count-type, count)"""
     path_count_triples = lfilter(None, [path_count(pair) for pair in path_count_pairs])
     return elife_v1.group_results(path_count_triples)

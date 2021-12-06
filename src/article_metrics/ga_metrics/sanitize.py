@@ -1,7 +1,7 @@
 """simple script that santizes the `output` directory.
 works even if no santitation required.
 
-'sanitation' is simply removing certain fields from the results."""
+'sanitation' is simply removing potentially sensitive fields from the results."""
 
 import sys, os, json
 from . import core
