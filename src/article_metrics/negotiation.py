@@ -3,17 +3,16 @@ doesn't spaz out when you ask for a custom media article in the
 Accept header."""
 
 from rest_framework.renderers import JSONRenderer
-from .utils import lmap
 
 def mktype(row):
     nom, mime, version_list = row
-    klass_list = lmap(lambda ver: ("%sVersion%s" % (nom, ver), "%s; version=1" % mime), version_list)
+    klass_list = [("%sVersion%s" % (nom, ver), "%s; version=1" % mime) for ver in version_list]
     global_scope = globals()
 
     def gen_klass(klass_row):
         nom, mime = klass_row
         global_scope[nom] = type(nom, (JSONRenderer,), {'media_type': mime})
-    lmap(gen_klass, klass_list)
+    [gen_klass(klass) for klass in klass_list]
 
 _dynamic_types = [
     # class name, media type, known version list
@@ -21,4 +20,4 @@ _dynamic_types = [
     ('MetricTimePeriod', 'application/vnd.elife.metric-time-period+json', [1]),
 ]
 
-lmap(mktype, _dynamic_types)
+[mktype(_type) for _type in _dynamic_types]

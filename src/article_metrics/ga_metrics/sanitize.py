@@ -1,7 +1,10 @@
 """simple script that santizes the `output` directory.
-works even if no santitation required."""
+works even if no santitation required.
 
-import sys, os, core, json
+'sanitation' is simply removing potentially sensitive fields from the results."""
+
+import sys, os, json
+from . import core
 from os.path import join
 
 def do():

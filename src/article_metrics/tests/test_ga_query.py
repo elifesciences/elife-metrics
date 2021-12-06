@@ -126,3 +126,65 @@ class V5(base.SimpleBaseCase):
                 self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
                 for msid, expected_count in expected_sample.items():
                     self.assertEqual(expected_count, results[utils.msid2doi(msid)])
+
+class V6(base.SimpleBaseCase):
+    "v6 era is the same as v5, except paths containing certain url parameters are included."
+
+    def test_v6_daily(self):
+        fixture_path = join(self.fixture_dir, 'v6--views--2021-11-30.json')
+        fixture = json.load(open(fixture_path, 'r'))
+
+        from_dt = to_dt = datetime(2021, 12, 1) # daily
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+                ga_table_id = '0xdeadbeef'
+                results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
+                expected_num_results = 7265
+                expected_total = Counter(full=31275, abstract=0, digest=0)
+
+                # representative sample of `/article` and `/article/executable`, /article?foo=...
+                expected_sample = [
+                    (61268, Counter(full=7, abstract=0, digest=0)),
+                    (60066, Counter(full=4, abstract=0, digest=0)),
+                    (61523, Counter(full=5, abstract=0, digest=0)),
+                    (64909, Counter(full=17, abstract=0, digest=0)),
+                    (60095, Counter(full=1, abstract=0, digest=0)),
+                    (30274, Counter(full=8, abstract=0, digest=0)),
+                    (48, Counter(full=1, abstract=0, digest=0)),
+                    (78, Counter(full=1, abstract=0, digest=0)),
+                ]
+
+                self.assertEqual(expected_num_results, len(results))
+                self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
+                for msid, expected_count in expected_sample:
+                    self.assertEqual(expected_count, results[utils.msid2doi(msid)])
+
+    def test_v6_monthly(self):
+        fixture_path = join(self.fixture_dir, 'v6--views--2021-11-01_2021-11-30.json')
+        fixture = json.load(open(fixture_path, 'r'))
+
+        # it's a 2021-11 fixture but we'll use 2021-12 dates so that the v6 module is picked.
+        from_dt, to_dt = datetime(2021, 12, 1), datetime(2021, 12, 31) # monthly
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+                ga_table_id = '0xdeadbeef'
+                results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
+                expected_num_results = 11738
+                expected_total = Counter(full=712582, abstract=0, digest=0)
+
+                # representative sample of `/article` and `/article/executable`, /article?foo=...
+                expected_sample = [
+                    (61268, Counter(full=209, abstract=0, digest=0)),
+                    (60066, Counter(full=814, abstract=0, digest=0)),
+                    (61523, Counter(full=127, abstract=0, digest=0)),
+                    (64909, Counter(full=422, abstract=0, digest=0)),
+                    (60095, Counter(full=64, abstract=0, digest=0)),
+                    (30274, Counter(full=82, abstract=0, digest=0)),
+                    (48, Counter(full=2, abstract=0, digest=0)),
+                    (78, Counter(full=3, abstract=0, digest=0)),
+                ]
+
+                self.assertEqual(expected_num_results, len(results))
+                self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
+                for msid, expected_count in expected_sample:
+                    self.assertEqual(expected_count, results[utils.msid2doi(msid)])

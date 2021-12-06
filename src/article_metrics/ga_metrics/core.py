@@ -15,19 +15,14 @@ from httplib2 import Http
 from .utils import ymd, firstof, month_min_max, d2dt
 from kids.cache import cache
 import logging
-
 from django.conf import settings
-
-
-from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5
+from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6
 
 logging.basicConfig()
 LOG = logging.getLogger(__name__)
 LOG.level = logging.INFO
 
-#OUTPUT_SUBDIR = 'output'
-
-# TODO: shift this into app.cfg
+# TODO: shift this into settings.py/app.cfg
 SECRETS_LOCATIONS = [
     'client-secrets.json',
     '/etc/elife-ga-metrics/client-secrets.json'
@@ -35,7 +30,7 @@ SECRETS_LOCATIONS = [
 
 MAX_GA_RESULTS = 10000
 
-# TODO: dodgy, unused, remove
+# lsh@2021-12: test logic doesn't belong here. replace with a mock during testing
 def output_dir():
     root = os.path.dirname(os.path.dirname(__file__))
     if os.environ.get('TESTING'):
@@ -58,6 +53,62 @@ SITE_SWITCH_v2 = datetime(year=2017, month=6, day=1)
 
 # when we added /executable
 RDS_ADDITION = datetime(year=2020, month=2, day=21)
+
+# whitelisted urlparams
+URL_PARAMS = datetime(year=2021, month=11, day=30)
+
+def module_picker(from_date, to_date):
+    "returns the module we should be using for scraping this date range."
+    daily = from_date == to_date
+    if daily:
+        if from_date > URL_PARAMS:
+            return elife_v6
+
+        if from_date >= RDS_ADDITION:
+            return elife_v5
+
+        if from_date >= SITE_SWITCH_v2:
+            return elife_v4
+
+        if from_date > VERSIONLESS_URLS:
+            return elife_v3
+
+        if from_date > SITE_SWITCH:
+            return elife_v2
+
+    # monthly/arbitrary range
+    else:
+        if from_date > URL_PARAMS:
+            return elife_v6
+
+        if from_date >= RDS_ADDITION:
+            return elife_v5
+
+        if from_date >= SITE_SWITCH_v2:
+            return elife_v4
+
+        if (from_date, to_date) == VERSIONLESS_URLS_MONTH:
+            # business rule: if the given from-to dates represent a
+            # monthly date range and that date range is the same year+month
+            # we switched to versionless urls, use the v3 patterns.
+            return elife_v3
+
+        # if the site switched to versionless urls before our date range, use v3
+        if from_date > VERSIONLESS_URLS:
+            return elife_v3
+
+        # if the site switch happened before the start our date range, use v2
+        if from_date > SITE_SWITCH:
+            return elife_v2
+
+        # TODO, WARN: partial month logic here
+        # if the site switch happened between our two dates, use new.
+        # if monthly, this means we lose 9 days of stats
+        if SITE_SWITCH > from_date and SITE_SWITCH < to_date:
+            return elife_v2
+
+    return elife_v1
+
 
 #
 # utils
@@ -93,8 +144,8 @@ def oauth_secrets():
     settings_file_locations = SECRETS_LOCATIONS
     settings_file = firstof(os.path.exists, settings_file_locations)
     if not settings_file:
-        msg = "could not find the credentials file! I looked here:\n%s" % \
-            '\n'.join(settings_file_locations)
+        loc_list = '\n'.join(settings_file_locations)
+        msg = "could not find the credentials file! I looked here:\n%s" % loc_list
         raise EnvironmentError(msg)
     return settings_file
 
@@ -114,8 +165,8 @@ def ga_service():
 
 # copied from non-article metrics logic.py
 def query_ga(query, num_attempts=5):
-    """performs given query but fetches any further pages.
-    concatenated results are returned in the response as 'rows'"""
+    """performs given query and fetches any further pages.
+    concatenated results are returned in the response dict as `rows`."""
     results_pp = query.get('max_results', MAX_GA_RESULTS)
     query['max_results'] = results_pp
     query['start_index'] = 1
@@ -136,6 +187,7 @@ def query_ga(query, num_attempts=5):
 
     return response
 
+# pylint: disable=E1101
 def _query_ga(query_map, num_attempts=5):
     "talks to google with the given query, applying exponential back-off if rate limited"
 
@@ -253,62 +305,9 @@ def query_ga_write_results(query, num_attempts=5):
     path = output_path_from_results(response)
     return response, write_results(response, path)
 
-
 #
 #
 #
-
-def module_picker(from_date, to_date):
-    "determine which module we should be using for scraping this date range"
-    daily = from_date == to_date
-    if daily:
-        if from_date >= RDS_ADDITION:
-            return elife_v5
-
-        if from_date >= SITE_SWITCH_v2:
-            return elife_v4
-
-        if from_date > VERSIONLESS_URLS:
-            return elife_v3
-
-        if from_date > SITE_SWITCH:
-            return elife_v2
-
-    # monthly/arbitrary range
-    else:
-        if from_date >= RDS_ADDITION:
-            return elife_v5
-
-        if from_date >= SITE_SWITCH_v2:
-            return elife_v4
-
-        if (from_date, to_date) == VERSIONLESS_URLS_MONTH:
-            # business rule: if the given from-to dates represent a
-            # monthly date range and that date range is the same year+month
-            # we switched to versionless urls, use the v3 patterns.
-            return elife_v3
-
-        # if the site switched to versionless urls before our date range, use v3
-        if from_date > VERSIONLESS_URLS:
-            return elife_v3
-
-        # if the site switch happened before the start our date range, use v2
-        if from_date > SITE_SWITCH:
-            return elife_v2
-
-        # TODO, WARN: partial month logic here
-        # if the site switch happened between our two dates, use new.
-        # if monthly, this means we lose 9 days of stats
-        if SITE_SWITCH > from_date and SITE_SWITCH < to_date:
-            return elife_v2
-
-    return elife_v1
-
-
-#
-#
-#
-
 
 def article_views(table_id, from_date, to_date, cached=False, only_cached=False):
     "returns article view data either from the cache or from talking to google"

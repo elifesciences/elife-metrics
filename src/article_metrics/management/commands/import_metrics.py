@@ -10,14 +10,6 @@ from metrics import logic as na_logic
 import logging
 LOG = logging.getLogger('debugger')
 
-'''
-def hw_or_ga(v):
-    pv = v.lower().strip()
-    if not pv in ['ga', 'hw']:
-        raise argparse.ArgumentTypeError("'--just-source' accepts only 'hw' or 'ga'" % v)
-    return pv
-'''
-
 def first(x):
     try:
         return x[0]
@@ -31,9 +23,6 @@ class Command(BaseCommand):
     help = 'imports all metrics from google analytics'
 
     def add_arguments(self, parser):
-        # all
-        #parser.add_argument('--just-source', nargs='?', dest='just_source', type=hw_or_ga, default=None)
-
         # views+downloads
         # import the last two days by default
         parser.add_argument('--days', nargs='?', type=int, default=2)
