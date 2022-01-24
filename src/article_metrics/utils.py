@@ -254,9 +254,11 @@ def mkdirs(path):
     # lsh@2021-11-08: worked well enough but is failing mysteriously now.
     # switching to `os.makedirs` see if that helps yield a better error.
     #os.system('mkdir -p %s' % path)
-    if os.path.exists(path):
-        return True
-    os.makedirs(path)
+    # lsh@2022-01-24: this change coincides with a high memory usage warning, reverting back to above.
+    #if os.path.exists(path):
+    #    return True
+    #os.makedirs(path)
+    os.system('mkdir -p %s' % path)
     return os.path.exists(path)
 
 def tempdir():
