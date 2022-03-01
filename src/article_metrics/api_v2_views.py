@@ -2,6 +2,7 @@ from article_metrics import models
 from django.shortcuts import get_object_or_404
 from django.http import Http404
 from django.conf import settings
+from django.db import connection
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.renderers import StaticHTMLRenderer
 from et3.render import render_item
@@ -15,6 +16,50 @@ from rest_framework.exceptions import ValidationError
 import logging
 
 LOG = logging.getLogger(__name__)
+
+
+PROFILING=True
+import cProfile, pstats
+def profile(fn):
+    "prints profiling stats using cProfile when used a view decorator."
+
+    if not PROFILING:
+        return fn
+
+    def wrapper(*args, **kwargs):
+        pr = cProfile.Profile(timeunit=0.001)
+        pr.enable()
+        result = fn(*args, **kwargs)
+        pr.disable()
+
+        sortby = "cumulative"
+        ps = pstats.Stats(pr).sort_stats(sortby)
+        # 10% of profiled functions, then just those from 'elife-metrics/src/*' functions
+        # - https://docs.python.org/3/library/profile.html#pstats.Stats.print_stats
+        #ps.print_stats(.1, 'elife-metrics/src')
+        ps.print_stats(.01)
+        fname = "/tmp/output-%s.prof" % fn.__name__
+        ps.dump_stats(fname)
+        print("wrote", fname)
+
+        return result
+
+    return wrapper
+
+
+def transactions(fn):
+
+    def wrapper(*args, **kwargs):
+        cursor = connection.cursor()
+        result = fn(*args, **kwargs)
+
+        qlist = connection.queries
+        print("%s queries" % len(qlist))
+        for q in qlist:
+            print("%s\t%s" % (q['time'], q['sql']))
+        return result
+
+    return wrapper
 
 def request_args(request, **overrides):
     opts = {}
@@ -82,6 +127,7 @@ def serialize(total_results, sum_value, obj_list, metric):
 #
 #
 
+
 @api_view(['GET'])
 def article_metrics(request, msid, metric):
     try:
@@ -136,6 +182,8 @@ def ping(request):
 #
 
 @api_view(['GET'])
+@transactions
+@profile
 def summary(request, msid=None):
     "returns the final totals for all articles with no finer grained information"
     try:
@@ -157,6 +205,33 @@ def summary(request, msid=None):
 
         payload = {
             'total': total_results,
+            'items': payload
+        }
+        return Response(payload, content_type="application/json")
+
+    except AssertionError as err:
+        raise ValidationError(err) # 400, client error
+
+    except Exception as err:
+        LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
+        raise # 500, server error
+
+
+@api_view(['GET'])
+@transactions
+@profile
+def summary2(request, msid=None):
+    "returns the final totals for all articles with no finer grained information"
+    try:
+        kwargs = request_args(request)
+
+        payload = logic.summary_by_msid2(msid, kwargs['page'], kwargs['per_page'], kwargs['order'])
+        
+        if not payload:
+            raise Http404("no results for that query")
+
+        payload = {
+            'total': len(payload),
             'items': payload
         }
         return Response(payload, content_type="application/json")

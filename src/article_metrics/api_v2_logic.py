@@ -117,3 +117,93 @@ def summary_by_obj(artobj):
         return summary_by_msid(utils.doi2msid(artobj.doi))
     except AssertionError:
         LOG.warn("bad data, skipping article: %s", artobj)
+
+
+#
+#
+#
+
+
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
+
+def summary_by_msid2(msid, page, per_page, order):
+
+    from django.db import connection
+    
+    sql_all = '''
+
+select
+    ma.id,
+    ma.doi, 
+    sum(mm.full + mm.abstract + mm.digest) as views,
+    sum(mm.pdf) as downloads,
+    (select sum(num) from metrics_citation mc where mc.article_id = ma.id and source = 'scopus') as scopus,
+    (select sum(num) from metrics_citation mc where mc.article_id = ma.id and source = 'pubmed') as pubmed,
+    (select sum(num) from metrics_citation mc where mc.article_id = ma.id and source = 'crossref') as crossref
+from 
+    metrics_article ma 
+    JOIN metrics_metric mm ON ma.id = mm.article_id
+where 
+    mm.source = 'ga'
+    and mm.period = 'day'
+
+group by 
+    ma.id,
+    ma.doi
+
+order by ma.doi DESC
+
+offset %s
+limit %s
+
+
+;
+    '''
+
+    sql_one = '''
+
+select
+    ma.id,
+    ma.doi, 
+    sum(mm.full + mm.abstract + mm.digest) as views,
+    sum(mm.pdf) as downloads,
+
+    (select sum(num) from metrics_citation mc1 where mc1.article_id = ma.id and source = 'scopus') as cnt_citation_scopus,
+    (select sum(num) from metrics_citation mc1 where mc1.article_id = ma.id and source = 'pubmed') as cnt_citation_pubmed,
+    (select sum(num) from metrics_citation mc1 where mc1.article_id = ma.id and source = 'crossref') as cnt_citation_crossref
+from 
+    metrics_article ma 
+    JOIN metrics_metric mm ON ma.id = mm.article_id
+where 
+    mm.source = 'ga'
+    and mm.period = 'day'
+    and ma.doi = %s
+
+group by 
+    ma.id,
+    ma.doi
+
+;
+    '''
+
+    offset = per_page * page
+    
+    sql = sql_all
+    args = [offset, per_page]
+
+    if msid:
+        sql = sql_one
+        args = [utils.msid2doi(msid)]
+
+    with connection.cursor() as cursor:
+        
+        cursor.execute(sql, args)
+        rows = dictfetchall(cursor) #.dictfetchall()
+    return rows
+    
