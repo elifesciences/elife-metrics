@@ -5,7 +5,7 @@ example settings can be found in /path/to/lax/elife.cfg
 
 ./install.sh will create a symlink from dev.cfg -> lax.cfg if lax.cfg not found."""
 
-import os, sys
+import os, sys, tempfile
 from os.path import join
 from datetime import datetime
 import configparser
@@ -69,13 +69,13 @@ SCOPUS_KEY = cfg('scopus.api-key')
 CROSSREF_USER = cfg('crossref.user')
 CROSSREF_PASS = cfg('crossref.pass')
 
-CACHE_DIR = OUTPUT_PATH
-# no caching by default, cached keys must set their own individual timeouts
-CACHE = Cache(directory=CACHE_DIR, timeout=0)
+# diskcache, temporary
+CACHE = Cache(directory=tempfile.gettempdir())
 
+# requests-cache, permanent
 # time in days before the cached requests expires
 CACHE_EXPIRY = 2 # days
-CACHE_NAME = join(CACHE_DIR, 'db.sqlite3')
+CACHE_NAME = join(OUTPUT_DIR, 'db.sqlite3')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')
