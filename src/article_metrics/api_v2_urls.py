@@ -8,9 +8,8 @@ urlpatterns = ([
     url(r'^article/(?P<msid>\d+)/(?P<metric>(citations|downloads|page-views))$', views.article_metrics, name='alm'),
 
     url(r'^article/(?P<msid>\d+)/summary$', views.summary, name='article-summary'),
-    url(r'^article/summary$', views.summary, name='summary'),
-
-    url(r'^article/(?P<msid>\d+)/summary2$', views.summary2, name='article-summary2'),
-    url(r'^article/summary2$', views.summary2, name='summary2'),
+    # lsh@2022-03-04: disabled in favour of views.summary2. views.summary still ok for individual articles.
+    #url(r'^article/summary$', views.summary, name='summary'),
+    url(r'^article/summary$', views.summary2, name='summary2'),
 
 ], app_name)

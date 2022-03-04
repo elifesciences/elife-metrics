@@ -1,3 +1,4 @@
+import cProfile, pstats
 from article_metrics import models
 from django.shortcuts import get_object_or_404
 from django.http import Http404
@@ -18,8 +19,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 
-PROFILING=True
-import cProfile, pstats
+PROFILING = True
 def profile(fn):
     "prints profiling stats using cProfile when used a view decorator."
 
@@ -50,7 +50,7 @@ def profile(fn):
 def transactions(fn):
 
     def wrapper(*args, **kwargs):
-        cursor = connection.cursor()
+        #cursor = connection.cursor()
         result = fn(*args, **kwargs)
 
         qlist = connection.queries
@@ -220,18 +220,17 @@ def summary(request, msid=None):
 @api_view(['GET'])
 @transactions
 @profile
-def summary2(request, msid=None):
+def summary2(request):
     "returns the final totals for all articles with no finer grained information"
     try:
         kwargs = request_args(request)
 
-        payload = logic.summary_by_msid2(msid, kwargs['page'], kwargs['per_page'], kwargs['order'])
-        
+        total_results, payload = logic.summary(kwargs['page'], kwargs['per_page'], kwargs['order'])
         if not payload:
-            raise Http404("no results for that query")
+            raise Http404("no results")
 
         payload = {
-            'total': len(payload),
+            'total': total_results,
             'items': payload
         }
         return Response(payload, content_type="application/json")

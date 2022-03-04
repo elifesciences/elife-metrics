@@ -13,6 +13,7 @@ from pythonjsonlogger import jsonlogger
 import yaml
 from et3.render import render_item
 from et3.extract import path as p
+from diskcache import Cache
 
 PROJECT_NAME = 'elife-metrics'
 
@@ -68,9 +69,13 @@ SCOPUS_KEY = cfg('scopus.api-key')
 CROSSREF_USER = cfg('crossref.user')
 CROSSREF_PASS = cfg('crossref.pass')
 
+CACHE_DIR = OUTPUT_PATH
+# no caching by default, cached keys must set their own individual timeouts
+CACHE = Cache(directory=CACHE_DIR, timeout=0)
+
 # time in days before the cached requests expires
 CACHE_EXPIRY = 2 # days
-CACHE_NAME = join(OUTPUT_PATH, 'db.sqlite3')
+CACHE_NAME = join(CACHE_DIR, 'db.sqlite3')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = cfg('general.secret-key')
@@ -206,6 +211,7 @@ REST_FRAMEWORK = {
     )
 }
 
+SQL_PATH = join(PROJECT_DIR, 'schema/sql')
 SCHEMA_PATH = join(PROJECT_DIR, 'schema/api-raml/dist')
 SCHEMA_IDX = {
     'metric': join(SCHEMA_PATH, 'model/metric.v1.json'),
