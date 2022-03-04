@@ -329,6 +329,9 @@ def merge(*dicts):
 def cached(cache_key, expires_seconds):
     def wrapper1(fn):
         def wrapper2(*args, **kwargs):
+            # no caching while testing
+            if settings.TESTING:
+                return fn(*args, **kwargs)
             result = settings.CACHE.get(cache_key)
             if not result:
                 result = fn(*args, **kwargs)

@@ -182,8 +182,6 @@ def ping(request):
 #
 
 @api_view(['GET'])
-@transactions
-@profile
 def summary(request, msid=None):
     "returns the final totals for all articles with no finer grained information"
     try:
@@ -218,17 +216,12 @@ def summary(request, msid=None):
 
 
 @api_view(['GET'])
-@transactions
-@profile
 def summary2(request):
     "returns the final totals for all articles with no finer grained information"
     try:
         kwargs = request_args(request)
 
         total_results, payload = logic.summary(kwargs['page'], kwargs['per_page'], kwargs['order'])
-        if not payload:
-            raise Http404("no results")
-
         payload = {
             'total': total_results,
             'items': payload

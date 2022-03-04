@@ -8,6 +8,7 @@ import logging
 import metrics.models
 from django.conf import settings
 from django.db import connection
+from psycopg2.extensions import AsIs
 
 LOG = logging.getLogger(__name__)
 
@@ -135,6 +136,13 @@ def dictfetchall(cursor):
         for row in cursor.fetchall()
     ]
 
+def coerce(row):
+    try:
+        row['id'] = utils.doi2msid(row['id'])
+        return row
+    except Exception:
+        LOG.warn("bad data, skipping article: %s", row)
+
 SUMMARY_SQL_ALL = open(os.path.join(settings.SQL_PATH, 'metrics-summary.sql'), 'r').read()
 
 @cached('summary', 120) # two minutes
@@ -142,8 +150,10 @@ def _summary(order):
     """an optimised query for returning article metric summaries.
     execution time is the same for all results, 100 results or just one, so no pagination is done."""
     with connection.cursor() as cursor:
-        cursor.execute(SUMMARY_SQL_ALL, [order])
-        return dictfetchall(cursor)
+        cursor.execute(SUMMARY_SQL_ALL, [AsIs(order)])
+        rows = dictfetchall(cursor)
+        return list(filter(None, map(coerce, rows)))
+
 
 def summary(page, per_page, order):
     """an optimised query for returning article metric summaries.

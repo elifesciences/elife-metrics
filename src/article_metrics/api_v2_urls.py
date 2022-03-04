@@ -10,6 +10,6 @@ urlpatterns = ([
     url(r'^article/(?P<msid>\d+)/summary$', views.summary, name='article-summary'),
     # lsh@2022-03-04: disabled in favour of views.summary2. views.summary still ok for individual articles.
     #url(r'^article/summary$', views.summary, name='summary'),
-    url(r'^article/summary$', views.summary2, name='summary2'),
+    url(r'^article/summary$', views.summary2, name='summary'),
 
 ], app_name)

@@ -8,6 +8,7 @@ from . import base
 from article_metrics.scopus import citations
 from django.conf import settings
 from article_metrics.utils import lmap
+from unittest import skip
 
 class One(base.BaseCase):
     def setUp(self):
@@ -66,6 +67,7 @@ class One(base.BaseCase):
 
     # TODO: this is talking to scopus.
     # see fixtures/scopus-responses/search-p1.json and p2.json
+    @skip('this is talking to scopus')
     def test_scopus_request(self):
         search_gen = citations.search(settings.SCOPUS_KEY, settings.DOI_PREFIX)
         search_results = next(search_gen)

@@ -1,6 +1,7 @@
 select
     -- strips doi prefix, converts result to integer to avoid leading zeros
-    cast(substr(ma.doi, 15) as bigint) as msid,
+    --cast(substr(ma.doi, 15) as bigint) as msid,
+    ma.doi as id,
     mm.views,
     mm.downloads,
     coalesce(mc.scopus, 0) as scopus,
@@ -50,6 +51,6 @@ where
     ma.id = mm.article_id
 
 order by 
-    msid DESC
+    ma.id %s
 
 ;
