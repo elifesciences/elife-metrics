@@ -136,7 +136,8 @@ def dictfetchall(cursor):
         for row in cursor.fetchall()
     ]
 
-def coerce(row):
+def coerce_summary_row(row):
+    "post-processing of rows from `summary`, because we can't do everything in SQL"
     try:
         row['id'] = utils.doi2msid(row['id'])
         return row
@@ -145,24 +146,19 @@ def coerce(row):
 
 SUMMARY_SQL_ALL = open(os.path.join(settings.SQL_PATH, 'metrics-summary.sql'), 'r').read()
 
-@cached('summary', 120) # two minutes
+@cached('summary', 120) # seconds (two minutes)
 def _summary(order):
     """an optimised query for returning article metric summaries.
-    execution time is the same for all results, 100 results or just one, so no pagination is done."""
+    execution time is the same for all results or just one, so pagination is skipped."""
     with connection.cursor() as cursor:
         cursor.execute(SUMMARY_SQL_ALL, [AsIs(order)])
         rows = dictfetchall(cursor)
-        return list(filter(None, map(coerce, rows)))
-
+        return list(filter(None, map(coerce_summary_row, rows)))
 
 def summary(page, per_page, order):
     """an optimised query for returning article metric summaries.
-    execution time is the same for all results or just one, so pagination happens on the results of the same query.
-    it could
-    """
-
+    execution time is the same for all results or just one, so pagination uses list slices."""
     rows = _summary(order)
-
     # ?per-page=100&page=1 = 0:100
     # ?per-page=100&page=2 = 100:200
     start_pos = per_page * (page - 1) # slices are 0-based

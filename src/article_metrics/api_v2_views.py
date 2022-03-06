@@ -18,8 +18,7 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-
-PROFILING = True
+PROFILING = False
 def profile(fn):
     "prints profiling stats using cProfile when used a view decorator."
 
@@ -36,23 +35,24 @@ def profile(fn):
         ps = pstats.Stats(pr).sort_stats(sortby)
         # 10% of profiled functions, then just those from 'elife-metrics/src/*' functions
         # - https://docs.python.org/3/library/profile.html#pstats.Stats.print_stats
-        #ps.print_stats(.1, 'elife-metrics/src')
+        #ps.print_stats(.01, 'elife-metrics/src')
         ps.print_stats(.01)
         fname = "/tmp/output-%s.prof" % fn.__name__
         ps.dump_stats(fname)
         print("wrote", fname)
-
         return result
 
     return wrapper
 
 
 def transactions(fn):
+    "prints the number of transaction made during execution of the given `fn` and then the SQL of each."
+
+    if not PROFILING:
+        return fn
 
     def wrapper(*args, **kwargs):
-        #cursor = connection.cursor()
         result = fn(*args, **kwargs)
-
         qlist = connection.queries
         print("%s queries" % len(qlist))
         for q in qlist:
@@ -126,7 +126,6 @@ def serialize(total_results, sum_value, obj_list, metric):
 #
 #
 #
-
 
 @api_view(['GET'])
 def article_metrics(request, msid, metric):
@@ -220,7 +219,6 @@ def summary2(request):
     "returns the final totals for all articles with no finer grained information"
     try:
         kwargs = request_args(request)
-
         total_results, payload = logic.summary(kwargs['page'], kwargs['per_page'], kwargs['order'])
         payload = {
             'total': total_results,

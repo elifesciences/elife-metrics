@@ -1,5 +1,6 @@
 select
-    -- strips doi prefix, converts result to integer to avoid leading zeros
+    -- strips doi prefix, converts result to integer to avoid leading zeros.
+    -- disabled as it's possible bad DOIs could cause query to fail. conversion now happens in code.
     --cast(substr(ma.doi, 15) as bigint) as msid,
     ma.doi as id,
     mm.views,
