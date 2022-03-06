@@ -1,10 +1,14 @@
+import os
 from collections import OrderedDict
 from . import models
 from . import utils
-from .utils import ensure, rest, lmap
+from .utils import ensure, rest, lmap, cached
 from django.db.models import Sum, F, Max
 import logging
 import metrics.models
+from django.conf import settings
+from django.db import connection
+from psycopg2.extensions import AsIs
 
 LOG = logging.getLogger(__name__)
 
@@ -117,3 +121,46 @@ def summary_by_obj(artobj):
         return summary_by_msid(utils.doi2msid(artobj.doi))
     except AssertionError:
         LOG.warn("bad data, skipping article: %s", artobj)
+
+
+#
+#
+#
+
+
+def dictfetchall(cursor):
+    "Return all rows from a cursor as a dict"
+    columns = [col[0] for col in cursor.description]
+    return [
+        dict(zip(columns, row))
+        for row in cursor.fetchall()
+    ]
+
+def coerce_summary_row(row):
+    "post-processing of rows from `summary`, because we can't do everything in SQL"
+    try:
+        row['id'] = utils.doi2msid(row['id'])
+        return row
+    except Exception:
+        LOG.warn("bad data, skipping article: %s", row)
+
+SUMMARY_SQL_ALL = open(os.path.join(settings.SQL_PATH, 'metrics-summary.sql'), 'r').read()
+
+@cached('summary', 120) # seconds (two minutes)
+def _summary(order):
+    """an optimised query for returning article metric summaries.
+    execution time is the same for all results or just one, so pagination is skipped."""
+    with connection.cursor() as cursor:
+        cursor.execute(SUMMARY_SQL_ALL, [AsIs(order)])
+        rows = dictfetchall(cursor)
+        return list(filter(None, map(coerce_summary_row, rows)))
+
+def summary(page, per_page, order):
+    """an optimised query for returning article metric summaries.
+    execution time is the same for all results or just one, so pagination uses list slices."""
+    rows = _summary(order)
+    # ?per-page=100&page=1 = 0:100
+    # ?per-page=100&page=2 = 100:200
+    start_pos = per_page * (page - 1) # slices are 0-based
+    offset = start_pos + per_page
+    return len(rows), rows[start_pos:offset]
