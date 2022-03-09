@@ -1,8 +1,10 @@
+import cachetools
 import os
 from collections import OrderedDict
 from . import models
 from . import utils
-from .utils import ensure, rest, lmap, cached
+from .utils import ensure, rest, lmap
+from kids.cache import cache
 from django.db.models import Sum, F, Max
 import logging
 import metrics.models
@@ -145,20 +147,21 @@ def coerce_summary_row(row):
         LOG.warn("bad data, skipping article: %s", row)
 
 SUMMARY_SQL_ALL = open(os.path.join(settings.SQL_PATH, 'metrics-summary.sql'), 'r').read()
+TWO_MIN_CACHE = cachetools.TTLCache(maxsize=1, ttl=120 if not settings.TESTING else 0)
 
-@cached('summary', 120) # seconds (two minutes)
+@cache(use=TWO_MIN_CACHE)
 def _summary(order):
     """an optimised query for returning article metric summaries.
     execution time is the same for all results or just one, so pagination is skipped."""
     with connection.cursor() as cursor:
         cursor.execute(SUMMARY_SQL_ALL, [AsIs(order)])
         rows = dictfetchall(cursor)
-        return list(filter(None, map(coerce_summary_row, rows)))
+    return list(filter(None, map(coerce_summary_row, rows)))
 
 def summary(page, per_page, order):
     """an optimised query for returning article metric summaries.
     execution time is the same for all results or just one, so pagination uses list slices."""
-    rows = _summary(order)
+    rows = _summary(order) # pylint: disable=E1111
     # ?per-page=100&page=1 = 0:100
     # ?per-page=100&page=2 = 100:200
     start_pos = per_page * (page - 1) # slices are 0-based

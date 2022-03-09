@@ -7,7 +7,6 @@ from datetime import datetime, date
 import dateutil
 import dateutil.parser
 import pytz
-from django.conf import settings
 
 LOG = logging.getLogger(__name__)
 
@@ -256,9 +255,9 @@ def mkdirs(path):
     # switching to `os.makedirs` see if that helps yield a better error.
     #os.system('mkdir -p %s' % path)
     # lsh@2022-01-24: this change coincides with a high memory usage warning, reverting back to above.
-    #if os.path.exists(path):
+    # if os.path.exists(path):
     #    return True
-    #os.makedirs(path)
+    # os.makedirs(path)
     os.system('mkdir -p %s' % path)
     return os.path.exists(path)
 
@@ -325,17 +324,3 @@ def merge(*dicts):
         c.update(copy.deepcopy(b))
         return c
     return reduce(_merge, dicts)
-
-def cached(cache_key, expires_seconds):
-    def wrapper1(fn):
-        def wrapper2(*args, **kwargs):
-            # no caching while testing
-            if settings.TESTING:
-                return fn(*args, **kwargs)
-            result = settings.CACHE.get(cache_key)
-            if not result:
-                result = fn(*args, **kwargs)
-                settings.CACHE.set(cache_key, result, expires_seconds)
-            return result
-        return wrapper2
-    return wrapper1
