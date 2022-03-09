@@ -5,7 +5,7 @@ example settings can be found in /path/to/lax/elife.cfg
 
 ./install.sh will create a symlink from dev.cfg -> lax.cfg if lax.cfg not found."""
 
-import os, sys, tempfile
+import os, sys
 from os.path import join
 from datetime import datetime
 import configparser
@@ -13,7 +13,6 @@ from pythonjsonlogger import jsonlogger
 import yaml
 from et3.render import render_item
 from et3.extract import path as p
-from diskcache import Cache
 
 PROJECT_NAME = 'elife-metrics'
 
@@ -68,9 +67,6 @@ SCOPUS_KEY = cfg('scopus.api-key')
 
 CROSSREF_USER = cfg('crossref.user')
 CROSSREF_PASS = cfg('crossref.pass')
-
-# diskcache, temporary
-CACHE = Cache(directory=tempfile.gettempdir())
 
 # requests-cache, permanent
 # time in days before the cached requests expires

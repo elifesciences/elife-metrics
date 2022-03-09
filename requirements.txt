@@ -1,9 +1,9 @@
-# file generated 2022-03-04 - see update-dependencies.sh
+# file generated 2022-03-09 - see update-dependencies.sh
 astroid==2.9.3
 attrs==21.4.0
 autopep8==1.6.0
-boto3==1.21.12
-botocore==1.24.12
+boto3==1.21.15
+botocore==1.24.15
 cachetools==4.2.4
 certifi==2021.10.8
 cffi==1.15.0
@@ -11,12 +11,11 @@ charset-normalizer==2.0.12
 contextlib2==21.6.0
 coverage==5.5
 cryptography==3.4.8
-diskcache==5.4.0
 Django==2.2.27
 django-annoying==0.10.6
 djangorestframework==3.13.1
 et3==1.5.1
-google-api-core==2.6.0
+google-api-core==2.7.0
 google-api-python-client==1.12.10
 google-auth==2.6.0
 google-auth-httplib2==0.1.0
