@@ -255,9 +255,9 @@ def mkdirs(path):
     # switching to `os.makedirs` see if that helps yield a better error.
     #os.system('mkdir -p %s' % path)
     # lsh@2022-01-24: this change coincides with a high memory usage warning, reverting back to above.
-    #if os.path.exists(path):
+    # if os.path.exists(path):
     #    return True
-    #os.makedirs(path)
+    # os.makedirs(path)
     os.system('mkdir -p %s' % path)
     return os.path.exists(path)
 

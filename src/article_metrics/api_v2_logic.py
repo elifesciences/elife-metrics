@@ -161,7 +161,7 @@ def _summary(order):
 def summary(page, per_page, order):
     """an optimised query for returning article metric summaries.
     execution time is the same for all results or just one, so pagination uses list slices."""
-    rows = _summary(order)
+    rows = _summary(order) # pylint: disable=E1111
     # ?per-page=100&page=1 = 0:100
     # ?per-page=100&page=2 = 100:200
     start_pos = per_page * (page - 1) # slices are 0-based

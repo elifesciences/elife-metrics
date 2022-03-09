@@ -7,6 +7,8 @@ from article_metrics import utils
 import requests, requests_cache
 import logging
 
+LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
+
 if not settings.TESTING:
     requests_cache.install_cache(**{
         # install cache kwargs
@@ -29,8 +31,6 @@ def clear_expired():
 def clear_cache():
     # completely empties the requests-cache database, probably not what you intended
     requests_cache.clear()
-
-LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
 
 def opid(nom=''):
     "return a unique id to track a set of operations"
