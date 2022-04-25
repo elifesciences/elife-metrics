@@ -33,7 +33,6 @@ schema = "~=0.6"
 sqlparse = "~=0.2"
 Django = "==2.2.*"
 Markdown = "~=3.0"
-#pyOpenSSL = "==18.0.0"
 PyYAML = "~=5.3"
 uWSGI = "~=2.0"
 
@@ -42,5 +41,7 @@ autopep8 = "~=1.3"
 coverage = "~=5.0"
 pyflakes = "~=2.0"
 pylint = "~=2.3"
-pylint-django = "~=2.0"
+# lsh@2022-04-25: removed and lint script simplified.
+# was causing a recursion error with requests+requests-cache somehow.
+#pylint-django = "~=2.0"
 unittest-xml-reporting = "~=2.2"

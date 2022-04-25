@@ -29,7 +29,7 @@ class Article(models.Model):
         ordering = ('-doi',)
 
     def __str__(self):
-        return self.doi
+        return str(self.doi)
 
     def __repr__(self):
         return '<Article %r>' % self.doi
