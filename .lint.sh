@@ -11,16 +11,15 @@ echo "pyflakes"
 pyflakes ./src/
 
 echo "pylint"
+
+export DJANGO_SETTINGS_MODULE=core.settings
+
 # E1103 - a variable is accessed for a nonexistent member, but astng was not able to interpret all possible types of this variable.
-pylint -E ./src/metrics/** ./src/article_metrics/** \
-    --load-plugins=pylint_django \
-    --django-settings-module=core.settings \
-    --disable=E1103
+pylint -E ./src --disable=E1103
+
 # specific warnings we're interested in, comma separated with no spaces
 # presence of these warnings are a failure
-pylint ./src/metrics/** ./src/article_metrics/** \
-    --load-plugins=pylint_django \
-    --django-settings-module=core.settings \
+pylint ./src \
     --disable=all --reports=n --score=n \
     --enable=redefined-builtin,pointless-string-statement,no-else-return,redefined-outer-name
 

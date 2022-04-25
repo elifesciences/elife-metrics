@@ -18,7 +18,7 @@ class PageType(Model):
     name = CharField(primary_key=True, max_length=255, choices=page_type_choices())
 
     def __str__(self):
-        return self.name
+        return str(self.name)
 
     def __repr__(self):
         return '<PageType %r>' % self.__str__()
@@ -48,7 +48,7 @@ class PageCount(Model):
         unique_together = (('page', 'date'),) # one result per-page, per-date
 
     def __str__(self):
-        return "%s: %d views" % (self.date.strftime('%Y-%m-%d'), self.views) # ll: '2018-01-01: 12 views'
+        return "%s: %d views" % (self.date.strftime('%Y-%m-%d'), int(self.views)) # "2018-01-01: 12 views"
 
     def __repr__(self):
         return "<PageCount '%s:%s'>" % (self.date.strftime('%Y-%m-%d'), self.views) # ll: <PageCount '2018-01-01:12'>
