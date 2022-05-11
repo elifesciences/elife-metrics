@@ -1,3 +1,4 @@
+import threading
 import time
 import os, json, copy
 import tempfile, shutil
@@ -291,7 +292,7 @@ def partial_match(patn, real):
 # don't use if we ever go concurrent
 # http://blog.gregburek.com/2011/12/05/Rate-limiting-with-decorators/
 # https://stackoverflow.com/questions/667508/whats-a-good-rate-limiting-algorithm/667706#667706
-def simple_rate_limiter(maxPerSecond):
+def simple_rate_limiter1(maxPerSecond):
     minInterval = 1.0 / float(maxPerSecond)
 
     def decorate(func):
@@ -307,6 +308,37 @@ def simple_rate_limiter(maxPerSecond):
             return ret
         return rateLimitedFunction
     return decorate
+
+# a thread-safe, 3.8 compatible variation on the above
+# - https://gist.github.com/gregburek/1441055?permalink_comment_id=1848222#gistcomment-1848222
+# def rate_limited(max_per_second):
+def simple_rate_limiter2(max_per_second):
+    lock = threading.Lock()
+    min_interval = 1.0 / max_per_second
+
+    def decorate(func):
+        last_time_called = time.perf_counter()
+
+        @wraps(func)
+        def rate_limited_function(*args, **kwargs):
+            lock.acquire()
+            nonlocal last_time_called
+            elapsed = time.perf_counter() - last_time_called
+            left_to_wait = min_interval - elapsed
+
+            if left_to_wait > 0:
+                time.sleep(left_to_wait)
+
+            ret = func(*args, **kwargs)
+            last_time_called = time.perf_counter()
+            lock.release()
+            return ret
+
+        return rate_limited_function
+
+    return decorate
+
+simple_rate_limiter = simple_rate_limiter2
 
 #
 #

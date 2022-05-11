@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
 
-class DownstreamCachine(TestCase):
+class DownstreamCaching(TestCase):
     def setUp(self):
         self.c = Client()
         self.url = '/' # we could hit more urls but it's applied application-wide
