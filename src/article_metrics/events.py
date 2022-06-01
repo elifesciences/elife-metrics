@@ -14,7 +14,7 @@ def sns_topic_arn(**overrides):
     vals.update(overrides)
     # ll: arn:aws:sns:us-east-1:112634557572:bus-articles--ci
     arn = "arn:aws:sns:{region}:{subscriber}:{name}--{env}".format(**vals)
-    LOG.info("using topic arn: %s", arn)
+    LOG.debug("using topic arn: %s", arn)
     return arn
 
 #
@@ -25,10 +25,10 @@ def event_bus_conn(**overrides):
     sns = boto3.resource('sns')
     return sns.Topic(sns_topic_arn(**overrides))
 
-def notify(obj, **overrides):
+def notify(obj, **kwargs):
     "notify the event bus that this Citation or Metric has changes"
     if settings.DEBUG:
-        LOG.debug("application is in DEBUG mode, not notifying anyone")
+        LOG.warn("application is in DEBUG mode, nobody will be notified.")
         return
     try:
         msg = {
@@ -39,7 +39,11 @@ def notify(obj, **overrides):
         }
         msg_json = json.dumps(msg)
         LOG.info("writing message to event bus", extra={'bus-message': msg_json})
-        event_bus_conn(**overrides).publish(Message=msg_json)
+        conn = kwargs.pop('conn', None)
+        if not conn:
+            conn_overrides = kwargs.pop('conn_overrides', {})
+            conn = event_bus_conn(**conn_overrides)
+        conn.publish(Message=msg_json)
 
     except ValueError as err:
         # probably serializing value

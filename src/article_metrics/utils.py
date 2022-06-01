@@ -15,6 +15,11 @@ lmap = lambda func, *iterable: list(map(func, *iterable))
 lfilter = lambda func, *iterable: list(filter(func, *iterable))
 keys = lambda d: list(d.keys())
 
+def run(func, iterable):
+    "calls `func` for each item in `iterable`, discarding results, returns `None`."
+    for x in iterable:
+        func(x)
+
 class ParseError(ValueError):
     pass
 
