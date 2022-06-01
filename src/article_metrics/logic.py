@@ -6,7 +6,7 @@ from django.conf import settings
 from . import models
 from django.db import transaction
 from . import utils
-from .utils import first, create_or_update, ensure, splitfilter, comp, lmap, lfilter
+from .utils import first, create_or_update, ensure, splitfilter, comp, run, lfilter
 import logging
 from . import events
 
@@ -30,13 +30,13 @@ def format_dt_pair(dt_pair):
 #
 #
 
-def notify(obj):
+def notify(obj, **kwargs):
     if not transaction.get_autocommit():
         # we're inside a managed transaction.
         # send the notification only after successful commit
-        transaction.on_commit(partial(events.notify, obj))
+        transaction.on_commit(lambda: events.notify(obj, **kwargs))
     else:
-        events.notify(obj)
+        events.notify(obj, **kwargs)
 
 def recently_updated_citations(td):
     "all citations updated in the last given duration"
@@ -49,10 +49,13 @@ def recently_updated_metrics(td):
     return models.Metric.objects.filter(datetime_record_updated__gte=since).order_by('-article__doi')
 
 def recently_updated_article_notifications(**kwargs):
-    "send notifications about all articles recently updated"
+    "send notifications about all recently updated articles"
     td = timedelta(**kwargs)
-    lmap(notify, recently_updated_citations(td))
-    lmap(notify, recently_updated_metrics(td))
+    conn = events.event_bus_conn()
+    for citation_obj in recently_updated_citations(td):
+        notify(citation_obj, conn=conn)
+    for metric_obj in recently_updated_metrics(td):
+        notify(metric_obj, conn=conn)
 
 #
 #
@@ -99,16 +102,17 @@ def _insert_row(data):
 
 @transaction.atomic
 def insert_row(data):
-    """inserts a metric into the database within a transaction. DO NOT USE if you are inserting many
-    metrics. use `insert_many_rows` or your performance will suffer greatly"""
+    """inserts a metric dict into the database using a single transaction.
+    DO NOT USE when inserting many objects. Use `insert_many_rows` or your performance will suffer greatly."""
     return _insert_row(data)
 
 @transaction.atomic
 def insert_many_rows(data_list):
-    return lmap(_insert_row, data_list)
+    "inserts all items in given `data_list` using a single transaction."
+    run(_insert_row, data_list)
 
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
-    "import metrics from GA between the two given dates or from inception"
+    "import metrics from GA between the two given dates or from the inception date in `settings.py`"
     ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
 
     table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
@@ -135,7 +139,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         doi_list = set(views.keys()).union(list(downloads.keys()))
         row_list = [create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
         # insert rows in batches of 1000
-        lmap(insert_many_rows, utils.partition(row_list, 1000))
+        run(insert_many_rows, utils.partition(row_list, 1000))
 
 #
 # citations
@@ -163,14 +167,14 @@ def import_scopus_citations():
     results = all_todays_entries()
     good_eggs, bad_eggs = splitfilter(lambda e: 'bad' not in e, results)
     LOG.warn("refusing to insert %s bad entries", len(bad_eggs), extra={'bad-entries': bad_eggs})
-    return lmap(comp(insert_citation, countable), good_eggs)
+    run(comp(insert_citation, countable), good_eggs)
 
 def import_pmc_citations():
     from .pm.citations import citations_for_all_articles
     results = citations_for_all_articles()
-    return lmap(comp(partial(insert_citation, aid='pmcid'), countable), results)
+    run(comp(partial(insert_citation, aid='pmcid'), countable), results)
 
 def import_crossref_citations():
     from .crossref.citations import citations_for_all_articles
     results = citations_for_all_articles()
-    return lmap(comp(insert_citation, countable), lfilter(None, results))
+    run(comp(insert_citation, countable), lfilter(None, results))
