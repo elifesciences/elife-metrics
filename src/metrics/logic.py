@@ -1,5 +1,5 @@
 from . import models, history
-from article_metrics.utils import ensure, lmap, create_or_update, first, ymd, lfilter
+from article_metrics.utils import ensure, lmap, create_or_update, first, ymd, lfilter, run
 from article_metrics.ga_metrics import core as ga_core
 from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth
@@ -361,7 +361,7 @@ def update_ptype(ptype, replace_cache_files=False):
         LOG.error(err)
 
 def update_all_ptypes():
-    lmap(update_ptype, models.PAGE_TYPES)
+    run(update_ptype, models.PAGE_TYPES)
 
 #
 #

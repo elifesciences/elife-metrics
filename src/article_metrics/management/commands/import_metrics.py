@@ -4,20 +4,10 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from article_metrics import logic, models
-
-from metrics import logic as na_logic
-
+from metrics import logic as na_logic # non-article logic
 import logging
+
 LOG = logging.getLogger('debugger')
-
-def first(x):
-    try:
-        return x[0]
-    except (TypeError, KeyError):
-        return None
-
-def rest(x):
-    return x[1:]
 
 class Command(BaseCommand):
     help = 'imports all metrics from google analytics'
@@ -68,7 +58,7 @@ class Command(BaseCommand):
             start_time = time.time() # seconds since epoch
             for source, row in sources.items():
                 try:
-                    fn, args = first(row), rest(row)
+                    fn, args = row[0], row[1:]
                     fn(*args)
                 except KeyboardInterrupt:
                     print('ctrl-c caught, skipping rest of %s' % source)
