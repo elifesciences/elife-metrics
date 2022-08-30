@@ -17,18 +17,15 @@ djangorestframework = "~=3.9"
 et3 = "~=1.5"
 google-api-python-client = "~=1.7"
 "kids.cache" = "==0.0.7"
-newrelic = "*"
+newrelic = "~=7.16"
 oauth2client = "~=4.1"
 # psycopg2 doesn't use semver.
-# psycopg2 2.9.x isn't compatible with django 2.2:
-# https://github.com/psycopg/psycopg2/issues/1293
-psycopg2 = "==2.8.*"
+psycopg2-binary = "==2.9.*"
 python-dateutil = "~=2.7"
 python-json-logger = "~=0.1"
 pytz = "*"
 requests = "~=2.20"
 requests-cache = "~=0.4"
-responses = "~=0.9"
 schema = "~=0.6"
 sqlparse = "~=0.2"
 Django = "==3.2.*"
@@ -44,4 +41,5 @@ pylint = "~=2.3"
 # lsh@2022-04-25: removed and lint script simplified.
 # was causing a recursion error with requests+requests-cache somehow.
 #pylint-django = "~=2.0"
+responses = "~=0.9"
 unittest-xml-reporting = "~=2.2"
