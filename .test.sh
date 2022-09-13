@@ -1,8 +1,5 @@
 #!/bin/bash
-
-set -e # everything must pass
-
-pyflakes src/
+set -e
 
 args="$@"
 module="src"
@@ -15,7 +12,13 @@ fi
 # remove any old compiled python files
 find src/ -name '*.pyc' -delete
 
-coverage run --source='src/' --omit='*/tests/*,*/migrations/*,*/core/*' src/manage.py test "$module" --no-input -v 2
+export DJANGO_SETTINGS_MODULE=core.settings
+pytest "$module" \
+    -vvv \
+    --no-migrations \
+    --cov=src --cov-config=.coveragerc \
+    --disable-socket
+
 echo "* passed tests"
 
 # run coverage test

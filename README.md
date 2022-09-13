@@ -40,7 +40,7 @@ would yield a response similar to:
 
 [code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/tests/)  
 
-    ./test.sh
+    ./project_tests.sh
 
 ## running
 
@@ -51,7 +51,7 @@ would yield a response similar to:
 
 ## Copyright & Licence
  
-Copyright 2016-2019 eLife Sciences. Licensed under the [GPLv3](LICENCE.txt)
+Copyright 2016-2022 eLife Sciences. Licensed under the [GPLv3](LICENCE.txt)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
