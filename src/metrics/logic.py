@@ -171,7 +171,7 @@ def aggregate(normalised_rows):
 def process_response(ptype, frame, response):
     rows = response.get('rows')
     if not rows:
-        LOG.warn("GA responded with no results", extra={'query': response['query'], 'ptype': ptype, 'frame': frame})
+        LOG.warning("GA responded with no results", extra={'query': response['query'], 'ptype': ptype, 'frame': frame})
         return []
 
     # look for the "results_processor_frame_foo" function ...

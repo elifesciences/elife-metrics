@@ -70,7 +70,7 @@ def get_create_article(data):
         return first(create_or_update(models.Article, data, create=True, update=False))
     except AssertionError as err:
         # it shouldn't get to this point!
-        LOG.warn("refusing to fetch/create bad article: %s" % err, extra={'article-data': data})
+        LOG.warning("refusing to fetch/create bad article: %s" % err, extra={'article-data': data})
 
 #
 #
@@ -93,7 +93,7 @@ def create_row(doi, period, views, downloads):
 def _insert_row(data):
     article_obj = get_create_article({'doi': data['doi']})
     if not article_obj:
-        LOG.warn("refusing to insert bad metric", extra={'row-data': data})
+        LOG.warning("refusing to insert bad metric", extra={'row-data': data})
         return
     row = utils.exsubdict(data, ['doi'])
     row['article'] = article_obj
@@ -148,7 +148,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
 def insert_citation(data, aid='doi'):
     article_obj = get_create_article({aid: data[aid]})
     if not article_obj:
-        LOG.warn("refusing to insert bad citation", extra={'citation-data': data})
+        LOG.warning("refusing to insert bad citation", extra={'citation-data': data})
         return
     row = utils.exsubdict(data, [aid])
     row['article'] = article_obj
@@ -166,7 +166,7 @@ def import_scopus_citations():
     from .scopus.citations import all_todays_entries
     results = all_todays_entries()
     good_eggs, bad_eggs = splitfilter(lambda e: 'bad' not in e, results)
-    LOG.warn("refusing to insert %s bad entries", len(bad_eggs), extra={'bad-entries': bad_eggs})
+    LOG.warning("refusing to insert %s bad entries", len(bad_eggs), extra={'bad-entries': bad_eggs})
     run(comp(insert_citation, countable), good_eggs)
 
 def import_pmc_citations():

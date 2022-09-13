@@ -76,7 +76,7 @@ def logit_handler(xid, err):
         'id': xid,
         'logged': [fname, fname2],
     }
-    LOG.warn("non-2xx response %s" % err, extra=ctx)
+    LOG.warning("non-2xx response %s" % err, extra=ctx)
 
 def raise_handler(xid, err):
     "logs the error and then raises it again to be handled by the calling function"
@@ -119,7 +119,7 @@ def requests_get(*args, **kwargs):
 
     except requests.HTTPError as err:
         # non 2xx response
-        LOG.warn("error response attempting to fetch remote resource: %s" % err, extra=ctx)
+        LOG.warning("error response attempting to fetch remote resource: %s" % err, extra=ctx)
 
         # these can be handled by passing in an 'opts' kwarg ll:
         # {404: handler.LOGIT}

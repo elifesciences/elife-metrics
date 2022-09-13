@@ -38,7 +38,7 @@ def path_count(pair):
     # path ll: /articles/12345
     bits = re.match(PATH_RE, path.lower())
     if not bits:
-        LOG.warn("skpping unhandled path %s", pair)
+        LOG.warning("skpping unhandled path %s", pair)
         return
     data = bits.groupdict()
     return data['artid'], 'full', int(count)

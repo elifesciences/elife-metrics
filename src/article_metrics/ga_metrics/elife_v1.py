@@ -128,8 +128,8 @@ def path_count(pair):
 
     except AssertionError:
         # we have an unhandled path
-        #LOG.warn("skpping unhandled path %s (%r)", pair, e)
-        LOG.warn("skpping unhandled path %s", pair)
+        #LOG.warning("skpping unhandled path %s (%r)", pair, e)
+        LOG.warning("skpping unhandled path %s", pair)
 
 def count_counter_list(counter_lst):
     """takes a list of Counter objects and returns a single aggregate Counter object.

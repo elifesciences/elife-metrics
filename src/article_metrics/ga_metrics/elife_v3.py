@@ -58,7 +58,7 @@ def path_count(pair):
     # path will always be something similar to: /content/4/e10719v1
     bits = re.search(PATH_RE, path.lower())
     if not bits:
-        LOG.warn("skpping unhandled path %s", pair)
+        LOG.warning("skpping unhandled path %s", pair)
         return
     data = bits.groupdict()
     return data['artid'], TYPE_MAP[data['type']], int(count)

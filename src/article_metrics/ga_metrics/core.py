@@ -221,7 +221,7 @@ def _query_ga(query_map, num_attempts=5):
             raise
 
         except errors.HttpError as e:
-            LOG.warn("HttpError ... can we recover?")
+            LOG.warning("HttpError ... can we recover?")
 
             status_code = e.resp.status
 
@@ -360,7 +360,7 @@ def article_metrics(table_id, from_date, to_date, cached=False, only_cached=Fals
     sset = download_dois - views_dois
     if sset:
         msg = "downloads with no corresponding page view: %r"
-        LOG.warn(msg, {missing_doi: downloads[missing_doi] for missing_doi in list(sset)})
+        LOG.warning(msg, {missing_doi: downloads[missing_doi] for missing_doi in list(sset)})
 
     # keep the two separate until we introduce POAs? or just always
     return {'views': views, 'downloads': downloads}

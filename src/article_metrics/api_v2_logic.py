@@ -122,7 +122,7 @@ def summary_by_obj(artobj):
     try:
         return summary_by_msid(utils.doi2msid(artobj.doi))
     except AssertionError:
-        LOG.warn("bad data, skipping article: %s", artobj)
+        LOG.warning("bad data, skipping article: %s", artobj)
 
 
 #
@@ -144,7 +144,7 @@ def coerce_summary_row(row):
         row['id'] = utils.doi2msid(row['id'])
         return row
     except Exception:
-        LOG.warn("bad data, skipping article: %s", row)
+        LOG.warning("bad data, skipping article: %s", row)
 
 SUMMARY_SQL_ALL = open(os.path.join(settings.SQL_PATH, 'metrics-summary.sql'), 'r').read()
 TWO_MIN_CACHE = cachetools.TTLCache(maxsize=1, ttl=120 if not settings.TESTING else 0)
