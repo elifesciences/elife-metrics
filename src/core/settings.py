@@ -32,7 +32,7 @@ if os.path.isdir("/ext"):
 # cfg handling
 
 CFG_NAME = 'app.cfg'
-DYNCONFIG = configparser.SafeConfigParser(**{
+DYNCONFIG = configparser.ConfigParser(**{
     'allow_no_value': True,
     'defaults': {'dir': SRC_DIR, 'project': PROJECT_NAME}})
 DYNCONFIG.read(join(PROJECT_DIR, CFG_NAME)) # ll: /path/to/lax/app.cfg
