@@ -1,12 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # Analytics API:
-# https://developers.google.com/analytics/devguides/reporting/core/v3/reference
-
-__author__ = [
-    'Luke Skibinski <l.skibinski@elifesciences.org>',
-]
+# - https://developers.google.com/analytics/devguides/reporting/core/v3/reference
 
 import re
 from collections import Counter
