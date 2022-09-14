@@ -9,9 +9,7 @@ from datetime import datetime, timedelta
 import logging
 from collections import OrderedDict
 
-logging.basicConfig()
 LOG = logging.getLogger(__name__)
-LOG.level = logging.INFO
 
 #
 # bulk requests to ga
@@ -50,6 +48,8 @@ def generate_queries(table_id, query_func_name, datetime_list, use_cached=False,
 
     return query_list
 
+# TODO: nothing depends on the return value of this function
+# accumulating a large number of results in memory may be a bad idea. profile.
 def bulk_query(query_list):
     "executes a list of queries"
     return lmap(core.query_ga_write_results, query_list)
@@ -117,12 +117,6 @@ def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_o
 #
 #
 #
-
-# TODO: good idea!
-def fill_gaps():
-    """goes through all files we have output and looks for 'gaps' and
-    then creates a query that will fill it. NOT a replacement for
-    regenerate_results """
 
 def regenerate_results(table_id, from_date=core.VIEWS_INCEPTION):
     "this will perform all queries again, overwriting the results in `output`"

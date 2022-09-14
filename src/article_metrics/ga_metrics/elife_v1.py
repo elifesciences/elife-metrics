@@ -10,11 +10,7 @@ from article_metrics.utils import lmap, lfilter
 import logging
 from functools import reduce
 
-# from elife_ga_metrics import core # can't be doing this, circular dependencies.
-
-logging.basicConfig()
 LOG = logging.getLogger(__name__)
-LOG.level = logging.INFO
 
 #
 # downloads handling

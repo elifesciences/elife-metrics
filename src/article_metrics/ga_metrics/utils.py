@@ -3,9 +3,7 @@ from datetime import datetime, timedelta
 import logging
 from article_metrics.utils import ensure, isint, msid2doi
 
-logging.basicConfig()
 LOG = logging.getLogger(__name__)
-LOG.level = logging.INFO
 
 def norm_table_id(table_id):
     if str(table_id).startswith('ga:'):

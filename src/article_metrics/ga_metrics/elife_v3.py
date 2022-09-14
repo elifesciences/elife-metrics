@@ -1,6 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 """
 elife_v3, the switch to versionless urls
 
@@ -8,17 +5,13 @@ essentially the same as elife_v2 BUT the version suffix is now optional.
 
 """
 
-# we can reuse these functions
 from . import elife_v1
-# these seemingly unused imports are actually used
 from .elife_v1 import group_results
 from article_metrics.utils import lfilter
 import re
 import logging
 
-logging.basicConfig()
 LOG = logging.getLogger(__name__)
-LOG.level = logging.INFO
 
 event_counts_query = elife_v1.event_counts_query
 event_counts = elife_v1.event_counts
