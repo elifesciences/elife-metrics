@@ -136,7 +136,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 # Testing
-TESTING = 'test' in sys.argv
+# handles django, coverage and pytest detection
+TESTING = 'test' in sys.argv or 'pytest' in sys.argv[0]
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 TEST_OUTPUT_DIR = 'xml'
 
