@@ -6,13 +6,13 @@ from datetime import timedelta, datetime
 import pytest
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
+TABLE_ID = 'ga:82618489'
+BASE_DATE = datetime(year=2001, month=1, day=1)
 
 def fixture_path(path):
     path = os.path.join(THIS_DIR, 'fixtures', path)
     utils.ensure(os.path.exists(path), "fixture not found: %s" % path)
     return path
-
-BASE_DATE = datetime(year=2001, month=1, day=1)
 
 def resp_json(resp):
     # json.loads(resp.bytes.decode('utf-8')) # python3
@@ -80,7 +80,7 @@ def insert_metrics(abbr_list):
 
 class SimpleBaseCase(unittest.TestCase):
     "use this base if you don't need database wrangling"
-    table_id = 'ga:82618489'
+    table_id = TABLE_ID
     maxDiff = None
     this_dir = THIS_DIR
     fixture_dir = os.path.join(this_dir, 'fixtures')
