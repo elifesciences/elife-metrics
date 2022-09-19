@@ -146,15 +146,10 @@ def coerce_summary_row(row):
     except Exception:
         LOG.warning("bad data, skipping article: %s", row)
 
-def conditional_cache(fn, **kwargs):
-    def _wrapper(f):
-        return cache(**kwargs)(f) if fn() else f
-    return _wrapper
-
 SUMMARY_SQL_ALL = open(os.path.join(settings.SQL_PATH, 'metrics-summary.sql'), 'r').read()
-TWO_MIN_CACHE = cachetools.TTLCache(maxsize=1, ttl=120)
+TWO_MIN_CACHE = cachetools.TTLCache(maxsize=1, ttl=120 if not settings.TESTING else 0)
 
-@conditional_cache(lambda: settings.TESTING, use=TWO_MIN_CACHE)
+@cache(use=TWO_MIN_CACHE)
 def _summary(order):
     """an optimised query for returning article metric summaries.
     execution time is the same for all results or just one, so pagination is skipped."""
