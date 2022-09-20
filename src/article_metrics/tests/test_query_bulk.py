@@ -1,6 +1,5 @@
 from unittest import mock
 from . import base
-import json
 from datetime import timedelta
 from article_metrics.ga_metrics import core
 from collections import Counter
