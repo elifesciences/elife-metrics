@@ -9,18 +9,10 @@ def test_daily_query_results_correct_pre_switch():
     "the results from a query (pre-switch) are calculated correctly"
     from_date = to_date = core.SITE_SWITCH - timedelta(days=1)
     fixture_path = base.fixture_path('views-2016-02-08.json')
-        
-    def query_fn(_):
-        raw_data = json.load(open(fixture_path, 'r'))
-        return raw_data, fixture_path
 
-    def path_fn(*args):
-        return fixture_path
-        
-    with mock.patch('article_metrics.ga_metrics.core.output_path', path_fn):
-        with mock.patch('article_metrics.ga_metrics.core.query_ga_write_results', query_fn):
-            counts = core.article_views(base.TABLE_ID, from_date, to_date)
-        
+    with mock.patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+        counts = core.article_views(base.TABLE_ID, from_date, to_date, cached=True)
+
     expected = {
         '10.7554/eLife.10778': Counter({'full': 119, 'abstract': 10, 'digest': 1}),
         '10.7554/eLife.10509': Counter({'full': 11, 'abstract': 2, 'digest': 0}),
