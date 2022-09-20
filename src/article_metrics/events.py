@@ -28,7 +28,7 @@ def event_bus_conn(**overrides):
 def notify(obj, **kwargs):
     "notify the event bus that this Citation or Metric has changes"
     if settings.DEBUG:
-        LOG.warn("application is in DEBUG mode, nobody will be notified.")
+        LOG.warning("application is in DEBUG mode, nobody will be notified.")
         return
     try:
         msg = {

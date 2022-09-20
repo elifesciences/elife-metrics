@@ -302,7 +302,7 @@ class Two(base.BaseCase):
         del fixture['rows']
         with patch('metrics.logic.LOG') as mock:
             processed_results = logic.process_response(models.EVENT, frame, fixture)
-            self.assertEqual(mock.warn.call_count, 1)
+            self.assertEqual(mock.warning.call_count, 1)
             expected_results = []
             self.assertEqual(processed_results, expected_results)
 

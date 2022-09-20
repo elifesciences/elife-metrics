@@ -1,0 +1,9 @@
+[run]
+omit = 
+    src/core/wsgi.py
+    src/*/admin.py
+
+[report]
+omit =
+    */tests/*
+    */migrations/*

@@ -32,7 +32,7 @@ if os.path.isdir("/ext"):
 # cfg handling
 
 CFG_NAME = 'app.cfg'
-DYNCONFIG = configparser.SafeConfigParser(**{
+DYNCONFIG = configparser.ConfigParser(**{
     'allow_no_value': True,
     'defaults': {'dir': SRC_DIR, 'project': PROJECT_NAME}})
 DYNCONFIG.read(join(PROJECT_DIR, CFG_NAME)) # ll: /path/to/lax/app.cfg
@@ -136,7 +136,8 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 # Testing
-TESTING = 'test' in sys.argv
+# handles django, coverage and pytest test runner detection
+TESTING = 'test' in sys.argv or 'pytest' in sys.argv[0]
 TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.XMLTestRunner'
 TEST_OUTPUT_DIR = 'xml'
 

@@ -1,12 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
 # Analytics API:
-# https://developers.google.com/analytics/devguides/reporting/core/v3/reference
-
-__author__ = [
-    'Luke Skibinski <l.skibinski@elifesciences.org>',
-]
+# - https://developers.google.com/analytics/devguides/reporting/core/v3/reference
 
 import re
 from collections import Counter
@@ -17,11 +10,7 @@ from article_metrics.utils import lmap, lfilter
 import logging
 from functools import reduce
 
-# from elife_ga_metrics import core # can't be doing this, circular dependencies.
-
-logging.basicConfig()
 LOG = logging.getLogger(__name__)
-LOG.level = logging.INFO
 
 #
 # downloads handling
@@ -135,8 +124,8 @@ def path_count(pair):
 
     except AssertionError:
         # we have an unhandled path
-        #LOG.warn("skpping unhandled path %s (%r)", pair, e)
-        LOG.warn("skpping unhandled path %s", pair)
+        #LOG.warning("skpping unhandled path %s (%r)", pair, e)
+        LOG.warning("skpping unhandled path %s", pair)
 
 def count_counter_list(counter_lst):
     """takes a list of Counter objects and returns a single aggregate Counter object.

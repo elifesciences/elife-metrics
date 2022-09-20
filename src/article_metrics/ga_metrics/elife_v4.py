@@ -7,9 +7,7 @@ the urls become greatly simplified. no more volumes, no content types, no abstra
 
 """
 
-# we can reuse these functions
 from . import elife_v1
-# these seemingly unused imports are actually used
 from .elife_v1 import group_results
 from article_metrics.utils import lfilter
 import re
@@ -38,7 +36,7 @@ def path_count(pair):
     # path ll: /articles/12345
     bits = re.match(PATH_RE, path.lower())
     if not bits:
-        LOG.warn("skpping unhandled path %s", pair)
+        LOG.warning("skpping unhandled path %s", pair)
         return
     data = bits.groupdict()
     return data['artid'], 'full', int(count)

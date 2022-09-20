@@ -1,16 +1,10 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-
-# we can reuse these functions
 from . import elife_v1
 from .elife_v1 import group_results
 from article_metrics.utils import lfilter
 import re
 import logging
 
-logging.basicConfig()
 LOG = logging.getLogger(__name__)
-LOG.level = logging.INFO
 
 event_counts_query = elife_v1.event_counts_query
 event_counts = elife_v1.event_counts
@@ -52,7 +46,7 @@ def path_count(pair):
     # path will always be something similar to: /content/4/e10719v1
     bits = re.search(PATH_RE, path.lower())
     if not bits:
-        LOG.warn("skpping unhandled path %s", pair)
+        LOG.warning("skpping unhandled path %s", pair)
         return
     data = bits.groupdict()
     return data['artid'], TYPE_MAP[data['type']], int(count)

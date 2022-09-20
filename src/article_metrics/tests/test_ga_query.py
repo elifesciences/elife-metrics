@@ -17,7 +17,11 @@ class V3V4Transition(base.SimpleBaseCase):
     def test_daily_query_results_correct_pre_switch(self):
         "the results from a query (pre-switch) are calculated correctly"
         from_date = to_date = core.SITE_SWITCH - timedelta(days=1)
-        counts = core.article_views(self.table_id, from_date, to_date)
+
+        fixture = base.fixture_path('views-2016-02-08.json')
+        with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture):
+            counts = core.article_views(self.table_id, from_date, to_date, cached=True)
+
         expected = {
             '10.7554/eLife.10778': Counter({'full': 119, 'abstract': 10, 'digest': 1}),
             '10.7554/eLife.10509': Counter({'full': 11, 'abstract': 2, 'digest': 0}),
@@ -29,7 +33,11 @@ class V3V4Transition(base.SimpleBaseCase):
     def test_daily_query_results_correct_post_switch(self):
         "the results from a query (post-switch) are calculated correctly"
         from_date = to_date = core.SITE_SWITCH + timedelta(days=1) # day after
-        counts = core.article_views(self.table_id, from_date, to_date, cached=True)
+
+        fixture = base.fixture_path('views-2016-02-10.json')
+        with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture):
+            counts = core.article_views(self.table_id, from_date, to_date, cached=True)
+
         expected = {
             '10.7554/eLife.10518': Counter({'abstract': 0, 'digest': 1, 'full': 4}),
             '10.7554/eLife.10921': Counter({'abstract': 0, 'digest': 2, 'full': 153}),

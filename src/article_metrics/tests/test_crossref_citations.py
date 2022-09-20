@@ -26,4 +26,4 @@ class One(base.BaseCase):
         with self.settings(DUMP_PATH=self.tempdir):
             expected_response = None
             self.assertEqual(expected_response, crossref.fetch(bad_doi))
-            self.assertTrue(mock.warn.called) # logged
+            self.assertTrue(mock.warning.called) # logged

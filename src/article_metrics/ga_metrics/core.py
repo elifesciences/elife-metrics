@@ -18,9 +18,7 @@ import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6
 
-logging.basicConfig()
 LOG = logging.getLogger(__name__)
-LOG.level = logging.INFO
 
 # TODO: shift this into settings.py/app.cfg
 SECRETS_LOCATIONS = [
@@ -163,30 +161,6 @@ def ga_service():
     service = build(service_name, 'v3', http=http, cache_discovery=False)
     return service
 
-# copied from non-article metrics logic.py
-def query_ga(query, num_attempts=5):
-    """performs given query and fetches any further pages.
-    concatenated results are returned in the response dict as `rows`."""
-    results_pp = query.get('max_results', MAX_GA_RESULTS)
-    query['max_results'] = results_pp
-    query['start_index'] = 1
-
-    page, results = 1, []
-    while True:
-        LOG.info("requesting page %s for query %s" % (page, query['filters']))
-        response = _query_ga(query, num_attempts)
-        results.extend(response.get('rows') or [])
-        if (results_pp * page) >= response['totalResults']:
-            break # no more pages to fetch
-        query['start_index'] += results_pp # 1, 2001, 4001, etc
-        page += 1
-
-    # use the last response given but with all of the results
-    response['rows'] = results
-    response['totalPages'] = page
-
-    return response
-
 # pylint: disable=E1101
 def _query_ga(query_map, num_attempts=5):
     "talks to google with the given query, applying exponential back-off if rate limited"
@@ -221,7 +195,7 @@ def _query_ga(query_map, num_attempts=5):
             raise
 
         except errors.HttpError as e:
-            LOG.warn("HttpError ... can we recover?")
+            LOG.warning("HttpError ... can we recover?")
 
             status_code = e.resp.status
 
@@ -248,6 +222,31 @@ def _query_ga(query_map, num_attempts=5):
             raise
 
     raise AssertionError("Failed to execute query after %s attempts" % num_attempts)
+
+# copied from non-article metrics logic.py
+def query_ga(query, num_attempts=5):
+    """performs given query and fetches any further pages.
+    concatenated results are returned in the response dict as `rows`."""
+
+    results_pp = query.get('max_results', MAX_GA_RESULTS)
+    query['max_results'] = results_pp
+    query['start_index'] = 1
+
+    page, results = 1, []
+    while True:
+        LOG.info("requesting page %s for query %s" % (page, query['filters']))
+        response = _query_ga(query, num_attempts)
+        results.extend(response.get('rows') or [])
+        if (results_pp * page) >= response['totalResults']:
+            break # no more pages to fetch
+        query['start_index'] += results_pp # 1, 2001, 4001, etc
+        page += 1
+
+    # use the last response given but with all of the results
+    response['rows'] = results
+    response['totalPages'] = page
+
+    return response
 
 def output_path(results_type, from_date, to_date):
     "generates a path for results of the given type"
@@ -360,7 +359,7 @@ def article_metrics(table_id, from_date, to_date, cached=False, only_cached=Fals
     sset = download_dois - views_dois
     if sset:
         msg = "downloads with no corresponding page view: %r"
-        LOG.warn(msg, {missing_doi: downloads[missing_doi] for missing_doi in list(sset)})
+        LOG.warning(msg, {missing_doi: downloads[missing_doi] for missing_doi in list(sset)})
 
     # keep the two separate until we introduce POAs? or just always
     return {'views': views, 'downloads': downloads}

@@ -16,7 +16,7 @@ def update_article(row):
     }
     ensure(data['doi'].startswith(settings.DOI_PREFIX), "refusing to create/update non-journal article: %s" % row)
     if not data['pmid']:
-        LOG.warn("no pmid for %s" % data['doi'])
+        LOG.warning("no pmid for %s" % data['doi'])
 
     # the doi values in the csv data look perfect and I've never had a problem with them
     # however
