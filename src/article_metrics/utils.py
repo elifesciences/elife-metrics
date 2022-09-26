@@ -1,3 +1,4 @@
+import itertools
 import threading
 import time
 import os, json, copy
@@ -10,6 +11,12 @@ import dateutil.parser
 import pytz
 
 LOG = logging.getLogger(__name__)
+
+def ensure(assertion, msg, exception_class=AssertionError):
+    """intended as a convenient replacement for `assert` statements that
+    get compiled away with -O flags"""
+    if not assertion:
+        raise exception_class(msg)
 
 lmap = lambda func, *iterable: list(map(func, *iterable))
 lfilter = lambda func, *iterable: list(filter(func, *iterable))
@@ -34,8 +41,30 @@ def comp(*fns):
 
 # http://stackoverflow.com/questions/3744451/is-this-how-you-paginate-or-is-there-a-better-algorithm
 def paginate(seq, rowlen):
+    ensure(rowlen > 0, "rowlen must be greater than zero")
     for start in range(0, len(seq), rowlen):
         yield seq[start:start + rowlen]
+
+def paginate_v2(seq, rowlen):
+    "just like `paginate` but doesn't need to know the length of the given `seq` to generate pages."
+    ensure(rowlen > 0, "rowlen must be greater than zero")
+
+    # if given `seq` is a regular list then it won't be consumed as we page through it.
+    # in non-lazy cases our starting point in the list must be offset by the number of pages we've already seen.
+    is_lazy = not isinstance(seq, list)
+
+    for start in itertools.count(0, step=rowlen): # an infinite set of pages
+        if is_lazy:
+            start = 0
+
+        # we can't slice a lazy sequence normally so we use `islice` and realise the result.
+        result = list(itertools.islice(seq, start, start + rowlen))
+
+        # if the `seq` is fully consumed slicing it will return an empty list.
+        # in this case yield nothing and quit.
+        if not result:
+            return
+        yield result
 
 def complement(pred):
     @wraps(pred)
@@ -81,12 +110,6 @@ def firstnn(x):
 
 def rest(x):
     return x[1:]
-
-def ensure(assertion, msg, exception_class=AssertionError):
-    """intended as a convenient replacement for `assert` statements that
-    get compiled away with -O flags"""
-    if not assertion:
-        raise exception_class(msg)
 
 def pad_msid(msid):
     return str(int(msid)).zfill(5)

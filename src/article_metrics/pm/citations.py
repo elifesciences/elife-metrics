@@ -69,8 +69,9 @@ def resolve_pmcid(artobj):
 #
 
 def fetch(pmcid_list):
-    ensure(len(pmcid_list) <= MAX_PER_PAGE,
-           "no more than %s results can be processed per-request. requested: %s" % (MAX_PER_PAGE, len(pmcid_list)))
+    pmcid_list_len = len(list(pmcid_list))
+    ensure(pmcid_list_len <= MAX_PER_PAGE,
+           "no more than %s results can be processed per-request. requested: %s" % (MAX_PER_PAGE, pmcid_list_len))
     headers = {
         'accept': 'application/json'
     }
@@ -117,6 +118,16 @@ def fetch_parse(pmcid_list):
     # ... to be parsed all at once.
     return lmap(parse_result, results)
 
+def fetch_parse_v2(pmcid_list):
+    """pages through all results for a list of PMC ids (can be just one) and parses the results.
+    version 2 processes results lazily.
+    the given `pmcid_list` doesn't *have* to be lazy but it's probably best."""
+    for page, sub_pmcid_list in enumerate(utils.paginate_v2(pmcid_list, MAX_PER_PAGE)):
+        LOG.debug("page %s, %s per-page", page + 1, MAX_PER_PAGE)
+        resp = fetch(sub_pmcid_list)
+        for result in resp.json()["linksets"]:
+            yield parse_result(result)
+
 def process_results(results):
     "post process the parsed results"
 
@@ -126,6 +137,16 @@ def process_results(results):
 
     data = lfilter(good_row, results)
     return data
+
+def process_results_v2(results):
+    """post process the parsed results.
+    version 2 processes the results lazily."""
+
+    def good_row(row):
+        # need to figure out where these are sneaking in
+        return row['pmcid'] != 'PMC0'
+
+    return filter(good_row, results)
 
 #
 # results for individual articles
@@ -147,7 +168,14 @@ def count_for_msid(msid):
 #
 
 def count_for_qs(qs):
-    return process_results(fetch_parse(lmap(resolve_pmcid, qs)))
+    """the queryset `qs` fetches objects in chunks of 2000 by default when using iterator().
+    `resolve_pmcid` will consume each of those objects one by one,
+    possibly doing a network fetch and a db upsert if IDs are not present,
+    and yielding a list of maps behind it.k
+    `fetch_parse_v2` will consume this list in batches of `MAX_PER_PAGE`,
+    processing each search result in the page before yielding them individually to logic.import_pmc_citations,
+    that will upsert (or not) each result into the db individually."""
+    return process_results_v2(fetch_parse_v2(map(resolve_pmcid, qs)))
 
 def citations_for_all_articles():
-    return count_for_qs(models.Article.objects.all())
+    return count_for_qs(models.Article.objects.all().iterator())

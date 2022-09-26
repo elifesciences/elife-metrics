@@ -1,4 +1,9 @@
-"""PMC provide a CSV of it's DB via FTP."""
+"""PMC provide a CSV of it's DB via FTP.
+If the `import_metrics` management command cannot find a PMID for an article it will go fetch it.
+The number of fetches can be amortised by bulk loading this CSV file.
+See `download-pmcids.sh` to download *and* populate the database.
+"""
+
 from article_metrics import models, utils
 from article_metrics.utils import create_or_update, lmap, ensure
 from django.conf import settings

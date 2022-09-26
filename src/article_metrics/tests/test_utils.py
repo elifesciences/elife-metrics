@@ -1,3 +1,4 @@
+import typing
 from article_metrics import utils, models
 from . import base
 import pytz
@@ -126,3 +127,35 @@ class TestUtils(base.BaseCase):
         ]
         for given, expected in cases:
             self.assertEqual(utils.msid2doi(given), expected)
+
+def test_paginate():
+    cases = [
+        ([1, 2, 3], 1, [[1], [2], [3]]),
+        ([1, 2, 3], 2, [[1, 2], [3]]),
+        ([1, 2, 3], 3, [[1, 2, 3]]),
+        ([1, 2, 3], 4, [[1, 2, 3]]),
+    ]
+    for seq, rowlen, expected in cases:
+        result = utils.paginate(seq, rowlen)
+        assert isinstance(result, typing.Generator)
+        assert list(result) == expected
+
+def test_paginate_v2():
+    cases = [
+        ([1, 2, 3], 1, [[1], [2], [3]]),
+        ([1, 2, 3], 2, [[1, 2], [3]]),
+        ([1, 2, 3], 3, [[1, 2, 3]]),
+        ([1, 2, 3], 4, [[1, 2, 3]]),
+    ]
+    # v2 handles regular lists like v1
+    for seq, rowlen, expected in cases:
+        result = utils.paginate_v2(seq, rowlen)
+        assert isinstance(result, typing.Generator)
+        assert list(result) == expected, 'failed case: %s' % expected
+
+    # v2 also handles lazy lists
+    for seq, rowlen, expected in cases:
+        lazy_seq = iter(seq)
+        result = utils.paginate_v2(lazy_seq, rowlen)
+        assert isinstance(result, typing.Generator)
+        assert list(result) == expected, 'failed case: %s' % expected
