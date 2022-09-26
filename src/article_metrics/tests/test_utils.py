@@ -147,7 +147,15 @@ def test_paginate_v2():
         ([1, 2, 3], 3, [[1, 2, 3]]),
         ([1, 2, 3], 4, [[1, 2, 3]]),
     ]
+    # v2 handles regular lists like v1
     for seq, rowlen, expected in cases:
         result = utils.paginate_v2(seq, rowlen)
         assert isinstance(result, typing.Generator)
-        assert list(result) == expected
+        assert list(result) == expected, 'failed case: %s' % expected
+
+    # v2 also handles lazy lists
+    for seq, rowlen, expected in cases:
+        lazy_seq = iter(seq)
+        result = utils.paginate_v2(lazy_seq, rowlen)
+        assert isinstance(result, typing.Generator)
+        assert list(result) == expected, 'failed case: %s' % expected
