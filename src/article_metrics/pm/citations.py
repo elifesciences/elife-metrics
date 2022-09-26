@@ -168,13 +168,13 @@ def count_for_msid(msid):
 #
 
 def count_for_qs(qs):
-    # the queryset fetches objects in chunks of 2000 (by default) when using iterator().
-    # resolve_pmcid will consume each of those objects one by one,
-    # possibly doing a network fetch and a db upsert,
-    # and yielding a list of maps behind it that
-    # lazy_fetch_parse will consume, accumulating in batches of MAX_PER_PAGE,
-    # processing the search results before yielding them to logic.import_pmc_citations,
-    # that is upserting each result into the db individually.
+    """the queryset `qs` fetches objects in chunks of 2000 by default when using iterator().
+    `resolve_pmcid` will consume each of those objects one by one,
+    possibly doing a network fetch and a db upsert if IDs are not present,
+    and yielding a list of maps behind it.k
+    `fetch_parse_v2` will consume this list in batches of `MAX_PER_PAGE`,
+    processing each search result in the page before yielding them individually to logic.import_pmc_citations,
+    that will upsert (or not) each result into the db individually."""
     return process_results_v2(fetch_parse_v2(map(resolve_pmcid, qs)))
 
 def citations_for_all_articles():
