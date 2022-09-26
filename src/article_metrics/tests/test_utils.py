@@ -140,14 +140,14 @@ def test_paginate():
         assert isinstance(result, typing.Generator)
         assert list(result) == expected
 
-def test_lazy_paginate():
+def test_paginate_v2():
     cases = [
         ([1, 2, 3], 1, [[1], [2], [3]]),
-        #([1,2,3], 2, [[1, 2], [3]]),
-        #([1,2,3], 3, [[1, 2, 3]]),
-        #([1,2,3], 4, [[1, 2, 3]]),
+        ([1, 2, 3], 2, [[1, 2], [3]]),
+        ([1, 2, 3], 3, [[1, 2, 3]]),
+        ([1, 2, 3], 4, [[1, 2, 3]]),
     ]
     for seq, rowlen, expected in cases:
-        result = utils.lazy_paginate(seq, rowlen)
+        result = utils.paginate_v2(seq, rowlen)
         assert isinstance(result, typing.Generator)
         assert list(result) == expected
