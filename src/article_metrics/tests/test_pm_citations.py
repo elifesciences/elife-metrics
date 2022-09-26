@@ -110,8 +110,8 @@ class One(base.BaseCase):
             'num': expected_citations,
             'source_id': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4559886/'}]
 
-        results = citations.citations_for_all_articles()
-        self.assertEqual(results, expected)
+        results = list(citations.citations_for_all_articles())
+        assert results == expected
 
     @responses.activate
     def test_count_response(self):
