@@ -2,7 +2,7 @@ import requests
 import logging
 from django.conf import settings
 from article_metrics import models, handler, utils
-from article_metrics.utils import first, flatten, simple_rate_limiter, lmap, lfilter, isint, ParseError, ensure
+from article_metrics.utils import first, flatten, simple_rate_limiter, lfilter, isint, ParseError, ensure
 
 LOG = logging.getLogger(__name__)
 
@@ -84,10 +84,10 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 def parse_entry(entry):
     "parses a single search result from scopus"
     try:
-        citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
         ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
         ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
         ensure(isint(entry['citedby-count']), "citedby count isn't an integer", ParseError)
+        citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
 
         if isinstance(entry['prism:doi'], list):
             weird_key = "$"
@@ -116,26 +116,16 @@ def parse_entry(entry):
         LOG.warning("discarding scopus citation: failed to parse entry", extra={'response': entry})
         return {'bad': entry}
 
-def parse_results(search_result):
+def parse_result_page(search_result):
     "parses citation counts from a page of search results from scopus"
-    return lmap(parse_entry, search_result['entry'])
+    return map(parse_entry, search_result['entry'])
 
 def all_entries(search_result_list):
     "returns a list of 'entries', citation information for articles from a *list* of search result pages"
-    return flatten([parse_results(result) for result in search_result_list])
+    return flatten(map(parse_result_page, search_result_list))
 
-def is_abstract(entry):
-    # ll 10.7554/eLife.22757.001
-    return len(entry['doi'].split('.')) == 4
-
-def not_abstract(entry):
-    return not is_abstract(entry)
-
-#
-#
-#
+# ---
 
 def all_todays_entries():
     "convenience"
-    # return filter(not_abstract, all_entries(list(search())))
-    return all_entries(list(search()))
+    return all_entries(search())
