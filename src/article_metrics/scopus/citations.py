@@ -84,10 +84,10 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
 def parse_entry(entry):
     "parses a single search result from scopus"
     try:
+        citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
         ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
         ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
         ensure(isint(entry['citedby-count']), "citedby count isn't an integer", ParseError)
-        citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
 
         if isinstance(entry['prism:doi'], list):
             weird_key = "$"
