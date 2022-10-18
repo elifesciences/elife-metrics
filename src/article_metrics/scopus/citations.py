@@ -85,8 +85,8 @@ def parse_entry(entry):
     "parses a single search result from scopus"
     try:
         citedby_link = first(lfilter(lambda d: d["@ref"] == "scopus-citedby", entry['link']))
-        ensure('prism:doi' in entry, "entry is missing 'doi'!", ParseError)
-        ensure('citedby-count' in entry, "entry is missing 'citedby-count'!", ParseError)
+        ensure('prism:doi' in entry, "entry is missing 'doi'", ParseError)
+        ensure('citedby-count' in entry, "entry is missing 'citedby-count'", ParseError)
         ensure(isint(entry['citedby-count']), "citedby count isn't an integer", ParseError)
 
         if isinstance(entry['prism:doi'], list):
@@ -108,12 +108,12 @@ def parse_entry(entry):
 
     # errors handled here won't be caught by handler.capture_parse_error
 
-    except AssertionError:
-        LOG.warning("discarding scopus citation: failed to parse doi", extra={'response': entry})
+    except AssertionError as ae:
+        LOG.debug("discarding scopus citation, failed to parse doi %r: %s" % (entry.get('prism:doi'), str(ae)), extra={'response': entry})
         return {'bad': entry}
 
-    except ParseError:
-        LOG.warning("discarding scopus citation: failed to parse entry", extra={'response': entry})
+    except ParseError as pe:
+        LOG.warning("discarding scopus citation, failed to parse search result: %s", str(pe), extra={'response': entry})
         return {'bad': entry}
 
 def parse_result_page(search_result):
