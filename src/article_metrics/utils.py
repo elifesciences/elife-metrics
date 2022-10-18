@@ -117,16 +117,16 @@ def pad_msid(msid):
 def doi2msid(doi, safe=False, allow_subresource=True):
     "doi to manuscript id used in EJP"
     try:
-        ensure(isinstance(doi, str), "unparseable elife doi, expecting a string, got %s" % type(doi))
+        ensure(isinstance(doi, str), "expecting a string, got %s" % type(doi))
         prefix = '10.7554/elife.'
-        ensure(doi.lower().startswith(prefix), "unparseable elife doi, unrecognised prefix")
+        ensure(doi.lower().startswith(prefix), "unrecognised prefix")
         stripped = doi[len(prefix):].lstrip('0')
         # handles dois like: 10.7554/eLife.09560.001
         bits = stripped.split('.', 1)
         if not allow_subresource:
-            ensure(len(bits) == 1, "refusing to parse elife doi further, subresource detected")
+            ensure(len(bits) == 1, "subresource detected") # business rule, we don't count sub-resources
         stripped = bits[0]
-        ensure(isint(stripped), "unparseable elife doi, manuscript ID is not an integer")
+        ensure(isint(stripped), "manuscript ID is not an integer")
         return int(stripped)
     except AssertionError:
         if safe:

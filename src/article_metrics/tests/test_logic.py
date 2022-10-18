@@ -28,7 +28,13 @@ class One(BaseCase):
 
     def test_import_scopus_citations(self):
         search_results = json.load(open(join(self.fixture_dir, "scopus-responses", "dodgy-scopus-results.json"), "r"))
-        fixture = scopus_citations.parse_results(search_results)
+        fixture = scopus_citations.parse_result_page(search_results)
+        # lsh@2022-10-17: `parse_result_page` is now lazy.
+        # calling `len` on it to find the expected number of entries will fail,
+        # calling `list` on it may skew the test,
+        # calling `list` on it during the `expected` check will produce 0 as it has been consumed.
+        # instead, read in a copy and then realise it with `list`.
+        realised_fixture = list(scopus_citations.parse_result_page(search_results))
         with mock.patch("article_metrics.scopus.citations.all_todays_entries", return_value=fixture):
             logic.import_scopus_citations()
 
@@ -36,7 +42,7 @@ class One(BaseCase):
             unknown_doi_prefixes = 1
             subresource_dois = 2
             bad_eggs = unparseable_entries + unknown_doi_prefixes + subresource_dois
-            expected = len(fixture) - bad_eggs
+            expected = len(realised_fixture) - bad_eggs
             self.assertEqual(models.Article.objects.count(), expected)
 
 class Two(BaseCase):
