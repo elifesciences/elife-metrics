@@ -13,7 +13,7 @@ MAX_PER_PAGE = 200 # we can actually go as high as ~800
 
 def norm_pmcid(pmcid):
     "returns the integer form of a pmc id, stripping any leading 'pmc' prefix."
-    if not pmcid:
+    if pmcid is None or not str(pmcid).strip():
         return None
     if str(pmcid).lower().startswith('pmc'):
         return pmcid[3:]
