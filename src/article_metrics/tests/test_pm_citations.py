@@ -5,22 +5,25 @@ from . import base
 from article_metrics.pm import citations
 from article_metrics import models
 
+def test_norm_pmcid():
+    cases = [
+        (None, None),
+        ('', None),
+        (1, '1'),
+        (1234567, '1234567'),
+        ('1234567', '1234567'),
+        ('PMC1', '1'),
+        ('PMC1234567', '1234567')
+    ]
+    for given, expected in cases:
+        assert citations.norm_pmcid(given) == expected
+
+
 class One(base.BaseCase):
     def setUp(self):
         self.doi = '10.7554/eLife.09560'
         self.pmid = '26354291'
         self.pmcid = 'PMC4559886'
-
-    def test_norm_pmcid(self):
-        cases = [
-            (1, '1'),
-            (1234567, '1234567'),
-            ('1234567', '1234567'),
-            ('PMC1', '1'),
-            ('PMC1234567', '1234567')
-        ]
-        for given, expected in cases:
-            self.assertEqual(expected, citations.norm_pmcid(given))
 
     @responses.activate
     def test_fetch_pmids(self):
