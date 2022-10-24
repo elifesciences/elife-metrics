@@ -13,6 +13,8 @@ MAX_PER_PAGE = 200 # we can actually go as high as ~800
 
 def norm_pmcid(pmcid):
     "returns the integer form of a pmc id, stripping any leading 'pmc' prefix."
+    if pmcid is None or not str(pmcid).strip():
+        return None
     if str(pmcid).lower().startswith('pmc'):
         return pmcid[3:]
     return str(pmcid)
@@ -78,7 +80,7 @@ def fetch(pmcid_list):
     params = {
         'dbfrom': 'pubmed',
         'linkname': 'pmc_pmc_citedby',
-        'id': lmap(norm_pmcid, pmcid_list),
+        'id': [norm_pmcid(pmcid) for pmcid in pmcid_list if pmcid],
         'tool': 'elife-metrics',
         'email': settings.CONTACT_EMAIL,
         'retmode': 'json'
