@@ -8,10 +8,9 @@ python_version = "3.8"
 
 [packages]
 boto3 = "~=1.9"
-# dependency of 'google-api-python-client' but can be used 
+# also a dependency of 'google-api-python-client' but can be used 
 # with 'kids.cache' for caches with timers.
 cachetools = "~=4.2"
-cryptography = "~=3.2"
 django-annoying = "~=0.10"
 djangorestframework = "~=3.9"
 et3 = "~=1.5"
