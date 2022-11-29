@@ -49,6 +49,8 @@ def cfg(path, default=0xDEADBEEF):
     except Exception as err:
         print(('error on %r: %s' % (path, err)))
 
+GA4_SWITCH = datetime.strptime("2023-12-31T00:00Z")
+
 # used to know how far to go back in metrics gathering
 INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
 DOI_PREFIX = cfg('journal.doi-prefix')

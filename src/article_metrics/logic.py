@@ -1,14 +1,11 @@
 from functools import partial
 from datetime import datetime, timedelta
-from . import ga_metrics
-from .ga_metrics import bulk
+from . import ga_metrics as ga3_metrics, models, utils, events
+
 from django.conf import settings
-from . import models
 from django.db import transaction
-from . import utils
 from .utils import first, create_or_update, ensure, splitfilter, comp, run, lfilter
 import logging
-from . import events
 
 LOG = logging.getLogger(__name__)
 
@@ -91,6 +88,7 @@ def create_row(doi, period, views, downloads):
     return row
 
 def _insert_row(data):
+    "creates or updates a Metric in the database using `data`."
     article_obj = get_create_article({'doi': data['doi']})
     if not article_obj:
         LOG.warning("refusing to insert bad metric", extra={'row-data': data})
@@ -111,24 +109,13 @@ def insert_many_rows(data_list):
     "inserts all items in given `data_list` using a single transaction."
     run(_insert_row, data_list)
 
-def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
+def import_ga3_metrics(metrics_type, from_date, to_date, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from the inception date in `settings.py`"
-    ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
-
     table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
-    the_beginning = ga_metrics.core.VIEWS_INCEPTION
-    yesterday = datetime.now() - timedelta(days=1)
-
-    if not from_date:
-        from_date = the_beginning
-
-    if not to_date:
-        # don't import today's partial results. they're available but lets wait until tomorrow
-        to_date = yesterday
 
     f = {
-        'daily': bulk.daily_metrics_between,
-        'monthly': bulk.monthly_metrics_between,
+        'daily': ga3_metrics.bulk.daily_metrics_between,
+        'monthly': ga3_metrics.bulk.monthly_metrics_between,
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
 
@@ -140,6 +127,28 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         row_list = [create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
         # insert rows in batches of 1000
         run(insert_many_rows, utils.partition(row_list, 1000))
+
+def import_ga4_metrics(metrics_type, from_date, to_date):
+    pass
+
+def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, *args, **kwargs):
+    ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
+
+    the_beginning = ga3_metrics.core.VIEWS_INCEPTION # TODO: move these to settings.py
+    yesterday = datetime.now() - timedelta(days=1)
+
+    if not from_date:
+        from_date = the_beginning
+
+    if not to_date:
+        # don't import today's partial results. they're available but lets wait until tomorrow
+        to_date = yesterday
+
+    if from_date < settings.GA4_SWITCH:
+        return import_ga3_metrics(metrics_type, from_date, *args, **kwargs)
+
+    return import_ga4_metrics(metrics_type, from_date, *args, **kwargs)
+
 
 #
 # citations
