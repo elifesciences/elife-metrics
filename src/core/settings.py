@@ -49,8 +49,6 @@ def cfg(path, default=0xDEADBEEF):
     except Exception as err:
         print(('error on %r: %s' % (path, err)))
 
-GA4_SWITCH = datetime.strptime("2023-12-31T00:00Z")
-
 # used to know how far to go back in metrics gathering
 INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
 DOI_PREFIX = cfg('journal.doi-prefix')
@@ -305,3 +303,15 @@ LOGGING = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+# ---
+
+GA4_SWITCH = "2023-12-31T00:00Z"
+
+# TODO: remove in favour of SECRETS_LOCATION
+GA_SECRETS_LOCATION_LIST = [
+    os.path.join(PROJECT_DIR, 'client-secrets.json'),
+    '/etc/elife-ga-metrics/client-secrets.json'
+]
+
+GA_SECRETS_LOCATION = cfg('ga.oauth-secrets-path')

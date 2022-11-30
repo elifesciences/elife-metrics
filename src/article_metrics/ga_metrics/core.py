@@ -20,12 +20,6 @@ from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6
 
 LOG = logging.getLogger(__name__)
 
-# TODO: shift this into settings.py/app.cfg
-SECRETS_LOCATIONS = [
-    'client-secrets.json',
-    '/etc/elife-ga-metrics/client-secrets.json'
-]
-
 MAX_GA_RESULTS = 10000
 
 # lsh@2021-12: test logic doesn't belong here. replace with a mock during testing
@@ -139,10 +133,9 @@ def sanitize_ga_response(ga_response):
     return ga_response
 
 def oauth_secrets():
-    settings_file_locations = SECRETS_LOCATIONS
-    settings_file = firstof(os.path.exists, settings_file_locations)
+    settings_file = firstof(os.path.exists, settings.GA_SECRETS_LOCATION_LIST)
     if not settings_file:
-        loc_list = '\n'.join(settings_file_locations)
+        loc_list = '\n'.join(settings.GA_SECRETS_LOCATION_LIST)
         msg = "could not find the credentials file! I looked here:\n%s" % loc_list
         raise EnvironmentError(msg)
     return settings_file

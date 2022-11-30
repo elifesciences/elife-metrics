@@ -1,7 +1,6 @@
 from functools import partial
 from datetime import datetime, timedelta
-from . import ga_metrics as ga3_metrics, models, utils, events
-
+from . import ga_metrics as ga3_metrics, ga4_metrics, models, utils, events
 from django.conf import settings
 from django.db import transaction
 from .utils import first, create_or_update, ensure, splitfilter, comp, run, lfilter
@@ -69,24 +68,6 @@ def get_create_article(data):
         # it shouldn't get to this point!
         LOG.warning("refusing to fetch/create bad article: %s" % err, extra={'article-data': data})
 
-#
-#
-#
-
-def create_row(doi, period, views, downloads):
-    "wrangles the data into a format suitable for `insert_row`"
-    views = views or {
-        'full': 0,
-        'abstract': 0,
-        'digest': 0,
-    }
-    views['pdf'] = downloads or 0
-    views['doi'] = doi
-    views['source'] = models.GA
-    row = dict(list(zip(['period', 'date'], format_dt_pair(period))))
-    row.update(views)
-    return row
-
 def _insert_row(data):
     "creates or updates a Metric in the database using `data`."
     article_obj = get_create_article({'doi': data['doi']})
@@ -109,6 +90,20 @@ def insert_many_rows(data_list):
     "inserts all items in given `data_list` using a single transaction."
     run(_insert_row, data_list)
 
+def _create_row(doi, period, views, downloads):
+    "wrangles the data into a format suitable for `insert_row`"
+    views = views or {
+        'full': 0,
+        'abstract': 0,
+        'digest': 0,
+    }
+    views['pdf'] = downloads or 0
+    views['doi'] = doi
+    views['source'] = models.GA
+    row = dict(list(zip(['period', 'date'], format_dt_pair(period))))
+    row.update(views)
+    return row
+
 def import_ga3_metrics(metrics_type, from_date, to_date, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from the inception date in `settings.py`"
     table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
@@ -124,12 +119,12 @@ def import_ga3_metrics(metrics_type, from_date, to_date, use_cached=True, use_on
         # there is often a disjoint between articles that have been viewed and those downloaded within a period
         # what we do is create a record for *all* articles seen, even if their views or downloads may not exist
         doi_list = set(views.keys()).union(list(downloads.keys()))
-        row_list = [create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
+        row_list = [_create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
         # insert rows in batches of 1000
         run(insert_many_rows, utils.partition(row_list, 1000))
 
 def import_ga4_metrics(metrics_type, from_date, to_date):
-    pass
+    ga4_metrics.core.daily_metrics_between(from_date, to_date)
 
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, *args, **kwargs):
     ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
