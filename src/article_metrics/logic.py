@@ -90,7 +90,7 @@ def insert_many_rows(data_list):
     "inserts all items in given `data_list` using a single transaction."
     run(_insert_row, data_list)
 
-def _create_row(doi, period, views, downloads):
+def create_row(doi, period, views, downloads):
     "wrangles the data into a format suitable for `insert_row`"
     views = views or {
         'full': 0,
@@ -104,10 +104,11 @@ def _create_row(doi, period, views, downloads):
     row.update(views)
     return row
 
-def import_ga_metrics(metrics_type, from_date, to_date, use_cached=True, use_only_cached=False):
+def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from the inception date in `settings.py`"
     ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
 
+    table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
     the_beginning = ga_metrics.core.VIEWS_INCEPTION
     yesterday = datetime.now() - timedelta(days=1)
 
@@ -117,8 +118,6 @@ def import_ga_metrics(metrics_type, from_date, to_date, use_cached=True, use_onl
     if not to_date:
         # don't import today's partial results. they're available but lets wait until tomorrow
         to_date = yesterday
-
-    table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
 
     f = {
         'daily': ga_metrics.bulk.daily_metrics_between,
@@ -131,10 +130,9 @@ def import_ga_metrics(metrics_type, from_date, to_date, use_cached=True, use_onl
         # there is often a disjoint between articles that have been viewed and those downloaded within a period
         # what we do is create a record for *all* articles seen, even if their views or downloads may not exist
         doi_list = set(views.keys()).union(list(downloads.keys()))
-        row_list = [_create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
+        row_list = [create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
         # insert rows in batches of 1000
         run(insert_many_rows, utils.partition(row_list, 1000))
-
 
 #
 # citations
