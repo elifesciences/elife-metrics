@@ -93,7 +93,7 @@ class TestGAImport(BaseCase):
             return fixture
 
         with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
-            logic.import_ga_metrics(from_date=day_to_import, to_date=day_to_import, use_only_cached=True)
+            logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import, use_only_cached=True)
         # we know this day reveals this many articles
         # expected_article_count = 1090 # changed when we introduced POA articles
         #expected_article_count = 1119

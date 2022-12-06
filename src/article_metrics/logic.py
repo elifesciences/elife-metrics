@@ -1,6 +1,6 @@
 from functools import partial
 from datetime import datetime, timedelta
-from . import ga_metrics as ga3_metrics, ga4_metrics, models, utils, events
+from . import ga_metrics, models, utils, events
 from django.conf import settings
 from django.db import transaction
 from .utils import first, create_or_update, ensure, splitfilter, comp, run, lfilter
@@ -104,13 +104,25 @@ def _create_row(doi, period, views, downloads):
     row.update(views)
     return row
 
-def import_ga3_metrics(metrics_type, from_date, to_date, use_cached=True, use_only_cached=False):
+def import_ga_metrics(metrics_type, from_date, to_date, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from the inception date in `settings.py`"
+    ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
+
+    the_beginning = ga_metrics.core.VIEWS_INCEPTION
+    yesterday = datetime.now() - timedelta(days=1)
+
+    if not from_date:
+        from_date = the_beginning
+
+    if not to_date:
+        # don't import today's partial results. they're available but lets wait until tomorrow
+        to_date = yesterday
+
     table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
 
     f = {
-        'daily': ga3_metrics.bulk.daily_metrics_between,
-        'monthly': ga3_metrics.bulk.monthly_metrics_between,
+        'daily': ga_metrics.bulk.daily_metrics_between,
+        'monthly': ga_metrics.bulk.monthly_metrics_between,
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
 
@@ -122,27 +134,6 @@ def import_ga3_metrics(metrics_type, from_date, to_date, use_cached=True, use_on
         row_list = [_create_row(doi, period, views.get(doi), downloads.get(doi)) for doi in doi_list]
         # insert rows in batches of 1000
         run(insert_many_rows, utils.partition(row_list, 1000))
-
-def import_ga4_metrics(metrics_type, from_date, to_date):
-    ga4_metrics.core.daily_metrics_between(from_date, to_date)
-
-def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, *args, **kwargs):
-    ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
-
-    the_beginning = ga3_metrics.core.VIEWS_INCEPTION # TODO: move these to settings.py
-    yesterday = datetime.now() - timedelta(days=1)
-
-    if not from_date:
-        from_date = the_beginning
-
-    if not to_date:
-        # don't import today's partial results. they're available but lets wait until tomorrow
-        to_date = yesterday
-
-    if from_date < settings.GA4_SWITCH:
-        return import_ga3_metrics(metrics_type, from_date, *args, **kwargs)
-
-    return import_ga4_metrics(metrics_type, from_date, *args, **kwargs)
 
 
 #

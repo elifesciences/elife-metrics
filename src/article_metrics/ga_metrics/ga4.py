@@ -28,7 +28,7 @@ def ga_service():
     return service
 
 # pylint: disable=E1101
-def query_ga(query_map, num_attempts=5):
+def _query_ga(query_map, num_attempts=5):
     """talks to GA, executing the given `query_map`.
     applies exponential back-off if rate limited or when service is unavailable."""
 
@@ -88,7 +88,7 @@ def query_ga(query_map, num_attempts=5):
     raise AssertionError("Failed to execute query after %s attempts" % num_attempts)
 
 # copied from non-article metrics logic.py
-def query_ga_paginated(query, **kwargs):
+def query_ga(query, **kwargs):
     """performs given `query` and fetches any further pages.
     results are concatenated and returned as part of the last response dict as `rows`."""
 
@@ -98,7 +98,7 @@ def query_ga_paginated(query, **kwargs):
     page, results = 1, []
     while True:
         LOG.info("requesting page %s for query %s" % (page, query))  # ['filters']))
-        response = query_ga(query, **kwargs)
+        response = _query_ga(query, **kwargs)
         results.extend(response.get('rows') or [])
         if (results_pp * page) >= response['rowCount']:
             break # no more pages to fetch
@@ -110,7 +110,3 @@ def query_ga_paginated(query, **kwargs):
     response['-total-pages'] = page
 
     return response
-
-def daily_metrics_between(from_date, to_date):
-    from . import elife_v7
-    return query_ga_paginated(elife_v7.query(from_date, to_date))

@@ -12,15 +12,18 @@ from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
-from .utils import ymd, firstof, month_min_max, d2dt
+from .utils import ymd, firstof, month_min_max, d2dt, ensure
 from kids.cache import cache
 import logging
 from django.conf import settings
-from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6
+from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
+from . import ga4
+from article_metrics.utils import utcnow
 
 LOG = logging.getLogger(__name__)
 
 MAX_GA_RESULTS = 10000
+GA3, GA4 = 'ga3', 'ga4'
 
 # lsh@2021-12: test logic doesn't belong here. replace with a mock during testing
 def output_dir():
@@ -49,55 +52,46 @@ RDS_ADDITION = datetime(year=2020, month=2, day=21)
 # whitelisted urlparams
 URL_PARAMS = datetime(year=2021, month=11, day=30)
 
+# switch from ga3 to ga4
+GA4_SWITCH = datetime(year=2023, month=12, day=30) # todo: these are all naive datetimes
+
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
     daily = from_date == to_date
-    if daily:
-        if from_date > URL_PARAMS:
-            return elife_v6
+    monthly = not daily
 
-        if from_date >= RDS_ADDITION:
-            return elife_v5
+    if from_date > GA4_SWITCH:
+        return elife_v7
 
-        if from_date >= SITE_SWITCH_v2:
-            return elife_v4
+    if from_date > URL_PARAMS:
+        return elife_v6
 
-        if from_date > VERSIONLESS_URLS:
-            return elife_v3
+    if from_date >= RDS_ADDITION:
+        return elife_v5
 
-        if from_date > SITE_SWITCH:
-            return elife_v2
+    if from_date >= SITE_SWITCH_v2:
+        return elife_v4
 
-    # monthly/arbitrary range
-    else:
-        if from_date > URL_PARAMS:
-            return elife_v6
+    if monthly and \
+       (from_date, to_date) == VERSIONLESS_URLS_MONTH:
+        # business rule: if the given from-to dates represent a
+        # monthly date range and that date range is the same year+month
+        # we switched to versionless urls, use the v3 patterns.
+        return elife_v3
 
-        if from_date >= RDS_ADDITION:
-            return elife_v5
+    # if the site switched to versionless urls before our date range, use v3
+    if from_date > VERSIONLESS_URLS:
+        return elife_v3
 
-        if from_date >= SITE_SWITCH_v2:
-            return elife_v4
+    if from_date > SITE_SWITCH:
+        return elife_v2
 
-        if (from_date, to_date) == VERSIONLESS_URLS_MONTH:
-            # business rule: if the given from-to dates represent a
-            # monthly date range and that date range is the same year+month
-            # we switched to versionless urls, use the v3 patterns.
-            return elife_v3
-
-        # if the site switched to versionless urls before our date range, use v3
-        if from_date > VERSIONLESS_URLS:
-            return elife_v3
-
-        # if the site switch happened before the start our date range, use v2
-        if from_date > SITE_SWITCH:
-            return elife_v2
-
-        # TODO, WARN: partial month logic here
-        # if the site switch happened between our two dates, use new.
-        # if monthly, this means we lose 9 days of stats
-        if SITE_SWITCH > from_date and SITE_SWITCH < to_date:
-            return elife_v2
+    # TODO, WARN: partial month logic here
+    # if the site switch happened between our two dates, use new.
+    # if monthly, this means we lose 9 days of stats
+    if monthly and \
+       SITE_SWITCH > from_date and SITE_SWITCH < to_date:
+        return elife_v2
 
     return elife_v1
 
@@ -153,6 +147,11 @@ def ga_service():
     # - https://github.com/googleapis/google-api-python-client/issues/345
     service = build(service_name, 'v3', http=http, cache_discovery=False)
     return service
+
+def guess_ga(query_map):
+    return GA3 if 'ids' in query_map else GA4
+
+# --- GA3 logic
 
 # pylint: disable=E1101
 def _query_ga(query_map, num_attempts=5):
@@ -297,6 +296,53 @@ def query_ga_write_results(query, num_attempts=5):
     path = output_path_from_results(response)
     return response, write_results(response, path)
 
+# --- END GA3 LOGIC
+
+def output_path_v2(results_type, from_date_dt, to_date_dt):
+    "generates a path for results of the given type"
+    known_results_types = ['views', 'downloads',
+                           'blog-article', 'collection', 'digest', 'event', 'interview', 'labs-post', 'press-package']
+    ensure(results_type in known_results_types, "unknown results type %r: %s" % ", ".join(known_results_types))
+    ensure(isinstance(from_date_dt, datetime), "from_date_dt must be a datetime object")
+    ensure(isinstance(to_date_dt, datetime), "to_date_dt must be a datetime object")
+
+    from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
+    now_dt = utcnow()
+    now = ymd(now_dt)
+
+    # different formatting if two different dates are provided
+    if from_date == to_date:
+        dt_str = to_date
+    else:
+        dt_str = "%s_%s" % (from_date, to_date)
+
+    partial = ""
+    if to_date == now or to_date_dt >= now_dt:
+        # anything gathered today or for the future (month ranges)
+        # will only ever be partial. when run again on a future day
+        # there will be cache miss and the full results downloaded
+        partial = ".partial"
+
+    # ll: output/downloads/2014-04-01.json
+    # ll: output/views/2014-01-01_2014-01-31.json.partial
+    return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json" + partial)
+
+def write_results_v2(results, path):
+    "writes `results` as json to the given `path`"
+    dirname = os.path.dirname(path)
+    ensure(os.path.exists(dirname), "output directory does not exist: %s" % path)
+    LOG.info("writing %r", path)
+    json.dump(results, open(path, 'w'), indent=4, sort_keys=True)
+
+def query_ga_write_results_v2(query_map, from_date_dt, to_date_dt, results_type, **kwargs):
+    if guess_ga(query_map) == GA3:
+        return query_ga_write_results(query_map, **kwargs)
+
+    results = ga4.query_ga(query_map, **kwargs)
+    path = output_path_v2(results_type, from_date_dt, to_date_dt)
+    write_results_v2(results, path)
+    return results, path
+
 #
 #
 #
@@ -307,7 +353,7 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
         LOG.warning("given date range %r for views is older than known inception %r, skipping", (ymd(from_date), ymd(to_date)), VIEWS_INCEPTION)
         return {}
 
-    path = output_path('views', from_date, to_date)
+    path = output_path_v2('views', from_date, to_date)
     module = module_picker(from_date, to_date)
     if cached and os.path.exists(path):
         raw_data = json.load(open(path, 'r'))
@@ -318,7 +364,7 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
     else:
         # talk to google
         query_map = module.path_counts_query(table_id, from_date, to_date)
-        raw_data, actual_path = query_ga_write_results(query_map)
+        raw_data, actual_path = query_ga_write_results_v2(query_map, 'views', from_date, to_date)
         assert path == actual_path, "the expected output path (%s) doesn't match the path actually written to (%s)" % (path, actual_path)
     return module.path_counts(raw_data.get('rows', []))
 
@@ -327,7 +373,7 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
     if not valid_downloads_dt_pair((from_date, to_date)):
         LOG.warning("given date range %r for downloads is older than known inception %r, skipping", (ymd(from_date), ymd(to_date)), DOWNLOADS_INCEPTION)
         return {}
-    path = output_path('downloads', from_date, to_date)
+    path = output_path_v2('downloads', from_date, to_date)
     module = module_picker(from_date, to_date)
     if cached and os.path.exists(path):
         raw_data = json.load(open(path, 'r'))
@@ -338,7 +384,7 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
     else:
         # talk to google
         query_map = module.event_counts_query(table_id, from_date, to_date)
-        raw_data, actual_path = query_ga_write_results(query_map)
+        raw_data, actual_path = query_ga_write_results_v2(query_map, 'downloads', from_date, to_date)
         assert path == actual_path, "the expected output path (%s) doesn't match the path actually written to (%s)" % (path, actual_path)
     return module.event_counts(raw_data.get('rows', []))
 

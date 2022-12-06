@@ -95,6 +95,7 @@ def deplumpen(artid):
         raise ValueError(msg)
 
 def d2dt(d):
+    "convert date `d` to a `datetime` object"
     if isinstance(d, datetime):
         return d
     return datetime(year=d.year, month=d.month, day=d.day, hour=0, minute=0, second=0)

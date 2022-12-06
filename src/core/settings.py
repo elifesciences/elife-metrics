@@ -306,8 +306,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # ---
 
-GA4_SWITCH = "2023-12-31T00:00Z"
-
 # TODO: remove in favour of SECRETS_LOCATION
 GA_SECRETS_LOCATION_LIST = [
     os.path.join(PROJECT_DIR, 'client-secrets.json'),
