@@ -297,8 +297,6 @@ def query_ga_write_results(query, num_attempts=5):
     return response, write_results(response, path)
 
 
-
-
 # --- bulk
 
 
@@ -330,7 +328,7 @@ def generate_queries(table_id, query_func_name, datetime_list, use_cached=False,
         if use_only_cached:
             LOG.info("skipping google query, using only cache files")
             continue
-        
+
         q = query_func(table_id, start_date, end_date)
         query_list.append(q)
 
@@ -357,7 +355,7 @@ def metrics_for_range(table_id, dt_range_list, use_cached=False, use_only_cached
 
 def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_only_cached=False):
     "does a DAILY query between two dates, NOT a single query within a date range"
-    
+
     date_list = utils.dt_range(from_date, to_date)
     query_list = []
 
@@ -372,7 +370,7 @@ def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_onl
                                        'event_counts_query',
                                        pdf_dt_range,
                                        use_cached, use_only_cached))
-    
+
     bulk_query(query_list)
 
     # everything should be cached by now
@@ -400,31 +398,8 @@ def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_o
     use_cached = True # DELIBERATE
     return metrics_for_range(table_id, views_dt_range, use_cached, use_only_cached)
 
-#
-#
-#
-
-def regenerate_results(table_id, from_date=VIEWS_INCEPTION):
-    "this will perform all queries again, overwriting the results in `output`"
-    today = datetime.now()
-    use_cached, use_only_cached = False, False
-    LOG.info("querying daily metrics ...")
-    daily_metrics_between(table_id,
-                          from_date,
-                          today,
-                          use_cached, use_only_cached)
-
-    LOG.info("querying monthly metrics ...")
-    monthly_metrics_between(table_id,
-                            from_date,
-                            today,
-                            use_cached, use_only_cached)
-
 
 # --- endbulk
-
-
-
 
 
 # --- END GA3 LOGIC
