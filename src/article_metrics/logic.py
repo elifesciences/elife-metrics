@@ -120,8 +120,8 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         to_date = yesterday
 
     f = {
-        'daily': ga_metrics.bulk.daily_metrics_between,
-        'monthly': ga_metrics.bulk.monthly_metrics_between,
+        'daily': ga_metrics.core.daily_metrics_between,
+        'monthly': ga_metrics.core.monthly_metrics_between,
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
 

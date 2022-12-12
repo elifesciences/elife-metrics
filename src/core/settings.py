@@ -79,9 +79,6 @@ SECRET_KEY = cfg('general.secret-key')
 DEBUG = cfg('general.debug')
 assert isinstance(DEBUG, bool), "'debug' must be either True or False as a boolean, not %r" % (DEBUG, )
 
-DEV, TEST, PROD = 'dev', 'test', 'prod'
-ENV = cfg('general.env', DEV)
-
 ALLOWED_HOSTS = list(filter(None, cfg('general.allowed-hosts', '').split(',')))
 
 # Application definition
@@ -228,13 +225,11 @@ API_OPTS = render_item({
     'order_direction': [p('order.default')],
 }, _load_api_raml(API_PATH))
 
-LOG_FILE = join(PROJECT_DIR, 'elife-metrics.log')
-if ENV != DEV:
-    LOG_FILE = join('/var/log/', 'elife-metrics.log')
+LOG_FILE = cfg('general.log-file', join(PROJECT_DIR, 'elife-metrics.log'))
 
 DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log')
 
-# whereever our log files are, ensure they are writable before we do anything else.
+# wherever our log files are, ensure they are writable before we do anything else.
 def writable(path):
     os.system('touch ' + path)
     # https://docs.python.org/2/library/os.html

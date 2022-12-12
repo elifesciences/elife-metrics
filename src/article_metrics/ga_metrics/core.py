@@ -17,8 +17,8 @@ from kids.cache import cache
 import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
-from . import ga4
-from article_metrics.utils import utcnow
+from . import utils, ga4
+from article_metrics.utils import lmap, lfilter
 
 LOG = logging.getLogger(__name__)
 
@@ -296,18 +296,149 @@ def query_ga_write_results(query, num_attempts=5):
     path = output_path_from_results(response)
     return response, write_results(response, path)
 
+
+
+
+# --- bulk
+
+
+#
+# bulk requests to ga
+#
+
+def generate_queries(table_id, query_func_name, datetime_list, use_cached=False, use_only_cached=False):
+    "returns a list of queries to be executed by google"
+    assert isinstance(query_func_name, str), "query func name must be a string"
+    query_list = []
+    for start_date, end_date in datetime_list:
+        module = module_picker(start_date, end_date)
+        query_func = getattr(module, query_func_name)
+        query_type = 'views' if query_func_name == 'path_counts_query' else 'downloads'
+
+        path = output_path(query_type, start_date, end_date)
+
+        LOG.debug("looking for metrics here: %s", path)
+        if use_cached:
+            if os.path.exists(path):
+                LOG.debug("we have %r results for %r to %r already", query_type, ymd(start_date), ymd(end_date))
+                continue
+            else:
+                LOG.info("no cache file for %r results for %r to %r", query_type, ymd(start_date), ymd(end_date))
+        else:
+            LOG.debug("couldn't find file %r", path)
+
+        if use_only_cached:
+            LOG.info("skipping google query, using only cache files")
+            continue
+        
+        q = query_func(table_id, start_date, end_date)
+        query_list.append(q)
+
+    if use_only_cached:
+        # code problem
+        assert query_list == [], "use_only_cached==True but we're accumulating queries somehow"
+
+    return query_list
+
+# TODO: nothing depends on the return value of this function
+# accumulating a large number of results in memory may be a bad idea. profile.
+def bulk_query(query_list):
+    "executes a list of queries"
+    return lmap(query_ga_write_results, query_list)
+
+def metrics_for_range(table_id, dt_range_list, use_cached=False, use_only_cached=False):
+    # tell core to do it's data wrangling for us (using cached data)
+    #results = OrderedDict({})
+    results = {}
+    for from_date, to_date in dt_range_list:
+        res = article_metrics(table_id, from_date, to_date, use_cached, use_only_cached)
+        results[(ymd(from_date), ymd(to_date))] = res
+    return results
+
+def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_only_cached=False):
+    "does a DAILY query between two dates, NOT a single query within a date range"
+    
+    date_list = utils.dt_range(from_date, to_date)
+    query_list = []
+
+    views_dt_range = lfilter(valid_view_dt_pair, date_list)
+    query_list.extend(generate_queries(table_id,
+                                       'path_counts_query',
+                                       views_dt_range,
+                                       use_cached, use_only_cached))
+
+    pdf_dt_range = lfilter(valid_downloads_dt_pair, date_list)
+    query_list.extend(generate_queries(table_id,
+                                       'event_counts_query',
+                                       pdf_dt_range,
+                                       use_cached, use_only_cached))
+    
+    bulk_query(query_list)
+
+    # everything should be cached by now
+    use_cached = True # DELIBERATE here. the above
+    return metrics_for_range(table_id, views_dt_range, use_cached, use_only_cached)
+
+def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_only_cached=False):
+    date_list = utils.dt_month_range(from_date, to_date)
+    views_dt_range = lfilter(valid_view_dt_pair, date_list)
+    pdf_dt_range = lfilter(valid_downloads_dt_pair, date_list)
+
+    query_list = []
+    query_list.extend(generate_queries(table_id,
+                                       'path_counts_query',
+                                       views_dt_range,
+                                       use_cached, use_only_cached))
+
+    query_list.extend(generate_queries(table_id,
+                                       'event_counts_query',
+                                       pdf_dt_range,
+                                       use_cached, use_only_cached))
+    bulk_query(query_list)
+
+    # everything should be cached by now
+    use_cached = True # DELIBERATE
+    return metrics_for_range(table_id, views_dt_range, use_cached, use_only_cached)
+
+#
+#
+#
+
+def regenerate_results(table_id, from_date=VIEWS_INCEPTION):
+    "this will perform all queries again, overwriting the results in `output`"
+    today = datetime.now()
+    use_cached, use_only_cached = False, False
+    LOG.info("querying daily metrics ...")
+    daily_metrics_between(table_id,
+                          from_date,
+                          today,
+                          use_cached, use_only_cached)
+
+    LOG.info("querying monthly metrics ...")
+    monthly_metrics_between(table_id,
+                            from_date,
+                            today,
+                            use_cached, use_only_cached)
+
+
+# --- endbulk
+
+
+
+
+
 # --- END GA3 LOGIC
 
 def output_path_v2(results_type, from_date_dt, to_date_dt):
     "generates a path for results of the given type"
     known_results_types = ['views', 'downloads',
                            'blog-article', 'collection', 'digest', 'event', 'interview', 'labs-post', 'press-package']
-    ensure(results_type in known_results_types, "unknown results type %r: %s" % ", ".join(known_results_types))
+    ensure(results_type in known_results_types, "unknown results type %r: %s" % (results_type, ", ".join(known_results_types)))
     ensure(isinstance(from_date_dt, datetime), "from_date_dt must be a datetime object")
     ensure(isinstance(to_date_dt, datetime), "to_date_dt must be a datetime object")
 
     from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
-    now_dt = utcnow()
+    now_dt = datetime.now()
     now = ymd(now_dt)
 
     # different formatting if two different dates are provided

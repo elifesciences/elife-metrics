@@ -19,7 +19,7 @@ class V3V4Transition(base.SimpleBaseCase):
         from_date = to_date = core.SITE_SWITCH - timedelta(days=1)
 
         fixture = base.fixture_path('views-2016-02-08.json')
-        with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture):
+        with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture):
             counts = core.article_views(self.table_id, from_date, to_date, cached=True)
 
         expected = {
@@ -35,7 +35,7 @@ class V3V4Transition(base.SimpleBaseCase):
         from_date = to_date = core.SITE_SWITCH + timedelta(days=1) # day after
 
         fixture = base.fixture_path('views-2016-02-10.json')
-        with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture):
+        with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture):
             counts = core.article_views(self.table_id, from_date, to_date, cached=True)
 
         expected = {
@@ -64,7 +64,7 @@ class V4(base.SimpleBaseCase):
     def test_elife_v4_excludes_bad_paths(self):
         from_dt, to_dt = datetime(2017, 10, 1), datetime(2017, 10, 31)
         with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(self.fixture, self.fixture_path)):
-            with patch('article_metrics.ga_metrics.core.output_path', return_value=self.fixture_path):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=self.fixture_path):
                 results = core.article_views('0xdeadbeef', from_dt, to_dt, cached=False, only_cached=False)
                 # total raw results = 4501
                 # after filtering bad eggs and aggregation: 4491
@@ -87,7 +87,7 @@ class V5(base.SimpleBaseCase):
 
         from_dt = to_dt = datetime(2020, 2, 22) # daily
         with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
-            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
                 ga_table_id = '0xdeadbeef'
                 results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
                 expected_total_results = 4491 # total results after counting (not rows in fixture)
@@ -114,7 +114,7 @@ class V5(base.SimpleBaseCase):
 
         from_dt, to_dt = datetime(2020, 3, 1), datetime(2020, 3, 31) # monthly
         with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
-            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
                 ga_table_id = '0xdeadbeef'
                 results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
 
@@ -144,7 +144,7 @@ class V6(base.SimpleBaseCase):
 
         from_dt = to_dt = datetime(2021, 12, 1) # daily
         with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
-            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
                 ga_table_id = '0xdeadbeef'
                 results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
                 expected_num_results = 7265
@@ -174,7 +174,7 @@ class V6(base.SimpleBaseCase):
         # it's a 2021-11 fixture but we'll use 2021-12 dates so that the v6 module is picked.
         from_dt, to_dt = datetime(2021, 12, 1), datetime(2021, 12, 31) # monthly
         with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
-            with patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
                 ga_table_id = '0xdeadbeef'
                 results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
                 expected_num_results = 11738
