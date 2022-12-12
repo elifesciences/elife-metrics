@@ -307,4 +307,4 @@ GA_SECRETS_LOCATION_LIST = [
     '/etc/elife-ga-metrics/client-secrets.json'
 ]
 
-GA_SECRETS_LOCATION = cfg('ga.oauth-secrets-path')
+GA_SECRETS_LOCATION = cfg('ga.oauth-secrets-path', os.path.join(PROJECT_DIR, 'client-secrets.json'))

@@ -405,7 +405,9 @@ def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_o
 # --- END GA3 LOGIC
 
 def output_path_v2(results_type, from_date_dt, to_date_dt):
-    "generates a path for results of the given type"
+    """generates a path for results of the given type.
+    same logic as `output_path`, but more strict.
+    """
     known_results_types = ['views', 'downloads',
                            'blog-article', 'collection', 'digest', 'event', 'interview', 'labs-post', 'press-package']
     ensure(results_type in known_results_types, "unknown results type %r: %s" % (results_type, ", ".join(known_results_types)))
