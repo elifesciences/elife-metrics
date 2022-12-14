@@ -200,7 +200,7 @@ class V6(base.SimpleBaseCase):
 class V7(base.SimpleBaseCase):
     "v7 era is the switch from GA3 to GA4"
 
-    def test_v7_daily(self):
+    def test_v7_daily_views(self):
         table_id = ''
         from_dt = to_dt = datetime(2022, 12, 1)
         fixture_path = base.fixture_path('v7--views--2022-12-01.json')
@@ -226,7 +226,7 @@ class V7(base.SimpleBaseCase):
         for msid, expected_count in expected_sample:
             self.assertEqual(expected_count, results[utils.msid2doi(msid)])
 
-    def test_v7_monthly(self):
+    def test_v7_monthly_views(self):
         table_id = ''
         from_dt, to_dt = datetime(2022, 11, 1), datetime(2022, 11, 30)
         fixture_path = base.fixture_path('v7--views--2022-11-01_2022-11-30.json')
@@ -252,3 +252,57 @@ class V7(base.SimpleBaseCase):
         self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
         for msid, expected_count in expected_sample:
             self.assertEqual(expected_count, results[utils.msid2doi(msid)])
+
+    def test_v7_daily_downloads(self):
+        table_id = ''
+        from_dt = to_dt = datetime(2022, 12, 1)
+        fixture_path = base.fixture_path('v7--downloads--2022-12-01.json')
+        fixture = json.load(open(fixture_path, 'r'))
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
+                results = core.article_downloads(table_id, from_dt, to_dt, cached=False, only_cached=False)
+
+        expected_num_rows = 1114
+        expected_total = 2527
+
+        # representative sample
+        expected_sample = [
+            (83292, 45),
+            (83071, 48),
+            (10989, 2),
+            (61562, 1),
+            (30294, 3),
+        ]
+
+        self.assertEqual(expected_num_rows, len(results))
+        self.assertEqual(expected_total, sum(results.values()))
+        for msid, expected_count in expected_sample:
+            doi = utils.msid2doi(msid)
+            self.assertEqual(expected_count, results[doi])
+
+    def test_v7_monthly_downloads(self):
+        table_id = ''
+        from_dt, to_dt = datetime(2022, 11, 1), datetime(2022, 11, 30)
+        fixture_path = base.fixture_path('v7--downloads--2022-11-01_2022-11-30.json')
+        fixture = json.load(open(fixture_path, 'r'))
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
+                results = core.article_downloads(table_id, from_dt, to_dt, cached=False, only_cached=False)
+
+        expected_num_rows = 10025
+        expected_total = 69818
+
+        # representative sample
+        expected_sample = [
+            (83292, 230),
+            (83071, 240),
+            (10989, 37),
+            (61523, 14),
+            (30278, 7),
+        ]
+
+        self.assertEqual(expected_num_rows, len(results))
+        self.assertEqual(expected_total, sum(results.values()))
+        for msid, expected_count in expected_sample:
+            doi = utils.msid2doi(msid)
+            self.assertEqual(expected_count, results[doi])

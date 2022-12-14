@@ -1,3 +1,4 @@
+from functools import reduce
 from datetime import datetime
 from . import elife_v1, utils
 from article_metrics.utils import ensure, lfilter
@@ -36,6 +37,7 @@ def path_counts_query(table_id, from_date, to_date):
 
     return {"dimensions": [{"name": "pagePathPlusQueryString"}],
             "metrics": [{"name": "sessions"}],
+            # TODO: orderBys
             "dateRanges": [{"startDate": utils.ymd(from_date),
                             "endDate": utils.ymd(to_date)}],
             "dimensionFilter": {
@@ -101,8 +103,14 @@ def event_counts_query(table_id, from_date, to_date):
         "metrics": [
             {"name": "eventCount"}
         ],
+        "orderBys": [
+            {"desc": False,
+             "dimension": {"dimensionName": "pagePath",
+                           "orderType": "ALPHANUMERIC"}}
+        ],
         "dateRanges": [
-            {"startDate": from_date, "endDate": to_date}
+            {"startDate": utils.ymd(from_date),
+             "endDate": utils.ymd(to_date)}
         ],
         "dimensionFilter": {
             "andGroup": {
@@ -157,7 +165,7 @@ def event_count(row):
         path = row['dimensionValues'][1]['value']
         count = row['metricValues'][0]['value']
         bits = path.split('/') # ['', 'articles', '80092']
-        return bits[2], int(count)
+        return int(bits[2]), int(count)
     except AssertionError as exc:
         LOG.debug("ignoring row (downloads), failed expections", exc_info=exc)
 
@@ -169,4 +177,10 @@ def event_counts(row_list):
     # and reducing to
     #   {80082: 2}
     # won't occur unless we manipulate the GA results.
-    return dict(map(event_count, row_list))
+    counts = map(event_count, row_list)
+    def aggr(dic, pair):
+        msid, count = pair
+        doi = utils.msid2doi(msid)
+        dic[doi] = dic.get(doi, 0) + count
+        return dic
+    return reduce(aggr, counts, {})
