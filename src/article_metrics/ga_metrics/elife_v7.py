@@ -1,3 +1,4 @@
+from datetime import datetime
 from . import elife_v1, utils
 from article_metrics.utils import ensure, lfilter
 import re
@@ -70,8 +71,8 @@ def path_count(row):
     }
     """
     try:
-        ensure(len(row['dimensionValues']) == 1, "row with multiple dimensionValues found: %s" % row)
-        ensure(len(row['metricValues']) == 1, "row with multiple metricValues found: %s" % row)
+        ensure(len(row['dimensionValues']) == 1, "row with unexpected number of dimensionValues found: %s" % row)
+        ensure(len(row['metricValues']) == 1, "row with unexpected number of metricValues found: %s" % row)
         path = row['dimensionValues'][0]['value']
         count = row['metricValues'][0]['value']
         regex_obj = re.match(PATH_RE, path.lower())
@@ -81,7 +82,7 @@ def path_count(row):
         count_type = 'full' # vs 'abstract' or 'digest', from previous eras
         return data['artid'], count_type, int(count)
     except AssertionError as exc:
-        LOG.debug("ignoring row, failed expections", exc_info=exc)
+        LOG.debug("ignoring row (views), failed expections", exc_info=exc)
 
 def path_counts(path_count_pairs):
     "takes a list of rows from GA4 and groups by msid, returning a list of (msid, count-type, count)"
@@ -89,7 +90,83 @@ def path_counts(path_count_pairs):
     return elife_v1.group_results(path_count_triples)
 
 def event_counts_query(table_id, from_date, to_date):
-    return {}
+    "returns the raw GA results for PDF downloads between the two given dates"
+    ensure(isinstance(from_date, datetime), "'from' date must be a datetime object. received %r" % from_date)
+    ensure(isinstance(to_date, datetime), "'to' date must be a datetime object. received %r" % to_date)
+    return {
+        "dimensions": [
+            {"name": "eventName"},
+            {"name": "pagePath"}
+        ],
+        "metrics": [
+            {"name": "eventCount"}
+        ],
+        "dateRanges": [
+            {"startDate": from_date, "endDate": to_date}
+        ],
+        "dimensionFilter": {
+            "andGroup": {
+                "expressions": [
+                    {
+                        "filter": {
+                            "fieldName": "eventName",
+                            "stringFilter": {
+                                "matchType": "EXACT",
+                                "value": "Download"
+                            }
+                        }
+                    },
+                    {
+                        "filter": {
+                            "fieldName": "pagePath",
+                            "stringFilter": {
+                                "matchType": "FULL_REGEXP",
+                                "value": "^/articles/\\d+$",
+                                "caseSensitive": True
+                            },
+                        }
+                    }
+                ]
+            }
+        },
+        "limit": 10000
+    }
+
+def event_count(row):
+    """
+    row looks like:
+    {
+        "dimensionValues": [
+            {
+                "value": "Download"
+            },
+            {
+                "value": "/articles/80092"
+            }
+        ],
+        "metricValues": [
+            {
+                "value": "717"
+            }
+        ]
+    }
+    """
+    try:
+        ensure(len(row['dimensionValues']) == 2, "row with unexpected number of dimensionValues found: %s" % row)
+        ensure(len(row['metricValues']) == 1, "row with unexpected number of metricValues found: %s" % row)
+        path = row['dimensionValues'][1]['value']
+        count = row['metricValues'][0]['value']
+        bits = path.split('/') # ['', 'articles', '80092']
+        return bits[2], int(count)
+    except AssertionError as exc:
+        LOG.debug("ignoring row (downloads), failed expections", exc_info=exc)
 
 def event_counts(row_list):
-    pass
+    "parses the list of rows returned by google to extract the doi and it's count"
+    # note: figures downloads (/articles/80082/figures) and mixed case paths (/Articles/800082) are excluded via the GA query.
+    # for example, a case where two rows for 80072, one downloads, one figure downloads resulting in:
+    #   [(80082, 717), (80082, 2)]
+    # and reducing to
+    #   {80082: 2}
+    # won't occur unless we manipulate the GA results.
+    return dict(map(event_count, row_list))
