@@ -2,11 +2,7 @@ from . import base
 from article_metrics.ga_metrics import core
 from apiclient import errors
 
-import logging
-
-LOG = logging.getLogger("")
-LOG.level = logging.DEBUG
-
+# because you can't do: setattr(object(), 'foo', 'bar')
 class Object(object):
     pass
 
@@ -25,12 +21,6 @@ class DummyQuery(object):
         raise errors.HttpError(self.resp, self.content)
 
 class TestQueryGA(base.SimpleBaseCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_exponential_backoff_applied_on_rate_limit(self):
         query = DummyQuery(raises=503)
         self.assertRaises(AssertionError, core._query_ga, query, num_attempts=1)
