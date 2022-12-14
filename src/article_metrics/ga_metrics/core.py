@@ -53,14 +53,16 @@ RDS_ADDITION = datetime(year=2020, month=2, day=21)
 URL_PARAMS = datetime(year=2021, month=11, day=30)
 
 # switch from ga3 to ga4
-GA4_SWITCH = datetime(year=2023, month=12, day=30) # todo: these are all naive datetimes
+# todo: fix the module in place during testing, test module_picker separately.
+GA4_SWITCH = datetime(year=2022, month=11, day=1)
 
+# todo: compare this to old split logic
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
     daily = from_date == to_date
     monthly = not daily
 
-    if from_date > GA4_SWITCH:
+    if from_date >= GA4_SWITCH:
         return elife_v7
 
     if from_date > URL_PARAMS:
@@ -103,6 +105,8 @@ def module_picker(from_date, to_date):
 def valid_dt_pair(dt_pair, inception):
     "returns true if both dates are greater than the date we started collecting on"
     from_date, to_date = dt_pair
+    ensure(isinstance(from_date, datetime), "from_date must be a datetime object, not %r" % (type(from_date),))
+    ensure(isinstance(to_date, datetime), "to_date must be a datetime object, not %r" % (type(to_date),))
     return from_date >= inception and to_date >= inception
 
 def valid_view_dt_pair(dt_pair):

@@ -196,3 +196,59 @@ class V6(base.SimpleBaseCase):
                 self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
                 for msid, expected_count in expected_sample:
                     self.assertEqual(expected_count, results[utils.msid2doi(msid)])
+
+class V7(base.SimpleBaseCase):
+    "v7 era is the switch from GA3 to GA4"
+
+    def test_v7_daily(self):
+        table_id = ''
+        from_dt = to_dt = datetime(2022, 12, 1)
+        fixture_path = base.fixture_path('v7--views--2022-12-01.json')
+        fixture = json.load(open(fixture_path, 'r'))
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
+                results = core.article_views(table_id, from_dt, to_dt, cached=False, only_cached=False)
+
+        expected_num_rows = 7890
+        expected_total = Counter(full=32877, abstract=0, digest=0)
+
+        # representative sample of `/article` and `/article/executable`, /article?foo=...
+        expected_sample = [
+            (83292, Counter(full=761, abstract=0, digest=0)),
+            (83071, Counter(full=652, abstract=0, digest=0)),
+            (10989, Counter(full=24, abstract=0, digest=0)),
+            # 11 regular, 1 /executable
+            (61523, Counter(full=11 + 1, abstract=0, digest=0))
+        ]
+
+        self.assertEqual(expected_num_rows, len(results))
+        self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
+        for msid, expected_count in expected_sample:
+            self.assertEqual(expected_count, results[utils.msid2doi(msid)])
+
+    def test_v7_monthly(self):
+        table_id = ''
+        from_dt, to_dt = datetime(2022, 11, 1), datetime(2022, 11, 30)
+        fixture_path = base.fixture_path('v7--views--2022-11-01_2022-11-30.json')
+        fixture = json.load(open(fixture_path, 'r'))
+        with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
+            with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
+                results = core.article_views(table_id, from_dt, to_dt, cached=False, only_cached=False)
+
+        expected_num_rows = 9952
+        expected_total = Counter(full=772733, abstract=0, digest=0)
+
+        # representative sample of `/article` and `/article/executable`, /article?foo=...
+        expected_sample = [
+            (83292, Counter(full=2518, abstract=0, digest=0)),
+            (83071, Counter(full=3186, abstract=0, digest=0)),
+            (10989, Counter(full=409, abstract=0, digest=0)),
+            # 81 regular, 22 executable
+            (61523, Counter(full=81 + 22, abstract=0, digest=0)),
+            # 20 regular, 31 executable
+            (30274, Counter(full=20 + 31, abstract=0, digest=0))
+        ]
+        self.assertEqual(expected_num_rows, len(results))
+        self.assertEqual(expected_total, elife_v1.count_counter_list(results.values()))
+        for msid, expected_count in expected_sample:
+            self.assertEqual(expected_count, results[utils.msid2doi(msid)])

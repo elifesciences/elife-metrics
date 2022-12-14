@@ -32,8 +32,8 @@ def _query_ga(query_map, num_attempts=5):
     """talks to GA, executing the given `query_map`.
     applies exponential back-off if rate limited or when service is unavailable."""
 
-    ensure(isinstance(query_map['dateRanges'][0]['startDate'], str), 'start date must be a string')
-    ensure(isinstance(query_map['dateRanges'][0]['endDate'], str), 'end date must be a string')
+    ensure(isinstance(query_map['dateRanges'][0]['startDate'], str), 'startDate must be a string: %s' % query_map)
+    ensure(isinstance(query_map['dateRanges'][0]['endDate'], str), 'endDate must be a string')
 
     property_id = 'properties/316514145'
     query = ga_service().properties().runReport(property=property_id, body=query_map)
@@ -108,5 +108,6 @@ def query_ga(query, **kwargs):
     # use the last response given but with all of the results
     response['rows'] = results
     response['-total-pages'] = page
-
+    #import json
+    #open('/tmp/r.json', 'w').write(json.dumps(response))
     return response
