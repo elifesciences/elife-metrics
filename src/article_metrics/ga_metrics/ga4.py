@@ -93,7 +93,7 @@ def query_ga(query, **kwargs):
     results are concatenated and returned as part of the last response dict as `rows`."""
 
     results_pp = query['limit'] = 10000 # 100k max
-    query['offset'] = 1
+    query['offset'] = 0
 
     page, results = 1, []
     while True:
@@ -102,7 +102,7 @@ def query_ga(query, **kwargs):
         results.extend(response.get('rows') or [])
         if (results_pp * page) >= response['rowCount']:
             break # no more pages to fetch
-        query['offset'] += results_pp # 1, 2001, 4001, etc
+        query['offset'] += results_pp # 0, 1000, 2000, 3000, etc
         page += 1
 
     # use the last response given but with all of the results
