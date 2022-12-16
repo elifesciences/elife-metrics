@@ -6,7 +6,7 @@ from . import history
 #    'blog-article', 'event', 'interview', 'labs-post', 'press-package', 'collection', 'digest'
 # ]
 
-PAGE_TYPES = history.load_from_file().keys()
+PAGE_TYPES = history.load_history().keys()
 EVENT, COLLECTION = 'event', 'collection' # avoid these
 
 LANDING_PAGE = ''
