@@ -6,7 +6,7 @@ def query_processor_frame_1(ptype, frame):
     adhoc = lmap(lambda path: "ga:pagePath==%s" % path, [
         "/from-ancient-dna-to-decay-an-interview-with-jessica-metcalf",
         "/food-for-thought-an-interview-with-ana-domingos",
-        "/helping-to-fight-tuberculosis-an-interview-with-david-dowdy"
+        "/helping-to-fight-tuberculosis-an-interview-with-david-dowdy",
 
         '/elife-news/chemistry-versus-cancer-an-interview-with-daniel-abankwa',
         '/elife-news/connecting-the-flight-controls-an-interview-with-tarjani-agrawal',
