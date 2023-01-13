@@ -1,13 +1,15 @@
 from django.db.models import Model, CharField, ForeignKey, PositiveIntegerField, DateField, CASCADE
 from . import history
 
-# avoid this
+# avoid doing this
 # PAGE_TYPES = BLOG, EVENT, INTERVIEW, LABS, PRESS, COLLECTION, DIGEST = [
 #    'blog-article', 'event', 'interview', 'labs-post', 'press-package', 'collection', 'digest'
 # ]
 
-PAGE_TYPES = history.load_history().keys()
-EVENT, COLLECTION = 'event', 'collection' # avoid these
+# lsh@2023-01: order matters and changes require a new migration.
+PAGE_TYPES = sorted(history.load_history().keys())
+
+EVENT, COLLECTION = 'event', 'collection' # avoid these types
 
 LANDING_PAGE = ''
 
