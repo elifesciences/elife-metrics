@@ -178,6 +178,7 @@ def event_counts(row_list):
     #   {80082: 2}
     # won't occur unless we manipulate the GA results.
     counts = map(event_count, row_list)
+
     def aggr(dic, pair):
         msid, count = pair
         doi = utils.msid2doi(msid)

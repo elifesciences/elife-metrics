@@ -1,3 +1,4 @@
+from article_metrics.ga_metrics.core import GA4_SWITCH
 from article_metrics.utils import lmap
 from schema import Schema, And, Or, Use as Coerce, Optional, SchemaError
 from datetime import datetime, date
@@ -10,8 +11,13 @@ LOG = logging.getLogger(__name__)
 HISTORY_DATA = {
     'blog-article': {
         'frames': [
-            {'starts': '2017-06-01',
+            {'starts': GA4_SWITCH,
              'ends': None,
+             'id': 3,
+             'prefix': '/inside-elife'},
+
+            {'starts': '2017-06-01',
+             'ends': GA4_SWITCH,
              'id': 2,
              'prefix': '/inside-elife'},
 
@@ -24,8 +30,13 @@ HISTORY_DATA = {
 
     'collection': {
         'frames': [
-            {'starts': '2017-06-01',
+            {'starts': GA4_SWITCH,
              'ends': None,
+             'id': 3,
+             'prefix': '/collections'},
+
+            {'starts': '2017-06-01',
+             'ends': GA4_SWITCH,
              'id': 2,
              'prefix': '/collections'},
 
@@ -45,15 +56,25 @@ HISTORY_DATA = {
 
     'digest': {
         'frames': [
-            {'starts': '2017-09-01',
+            {'starts': GA4_SWITCH,
              'ends': None,
+             'id': 2,
+             'prefix': '/digests'},
+
+            {'starts': '2017-09-01',
+             'ends': GA4_SWITCH,
              'id': 1,
              'prefix': '/digests'}]},
 
     'event': {
         'frames': [
-            {'starts': '2017-06-01',
+            {'starts': GA4_SWITCH,
              'ends': None,
+             'id': 3,
+             'prefix': '/events'},
+
+            {'starts': '2017-06-01',
+             'ends': GA4_SWITCH,
              'id': 2,
              'prefix': '/events'},
 
@@ -70,8 +91,13 @@ HISTORY_DATA = {
 
     'interview': {
         'frames': [
-            {'starts': '2017-06-01',
+            {'starts': GA4_SWITCH,
              'ends': None,
+             'id': 3,
+             'prefix': '/interviews'},
+
+            {'starts': '2017-06-01',
+             'ends': GA4_SWITCH,
              'id': 2,
              'prefix': '/interviews'},
 
@@ -83,9 +109,14 @@ HISTORY_DATA = {
 
     'labs-post': {
         'frames': [
-            {'starts': '2017-06-01',
+            {'starts': GA4_SWITCH,
              'ends': None,
-             'id': 1,
+             'id': 3,
+             'prefix': '/labs'},
+
+            {'starts': '2017-06-01',
+             'ends': GA4_SWITCH,
+             'id': 1, # todo: shouldn't this be 2?
              'prefix': '/labs'},
 
             {'starts': '2015-08-01',
@@ -108,8 +139,13 @@ HISTORY_DATA = {
 
     'press-package': {
         'frames': [
-            {'starts': '2017-06-01',
+            {'starts': GA4_SWITCH,
              'ends': None,
+             'id': 3,
+             'prefix': '/for-the-press'},
+
+            {'starts': '2017-06-01',
+             'ends': GA4_SWITCH,
              'id': 2,
              'prefix': '/for-the-press'},
 
@@ -125,6 +161,8 @@ HISTORY_DATA = {
 def date_wrangler(v):
     if isinstance(v, str):
         return datetime.strptime(v, "%Y-%m-%d").date()
+    if isinstance(v, datetime):
+        return v.date()
     return v
 
 def frames_wrangler(frame_list):

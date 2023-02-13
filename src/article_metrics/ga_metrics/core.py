@@ -54,7 +54,7 @@ URL_PARAMS = datetime(year=2021, month=11, day=30)
 
 # switch from ga3 to ga4
 # todo: fix the module in place during testing, test module_picker separately.
-GA4_SWITCH = datetime(year=2022, month=11, day=1)
+GA4_SWITCH = datetime(year=2023, month=7, day=1)
 
 # todo: compare this to old split logic
 def module_picker(from_date, to_date):

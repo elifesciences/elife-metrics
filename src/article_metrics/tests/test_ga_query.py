@@ -3,7 +3,7 @@ from . import base
 import json
 from datetime import datetime, timedelta
 from article_metrics import utils
-from article_metrics.ga_metrics import core, elife_v1
+from article_metrics.ga_metrics import utils as ga_utils, core, elife_v1
 from collections import Counter
 from unittest.mock import patch
 
@@ -202,7 +202,7 @@ class V7(base.SimpleBaseCase):
 
     def test_v7_daily_views(self):
         table_id = ''
-        from_dt = to_dt = datetime(2022, 12, 1)
+        from_dt = to_dt = core.GA4_SWITCH
         fixture_path = base.fixture_path('v7--views--2022-12-01.json')
         fixture = json.load(open(fixture_path, 'r'))
         with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
@@ -228,7 +228,7 @@ class V7(base.SimpleBaseCase):
 
     def test_v7_monthly_views(self):
         table_id = ''
-        from_dt, to_dt = datetime(2022, 11, 1), datetime(2022, 11, 30)
+        from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH)
         fixture_path = base.fixture_path('v7--views--2022-11-01_2022-11-30.json')
         fixture = json.load(open(fixture_path, 'r'))
         with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
@@ -255,7 +255,7 @@ class V7(base.SimpleBaseCase):
 
     def test_v7_daily_downloads(self):
         table_id = ''
-        from_dt = to_dt = datetime(2022, 12, 1)
+        from_dt = to_dt = core.GA4_SWITCH
         fixture_path = base.fixture_path('v7--downloads--2022-12-01.json')
         fixture = json.load(open(fixture_path, 'r'))
         with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
@@ -282,7 +282,7 @@ class V7(base.SimpleBaseCase):
 
     def test_v7_monthly_downloads(self):
         table_id = ''
-        from_dt, to_dt = datetime(2022, 11, 1), datetime(2022, 11, 30)
+        from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH)
         fixture_path = base.fixture_path('v7--downloads--2022-11-01_2022-11-30.json')
         fixture = json.load(open(fixture_path, 'r'))
         with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
