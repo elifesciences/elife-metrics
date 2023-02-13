@@ -284,7 +284,7 @@ def interesting_frames(start_date, end_date, frame_list):
     return lfilter(_interesting_frame, frame_list)
 
 
-def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
+def build_ga_query(ptype, start_date=None, end_date=None):
     """As we go further back in history the query will change as known epochs
     overlap. These overlaps will truncate the current period to the epoch
     boundaries."""
@@ -295,13 +295,9 @@ def build_ga_query(ptype, start_date=None, end_date=None, history_data=None):
     start_date and ensure(is_date(start_date), "bad start date")
     end_date and ensure(is_date(end_date), "bad end date")
 
-    # if history data provided, ensure it validates
-    if history_data:
-        history_data = history.type_object.validate(history_data)
-
-    # extract just the page type we're after
-    ptype_history = history_data or history.ptype_history(ptype)
-    frame_list = ptype_history['frames']
+    # extract just the page type we're after.
+    history_data = history.ptype_history(ptype)
+    frame_list = history_data['frames']
 
     # frames are ordered oldest to newest (asc)
     earliest_date = frame_list[0]['starts']
@@ -349,13 +345,13 @@ def update_page_counts(ptype, page_counts):
 #
 
 def update_ptype(ptype, replace_cache_files=False):
-    "glue code to query GA about a page-type and then processing and storing the results"
+    "query GA about a page-type and then processing and storing the results"
     try:
         for frame, query in build_ga_query(ptype):
             response = query_ga(ptype, query, replace_cache_files=replace_cache_files)
             normalised_rows = process_response(ptype, frame, response)
             counts = aggregate(normalised_rows)
-            LOG.info("inserting/updating %s %ss" % (len(counts), ptype))
+            LOG.info("inserting/updating %s '%s' rows" % (len(counts), ptype))
             update_page_counts(ptype, counts)
     except AssertionError as err:
         LOG.error(err)

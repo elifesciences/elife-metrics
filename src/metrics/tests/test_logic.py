@@ -174,12 +174,16 @@ class Two(base.BaseCase):
                  'pattern': '/old/pants'}
             ]
         }
+        # `validate` does more than validation, it also sorts frames and fills in empty dates.
+        # `history.type_object` is the schema for the 'frames' data with a ptype dict.
+        history_data = history.type_object.validate(history_data)
 
         # starts/ends just outside frame boundaries
         starts = midDec17 - two_days
         ends = midJan18 + two_days
 
-        ql = logic.build_ga_query(models.EVENT, starts, ends, history_data)
+        with patch('metrics.history.ptype_history', return_value=history_data):
+            ql = logic.build_ga_query(models.EVENT, starts, ends)
 
         frame_list = lmap(first, ql) # just the frames and not the queries for now
 
