@@ -35,7 +35,7 @@ def _query_ga(query_map, num_attempts=5):
     ensure(isinstance(query_map['dateRanges'][0]['startDate'], str), 'startDate must be a string: %s' % query_map)
     ensure(isinstance(query_map['dateRanges'][0]['endDate'], str), 'endDate must be a string')
 
-    property_id = 'properties/316514145'
+    property_id = 'properties/' + settings.GA4_TABLE_ID
     query = ga_service().properties().runReport(property=property_id, body=query_map)
 
     # execute it
