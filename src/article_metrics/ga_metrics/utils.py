@@ -69,11 +69,6 @@ def dt_month_range_gen(from_date, to_date, preserve_caps=False):
 def dt_month_range(from_date, to_date, preserve_caps=False):
     return list(dt_month_range_gen(from_date, to_date, preserve_caps))
 
-def firstof(fn, x):
-    for i in x:
-        if fn(i):
-            return i
-
 def enplumpen(artid):
     "takes an article id like e01234 and returns a DOI like 10.7554/eLife.01234"
     if isint(artid):

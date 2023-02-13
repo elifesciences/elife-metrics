@@ -50,7 +50,7 @@ def cfg(path, default=0xDEADBEEF):
         print(('error on %r: %s' % (path, err)))
 
 # used to know how far to go back in metrics gathering
-INCEPTION = datetime.datetime(year=2012, month=12, day=1)
+INCEPTION = datetime(year=2012, month=12, day=1)
 DOI_PREFIX = '10.7554'
 USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
 CONTACT_EMAIL = "it-admin@elifesciences.org"
@@ -310,3 +310,4 @@ GA_SECRETS_LOCATION_LIST = [
 ]
 
 GA_SECRETS_LOCATION = os.path.join(PROJECT_DIR, 'client-secrets.json')
+assert os.path.exists(GA_SECRETS_LOCATION), "client-secrets.json not found. I looked here: %s" % GA_SECRETS_LOCATION

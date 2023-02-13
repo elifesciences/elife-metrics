@@ -12,7 +12,7 @@ from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
-from .utils import ymd, firstof, month_min_max, d2dt, ensure
+from .utils import ymd, month_min_max, d2dt, ensure
 from kids.cache import cache
 import logging
 from django.conf import settings
@@ -130,18 +130,10 @@ def sanitize_ga_response(ga_response):
         del ga_response['query']['ids']
     return ga_response
 
-def oauth_secrets():
-    settings_file = firstof(os.path.exists, settings.GA_SECRETS_LOCATION_LIST)
-    if not settings_file:
-        loc_list = '\n'.join(settings.GA_SECRETS_LOCATION_LIST)
-        msg = "could not find the credentials file! I looked here:\n%s" % loc_list
-        raise EnvironmentError(msg)
-    return settings_file
-
 @cache
 def ga_service():
     service_name = 'analytics'
-    settings_file = oauth_secrets()
+    settings_file = settings.GA_SECRETS_LOCATION
     scope = 'https://www.googleapis.com/auth/analytics.readonly'
     credentials = ServiceAccountCredentials.from_json_keyfile_name(settings_file, scopes=[scope])
     http = Http()
