@@ -108,7 +108,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
     "import metrics from GA between the two given dates or from the inception date in `settings.py`"
     ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
 
-    table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
+    table_id = 'ga:%s' % settings.GA3_TABLE_ID
     the_beginning = ga_metrics.core.VIEWS_INCEPTION
     yesterday = datetime.now() - timedelta(days=1)
 

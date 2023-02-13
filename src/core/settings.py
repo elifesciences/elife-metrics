@@ -50,8 +50,8 @@ def cfg(path, default=0xDEADBEEF):
         print(('error on %r: %s' % (path, err)))
 
 # used to know how far to go back in metrics gathering
-INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
-DOI_PREFIX = cfg('journal.doi-prefix')
+INCEPTION = datetime.datetime(year=2012, month=12, day=1)
+DOI_PREFIX = '10.7554'
 USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
 CONTACT_EMAIL = "it-admin@elifesciences.org"
 
@@ -59,7 +59,9 @@ OUTPUT_PATH = join(EXT_DIR if USE_EXT else PROJECT_DIR, 'output')
 
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
 GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
-GA_TABLE_ID = cfg('ga.table-id')
+
+GA3_TABLE_ID = "82618489"
+GA4_TABLE_ID = "316514145"
 
 GA_PTYPE_SCHEMA_PATH = join(PROJECT_DIR, 'schema', 'metrics')
 
@@ -307,4 +309,4 @@ GA_SECRETS_LOCATION_LIST = [
     '/etc/elife-ga-metrics/client-secrets.json'
 ]
 
-GA_SECRETS_LOCATION = cfg('ga.oauth-secrets-path', os.path.join(PROJECT_DIR, 'client-secrets.json'))
+GA_SECRETS_LOCATION = os.path.join(PROJECT_DIR, 'client-secrets.json')
