@@ -1,4 +1,4 @@
-from . import models, history
+from . import models, history, ga3, ga4
 from article_metrics.utils import ensure, lmap, create_or_update, first, ymd, lfilter, run
 from article_metrics.ga_metrics import core as ga_core
 from django.db.models import Sum, F
@@ -6,11 +6,9 @@ from django.db.models.functions import TruncMonth
 from django.conf import settings
 from datetime import date, datetime
 from django.db import transaction
-import json
 import os
 import logging
 from urllib.parse import urlparse
-import importlib
 from functools import partial
 from collections import OrderedDict
 
@@ -19,6 +17,8 @@ LOG = logging.getLogger(__name__)
 DAY, MONTH = 'day', 'month'
 
 MAX_GA_RESULTS = 10000
+
+GA4_SWITCH_DATE = ga_core.GA4_SWITCH.date()
 
 def is_pid(pid):
     return isinstance(pid, str) and len(pid) < 256
@@ -32,15 +32,10 @@ def is_period(period):
 def is_date(dt):
     return isinstance(dt, date)
 
-def is_inrange(v, a, b):
-    return isinstance(v, int) and v >= a and v <= b
 
 #
 # utils
 #
-
-def _str2dt(string):
-    return datetime.strptime(string, "%Y%m%d").date()
 
 def mkidx(rows, keyfn):
     idx = {}
@@ -50,29 +45,6 @@ def mkidx(rows, keyfn):
         group.append(row)
         idx[key] = group
     return idx
-
-def get(k, d=None):
-    "`get('key', {}) => `{}.get('key')` but also `get('key')({})` => `{}.get('key')`"
-    if not d:
-        return lambda d: get(k, d)
-    return d.get(k)
-
-def load_fn(dotted_path):
-    try:
-        dotted_path = dotted_path.strip().lower().replace('-', '_') # basic path normalisation
-        package, funcname = dotted_path.rsplit('.', 1) # 'os.path.join' => 'os.path', 'join'
-        package = importlib.import_module(package)
-        ensure(hasattr(package, funcname),
-               "could not find function %r in package %r for given path: %s" % (funcname, package, dotted_path))
-        return getattr(package, funcname)
-    except ImportError as err:
-        # package doesn't exist
-        LOG.debug(str(err))
-
-    except AssertionError as err:
-        # package exists but not function
-        LOG.debug(str(err))
-    return None
 
 def asmaps(rows):
     "convenience, converts a list of GA result rows into dicts"
@@ -122,6 +94,9 @@ def process_mapped_path(mapping, path):
     return mapping.get(path)
 
 def generic_results_processor(ptype, frame, rows):
+
+    # TODO: will need to differentiate between ga3 and ga4 results
+
     if 'path-map-file' in frame:
         mapping = parse_map_file(frame)
         path_processor = partial(process_mapped_path, mapping)
@@ -140,7 +115,7 @@ def generic_results_processor(ptype, frame, rows):
                 return # raise ValueError?
             return {
                 'views': int(count),
-                'date': _str2dt(datestr),
+                'date': datetime.strptime(datestr, "%Y%m%d").date(),
                 'identifier': identifier,
             }
         except ValueError as err:
@@ -159,7 +134,7 @@ def aggregate(normalised_rows):
     # it's possible after normalisation for two paths to exist on same date
     idx = mkidx(normalised_rows, lambda row: (row['identifier'], row['date']))
     # return single record for each group, replacing 'views' with the sum of views in the group
-    rows = [(grp[0]['identifier'], grp[0]['date'], sum(map(get('views'), grp))) for grp in idx.values()]
+    rows = [(grp[0]['identifier'], grp[0]['date'], sum(map(lambda d: d.get('views'), grp))) for grp in idx.values()]
     rows = asmaps(rows)
 
     # sort rows by date and then path
@@ -169,16 +144,21 @@ def aggregate(normalised_rows):
     return rows
 
 def process_response(ptype, frame, response):
+
     rows = response.get('rows')
     if not rows:
         LOG.warning("GA responded with no results", extra={'query': response['query'], 'ptype': ptype, 'frame': frame})
         return []
 
     # look for the "results_processor_frame_foo" function ...
-    path = "metrics.{ptype}_type.results_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
+    #path = "metrics.{ptype}_type.results_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
 
     # ... and use the generic processor if not found.
-    results_processor = load_fn(path) or generic_results_processor
+    #results_processor = load_fn(path) or generic_results_processor
+
+    # lsh@2023-02-13: nothing ever used the per-page-type results processor.
+    # instead it looks like `generic_results_processor` got fat attempting to handle everything.
+    results_processor = generic_results_processor
 
     normalised = results_processor(ptype, frame, rows)
 
@@ -186,92 +166,34 @@ def process_response(ptype, frame, response):
 
     return normalised
 
-#
-#
-#
-
-def query_ga(ptype, query, results_pp=MAX_GA_RESULTS, replace_cache_files=False):
-    ensure(is_inrange(results_pp, 1, MAX_GA_RESULTS), "`results_pp` must be an integer between 1 and %s" % MAX_GA_RESULTS)
-    sd, ed = query['start_date'], query['end_date']
-    LOG.info("querying GA for %ss between %s and %s" % (ptype, sd, ed))
-    dump_path = ga_core.output_path(ptype, sd, ed)
-    # TODO: this settings.TESTING check is a code smell.
-    if os.path.exists(dump_path) and not settings.TESTING:
-        if not replace_cache_files:
-            LOG.info("(cache hit)")
-            return json.load(open(dump_path, 'r'))
-        # cache file will be replaced with results
-        pass
-
-    query['max_results'] = results_pp
-    query['start_index'] = 1
-    response = ga_core.query_ga(query)
-    if not settings.TESTING:
-        ga_core.write_results(response, dump_path)
-    return response
-
-#
-#
-#
-
-def generic_ga_filter(prefix):
-    "returns a generic GA pattern that handles `/prefix` and `/prefix/what/ever` patterns"
-    return "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$".format(prefix=prefix)
-
-def generic_ga_filter_w_paths(prefix, path_list):
-    stub = "ga:pagePath=~^{prefix}".format(prefix=prefix)
-
-    def mk(path):
-        return (stub + "/{path}$").format(path=path.lstrip('/'))
-    ql = ",".join(map(mk, path_list))
-    if prefix:
-        return "{landing}$,{enum}".format(landing=stub, enum=ql)
-    return ql
-
-def generic_query_processor(ptype, frame):
-    # NOTE: ptype is unused, it's just to match a query processor function's signature
-    ptype_filter = None
-    if frame.get('pattern'):
-        ptype_filter = frame['pattern']
-    elif frame.get('prefix') and frame.get('path-list'):
-        ptype_filter = generic_ga_filter_w_paths(frame['prefix'], frame['path-list'])
-    elif frame.get('prefix'):
-        ptype_filter = generic_ga_filter(frame['prefix'])
-    elif frame.get('path-map'):
-        ptype_filter = generic_ga_filter_w_paths('', frame['path-map'].keys())
-    ensure(ptype_filter, "bad frame data")
-    return ptype_filter
-
-#
-#
-#
+# ---
 
 def build_ga_query__queries_for_frame(ptype, frame, start_date, end_date):
-    query = {
-        'ids': settings.GA3_TABLE_ID,
-        'max_results': MAX_GA_RESULTS,
-        'metrics': 'ga:uniquePageviews', # *not* sessions, nor regular pageviews
-        'dimensions': 'ga:pagePath,ga:date',
-        'sort': 'ga:pagePath,ga:date',
-        'include_empty_rows': False,
+    """
+    the big ga3 to ga4 switch.
+    ga3.py has lots of query generation logic, probably over engineered
+    ga4.py is much the same
+    both should return results that can be processed with the `process_response` logic above.
+    """
+    era = ga_core.GA3 if end_date <= GA4_SWITCH_DATE else ga_core.GA4
+    if era == ga_core.GA3:
+        return ga3.build_ga3_query__queries_for_frame(ptype, frame, start_date, end_date)
+    return ga4.build_ga4_query__queries_for_frame(ptype, frame, start_date, end_date)
 
-        'start_date': frame['starts'] if start_date < frame['starts'] else start_date,
-        'end_date': frame['ends'] if end_date > frame['ends'] else end_date,
+# ---
 
-        # set by the `query_processor`
-        'filters': None,
-    }
+def query_ga(ptype, query, results_pp=MAX_GA_RESULTS, replace_cache_files=False):
+    ensure('end_date' in query, "query missing 'end_date' field")
+    end_date = query['end_date']
+    # urgh. todo?
+    if not is_date(end_date):
+        end_date = datetime.strptime(query['end_date'], '%Y-%m-%d').date()
+    era = ga_core.GA3 if end_date <= GA4_SWITCH_DATE else ga_core.GA4
+    if era == ga_core.GA3:
+        return ga3.query_ga(ptype, query, results_pp, replace_cache_files)
+    return ga4.query_ga(ptype, query, results_pp, replace_cache_files)
 
-    # look for the "query_processor_frame_foo" function ...
-    path = "metrics.{ptype}_type.query_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
-
-    # ... and use the generic query processor if not found.
-    query_processor = load_fn(path) or generic_query_processor
-
-    # update the query with a 'filters' value appropriate to type and frame
-    query['filters'] = query_processor(ptype, frame)
-
-    return query
+# ---
 
 def interesting_frames(start_date, end_date, frame_list):
     "do the start or end dates cross the frame boundary? if so, we're interested in it"

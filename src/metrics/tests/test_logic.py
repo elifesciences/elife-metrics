@@ -4,7 +4,6 @@ from article_metrics import utils
 from article_metrics.utils import tod, lmap, first, second, subdict
 from metrics import logic, models, history
 from datetime import date, timedelta
-from unittest import skip
 from unittest.mock import patch
 from collections import OrderedDict
 from django.db.models import Sum
@@ -12,12 +11,6 @@ from django.test import override_settings
 import json
 
 class One(base.BaseCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
     def test_no_nothing(self):
         "logic.page_views returns None when Page not found"
         expected_result = None
@@ -290,15 +283,6 @@ class Two(base.BaseCase):
         for idx, expected_row in expected:
             self.assertEqual(expected_row, processed_results[idx])
 
-    @skip('no special results processors anymore')
-    def test_process_response_special_processor(self):
-        "special handling of results may be necessary for specific time frames"
-        frame = {'id': '1', 'prefix': '/events'}
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
-        with patch('metrics.event_type.results_processor_frame_1') as mock:
-            logic.process_response(models.EVENT, frame, fixture)
-            self.assertTrue(mock.called)
-
     def test_process_response_no_results(self):
         "a response with no results issues a warning but otherwise doesn't break"
         frame = {'id': '2', 'prefix': '/events'}
@@ -419,51 +403,6 @@ class Three(base.BaseCase):
         self.assertEqual(models.PageType.objects.count(), 1) # 'event'
         # not the same as len(fixture.rows) because of aggregation
         self.assertEqual(models.PageCount.objects.count(), 138)
-
-class Four(base.BaseCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test_generic_query_pattern(self):
-        "dead simple usecase when you want full control of query to GA"
-        frame = {'pattern': '/pants'} # this would be shooting yourself in the foot however
-        expected = '/pants' # a list of GA queries typically, but we can get away with the bare minimum
-        self.assertEqual(logic.generic_query_processor('', frame), expected)
-
-    def test_generic_query_prefix(self):
-        "a simple 'prefix' and nothing else will get you a basic 'landing page and sub-contents' type query"
-        prefix = '/pants'
-        frame = {'prefix': prefix}
-        expected = logic.generic_ga_filter('/pants') # ll: "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$"
-        self.assertEqual(logic.generic_query_processor('', frame), expected)
-
-    def test_generic_query_prefix_list(self):
-        "a 'prefix' and a list of subpaths will get you a landing page and enumerated sub-paths query"
-        prefix = '/pants'
-        frame = {'prefix': prefix, 'path-list': ['foo', 'bar', 'baz']}
-        expected = "ga:pagePath=~^/pants$,ga:pagePath=~^/pants/foo$,ga:pagePath=~^/pants/bar$,ga:pagePath=~^/pants/baz$"
-        self.assertEqual(logic.generic_query_processor('', frame), expected)
-
-    def test_generic_query_prefix_list__collections(self):
-        "essentially a duplicate test, but using actual data"
-        collection = history.ptype_history(models.COLLECTION)
-        frame = collection['frames'][0]
-        # I do not endorse this official-but-awful method of string concatenation
-        expected = 'ga:pagePath=~^/collections/chemical-biology$' \
-                   ',ga:pagePath=~^/collections/tropical-disease$' \
-                   ',ga:pagePath=~^/collections/paleontology$' \
-                   ',ga:pagePath=~^/collections/human-genetics$' \
-                   ',ga:pagePath=~^/interviews/working-lives$' \
-                   ',ga:pagePath=~^/collections/natural-history-model-organisms$' \
-                   ',ga:pagePath=~^/natural-history-of-model-organisms$' \
-                   ',ga:pagePath=~^/collections/reproducibility-project-cancer-biology$' \
-                   ',ga:pagePath=~^/collections/plain-language-summaries$' \
-                   ',ga:pagePath=~^/interviews/early-career-researchers$'
-        actual = logic.generic_query_processor(models.COLLECTION, frame)
-        self.assertEqual(actual, expected)
 
 class Five(base.BaseCase):
     def test_parse_redirect_map(self):

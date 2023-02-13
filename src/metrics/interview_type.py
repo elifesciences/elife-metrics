@@ -1,5 +1,5 @@
 from article_metrics.utils import lmap
-from .logic import generic_ga_filter
+from .ga3 import generic_ga_filter
 
 def query_processor_frame_1(ptype, frame):
 
