@@ -48,7 +48,11 @@ def path_counts_query(table_id, from_date, to_date):
 # ...python *does* support {n,m} though, so we can filter bad article IDs in post
 # lsh@2021-11-30: still true.
 # parse the article ID from a path that may include an optional '/executable'.
-REGEX = r"/articles/(?P<artid>\d{1,5})"
+# lsh@2023-02-17: msid length increasing from max 5 digits to max 6 digits, however
+# this is a bad regex. it's been matching against "/articles/1234567890" and counting it as "/articles/12345"
+#REGEX = r"/articles/(?P<artid>\d{1,5})"
+# we now want 1-6 article digits, followed by the end of the line ($) OR url parameters, an anchor or a slash '/'
+REGEX = r"/articles/((?P<artid>\d{1,6})($|[?&#/]{1}){1})"
 PATH_RE = re.compile(REGEX, re.IGNORECASE)
 
 def path_count(pair):
