@@ -144,8 +144,11 @@ def ga_service():
     service = build(service_name, 'v3', http=http, cache_discovery=False)
     return service
 
-def guess_ga(query_map):
-    return GA3 if 'ids' in query_map else GA4
+def guess_era_from_query(query_map):
+    return GA3 if 'start_date' in query_map else GA4
+
+def guess_era_from_response(response):
+    return GA3 if 'query' in response else GA4
 
 # --- GA3 logic
 
@@ -334,7 +337,7 @@ def write_results_v2(results, path):
     json.dump(results, open(path, 'w'), indent=4, sort_keys=True)
 
 def query_ga_write_results_v2(query_map, from_date_dt, to_date_dt, results_type, **kwargs):
-    if guess_ga(query_map) == GA3:
+    if guess_era_from_query(query_map) == GA3:
         return query_ga_write_results(query_map, **kwargs)
 
     results = ga4.query_ga(query_map, **kwargs)

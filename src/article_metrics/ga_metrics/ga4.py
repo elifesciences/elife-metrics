@@ -87,7 +87,6 @@ def _query_ga(query_map, num_attempts=5):
 
     raise AssertionError("Failed to execute query after %s attempts" % num_attempts)
 
-# copied from non-article metrics logic.py
 def query_ga(query, **kwargs):
     """performs given `query` and fetches any further pages.
     results are concatenated and returned as part of the last response dict as `rows`."""

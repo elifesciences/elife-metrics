@@ -1,62 +1,46 @@
 from datetime import datetime
 from article_metrics.utils import ensure
+from article_metrics.ga_metrics import core as ga_core, utils as ga_utils
+import logging
 
-def generic_ga_filter(prefix):
-    "returns a generic GA pattern that handles `/prefix` and `/prefix/what/ever` patterns"
-    return "ga:pagePath=~^{prefix}$,ga:pagePath=~^{prefix}/.*$".format(prefix=prefix)
+LOG = logging.getLogger(__name__)
 
-def generic_ga_filter_w_paths(prefix, path_list):
-    stub = "ga:pagePath=~^{prefix}".format(prefix=prefix)
-
-    def mk(path):
-        return (stub + "/{path}$").format(path=path.lstrip('/'))
-    ql = ",".join(map(mk, path_list))
-    if prefix:
-        return "{landing}$,{enum}".format(landing=stub, enum=ql)
-    return ql
-
-def generic_query_processor(ptype, frame):
-    # NOTE: ptype is unused, it's just to match a query processor function's signature
-    ptype_filter = None
-    if frame.get('pattern'):
-        ptype_filter = frame['pattern']
-    elif frame.get('prefix') and frame.get('path-list'):
-        ptype_filter = generic_ga_filter_w_paths(frame['prefix'], frame['path-list'])
-    elif frame.get('prefix'):
-        ptype_filter = generic_ga_filter(frame['prefix'])
-    elif frame.get('path-map'):
-        ptype_filter = generic_ga_filter_w_paths('', frame['path-map'].keys())
-    ensure(ptype_filter, "bad frame data")
-    return ptype_filter
-
-
-def build_ga4_query__queries_for_frame(ptype, frame, start_date, end_date):
+def build_ga4_query__queries_for_frame(_, frame, start_date, end_date):
     ensure(isinstance(start_date, datetime), "'start' date must be a datetime object. received %r" % start_date)
     ensure(isinstance(end_date, datetime), "'end' date must be a datetime object. received %r" % end_date)
 
-    ga_filter = ""
+    # lsh@2023-02-13: there are no frames more complex than the 'prefix' anymore.
+    # pull any other logic in from ga3.py and dispatch as necessary.
 
-    query = {"dimensions": [{"name": "pagePathPlusQueryString"}],
-             "metrics": [{"name": "sessions"}],
-             # TODO: orderBys
-             "dateRanges": [{"startDate": '...',
-                            "endDate": '...'}],
-             "dimensionFilter": {
-        "filter": {
-            "fieldName": "pagePathPlusQueryString",
-            "stringFilter": {
-                "matchType": "FULL_REGEXP",
-                "value": ga_filter}}},
-             "limit": "10000"}
+    prefix = frame['prefix']
 
-    # look for the "query_processor_frame_foo" function ...
-    #path = "metrics.{ptype}_type.query_processor_frame_{id}".format(ptype=ptype, id=frame['id'])
+    # https://developers.google.com/analytics/devguides/reporting/data/v1
+    # https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema
+    return {"dimensions": [{"name": "pagePathPlusQueryString"}],
+            "metrics": [{"name": "sessions"}],
+            # TODO: orderBys
+            "dateRanges": [{"startDate": ga_utils.ymd(start_date),
+                            "endDate": ga_utils.ymd(end_date)}],
+            "dimensionFilter": {
+                "filter": {
+                    "fieldName": "pagePathPlusQueryString",
+                    "stringFilter": {
+                        "matchType": "BEGINS_WITH",
+                        "value": prefix}}},
+            "limit": "10000"}
 
-    # ... and use the generic query processor if not found.
-    #query_processor = load_fn(path) or generic_query_processor
-    query_processor = generic_query_processor
+def query_ga(ptype, query, results_pp=None, replace_cache_files=False):
+    ensure(not results_pp, "results_pp is ignored") # because it's *always* fixed at 10k
 
-    # update the query with a 'filters' value appropriate to type and frame
-    query['filters'] = query_processor(ptype, frame)
+    # urgh
+    start_dt = ga_utils.todt(query['dateRanges'][0]['startDate'])
+    end_dt = ga_utils.todt(query['dateRanges'][0]['endDate'])
 
-    return query
+    results, output_path = ga_core.query_ga_write_results2(query, start_dt, end_dt, ptype)
+    return results
+
+def process_response(ptype, frame, response):
+    if not response.get('rows'):
+        LOG.warning("GA responded with no results", extra={'query': response['query'], 'ptype': ptype, 'frame': frame})
+        return []
+    return []
