@@ -191,7 +191,6 @@ def tod(val):
     val = todt(val)
     return val.date()
 
-
 def utcnow():
     "returns a UTC datetime stamp with a UTC timezone object attached"
     # there is a datetime.utcnow(), but it doesn't attach a timezone object

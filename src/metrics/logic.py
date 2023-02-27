@@ -89,7 +89,7 @@ def build_ga_query__queries_for_frame(ptype, frame, start_date, end_date):
 def query_ga(ptype, query, results_pp=MAX_GA_RESULTS, replace_cache_files=False):
     if ga_core.guess_era_from_query(query) == ga_core.GA3:
         return ga3.query_ga(ptype, query, results_pp, replace_cache_files)
-    return ga4.query_ga(ptype, query, None, replace_cache_files)
+    return ga4.query_ga(ptype, query, replace_cache_files)
 
 # ---
 

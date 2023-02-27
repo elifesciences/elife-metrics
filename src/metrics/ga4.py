@@ -1,6 +1,9 @@
+from urllib.parse import urlparse
+from functools import partial
 from datetime import datetime
 from article_metrics.utils import ensure
-from article_metrics.ga_metrics import core as ga_core, utils as ga_utils
+from article_metrics.ga_metrics import core as ga_core
+from article_metrics import utils as ga_utils
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -16,7 +19,8 @@ def build_ga4_query__queries_for_frame(_, frame, start_date, end_date):
 
     # https://developers.google.com/analytics/devguides/reporting/data/v1
     # https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema
-    return {"dimensions": [{"name": "pagePathPlusQueryString"}],
+    return {"dimensions": [{"name": "date"},
+                           {"name": "pagePathPlusQueryString"}],
             "metrics": [{"name": "sessions"}],
             # TODO: orderBys
             "dateRanges": [{"startDate": ga_utils.ymd(start_date),
@@ -29,18 +33,49 @@ def build_ga4_query__queries_for_frame(_, frame, start_date, end_date):
                         "value": prefix}}},
             "limit": "10000"}
 
-def query_ga(ptype, query, results_pp=None, replace_cache_files=False):
-    ensure(not results_pp, "results_pp is ignored") # because it's *always* fixed at 10k
-
+def query_ga(ptype, query, replace_cache_files=False):
     # urgh
     start_dt = ga_utils.todt(query['dateRanges'][0]['startDate'])
     end_dt = ga_utils.todt(query['dateRanges'][0]['endDate'])
 
-    results, output_path = ga_core.query_ga_write_results2(query, start_dt, end_dt, ptype)
+    results_type = ptype
+    results, output_path = ga_core.query_ga_write_results_v2(query, start_dt, end_dt, results_type)
     return results
 
+# --- processing
+
+def prefixed_path_id(prefix, path):
+    path = urlparse(path).path.lower() # normalise
+    ensure(path.startswith(prefix), "path does not start with given prefix (%r): %s" % (prefix, path), ValueError)
+    path = path[len(prefix):].strip().strip('/') # /events => '', /events/foobar => foobar, /events/foo/bar/ => foo/bar
+    identifier = path.split('/', 1)[0] # '' => '', foobar => foobar, foo/bar => foo
+    return identifier
+
 def process_response(ptype, frame, response):
-    if not response.get('rows'):
+    rows = response.get('rows')
+    if not rows:
         LOG.warning("GA responded with no results", extra={'query': response['query'], 'ptype': ptype, 'frame': frame})
         return []
-    return []
+
+    id_fn = partial(prefixed_path_id, frame['prefix'])
+
+    def _process(row):
+        try:
+            datestr = row['dimensionValues'][0]['value']
+            path = row['dimensionValues'][1]['value']
+            count = row['metricValues'][0]['value']
+            identifier = id_fn(path)
+
+            if identifier is None:
+                return
+            return {
+                'views': int(count),
+                'date': datetime.strptime(datestr, "%Y%m%d").date(),
+                'identifier': identifier
+            }
+        except ValueError as err:
+            LOG.info("skipping row, bad value: %s" % str(err))
+        except Exception as err:
+            LOG.exception("unhandled exception processing row: %s", str(err), extra={"row": row})
+
+    return list(filter(None, map(_process, rows)))

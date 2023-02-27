@@ -18,7 +18,7 @@ import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 from . import utils, ga4
-from article_metrics.utils import lfilter
+from article_metrics.utils import lfilter, utcnow
 
 LOG = logging.getLogger(__name__)
 
@@ -309,7 +309,7 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     ensure(isinstance(to_date_dt, datetime), "to_date_dt must be a datetime object")
 
     from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
-    now_dt = datetime.now()
+    now_dt = utcnow()
     now = ymd(now_dt)
 
     # different formatting if two different dates are provided
@@ -333,7 +333,7 @@ def write_results_v2(results, path):
     "writes `results` as json to the given `path`"
     dirname = os.path.dirname(path)
     ensure(os.path.exists(dirname), "output directory does not exist: %s" % path)
-    LOG.info("writing %r", path)
+    LOG.debug("writing %r", path)
     json.dump(results, open(path, 'w'), indent=4, sort_keys=True)
 
 def query_ga_write_results_v2(query_map, from_date_dt, to_date_dt, results_type, **kwargs):
