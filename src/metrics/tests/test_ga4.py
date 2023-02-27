@@ -8,8 +8,8 @@ import pytest
 from article_metrics import utils
 import os
 
-@pytest.fixture
-def _tempdir(name="tempdir"):
+@pytest.fixture(name="tempdir")
+def _tempdir():
     path, closer = utils.tempdir()
     yield path
     closer()
