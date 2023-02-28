@@ -1,6 +1,6 @@
 from urllib.parse import urlparse
 from functools import partial
-from datetime import datetime
+from datetime import datetime, date
 from article_metrics.utils import ensure
 from article_metrics.ga_metrics import core as ga_core
 from article_metrics import utils as ga_utils
@@ -9,13 +9,17 @@ import logging
 LOG = logging.getLogger(__name__)
 
 def build_ga4_query__queries_for_frame(_, frame, start_date, end_date):
-    ensure(isinstance(start_date, datetime), "'start' date must be a datetime object. received %r" % start_date)
-    ensure(isinstance(end_date, datetime), "'end' date must be a datetime object. received %r" % end_date)
+    ensure(isinstance(start_date, date), "'start' date must be a datetime object. received %r" % start_date)
+    ensure(isinstance(end_date, date), "'end' date must be a datetime object. received %r" % end_date)
 
     # lsh@2023-02-13: there are no frames more complex than the 'prefix' anymore.
     # pull any other logic in from ga3.py and dispatch as necessary.
-
+    ensure('prefix' in frame, "frame with id %r has no 'prefix' key. ga4 only supported on frames using a simple prefix." % frame['id'])
     prefix = frame['prefix']
+
+    # cap the given date range (start_date, end_date) to frame boundaries if they extend beyond them.
+    start_date = frame['starts'] if start_date < frame['starts'] else start_date
+    end_date = frame['ends'] if end_date > frame['ends'] else end_date
 
     # https://developers.google.com/analytics/devguides/reporting/data/v1
     # https://developers.google.com/analytics/devguides/reporting/data/v1/api-schema
@@ -31,6 +35,10 @@ def build_ga4_query__queries_for_frame(_, frame, start_date, end_date):
                     "stringFilter": {
                         "matchType": "BEGINS_WITH",
                         "value": prefix}}},
+            "orderBys": [
+                {"desc": True,
+                 "dimension": {"dimensionName": "date",
+                               "orderType": "NUMERIC"}}],
             "limit": "10000"}
 
 def query_ga(ptype, query, replace_cache_files=False):

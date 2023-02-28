@@ -7,7 +7,6 @@ from datetime import date
 from . import logic, models
 from article_metrics import utils
 import logging
-from functools import partial
 
 LOG = logging.getLogger(__name__)
 

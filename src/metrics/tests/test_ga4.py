@@ -27,12 +27,19 @@ def test_build_ga4_query__queries_for_frame():
                 "stringFilter": {
                     "matchType": "BEGINS_WITH",
                     "value": "/inside-elife"}}},
+        "orderBys": [
+                {"desc": True,
+                 "dimension": {"dimensionName": "date",
+                               "orderType": "NUMERIC"}}],
         "limit": "10000"}
 
     start_dt = datetime(year=2023, month=1, day=1)
     end_dt = datetime(year=2023, month=1, day=31)
 
-    frame = {'prefix': '/inside-elife'}
+    frame = {'id': 'foo',
+             'prefix': '/inside-elife',
+             'starts': start_dt,
+             'ends': end_dt}
 
     actual = ga4.build_ga4_query__queries_for_frame(None, frame, start_dt, end_dt)
     assert actual == expected
@@ -41,9 +48,13 @@ def test_query_ga(tempdir):
     """not a great test, but essentially we expect `ga4.query_ga` to query ga and return
     the results from GA without modification, writing a cache file as a side effect.
     """
-    frame = {'prefix': '/inside-elife'}
     start_dt = datetime(year=2023, month=1, day=1)
     end_dt = datetime(year=2023, month=1, day=31)
+    frame = {'id': 'foo',
+             'prefix': '/inside-elife',
+             'starts': start_dt,
+             'ends': end_dt}
+
     query = ga4.build_ga4_query__queries_for_frame(None, frame, start_dt, end_dt)
 
     results_type = 'blog-article'

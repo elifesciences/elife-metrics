@@ -13,8 +13,6 @@ DAY, MONTH = 'day', 'month'
 
 MAX_GA_RESULTS = 10000
 
-GA4_SWITCH_DATE = ga_core.GA4_SWITCH.date()
-
 def is_pid(pid):
     return isinstance(pid, str) and len(pid) < 256
 
@@ -78,8 +76,14 @@ def build_ga_query__queries_for_frame(ptype, frame, start_date, end_date):
     ga3.py has lots of query generation logic, probably over engineered
     ga4.py is much the same
     both should return results that can be processed with the `process_response` logic above.
+
+    `start_date` and `end_date` is the given date range, it may extend across multiple frames.
+    the given `frame` falls within the given date range, either entirely or partially.
+
+    The new ga4 frames align with the switch to GA4 so all we need to do here is check
+    if the given frame starts on the `GA4_SWITCH` date.
     """
-    era = ga_core.GA3 if end_date <= GA4_SWITCH_DATE else ga_core.GA4
+    era = ga_core.GA4 if frame['starts'] >= ga_core.GA4_SWITCH.date() else ga_core.GA3
     if era == ga_core.GA3:
         return ga3.build_ga3_query__queries_for_frame(ptype, frame, start_date, end_date)
     return ga4.build_ga4_query__queries_for_frame(ptype, frame, start_date, end_date)
@@ -129,6 +133,11 @@ def build_ga_query(ptype, start_date=None, end_date=None):
 
     # only those frames that overlap our start/end dates
     frame_list = interesting_frames(start_date, end_date, frame_list)
+
+    # note: would be nice but ... logic belongs in history.py and too many tests assume asc order
+    # reverse the frame list so db inserts output doesn't look strangely chunked.
+    # for example, starting at 2017 down to 2014, then jumps to 2022 down to 2017, then up to 2023
+    #frame_list = frame_list[::-1]
 
     # each timeframe requires it's own pattern generation, post processing and normalisation
     query_list = [(frame, build_ga_query__queries_for_frame(ptype, frame, start_date, end_date)) for frame in frame_list]
