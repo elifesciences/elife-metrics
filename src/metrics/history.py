@@ -1,12 +1,14 @@
 from article_metrics.ga_metrics.core import GA4_SWITCH
 from article_metrics.utils import lmap
 from schema import Schema, And, Or, Use as Coerce, Optional, SchemaError
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from django.conf import settings
 import logging
 from article_metrics.utils import ensure
 
 LOG = logging.getLogger(__name__)
+
+one_day = timedelta(days=1)
 
 HISTORY_DATA = {
     'blog-article': {
@@ -17,7 +19,7 @@ HISTORY_DATA = {
              'prefix': '/inside-elife'},
 
             {'starts': '2017-06-01',
-             'ends': GA4_SWITCH,
+             'ends': GA4_SWITCH - one_day,
              'id': 2,
              'prefix': '/inside-elife'},
 
@@ -36,7 +38,7 @@ HISTORY_DATA = {
              'prefix': '/collections'},
 
             {'starts': '2017-06-01',
-             'ends': GA4_SWITCH,
+             'ends': GA4_SWITCH - one_day,
              'id': 2,
              'prefix': '/collections'},
 
@@ -62,7 +64,7 @@ HISTORY_DATA = {
              'prefix': '/digests'},
 
             {'starts': '2017-09-01',
-             'ends': GA4_SWITCH,
+             'ends': GA4_SWITCH - one_day,
              'id': 1,
              'prefix': '/digests'}]},
 
@@ -74,7 +76,7 @@ HISTORY_DATA = {
              'prefix': '/events'},
 
             {'starts': '2017-06-01',
-             'ends': GA4_SWITCH,
+             'ends': GA4_SWITCH - one_day,
              'id': 2,
              'prefix': '/events'},
 
@@ -97,7 +99,7 @@ HISTORY_DATA = {
              'prefix': '/interviews'},
 
             {'starts': '2017-06-01',
-             'ends': GA4_SWITCH,
+             'ends': GA4_SWITCH - one_day,
              'id': 2,
              'prefix': '/interviews'},
 
@@ -115,7 +117,7 @@ HISTORY_DATA = {
              'prefix': '/labs'},
 
             {'starts': '2017-06-01',
-             'ends': GA4_SWITCH,
+             'ends': GA4_SWITCH - one_day,
              'id': 1, # todo: shouldn't this be 2?
              'prefix': '/labs'},
 
@@ -145,7 +147,7 @@ HISTORY_DATA = {
              'prefix': '/for-the-press'},
 
             {'starts': '2017-06-01',
-             'ends': GA4_SWITCH,
+             'ends': GA4_SWITCH - one_day,
              'id': 2,
              'prefix': '/for-the-press'},
 
