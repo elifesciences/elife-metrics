@@ -177,8 +177,13 @@ class V6(base.SimpleBaseCase):
             with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
                 ga_table_id = '0xdeadbeef'
                 results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
-                expected_num_results = 11738
-                expected_total = Counter(full=712582, abstract=0, digest=0)
+                # lsh@2023-02-17: regular expression changed. msids now go to 6 digits and anything longer is excluded.
+                # "/articles/058355" is now being counted
+                # "/articles/5708990" is now being excluded and not counted as "570899"
+                #expected_num_results = 11738
+                #expected_total = Counter(full=712582, abstract=0, digest=0)
+                expected_num_results = 11739
+                expected_total = Counter(full=712581, abstract=0, digest=0)
 
                 # representative sample of `/article` and `/article/executable`, /article?foo=...
                 expected_sample = [
