@@ -161,11 +161,11 @@ HISTORY_DATA = {
 # --- spec
 
 def date_wrangler(v):
-    if isinstance(v, datetime.date):
+    if type(v) == datetime.date:
         return v
-    if isinstance(v, str):
+    if type(v) == str:
         return datetime.datetime.strptime(v, "%Y-%m-%d").date()
-    if isinstance(v, datetime.datetime):
+    if type(v) == datetime.datetime:
         return v.date()
     raise ValueError("could not wrangle date value: %s" % v)
 
