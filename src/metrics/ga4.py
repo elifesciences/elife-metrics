@@ -85,7 +85,7 @@ def process_response(ptype, frame, response):
                 'identifier': identifier
             }
         except ValueError as err:
-            LOG.debug("skipping row, bad value: %s" % str(err))
+            LOG.error("skipping row, bad value: %s" % str(err))
         except Exception as err:
             LOG.exception("unhandled exception processing row: %s", str(err), extra={"row": row})
 

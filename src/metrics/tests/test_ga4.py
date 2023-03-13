@@ -89,6 +89,18 @@ def test_process_response():
     actual = ga4.process_response(ptype, frame, response)
     assert actual[:10] == expected[:10]
 
+def test_process_response__other_row():
+    expected = []
+    expected_error = "skipping row, bad value: path does not start with given prefix ('/inside-elife'): (other)"
+    ptype = 'blog-article'
+    frame = {'prefix': '/inside-elife'}
+    response = json.load(open(base.fixture_path('ga4-response--other_row.json'), 'r'))
+    with mock.patch('metrics.ga4.LOG') as log:
+        actual = ga4.process_response(ptype, frame, response)
+        assert actual == expected
+        assert log.error.call_count == 1
+        assert log.error.call_args.args[0] == expected_error
+
 def test_prefixed_path_id():
     "a prefix is stripped from a path and the first of any remaining path segments is returned"
     cases = [
