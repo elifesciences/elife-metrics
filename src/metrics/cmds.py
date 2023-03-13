@@ -7,20 +7,22 @@ from datetime import date
 from . import logic, models
 from article_metrics import utils
 import logging
-from functools import partial
 
 LOG = logging.getLogger(__name__)
 
-def ingest_command(type_list, replace_cache_files=False):
+def ingest_command(ptype_list, replace_cache_files=False):
+    if ptype_list:
+        known_type_list = ", ".join(models.PAGE_TYPES)
+        for ptype in ptype_list:
+            utils.ensure(ptype in models.PAGE_TYPES, "unknown page type %r. known types: %s" % (ptype, known_type_list))
+    else:
+        ptype_list = models.PAGE_TYPES
     try:
-        supported_types = [t for t in type_list if t in models.PAGE_TYPES] or models.PAGE_TYPES
-        update_ptype = partial(logic.update_ptype, replace_cache_files=replace_cache_files)
-        utils.lmap(update_ptype, supported_types)
+        [logic.update_ptype(ptype, replace_cache_files=replace_cache_files) for ptype in ptype_list]
     except BaseException as err:
         LOG.exception(str(err))
 
 def update_test_fixtures():
-
     # ga-response-events-frame2.json
     start = date(year=2018, month=1, day=1)
     end = date(year=2018, month=1, day=31)

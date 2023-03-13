@@ -16,6 +16,8 @@ export DJANGO_SETTINGS_MODULE=core.settings
 pytest "$module" \
     -vvv \
     --no-migrations \
+    --capture=sys \
+    --show-capture=all \
     --cov=src --cov-config=.coveragerc --cov-report=html \
     --disable-socket
 

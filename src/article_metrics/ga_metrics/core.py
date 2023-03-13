@@ -12,13 +12,13 @@ from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
-from .utils import ymd, firstof, month_min_max, d2dt, ensure
+from .utils import ymd, month_min_max, d2dt, ensure
 from kids.cache import cache
 import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 from . import utils, ga4
-from article_metrics.utils import lfilter
+from article_metrics.utils import lfilter, utcnow
 
 LOG = logging.getLogger(__name__)
 
@@ -54,7 +54,7 @@ URL_PARAMS = datetime(year=2021, month=11, day=30)
 
 # switch from ga3 to ga4
 # todo: fix the module in place during testing, test module_picker separately.
-GA4_SWITCH = datetime(year=2022, month=11, day=1)
+GA4_SWITCH = datetime(year=2023, month=2, day=1)
 
 # todo: compare this to old split logic
 def module_picker(from_date, to_date):
@@ -130,18 +130,10 @@ def sanitize_ga_response(ga_response):
         del ga_response['query']['ids']
     return ga_response
 
-def oauth_secrets():
-    settings_file = firstof(os.path.exists, settings.GA_SECRETS_LOCATION_LIST)
-    if not settings_file:
-        loc_list = '\n'.join(settings.GA_SECRETS_LOCATION_LIST)
-        msg = "could not find the credentials file! I looked here:\n%s" % loc_list
-        raise EnvironmentError(msg)
-    return settings_file
-
 @cache
 def ga_service():
     service_name = 'analytics'
-    settings_file = oauth_secrets()
+    settings_file = settings.GA_SECRETS_LOCATION
     scope = 'https://www.googleapis.com/auth/analytics.readonly'
     credentials = ServiceAccountCredentials.from_json_keyfile_name(settings_file, scopes=[scope])
     http = Http()
@@ -152,8 +144,13 @@ def ga_service():
     service = build(service_name, 'v3', http=http, cache_discovery=False)
     return service
 
-def guess_ga(query_map):
-    return GA3 if 'ids' in query_map else GA4
+def guess_era_from_query(query_map):
+    # ga4 queries uses `dateRanges.0.startDate`.
+    return GA3 if 'start_date' in query_map else GA4
+
+def guess_era_from_response(response):
+    # ga4 does not return the query in the response.
+    return GA3 if 'query' in response else GA4
 
 # --- GA3 logic
 
@@ -314,7 +311,7 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     ensure(isinstance(to_date_dt, datetime), "to_date_dt must be a datetime object")
 
     from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
-    now_dt = datetime.now()
+    now_dt = utcnow()
     now = ymd(now_dt)
 
     # different formatting if two different dates are provided
@@ -338,11 +335,11 @@ def write_results_v2(results, path):
     "writes `results` as json to the given `path`"
     dirname = os.path.dirname(path)
     ensure(os.path.exists(dirname), "output directory does not exist: %s" % path)
-    LOG.info("writing %r", path)
+    LOG.debug("writing %r", path)
     json.dump(results, open(path, 'w'), indent=4, sort_keys=True)
 
 def query_ga_write_results_v2(query_map, from_date_dt, to_date_dt, results_type, **kwargs):
-    if guess_ga(query_map) == GA3:
+    if guess_era_from_query(query_map) == GA3:
         return query_ga_write_results(query_map, **kwargs)
 
     results = ga4.query_ga(query_map, **kwargs)

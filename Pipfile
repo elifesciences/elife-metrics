@@ -43,6 +43,8 @@ pylint = "~=2.3"
 pytest = "~=7.2"
 pytest-cov = "~=4.0"
 pytest-django = "~=4.5"
-pytest-socket = "~=0.5.1"
-responses = "~=0.9"
+# using semver, but hasn't hit 1.0 yet
+pytest-socket = "==0.5.1"
+# not using semver or hasn't hit 1.0 yet
+responses = "==0.22.*"
 unittest-xml-reporting = "~=2.2"

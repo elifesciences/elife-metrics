@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            cmds.ingest_command(type_list=options['just_type'], replace_cache_files=options['replace_cache_files'])
+            cmds.ingest_command(ptype_list=options['just_type'], replace_cache_files=options['replace_cache_files'])
         except BaseException as err:
             LOG.error("uncaught exception calling command 'ingest': %s" % err, extra={'cli-args': options})
             sys.exit(1)

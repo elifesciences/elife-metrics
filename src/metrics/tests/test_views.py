@@ -79,7 +79,7 @@ class Two(base.BaseCase):
 class Three(base.BaseCase):
     def setUp(self):
         self.c = Client()
-        self.spec_content_types = history.load_from_file().keys()
+        self.spec_content_types = history.load_history().keys()
         # create a page "asdf" for every content type in history file
         # this itself may fail if models.PAGE_TYPES hasn't been updated
         self.dummy_id = "asdf"
