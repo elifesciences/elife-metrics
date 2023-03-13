@@ -1,14 +1,14 @@
 from article_metrics.ga_metrics.core import GA4_SWITCH
 from article_metrics.utils import lmap
 from schema import Schema, And, Or, Use as Coerce, Optional, SchemaError
-from datetime import datetime, date, timedelta
+import datetime
 from django.conf import settings
 import logging
 from article_metrics.utils import ensure
 
 LOG = logging.getLogger(__name__)
 
-one_day = timedelta(days=1)
+one_day = datetime.timedelta(days=1)
 
 HISTORY_DATA = {
     'blog-article': {
@@ -118,12 +118,12 @@ HISTORY_DATA = {
 
             {'starts': '2017-06-01',
              'ends': GA4_SWITCH - one_day,
-             'id': 1, # todo: shouldn't this be 2?
+             'id': 2,
              'prefix': '/labs'},
 
             {'starts': '2015-08-01',
              'ends': '2017-05-31',
-             'id': 2,
+             'id': 1,
              'path-map': {'/elife-news/authoring-online-lens-writer': '417bcedc',
                           '/elife-news/colab-instant-messaging-scientists': '75edb315',
                           '/elife-news/composing-reproducible-manuscripts-using-r-markdown': 'cad57bcf',
@@ -161,23 +161,27 @@ HISTORY_DATA = {
 # --- spec
 
 def date_wrangler(v):
+    if isinstance(v, datetime.date):
+        return v
     if isinstance(v, str):
-        return datetime.strptime(v, "%Y-%m-%d").date()
-    if isinstance(v, datetime):
+        return datetime.datetime.strptime(v, "%Y-%m-%d").date()
+    if isinstance(v, datetime.datetime):
         return v.date()
-    return v
+    raise ValueError("could not wrangle date value: %s" % v)
 
 def frames_wrangler(frame_list):
 
     def fill_empties(frame):
         frame['starts'] = frame['starts'] or settings.INCEPTION.date()
-        frame['ends'] = frame['ends'] or date.today()
+        frame['ends'] = frame['ends'] or datetime.date.today()
         return frame
 
     frame_list = lmap(fill_empties, frame_list)
     frame_list = sorted(frame_list, key=lambda f: f['starts']) # ASC
 
     # TODO: ensure no overlaps between frames
+    # TODO: ensure start_date is less than end_date!
+    # happens when end_date is None and start_date is in the future.
 
     return frame_list
 

@@ -54,7 +54,7 @@ URL_PARAMS = datetime(year=2021, month=11, day=30)
 
 # switch from ga3 to ga4
 # todo: fix the module in place during testing, test module_picker separately.
-GA4_SWITCH = datetime(year=2023, month=7, day=1)
+GA4_SWITCH = datetime(year=2023, month=2, day=1)
 
 # todo: compare this to old split logic
 def module_picker(from_date, to_date):
@@ -145,9 +145,11 @@ def ga_service():
     return service
 
 def guess_era_from_query(query_map):
+    # ga4 queries uses `dateRanges.0.startDate`.
     return GA3 if 'start_date' in query_map else GA4
 
 def guess_era_from_response(response):
+    # ga4 does not return the query in the response.
     return GA3 if 'query' in response else GA4
 
 # --- GA3 logic

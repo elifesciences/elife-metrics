@@ -3,8 +3,6 @@ from datetime import datetime
 from urllib.parse import urlparse
 from functools import partial
 from collections import OrderedDict
-
-
 import importlib
 from article_metrics.utils import ensure, lmap, lfilter
 from article_metrics.ga_metrics import core as ga_core
@@ -213,7 +211,5 @@ def process_response(ptype, frame, response):
     results_processor = generic_results_processor
 
     normalised = results_processor(ptype, frame, rows)
-
-    # todo: schema check normalised rows. should be easy
 
     return normalised

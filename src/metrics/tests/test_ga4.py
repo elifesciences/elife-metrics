@@ -3,7 +3,6 @@ from . import base
 from unittest import mock
 from datetime import date, datetime
 from metrics import ga4
-#from django.test import override_settings
 import pytest
 from article_metrics import utils
 import os
@@ -41,7 +40,8 @@ def test_build_ga4_query__queries_for_frame():
              'starts': start_dt,
              'ends': end_dt}
 
-    actual = ga4.build_ga4_query__queries_for_frame(None, frame, start_dt, end_dt)
+    ptype = None
+    actual = ga4.build_ga4_query__queries_for_frame(ptype, frame, start_dt, end_dt)
     assert actual == expected
 
 def test_query_ga(tempdir):
@@ -55,11 +55,12 @@ def test_query_ga(tempdir):
              'starts': start_dt,
              'ends': end_dt}
 
-    query = ga4.build_ga4_query__queries_for_frame(None, frame, start_dt, end_dt)
+    ptype = None
+    query = ga4.build_ga4_query__queries_for_frame(ptype, frame, start_dt, end_dt)
 
     results_type = 'blog-article'
 
-    expected = fixture = json.loads(open(base.fixture_path('ga4-response--blog-articles.json'), 'r').read())
+    expected = fixture = json.load(open(base.fixture_path('ga4-response--blog-articles.json'), 'r'))
 
     output_path = os.path.join(tempdir, 'foo.json')
     with mock.patch('article_metrics.ga_metrics.core.output_path_v2', return_value=output_path):
@@ -68,7 +69,7 @@ def test_query_ga(tempdir):
 
     assert actual == expected
     assert os.path.exists(output_path)
-    assert json.loads(open(output_path, 'r').read()) == expected
+    assert json.load(open(output_path, 'r')) == expected
 
 def test_process_response():
     expected = [
@@ -84,6 +85,20 @@ def test_process_response():
         {'date': date(2023, 1, 2), 'identifier': 'ddab483b', 'views': 5}]
     ptype = 'blog-article'
     frame = {'prefix': '/inside-elife'}
-    response = json.loads(open(base.fixture_path('ga4-response--blog-articles.json'), 'r').read())
+    response = json.load(open(base.fixture_path('ga4-response--blog-articles.json'), 'r'))
     actual = ga4.process_response(ptype, frame, response)
     assert actual[:10] == expected[:10]
+
+def test_prefixed_path_id():
+    "a prefix is stripped from a path and the first of any remaining path segments is returned"
+    cases = [
+        ("/pants/foobar", "foobar"),
+        ("/pants/foo/bar", "foo"),
+        ("https://sub.example.org/pants/foo/bar", "foo"),
+        ("/pants/foo?bar=baz", "foo"),
+        ("/pants/foo?bar=baz&bup=", "foo"),
+        ("/pants/foo#bar", "foo"),
+        ("/pants/foo#bar?baz=bup", "foo"),
+    ]
+    for given, expected in cases:
+        assert ga4.prefixed_path_id('/pants', given) == expected

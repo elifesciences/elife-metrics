@@ -10,19 +10,19 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
-def ingest_command(type_list, replace_cache_files=False):
-    if type_list:
-        for ptype in type_list:
-            utils.ensure(ptype in models.PAGE_TYPES, "unknown page type %r" % ptype)
+def ingest_command(ptype_list, replace_cache_files=False):
+    if ptype_list:
+        known_type_list = ", ".join(models.PAGE_TYPES)
+        for ptype in ptype_list:
+            utils.ensure(ptype in models.PAGE_TYPES, "unknown page type %r. known types: %s" % (ptype, known_type_list))
     else:
-        type_list = models.PAGE_TYPES
+        ptype_list = models.PAGE_TYPES
     try:
-        [logic.update_ptype(ptype, replace_cache_files=replace_cache_files) for ptype in type_list]
+        [logic.update_ptype(ptype, replace_cache_files=replace_cache_files) for ptype in ptype_list]
     except BaseException as err:
         LOG.exception(str(err))
 
 def update_test_fixtures():
-
     # ga-response-events-frame2.json
     start = date(year=2018, month=1, day=1)
     end = date(year=2018, month=1, day=31)

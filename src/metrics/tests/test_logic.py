@@ -1,6 +1,5 @@
 from . import base
 import os
-from article_metrics import utils
 from article_metrics.utils import tod
 from metrics import logic, models
 from datetime import date, timedelta
@@ -56,59 +55,54 @@ class One(base.BaseCase):
         self.assertEqual(total, expected_sum)
         self.assertEqual(qobj.count(), expected_result_count)
 
-class Two(base.BaseCase):
-    def setUp(self):
-        self.tmpdir, self.rm_tmpdir = utils.tempdir()
+def test_interesting_frames():
+    one_day = timedelta(days=1)
+    one_moonth = timedelta(days=28)
+    a = date(year=2017, month=1, day=1)
+    b = a + one_moonth
+    c = b + one_moonth
+    d = c + one_moonth
+    e = d + one_moonth
+    f = e + one_moonth
 
-    def tearDown(self):
-        self.rm_tmpdir()
+    starts, ends = b + one_day, e - one_day
 
-    def test_interesting_frames(self):
-        one_day = timedelta(days=1)
-        one_moonth = timedelta(days=28)
-        a = date(year=2017, month=1, day=1)
-        b = a + one_moonth
-        c = b + one_moonth
-        d = c + one_moonth
-        e = d + one_moonth
-        f = e + one_moonth
+    frames = [
+        {'starts': a, 'ends': b}, # outside of scope
+        {'starts': b, 'ends': c}, # partially in scope
+        {'starts': c, 'ends': d}, # completely in scope
+        {'starts': d, 'ends': e}, # partially in scope
+        {'starts': e, 'ends': f}, # outside of scope
+    ]
 
-        starts, ends = b + one_day, e - one_day
+    expected_frames = [
+        {'starts': b, 'ends': c}, # partially in scope
+        {'starts': c, 'ends': d}, # completely in scope
+        {'starts': d, 'ends': e}, # partially in scope
+    ]
+    assert logic.interesting_frames(starts, ends, frames) == expected_frames
 
-        frames = [
-            {'starts': a, 'ends': b}, # outside of scope
-            {'starts': b, 'ends': c}, # partially in scope
-            {'starts': c, 'ends': d}, # completely in scope
-            {'starts': d, 'ends': e}, # partially in scope
-            {'starts': e, 'ends': f}, # outside of scope
-        ]
+def test_aggregate():
+    normalised_rows = logic.asmaps([
+        ("/events/foo", tod("2018-01-01"), 1),
+        ("/events/foo", tod("2018-01-02"), 2),
 
-        expected_frames = [
-            {'starts': b, 'ends': c}, # partially in scope
-            {'starts': c, 'ends': d}, # completely in scope
-            {'starts': d, 'ends': e}, # partially in scope
-        ]
-        self.assertEqual(logic.interesting_frames(starts, ends, frames), expected_frames)
+        ("/events/foo", tod("2018-01-03"), 2),
+        ("/events/bar", tod("2018-01-03"), 1),
+        ("/events/foo", tod("2018-01-03"), 2),
+    ])
+
+    # rows are sorted by date+path desc.
+    # this means '2018-01-03' comes before '2018-01-02' and 'f' comes before 'b'
+    expected_result = logic.asmaps([
+        ("/events/foo", tod("2018-01-03"), 4), # aggregated row
+        ("/events/bar", tod("2018-01-03"), 1),
+        ("/events/foo", tod("2018-01-02"), 2),
+        ("/events/foo", tod("2018-01-01"), 1),
+    ])
+    assert logic.aggregate(normalised_rows) == expected_result
 
 class Three(base.BaseCase):
-
-    def test_aggregate(self):
-        normalised_rows = logic.asmaps([
-            ("/events/foo", tod("2018-01-01"), 1),
-            ("/events/foo", tod("2018-01-02"), 2),
-
-            ("/events/foo", tod("2018-01-03"), 2),
-            ("/events/bar", tod("2018-01-03"), 1),
-            ("/events/foo", tod("2018-01-03"), 2),
-        ])
-
-        expected_result = logic.asmaps([
-            ("/events/foo", tod("2018-01-01"), 1),
-            ("/events/foo", tod("2018-01-02"), 2),
-            ("/events/foo", tod("2018-01-03"), 4), # aggregated
-            ("/events/bar", tod("2018-01-03"), 1)
-        ])
-        self.assertCountEqual(logic.aggregate(normalised_rows), expected_result)
 
     def test_insert(self):
         self.assertEqual(models.Page.objects.count(), 0)

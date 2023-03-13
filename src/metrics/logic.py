@@ -57,7 +57,7 @@ def aggregate(normalised_rows):
     rows = asmaps(rows)
 
     # sort rows by date and then path
-    # not necessary, but makes output nicer
+    # not necessary, but makes output predictable
     rows = sorted(rows, key=lambda r: ymd(r['date']) + r['identifier'], reverse=True) # DESC
 
     return rows
@@ -71,18 +71,14 @@ def process_response(ptype, frame, response):
 # ---
 
 def build_ga_query__queries_for_frame(ptype, frame, start_date, end_date):
-    """
-    the big ga3 to ga4 switch.
-    ga3.py has lots of query generation logic, probably over engineered
-    ga4.py is much the same
-    both should return results that can be processed with the `process_response` logic above.
+    """returns a list of GA3 and GA4 query maps for the given `frame` and for the given date range.
+    if the date range is outside of the frame's boundaries the range is capped.
 
     `start_date` and `end_date` is the given date range, it may extend across multiple frames.
     the given `frame` falls within the given date range, either entirely or partially.
 
     The new ga4 frames align with the switch to GA4 so all we need to do here is check
-    if the given frame starts on the `GA4_SWITCH` date.
-    """
+    if the given frame starts on the `GA4_SWITCH` date."""
     era = ga_core.GA4 if frame['starts'] >= ga_core.GA4_SWITCH.date() else ga_core.GA3
     if era == ga_core.GA3:
         return ga3.build_ga3_query__queries_for_frame(ptype, frame, start_date, end_date)
@@ -134,9 +130,9 @@ def build_ga_query(ptype, start_date=None, end_date=None):
     # only those frames that overlap our start/end dates
     frame_list = interesting_frames(start_date, end_date, frame_list)
 
-    # note: would be nice but ... logic belongs in history.py and too many tests assume asc order
     # reverse the frame list so db inserts output doesn't look strangely chunked.
     # for example, starting at 2017 down to 2014, then jumps to 2022 down to 2017, then up to 2023
+    # note: would be nice but ... logic belongs in history.py and too many tests assume asc order
     #frame_list = frame_list[::-1]
 
     # each timeframe requires it's own pattern generation, post processing and normalisation
@@ -174,7 +170,7 @@ def update_page_counts(ptype, page_counts):
 #
 
 def update_ptype(ptype, replace_cache_files=False):
-    "query GA about a page-type and then processing and storing the results"
+    "query GA about a page-type, then process and store the results."
     try:
         for frame, query in build_ga_query(ptype):
             response = query_ga(ptype, query, replace_cache_files=replace_cache_files)

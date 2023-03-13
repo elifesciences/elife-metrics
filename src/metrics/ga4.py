@@ -9,6 +9,10 @@ import logging
 LOG = logging.getLogger(__name__)
 
 def build_ga4_query__queries_for_frame(_, frame, start_date, end_date):
+    """returns a list of GA4 query maps for the given `frame` and for the given date range.
+    the date range may fall inside or outside of the frame's own boundaries.
+    if the date range is outside of the frame's boundaries the range is capped.
+    """
     ensure(isinstance(start_date, date), "'start' date must be a datetime object. received %r" % start_date)
     ensure(isinstance(end_date, date), "'end' date must be a datetime object. received %r" % end_date)
 
@@ -42,7 +46,6 @@ def build_ga4_query__queries_for_frame(_, frame, start_date, end_date):
             "limit": "10000"}
 
 def query_ga(ptype, query, replace_cache_files=False):
-    # urgh
     start_dt = ga_utils.todt(query['dateRanges'][0]['startDate'])
     end_dt = ga_utils.todt(query['dateRanges'][0]['endDate'])
 
@@ -53,6 +56,9 @@ def query_ga(ptype, query, replace_cache_files=False):
 # --- processing
 
 def prefixed_path_id(prefix, path):
+    """returns the 'foo' portion of a given `path` like '/events/foo', but only if `path` starts with `prefix`.
+    longer paths like '/events/foo/bar' or paths with query parameters like '/events/foo?bar=bar' will still
+    only return the 'foo' portion."""
     path = urlparse(path).path.lower() # normalise
     ensure(path.startswith(prefix), "path does not start with given prefix (%r): %s" % (prefix, path), ValueError)
     path = path[len(prefix):].strip().strip('/') # /events => '', /events/foobar => foobar, /events/foo/bar/ => foo/bar
@@ -73,16 +79,13 @@ def process_response(ptype, frame, response):
             path = row['dimensionValues'][1]['value']
             count = row['metricValues'][0]['value']
             identifier = id_fn(path)
-
-            if identifier is None:
-                return
             return {
                 'views': int(count),
                 'date': datetime.strptime(datestr, "%Y%m%d").date(),
                 'identifier': identifier
             }
         except ValueError as err:
-            LOG.info("skipping row, bad value: %s" % str(err))
+            LOG.debug("skipping row, bad value: %s" % str(err))
         except Exception as err:
             LOG.exception("unhandled exception processing row: %s", str(err), extra={"row": row})
 
