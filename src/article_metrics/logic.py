@@ -69,7 +69,7 @@ def get_create_article(data):
         LOG.warning("refusing to fetch/create bad article: %s" % err, extra={'article-data': data})
 
 def _insert_row(data):
-    "creates or updates a Metric in the database using `data`."
+    "creates or updates a `models.Metric` in the database using `data`."
     article_obj = get_create_article({'doi': data['doi']})
     if not article_obj:
         LOG.warning("refusing to insert bad metric", extra={'row-data': data})

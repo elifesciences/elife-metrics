@@ -1,7 +1,7 @@
 from . import base
 from datetime import datetime, timedelta
 from article_metrics.ga_metrics import utils
-from article_metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4, elife_v5
+from article_metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 
 class One(base.SimpleBaseCase):
     def setUp(self):
@@ -33,6 +33,12 @@ class One(base.SimpleBaseCase):
 
             # on the day of the addition of /executable, we use v5 urls
             (core.RDS_ADDITION, elife_v5),
+
+            # on the day *after* the capturing of url parameters, we use v6 urls
+            (core.URL_PARAMS + d1, elife_v6),
+
+            # on the day of the GA4 switch, we use v7 urls
+            (core.GA4_SWITCH, elife_v7),
         ]
         for dt, expected_module in expectations:
             self.assertEqual(expected_module, core.module_picker(dt, dt),
@@ -45,7 +51,9 @@ class One(base.SimpleBaseCase):
         dec2015 = datetime(year=2015, month=12, day=1), datetime(year=2015, month=12, day=31)
         june2017 = datetime(year=2017, month=6, day=1), datetime(year=2017, month=6, day=30)
         feb2020 = datetime(year=2020, month=2, day=1), datetime(year=2020, month=2, day=28)
-        mar2020 = datetime(year=2020, month=3, day=1), datetime(year=2020, month=3, day=31)
+        mar2020 = datetime(year=2020, month=3, day=1), datetime(year=2021, month=11, day=30)
+        dec2021 = datetime(year=2021, month=12, day=1), datetime(year=2023, month=3, day=31)
+        apr2023 = datetime(year=2023, month=4, day=1), datetime(year=2023, month=3, day=31)
 
         expectations = [
             # on the day, we still use v1 of the urls
@@ -69,6 +77,10 @@ class One(base.SimpleBaseCase):
 
             # on the month after, we switch to v5
             (mar2020, elife_v5),
+
+            (dec2021, elife_v6),
+
+            (apr2023, elife_v7),
         ]
         for dtpair, expected_module in expectations:
             actual = core.module_picker(*dtpair)

@@ -107,6 +107,4 @@ def query_ga(query, **kwargs):
     # use the last response given but with all of the results
     response['rows'] = results
     response['-total-pages'] = page
-    #import json
-    #open('/tmp/r.json', 'w').write(json.dumps(response))
     return response

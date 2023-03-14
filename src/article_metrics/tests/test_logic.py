@@ -5,7 +5,6 @@ from datetime import datetime
 from . import base
 import json
 from article_metrics.scopus import citations as scopus_citations
-
 import logging
 
 LOG = logging.getLogger(__name__)

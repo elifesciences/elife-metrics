@@ -7,8 +7,15 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+# lsh@2023-03-14: data structure changes with GA4, see new implementations of these below.
+#event_counts_query = elife_v1.event_counts_query
+#event_counts = elife_v1.event_counts
+
+# views counting
+
 def path_counts_query(table_id, from_date, to_date):
-    "a GA4 query using the same path regex from elife-v6"
+    """returns a query specific to this era that we can send to Google Analytics.
+    this era returns a GA4 query using the same path regex from elife-v6"""
 
     explanation = (
         # captures all articles
@@ -37,21 +44,29 @@ def path_counts_query(table_id, from_date, to_date):
 
     return {"dimensions": [{"name": "pagePathPlusQueryString"}],
             "metrics": [{"name": "sessions"}],
-            # TODO: orderBys
-            "dateRanges": [{"startDate": utils.ymd(from_date),
-                            "endDate": utils.ymd(to_date)}],
-            "dimensionFilter": {
+            "orderBys": [
+                {"desc": False,
+                 "dimension": {"dimensionName": "pagePathPlusQueryString",
+                               "orderType": "ALPHANUMERIC"}}
+    ],
+        "dateRanges": [{"startDate": utils.ymd(from_date),
+                        "endDate": utils.ymd(to_date)}],
+        "dimensionFilter": {
                 "filter": {
                     "fieldName": "pagePathPlusQueryString",
                     "stringFilter": {
                         "matchType": "FULL_REGEXP",
                         "value": ga_filter}}},
-            "limit": "10000"}
+        "limit": "10000"}
 
-# ...python *does* support {n,m} though, so we can filter bad article IDs in post
+# ga doesn't support {n,m} but python *does* support it, so we can filter bad article IDs in post.
 # lsh@2021-11-30: still true.
 # parse the article ID from a path that may include an optional '/executable'.
-REGEX = r"/articles/(?P<artid>\d{1,6})"
+# lsh@2023-02-17: msid length increasing from max 5 digits to max 6 digits, however
+# this is a bad regex. it's been matching against "/articles/1234567890" and counting it as "/articles/12345"
+#REGEX = r"/articles/(?P<artid>\d{1,5})"
+# we now want 1-6 article digits, followed by the end of the line ($) OR url parameters, an anchor or a slash '/'
+REGEX = r"/articles/((?P<artid>\d{1,6})($|[?&#/]{1}){1})"
 PATH_RE = re.compile(REGEX, re.IGNORECASE)
 
 def path_count(row):
@@ -78,13 +93,13 @@ def path_count(row):
         path = row['dimensionValues'][0]['value']
         count = row['metricValues'][0]['value']
         regex_obj = re.match(PATH_RE, path.lower())
-        ensure(regex_obj, "unhandled path: %s" % row)
+        ensure(regex_obj, "failed to find a valid path: %s" % path)
         # "/articles/12345/executable" => {'artid': 12345}
         data = regex_obj.groupdict()
         count_type = 'full' # vs 'abstract' or 'digest', from previous eras
         return data['artid'], count_type, int(count)
     except AssertionError as exc:
-        LOG.debug("ignoring row (views), failed expections", exc_info=exc)
+        LOG.debug("ignoring article views row, %s" % exc, extra={'row': row})
 
 def path_counts(path_count_pairs):
     "takes a list of rows from GA4 and groups by msid, returning a list of (msid, count-type, count)"
@@ -141,8 +156,9 @@ def event_counts_query(table_id, from_date, to_date):
     }
 
 def event_count(row):
-    """
-    row looks like:
+    """returns a pair of (path, download-count) from given `row`.
+
+    `row` looks like:
     {
         "dimensionValues": [
             {
@@ -165,9 +181,10 @@ def event_count(row):
         path = row['dimensionValues'][1]['value']
         count = row['metricValues'][0]['value']
         bits = path.split('/') # ['', 'articles', '80092']
+        ensure(len(bits) == 3, "failed to find a valid path: %s" % path)
         return int(bits[2]), int(count)
     except AssertionError as exc:
-        LOG.debug("ignoring row (downloads), failed expections", exc_info=exc)
+        LOG.debug("ignoring article downloads row, %s" % exc, extra={'row': row})
 
 def event_counts(row_list):
     "parses the list of rows returned by google to extract the doi and it's count"
@@ -175,8 +192,8 @@ def event_counts(row_list):
     # for example, a case where two rows for 80072, one downloads, one figure downloads resulting in:
     #   [(80082, 717), (80082, 2)]
     # and reducing to
-    #   {80082: 2}
-    # won't occur unless we manipulate the GA results.
+    #   {80082: 719}
+    # shouldn't occur.
     counts = map(event_count, row_list)
 
     def aggr(dic, pair):

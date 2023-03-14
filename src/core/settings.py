@@ -301,13 +301,5 @@ LOGGING = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
-# ---
-
-# TODO: remove in favour of SECRETS_LOCATION
-GA_SECRETS_LOCATION_LIST = [
-    os.path.join(PROJECT_DIR, 'client-secrets.json'),
-    '/etc/elife-ga-metrics/client-secrets.json'
-]
-
 GA_SECRETS_LOCATION = os.path.join(PROJECT_DIR, 'client-secrets.json')
 assert os.path.exists(GA_SECRETS_LOCATION), "client-secrets.json not found. I looked here: %s" % GA_SECRETS_LOCATION

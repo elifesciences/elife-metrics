@@ -53,10 +53,8 @@ RDS_ADDITION = datetime(year=2020, month=2, day=21)
 URL_PARAMS = datetime(year=2021, month=11, day=30)
 
 # switch from ga3 to ga4
-# todo: fix the module in place during testing, test module_picker separately.
-GA4_SWITCH = datetime(year=2023, month=2, day=1)
+GA4_SWITCH = datetime(year=2023, month=4, day=1)
 
-# todo: compare this to old split logic
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
     daily = from_date == to_date
@@ -145,11 +143,11 @@ def ga_service():
     return service
 
 def guess_era_from_query(query_map):
-    # ga4 queries uses `dateRanges.0.startDate`.
+    # ga4 queries use `dateRanges.0.startDate`.
     return GA3 if 'start_date' in query_map else GA4
 
 def guess_era_from_response(response):
-    # ga4 does not return the query in the response.
+    # ga4 does not return a 'query' in the response.
     return GA3 if 'query' in response else GA4
 
 # --- GA3 logic
@@ -307,8 +305,8 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     known_results_types = ['views', 'downloads',
                            'blog-article', 'collection', 'digest', 'event', 'interview', 'labs-post', 'press-package']
     ensure(results_type in known_results_types, "unknown results type %r: %s" % (results_type, ", ".join(known_results_types)))
-    ensure(isinstance(from_date_dt, datetime), "from_date_dt must be a datetime object")
-    ensure(isinstance(to_date_dt, datetime), "to_date_dt must be a datetime object")
+    ensure(type(from_date_dt) == datetime, "from_date_dt must be a datetime object")
+    ensure(type(to_date_dt) == datetime, "to_date_dt must be a datetime object")
 
     from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
     now_dt = utcnow()
@@ -332,7 +330,8 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json" + partial)
 
 def write_results_v2(results, path):
-    "writes `results` as json to the given `path`"
+    """writes `results` as json to the given `path`.
+    like v1, but expects output directory to exist and will not create it if it doesn't."""
     dirname = os.path.dirname(path)
     ensure(os.path.exists(dirname), "output directory does not exist: %s" % path)
     LOG.debug("writing %r", path)
