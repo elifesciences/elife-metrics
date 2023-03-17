@@ -227,7 +227,7 @@ API_OPTS = render_item({
     'order_direction': [p('order.default')],
 }, _load_api_raml(API_PATH))
 
-LOG_FILE = cfg('general.log-file', join(PROJECT_DIR, 'elife-metrics.log'))
+LOG_FILE = cfg('general.log-file', None) or join(PROJECT_DIR, 'elife-metrics.log')
 
 DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log')
 
