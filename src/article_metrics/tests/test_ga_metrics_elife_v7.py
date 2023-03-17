@@ -81,6 +81,29 @@ def test_event_count__bad_article():
         assert actual == expected
         assert log.debug.call_args[0][0] == expected_msg
 
+def test_event_count__other():
+    expected = None
+    expected_msg = "found 'other' row with value '717'. GA has aggregated rows because query returned too much data."
+    fixture = {
+        "dimensionValues": [
+            {
+                "value": "Download"
+            },
+            {
+                "value": "(other)"
+            }
+        ],
+        "metricValues": [
+            {
+                "value": "717"
+            }
+        ]
+    }
+    with mock.patch('article_metrics.ga_metrics.elife_v7.LOG') as log:
+        actual = elife_v7.event_count(fixture)
+        assert actual == expected
+        assert log.warning.call_args[0][0] == expected_msg
+
 def mkrow(path, value):
     return {"dimensionValues": [{"value": "Download"}, {"value": path}], "metricValues": [{"value": str(value)}]}
 

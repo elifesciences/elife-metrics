@@ -6,7 +6,7 @@
 
 from os.path import join
 import os, json, time, random
-from datetime import datetime
+from datetime import datetime, timezone
 from googleapiclient import errors
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
@@ -18,7 +18,7 @@ import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 from . import utils, ga4
-from article_metrics.utils import lfilter, utcnow
+from article_metrics.utils import lfilter, utcnow, todt
 
 LOG = logging.getLogger(__name__)
 
@@ -32,28 +32,28 @@ def output_dir():
         root = os.getenv('TEST_OUTPUT_DIR')
     return join(root, settings.GA_OUTPUT_SUBDIR)
 
-VIEWS_INCEPTION = datetime(year=2014, month=3, day=12)
-DOWNLOADS_INCEPTION = datetime(year=2015, month=2, day=13)
+VIEWS_INCEPTION = datetime(year=2014, month=3, day=12, tzinfo=timezone.utc)
+DOWNLOADS_INCEPTION = datetime(year=2015, month=2, day=13, tzinfo=timezone.utc)
 
 # when we switched away from HW
-SITE_SWITCH = datetime(year=2016, month=2, day=9)
+SITE_SWITCH = datetime(year=2016, month=2, day=9, tzinfo=timezone.utc)
 
 # when we were told to use versionless urls for latest article version
 # https://github.com/elifesciences/elife-website/commit/446408019f7ec999adc6c9a80e8fa28966a42304
-VERSIONLESS_URLS = datetime(year=2016, month=5, day=5)
+VERSIONLESS_URLS = datetime(year=2016, month=5, day=5, tzinfo=timezone.utc)
 VERSIONLESS_URLS_MONTH = month_min_max(VERSIONLESS_URLS)
 
 # when we first started using 2.0 urls
-SITE_SWITCH_v2 = datetime(year=2017, month=6, day=1)
+SITE_SWITCH_v2 = datetime(year=2017, month=6, day=1, tzinfo=timezone.utc)
 
 # when we added /executable
-RDS_ADDITION = datetime(year=2020, month=2, day=21)
+RDS_ADDITION = datetime(year=2020, month=2, day=21, tzinfo=timezone.utc)
 
 # whitelisted urlparams
-URL_PARAMS = datetime(year=2021, month=11, day=30)
+URL_PARAMS = datetime(year=2021, month=11, day=30, tzinfo=timezone.utc)
 
 # switch from ga3 to ga4
-GA4_SWITCH = datetime(year=2023, month=4, day=1)
+GA4_SWITCH = datetime(year=2023, month=3, day=1, tzinfo=timezone.utc)
 
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
@@ -250,7 +250,7 @@ def output_path(results_type, from_date, to_date):
         to_date_dt = d2dt(to_date)
         from_date, to_date = ymd(from_date), ymd(to_date)
 
-    now, now_dt = ymd(datetime.now()), datetime.now()
+    now, now_dt = ymd(datetime.now()), utcnow()
 
     # different formatting if two different dates are provided
     if from_date == to_date:
@@ -342,7 +342,9 @@ def query_ga_write_results_v2(query_map, from_date_dt, to_date_dt, results_type,
         return query_ga_write_results(query_map, **kwargs)
 
     results = ga4.query_ga(query_map, **kwargs)
-    path = output_path_v2(results_type, from_date_dt, to_date_dt)
+    query_start = todt(query_map['dateRanges'][0]['startDate'])
+    query_end = todt(query_map['dateRanges'][0]['endDate'])
+    path = output_path_v2(results_type, query_start, query_end)
     write_results_v2(results, path)
     return results, path
 
@@ -367,7 +369,7 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
     else:
         # talk to google
         query_map = module.path_counts_query(table_id, from_date, to_date)
-        raw_data, actual_path = query_ga_write_results_v2(query_map, 'views', from_date, to_date)
+        raw_data, actual_path = query_ga_write_results_v2(query_map, from_date, to_date, 'views')
         assert path == actual_path, "the expected output path (%s) doesn't match the path actually written to (%s)" % (path, actual_path)
     return module.path_counts(raw_data.get('rows', []))
 
@@ -388,7 +390,7 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
     else:
         # talk to google
         query_map = module.event_counts_query(table_id, from_date, to_date)
-        raw_data, actual_path = query_ga_write_results_v2(query_map, 'downloads', from_date, to_date)
+        raw_data, actual_path = query_ga_write_results_v2(query_map, from_date, to_date, 'downloads')
         assert path == actual_path, "the expected output path (%s) doesn't match the path actually written to (%s)" % (path, actual_path)
     return module.event_counts(raw_data.get('rows', []))
 
@@ -402,7 +404,7 @@ def article_metrics(table_id, from_date, to_date, cached=False, only_cached=Fals
     sset = download_dois - views_dois
     if sset:
         msg = "downloads with no corresponding page view: %r"
-        LOG.warning(msg, {missing_doi: downloads[missing_doi] for missing_doi in list(sset)})
+        LOG.debug(msg, {missing_doi: downloads[missing_doi] for missing_doi in list(sset)})
 
     # keep the two separate until we introduce POAs? or just always
     return {'views': views, 'downloads': downloads}
@@ -429,7 +431,7 @@ def generate_queries(table_id, query_func_name, datetime_list, use_cached=False,
                 LOG.debug("we have %r results for %r to %r already", query_type, ymd(start_date), ymd(end_date))
                 continue
             else:
-                LOG.info("no cache file for %r results for %r to %r", query_type, ymd(start_date), ymd(end_date))
+                LOG.info("no cache file for %r results for %r to %r: %s", query_type, ymd(start_date), ymd(end_date), path)
         else:
             LOG.debug("couldn't find file %r", path)
 
@@ -446,11 +448,11 @@ def generate_queries(table_id, query_func_name, datetime_list, use_cached=False,
 
     return query_list
 
-def bulk_query(query_list):
+def bulk_query(query_list, from_dt, to_dt, results_type):
     """executes a list of queries for their side effects (caching).
     results do not accumulate in memory, returns nothing."""
     for query in query_list:
-        query_ga_write_results(query) # todo: not v2
+        query_ga_write_results_v2(query, from_dt, to_dt, results_type)
 
 def metrics_for_range(table_id, dt_range_list, use_cached=False, use_only_cached=False):
     """query each `(from-date, to-date)` pair in `dt_range_list`.
@@ -474,14 +476,14 @@ def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_onl
                                        'path_counts_query',
                                        views_dt_range,
                                        use_cached, use_only_cached))
+    bulk_query(query_list, from_date, to_date, results_type='views')
 
     pdf_dt_range = lfilter(valid_downloads_dt_pair, date_list)
     query_list.extend(generate_queries(table_id,
                                        'event_counts_query',
                                        pdf_dt_range,
                                        use_cached, use_only_cached))
-
-    bulk_query(query_list)
+    bulk_query(query_list, from_date, to_date, results_type='downloads')
 
     # everything should be cached by now
     use_cached = True # DELIBERATE
@@ -497,12 +499,13 @@ def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_o
                                        'path_counts_query',
                                        views_dt_range,
                                        use_cached, use_only_cached))
+    bulk_query(query_list, from_date, to_date, 'views')
 
     query_list.extend(generate_queries(table_id,
                                        'event_counts_query',
                                        pdf_dt_range,
                                        use_cached, use_only_cached))
-    bulk_query(query_list)
+    bulk_query(query_list, from_date, to_date, 'downloads')
 
     # everything should be cached by now
     use_cached = True # DELIBERATE
