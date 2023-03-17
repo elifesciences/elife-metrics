@@ -6,7 +6,7 @@
 
 from os.path import join
 import os, json, time, random
-from datetime import datetime, timezone
+from datetime import datetime
 from googleapiclient import errors
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
@@ -18,7 +18,7 @@ import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 from . import utils, ga4
-from article_metrics.utils import lfilter, utcnow, todt
+from article_metrics.utils import lfilter, todt
 
 LOG = logging.getLogger(__name__)
 
@@ -32,28 +32,28 @@ def output_dir():
         root = os.getenv('TEST_OUTPUT_DIR')
     return join(root, settings.GA_OUTPUT_SUBDIR)
 
-VIEWS_INCEPTION = datetime(year=2014, month=3, day=12, tzinfo=timezone.utc)
-DOWNLOADS_INCEPTION = datetime(year=2015, month=2, day=13, tzinfo=timezone.utc)
+VIEWS_INCEPTION = datetime(year=2014, month=3, day=12)
+DOWNLOADS_INCEPTION = datetime(year=2015, month=2, day=13)
 
 # when we switched away from HW
-SITE_SWITCH = datetime(year=2016, month=2, day=9, tzinfo=timezone.utc)
+SITE_SWITCH = datetime(year=2016, month=2, day=9)
 
 # when we were told to use versionless urls for latest article version
 # https://github.com/elifesciences/elife-website/commit/446408019f7ec999adc6c9a80e8fa28966a42304
-VERSIONLESS_URLS = datetime(year=2016, month=5, day=5, tzinfo=timezone.utc)
+VERSIONLESS_URLS = datetime(year=2016, month=5, day=5)
 VERSIONLESS_URLS_MONTH = month_min_max(VERSIONLESS_URLS)
 
 # when we first started using 2.0 urls
-SITE_SWITCH_v2 = datetime(year=2017, month=6, day=1, tzinfo=timezone.utc)
+SITE_SWITCH_v2 = datetime(year=2017, month=6, day=1)
 
 # when we added /executable
-RDS_ADDITION = datetime(year=2020, month=2, day=21, tzinfo=timezone.utc)
+RDS_ADDITION = datetime(year=2020, month=2, day=21)
 
 # whitelisted urlparams
-URL_PARAMS = datetime(year=2021, month=11, day=30, tzinfo=timezone.utc)
+URL_PARAMS = datetime(year=2021, month=11, day=30)
 
 # switch from ga3 to ga4
-GA4_SWITCH = datetime(year=2023, month=3, day=1, tzinfo=timezone.utc)
+GA4_SWITCH = datetime(year=2023, month=3, day=1)
 
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
@@ -250,7 +250,7 @@ def output_path(results_type, from_date, to_date):
         to_date_dt = d2dt(to_date)
         from_date, to_date = ymd(from_date), ymd(to_date)
 
-    now, now_dt = ymd(datetime.now()), utcnow()
+    now, now_dt = ymd(datetime.now()), datetime.now()
 
     # different formatting if two different dates are provided
     if from_date == to_date:
@@ -309,7 +309,7 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     ensure(type(to_date_dt) == datetime, "to_date_dt must be a datetime object")
 
     from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
-    now_dt = utcnow()
+    now_dt = datetime.now()
     now = ymd(now_dt)
 
     # different formatting if two different dates are provided

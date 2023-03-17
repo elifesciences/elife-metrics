@@ -1,9 +1,9 @@
 import time, math
 from collections import OrderedDict
-from datetime import timedelta
+from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
-from article_metrics import logic, models, utils
+from article_metrics import logic, models
 from metrics import logic as na_logic # non-article logic
 import logging
 
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         parser.add_argument('--only-cached', dest='only_cached', action="store_true", default=False)
 
     def handle(self, *args, **options):
-        today = utils.utcnow()
+        today = datetime.now()
         n_days_ago = today - timedelta(days=options['days'])
         n_months_ago = today - relativedelta(months=options['months'])
         use_cached = options['cached']
