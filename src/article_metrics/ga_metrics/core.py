@@ -53,7 +53,7 @@ RDS_ADDITION = datetime(year=2020, month=2, day=21)
 URL_PARAMS = datetime(year=2021, month=11, day=30)
 
 # switch from ga3 to ga4
-GA4_SWITCH = datetime(year=2023, month=3, day=1)
+GA4_SWITCH = datetime(year=2023, month=3, day=20)
 
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
@@ -381,6 +381,7 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
 
     path = output_path_v2('downloads', from_date, to_date)
     module = module_picker(from_date, to_date)
+    print('got module',module,'for range',from_date,to_date)
     if cached and os.path.exists(path):
         raw_data = json.load(open(path, 'r'))
     elif only_cached:

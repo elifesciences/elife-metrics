@@ -233,7 +233,8 @@ class V7(base.SimpleBaseCase):
 
     def test_v7_monthly_views(self):
         table_id = ''
-        from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH)
+        one_month = timedelta(days=31)
+        from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH + one_month)
         fixture_path = base.fixture_path('v7--views--2022-11-01_2022-11-30.json')
         fixture = json.load(open(fixture_path, 'r'))
         with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
@@ -287,7 +288,8 @@ class V7(base.SimpleBaseCase):
 
     def test_v7_monthly_downloads(self):
         table_id = ''
-        from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH)
+        one_month = timedelta(days=31) # an overlap for month ranges will use elife-v6.
+        from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH + one_month)
         fixture_path = base.fixture_path('v7--downloads--2022-11-01_2022-11-30.json')
         fixture = json.load(open(fixture_path, 'r'))
         with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
