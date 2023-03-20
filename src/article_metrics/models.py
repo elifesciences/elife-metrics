@@ -22,7 +22,7 @@ def validate_doi(val):
 class Article(models.Model):
     doi = CharField(max_length=255, unique=True, help_text="article identifier", validators=[validate_doi])
     pmid = PositiveIntegerField(unique=True, blank=True, null=True)
-    pmcid = CharField(max_length=10, unique=True, blank=True, null=True)
+    pmcid = CharField(max_length=11, unique=True, blank=True, null=True)
 
     class Meta:
         db_table = 'metrics_article'
