@@ -53,7 +53,7 @@ class One(base.BaseCase):
         self.assertEqual(results['foo']['frames'][-1]['ends'], date.today())
 
     def test_default_history_file(self):
-        history.load_from_file() # no SchemaError errors thrown
+        history.load_history() # no SchemaError errors thrown
 
     def test_load_ptype_history(self):
         history.ptype_history(models.EVENT)

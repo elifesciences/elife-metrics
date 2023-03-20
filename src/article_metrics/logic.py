@@ -1,14 +1,10 @@
 from functools import partial
 from datetime import datetime, timedelta
-from . import ga_metrics
-from .ga_metrics import bulk
+from . import ga_metrics, models, utils, events
 from django.conf import settings
-from . import models
 from django.db import transaction
-from . import utils
 from .utils import first, create_or_update, ensure, splitfilter, comp, run, lfilter
 import logging
-from . import events
 
 LOG = logging.getLogger(__name__)
 
@@ -72,25 +68,8 @@ def get_create_article(data):
         # it shouldn't get to this point!
         LOG.warning("refusing to fetch/create bad article: %s" % err, extra={'article-data': data})
 
-#
-#
-#
-
-def create_row(doi, period, views, downloads):
-    "wrangles the data into a format suitable for `insert_row`"
-    views = views or {
-        'full': 0,
-        'abstract': 0,
-        'digest': 0,
-    }
-    views['pdf'] = downloads or 0
-    views['doi'] = doi
-    views['source'] = models.GA
-    row = dict(list(zip(['period', 'date'], format_dt_pair(period))))
-    row.update(views)
-    return row
-
 def _insert_row(data):
+    "creates or updates a `models.Metric` in the database using `data`."
     article_obj = get_create_article({'doi': data['doi']})
     if not article_obj:
         LOG.warning("refusing to insert bad metric", extra={'row-data': data})
@@ -111,11 +90,25 @@ def insert_many_rows(data_list):
     "inserts all items in given `data_list` using a single transaction."
     run(_insert_row, data_list)
 
+def create_row(doi, period, views, downloads):
+    "wrangles the data into a format suitable for `insert_row`"
+    views = views or {
+        'full': 0,
+        'abstract': 0,
+        'digest': 0,
+    }
+    views['pdf'] = downloads or 0
+    views['doi'] = doi
+    views['source'] = models.GA
+    row = dict(list(zip(['period', 'date'], format_dt_pair(period))))
+    row.update(views)
+    return row
+
 def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_cached=True, use_only_cached=False):
     "import metrics from GA between the two given dates or from the inception date in `settings.py`"
     ensure(metrics_type in ['daily', 'monthly'], 'metrics type must be either "daily" or "monthly"')
 
-    table_id = 'ga:%s' % settings.GA_TABLE_ID # TODO: remove, no longer necessary
+    table_id = 'ga:%s' % settings.GA3_TABLE_ID
     the_beginning = ga_metrics.core.VIEWS_INCEPTION
     yesterday = datetime.now() - timedelta(days=1)
 
@@ -127,8 +120,8 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
         to_date = yesterday
 
     f = {
-        'daily': bulk.daily_metrics_between,
-        'monthly': bulk.monthly_metrics_between,
+        'daily': ga_metrics.core.daily_metrics_between,
+        'monthly': ga_metrics.core.monthly_metrics_between,
     }
     results = f[metrics_type](table_id, from_date, to_date, use_cached, use_only_cached)
 

@@ -50,8 +50,8 @@ def cfg(path, default=0xDEADBEEF):
         print(('error on %r: %s' % (path, err)))
 
 # used to know how far to go back in metrics gathering
-INCEPTION = datetime.strptime(cfg('journal.inception'), '%Y-%m-%d')
-DOI_PREFIX = cfg('journal.doi-prefix')
+INCEPTION = datetime(year=2012, month=12, day=1)
+DOI_PREFIX = '10.7554'
 USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
 CONTACT_EMAIL = "it-admin@elifesciences.org"
 
@@ -59,9 +59,11 @@ OUTPUT_PATH = join(EXT_DIR if USE_EXT else PROJECT_DIR, 'output')
 
 # TODO: rename 'GA_OUTPUT_PATH'. we have a path here not a dirname
 GA_OUTPUT_SUBDIR = join(OUTPUT_PATH, 'ga')
-GA_TABLE_ID = cfg('ga.table-id')
+
+GA3_TABLE_ID = "82618489"
+GA4_TABLE_ID = "316514145"
+
 GA_PTYPE_SCHEMA_PATH = join(PROJECT_DIR, 'schema', 'metrics')
-GA_PTYPE_HISTORY_PATH = join(GA_PTYPE_SCHEMA_PATH, 'history.json')
 
 SCOPUS_KEY = cfg('scopus.api-key')
 
@@ -78,9 +80,6 @@ SECRET_KEY = cfg('general.secret-key')
 
 DEBUG = cfg('general.debug')
 assert isinstance(DEBUG, bool), "'debug' must be either True or False as a boolean, not %r" % (DEBUG, )
-
-DEV, TEST, PROD = 'dev', 'test', 'prod'
-ENV = cfg('general.env', DEV)
 
 ALLOWED_HOSTS = list(filter(None, cfg('general.allowed-hosts', '').split(',')))
 
@@ -228,13 +227,11 @@ API_OPTS = render_item({
     'order_direction': [p('order.default')],
 }, _load_api_raml(API_PATH))
 
-LOG_FILE = join(PROJECT_DIR, 'elife-metrics.log')
-if ENV != DEV:
-    LOG_FILE = join('/var/log/', 'elife-metrics.log')
+LOG_FILE = cfg('general.log-file', None) or join(PROJECT_DIR, 'elife-metrics.log')
 
 DEBUG_LOG_FILE = join(PROJECT_DIR, 'debugme.log')
 
-# whereever our log files are, ensure they are writable before we do anything else.
+# wherever our log files are, ensure they are writable before we do anything else.
 def writable(path):
     os.system('touch ' + path)
     # https://docs.python.org/2/library/os.html
@@ -303,3 +300,6 @@ LOGGING = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+GA_SECRETS_LOCATION = os.path.join(PROJECT_DIR, 'client-secrets.json')
+assert os.path.exists(GA_SECRETS_LOCATION), "client-secrets.json not found. I looked here: %s" % GA_SECRETS_LOCATION

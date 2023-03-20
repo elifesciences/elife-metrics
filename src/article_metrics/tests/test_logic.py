@@ -2,11 +2,14 @@ from unittest import mock
 from os.path import join
 from article_metrics import models, logic, utils
 from datetime import datetime
-from .base import BaseCase
+from . import base
 import json
 from article_metrics.scopus import citations as scopus_citations
+import logging
 
-class One(BaseCase):
+LOG = logging.getLogger(__name__)
+
+class One(base.BaseCase):
     def setUp(self):
         pass
 
@@ -45,7 +48,7 @@ class One(BaseCase):
             expected = len(realised_fixture) - bad_eggs
             self.assertEqual(models.Article.objects.count(), expected)
 
-class Two(BaseCase):
+class Two(base.BaseCase):
     def test_get_create_article(self):
         "article is created if doesn't exist"
         cases = [
@@ -75,7 +78,7 @@ class Two(BaseCase):
         self.assertEqual(art1.id, art2.id)
         self.assertEqual(art2.id, art3.id)
 
-class TestGAImport(BaseCase):
+class TestGAImport(base.BaseCase):
     def setUp(self):
         pass
 
@@ -87,13 +90,9 @@ class TestGAImport(BaseCase):
         self.assertEqual(0, models.Article.objects.count())
         day_to_import = datetime(year=2015, month=9, day=11)
 
-        def test_output_path(result_type, from_date, to_date):
-            # ignore whatever dates given, return path to fixture
-            fixture = join(self.fixture_dir, 'test_import_ga_daily_stats', 'ga-output', 'views', '2015-09-11.json')
-            return fixture
-
-        with mock.patch('article_metrics.ga_metrics.core.output_path', new=test_output_path):
-            logic.import_ga_metrics(from_date=day_to_import, to_date=day_to_import, use_only_cached=True)
+        fixture = base.fixture_path('test_import_ga_daily_stats/ga-output/views/2015-09-11.json')
+        with mock.patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture):
+            logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import, use_only_cached=True)
         # we know this day reveals this many articles
         # expected_article_count = 1090 # changed when we introduced POA articles
         #expected_article_count = 1119

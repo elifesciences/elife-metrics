@@ -20,12 +20,9 @@ class Command(BaseCommand):
         parser.add_argument('--months', nargs='?', type=int, default=2)
 
         # use cache files if they exist
-        parser.add_argument('--cached', dest='cached', action="store_true", default=False)
+        parser.add_argument('--cached', dest='cached', action="store_true", default=True)
         # import *only* from cached results, don't try to fetch from remote
         parser.add_argument('--only-cached', dest='only_cached', action="store_true", default=False)
-
-        # citations
-        # ...
 
     def handle(self, *args, **options):
         today = datetime.now()
@@ -36,8 +33,6 @@ class Command(BaseCommand):
 
         from_date = n_days_ago
         to_date = today
-
-        # print 'use cached? %r only cached? %r' % (use_cached, only_cached)
 
         GA_DAILY, GA_MONTHLY = 'ga-daily', 'ga-monthly'
         NA_METRICS = 'non-article-metrics'

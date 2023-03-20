@@ -9,7 +9,7 @@ def test_daily_query_results_correct_pre_switch():
     from_date = to_date = core.SITE_SWITCH - timedelta(days=1)
     fixture_path = base.fixture_path('views-2016-02-08.json')
 
-    with mock.patch('article_metrics.ga_metrics.core.output_path', return_value=fixture_path):
+    with mock.patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
         counts = core.article_views(base.TABLE_ID, from_date, to_date, cached=True)
 
     expected = {

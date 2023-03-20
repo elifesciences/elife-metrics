@@ -5,5 +5,7 @@ omit =
 
 [report]
 omit =
+    src/manage.py
+    */tests.py
     */tests/*
     */migrations/*

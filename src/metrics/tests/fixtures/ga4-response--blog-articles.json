@@ -1,0 +1,1330 @@
+{
+  "dimensionHeaders": [
+    {
+      "name": "date"
+    },
+    {
+      "name": "pagePathPlusQueryString"
+    }
+  ],
+  "metricHeaders": [
+    {
+      "name": "sessions",
+      "type": "TYPE_INTEGER"
+    }
+  ],
+  "rows": [
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/54d63486/elife-s-new-model-changing-the-way-you-share-your-research"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "157"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/54d63486/elife-s-new-model-changing-the-way-you-share-your-research"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "75"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/ebadb0f1/elife-s-new-model-funders-support-use-of-reviewed-preprints-in-research-assessment"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "20"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "10"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/ebadb0f1/elife-s-new-model-funders-support-use-of-reviewed-preprints-in-research-assessment"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "9"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/6794cd8a/ben-barres-spotlight-awards-announcing-the-winners-for-2022"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "7"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/6794cd8a/ben-barres-spotlight-awards-announcing-the-winners-for-2022"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/85518309/plain-language-summaries-how-to-write-an-elife-digest"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/db24dd46/elife-s-new-model-what-is-an-elife-assessment"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/ddab483b/special-issue-call-for-papers-in-reproductive-health"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "5"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "4"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/ddab483b/special-issue-call-for-papers-in-reproductive-health"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "4"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/13f2ccb2/for-authors-a-simpler-way-to-submit-to-elife"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "4"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/c40ae742/elife-latest-request-detailed-protocols-easily-via-bio-protocol-integration"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "4"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/85518309/plain-language-summaries-how-to-write-an-elife-digest"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/a3c31ce7/ben-barres-spotlight-awards-applications-open-for-2022"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/3e9e763b/elife-latest-our-expanded-editorial-team-in-medicine"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/8df4a59d/webinar-report-the-history-of-science-publishing"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/a3c31ce7/ben-barres-spotlight-awards-applications-open-for-2022"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/a885cea4/2022-elife-community-ambassadors-ready-for-action"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/f39cfcf5/enabling-the-contributor-roles-taxonomy-for-author-contributions"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "3"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/db24dd46/elife-s-new-model-what-is-an-elife-assessment"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/08396b6a/special-issue-call-for-papers-in-the-area-of-systems-genetics"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/4f706531/special-issue-call-for-papers-in-aging-geroscience-and-longevity"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/76669134/for-authors-why-publish-with-elife"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/77a49d1b/elife-latest-changes-to-our-publication-fee"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/bd416611/webinar-report-graphic-design-tips-for-creating-effective-figures"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/d276bfa1/special-issue-call-for-papers-on-the-allosteric-regulation-of-kinase-activity"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/e3e52a93/elife-latest-including-ideas-and-speculation-in-elife-papers"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "2"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/08396b6a/special-issue-call-for-papers-in-the-area-of-systems-genetics"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/3ad8267c/preprints-reviewed-by-elife-applying-deep-learning-to-the-microbiome"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/51839f0a/for-authors-updates-to-elife-s-data-sharing-policies"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/77b5c1f3/for-authors-updates-from-elife-s-ethics-committee"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/8a24d01a/workforce-diversity-strategies-for-cultivating-inclusion-in-research"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/9a652340/elife-latest-looking-for-a-new-editor-in-chief"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/a885cea4/2022-elife-community-ambassadors-ready-for-action"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/bb4cc937/elife-latest-welcoming-our-newest-editors-in-latin-america"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/d03cea47/elife-latest-welcoming-our-newest-editors"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/d276bfa1/special-issue-call-for-papers-on-the-allosteric-regulation-of-kinase-activity"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/d27ca052/blood-sucking-jurassic-parasite-discovered-metro"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/dd511e61/elife-latest-applications-open-for-new-reviewing-editors-from-latin-america-and-the-caribbean"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/e217a659/peer-review-further-results-from-a-trial-at-elife"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/e3e52a93/elife-latest-including-ideas-and-speculation-in-elife-papers"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/ecd03bf6/scientists-reveal-the-cause-of-the-irish-potato-famine-popsci"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/f111bdb0/set-science-free-from-publishers-paywalls-new-scientist"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife/fe50d2f1/early-career-advisory-group-meet-our-new-members-for-2022"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230101"
+        },
+        {
+          "value": "/inside-elife?page=2"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/00f2f185/elife-latest-preprints-and-peer-review"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/08396b6a/special-issue-call-for-papers-in-the-area-of-systems-genetics?twclid=2-4uetwu3jbnyt7y1oorreda8z6"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/08396b6a/special-issue-call-for-papers-in-the-area-of-systems-genetics?twclid=26nk8yfxtfdmjlvn9p0480f7i4"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/135ef475/randy-schekman-answers-questions-on-his-stance-against-luxuryjournals"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/192409e9/elife-welcomes-four-senior-editors"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/19c97b89/plain-language-summaries-results-of-the-2016-elife-digest-reader-survey"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/1b91d382/annual-report-2021-in-review"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/25e6a5ae/special-issue-call-for-papers-on-the-impact-of-the-covid-19-pandemic-on-cancer-prevention-control-care-and-survivorship"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/262c4c71/peer-review-first-results-from-a-trial-at-elife"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/2cfd8f57/suzanne-eaton-in-memory-of-a-remarkable-colleague"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/2e7e4ad1/sparks-of-change-share-your-story-in-elife"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/30ce0914/open-peer-reviewers-in-africa-nominations-are-now-open-to-recruit-future-peer-review-trainers-across-the-continent"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/31672928/webinar-report-academic-interviews-and-how-to-get-hired"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/37666df3/preprints-reviewed-by-elife-an-excellent-and-important-study-of-resurgent-currents-in-sodium-channels"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/380ee747/early-career-advisory-group-reflecting-on-a-year-of-activity"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/3ad8267c/preprints-reviewed-by-elife-applying-deep-learning-to-the-microbiome"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/3e00de7f/preprints-reviewed-by-elife-a-tour-de-force-study-of-neuronal-maturation"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/4148a7e3/quarterly-data-on-how-long-it-takes-to-get-a-decision-and-be-published-with-elife"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/4a6b6858/special-issue-call-for-papers-pushing-the-boundaries-of-microbiome-research"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/51839f0a/for-authors-updates-to-elife-s-data-sharing-policies"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/54d63486/elife-s-new-model-changing-the-way-you-share-your-research?fbclid=IwAR3vzES4WbuMjWPY7ziryzgPg0aK3iPshQakDdfgXhYRQ2GLhM569VdLHuY"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/5b9da722/elife-latest-74-working-scientists-join-the-board-of-reviewing-editors"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/5ebd9a3f/plain-language-summaries-journals-and-other-organizations-that-produce-plain-language-summaries"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/6933fe8e/resources-for-developers"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/78a6e41c/webinar-report-hfsp-postdoctoral-fellowships-from-the-human-frontier-science-program"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/93f9c37d/mental-health-in-academia-a-survey-of-individuals-who-support-researchers"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/a43f95ca/elife-references-yes-we-take-any-format-no-we-re-not-rekeying"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/b282d2d3/annual-report-2018-in-review"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/b6a249af/technology-at-elife-10-years-of-innovation"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/b7033d6d/early-career-advisory-group-applications-open-for-candidates-to-join-in-2021"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/bb4cc937/elife-latest-welcoming-our-newest-editors-in-latin-america"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/d2970264/elife-an-author-s-new-best-friend"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/e028651c/travel-grants-more-early-career-authors-receive-funding-in-2019"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/e5f8f1f7/elife-latest-what-we-have-learned-about-preprints"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/eb42df87/early-career-reviewers-pool-authors-can-now-select-and-nominate-early-career-reviewers-for-their-work"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/f111bdb0/set-science-free-from-publishers-paywalls-new-scientist"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/f744fae0/elife-community-ambassadors-welcoming-128-researchers-to-the-programme"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/f8281f87/early-career-travel-grants-applications-open-for-2019"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/fa9de0e7/preprint-review-a-guide-for-authors"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    },
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "/inside-elife/fe50d2f1/early-career-advisory-group-meet-our-new-members-for-2022"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "1"
+        }
+      ]
+    }
+  ],
+  "rowCount": 87,
+  "metadata": {
+    "dataLossFromOtherRow": true,
+    "currencyCode": "USD",
+    "timeZone": "America/Los_Angeles"
+  },
+  "kind": "analyticsData#runReport"
+}

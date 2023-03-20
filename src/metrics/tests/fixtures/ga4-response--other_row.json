@@ -1,0 +1,40 @@
+{
+  "dimensionHeaders": [
+    {
+      "name": "date"
+    },
+    {
+      "name": "pagePathPlusQueryString"
+    }
+  ],
+  "metricHeaders": [
+    {
+      "name": "sessions",
+      "type": "TYPE_INTEGER"
+    }
+  ],
+  "rows": [
+    {
+      "dimensionValues": [
+        {
+          "value": "20230102"
+        },
+        {
+          "value": "(other)"
+        }
+      ],
+      "metricValues": [
+        {
+          "value": "157"
+        }
+      ]
+    }
+  ],
+  "rowCount": 87,
+  "metadata": {
+    "dataLossFromOtherRow": true,
+    "currencyCode": "USD",
+    "timeZone": "America/Los_Angeles"
+  },
+  "kind": "analyticsData#runReport"
+}

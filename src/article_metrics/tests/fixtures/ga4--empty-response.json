@@ -1,0 +1,19 @@
+{
+    "dimensionHeaders": [
+        {
+            "name": "pagePathPlusQueryString"
+        }
+    ],
+    "metricHeaders": [
+        {
+            "name": "sessions",
+            "type": "TYPE_INTEGER"
+        }
+    ],
+    "metadata": {
+        "currencyCode": "USD",
+        "timeZone": "America/Los_Angeles"
+    },
+    "kind": "analyticsData#runReport"
+}
+

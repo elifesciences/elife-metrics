@@ -27,7 +27,7 @@ class TestAPI(base.BaseCase):
                 return base.fixture_path('test_import_ga_monthly_stats/downloads/2015-08-01_2015-08-31.json')
             raise ValueError(result_type)
 
-        with mock.patch('article_metrics.ga_metrics.core.output_path', new=dummy_output_path):
+        with mock.patch('article_metrics.ga_metrics.core.output_path_v2', new=dummy_output_path):
             logic.import_ga_metrics('monthly', from_date=month_to_import, to_date=month_to_import, use_only_cached=True)
 
         expected = 1649
@@ -72,7 +72,7 @@ class TestAPI(base.BaseCase):
                 return base.fixture_path('test_import_ga_daily_stats/ga-output/downloads/2015-09-11.json')
             raise ValueError(result_type)
 
-        with mock.patch('article_metrics.ga_metrics.core.output_path', new=dummy_output_path):
+        with mock.patch('article_metrics.ga_metrics.core.output_path_v2', new=dummy_output_path):
             logic.import_ga_metrics('daily', from_date=day_to_import, to_date=day_to_import, use_only_cached=True)
 
         doi = '10.7554/eLife.09560'
@@ -126,7 +126,7 @@ class TestAPI(base.BaseCase):
             if result_type == 'downloads':
                 return base.fixture_path('test_import_ga_multiple_daily_stats/downloads/' + dt + '.json')
 
-        with mock.patch('article_metrics.ga_metrics.core.output_path', new=dummy_output_path):
+        with mock.patch('article_metrics.ga_metrics.core.output_path_v2', new=dummy_output_path):
             logic.import_ga_metrics('daily', from_date, to_date, use_only_cached=True)
 
         doi = '10.7554/eLife.09560'

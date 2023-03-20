@@ -35,6 +35,7 @@ def event_counts_query(table_id, from_date, to_date):
 def event_counts(row_list):
     "parses the list of rows returned by google to extract the doi and it's count"
     def parse(row):
+        # a row looks like: ["10.7554/eLife.00003::pdf-article", "8"]
         label, count = row
         return label.split('::')[0], int(count)
     return dict(lmap(parse, row_list))
