@@ -18,7 +18,7 @@ import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 from . import utils, ga4
-from article_metrics.utils import lfilter, todt
+from article_metrics.utils import lfilter, todt_notz
 
 LOG = logging.getLogger(__name__)
 
@@ -342,8 +342,8 @@ def query_ga_write_results_v2(query_map, from_date_dt, to_date_dt, results_type,
         return query_ga_write_results(query_map, **kwargs)
 
     results = ga4.query_ga(query_map, **kwargs)
-    query_start = todt(query_map['dateRanges'][0]['startDate'])
-    query_end = todt(query_map['dateRanges'][0]['endDate'])
+    query_start = todt_notz(query_map['dateRanges'][0]['startDate'])
+    query_end = todt_notz(query_map['dateRanges'][0]['endDate'])
     path = output_path_v2(results_type, query_start, query_end)
     write_results_v2(results, path)
     return results, path
@@ -381,7 +381,6 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
 
     path = output_path_v2('downloads', from_date, to_date)
     module = module_picker(from_date, to_date)
-    print('got module',module,'for range',from_date,to_date)
     if cached and os.path.exists(path):
         raw_data = json.load(open(path, 'r'))
     elif only_cached:
