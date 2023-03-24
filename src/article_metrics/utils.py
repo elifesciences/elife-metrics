@@ -186,6 +186,8 @@ def todt_notz(val):
     """exactly like `todt` but strips timezone from result.
     this is becaues the majority of `elife-metrics` is using naive datetimes."""
     dt = todt(val)
+    if not dt:
+        return dt
     return dt.replace(tzinfo=None)
 
 def tod(val):
