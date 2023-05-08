@@ -46,7 +46,7 @@ class Command(BaseCommand):
         # import *only* from cached results, don't try to fetch from remote
         parser.add_argument('--only-cached', dest='only_cached', action="store_true", default=False)
 
-    @timeit("import_metrics.handle")
+    @timeit("overall")
     def handle(self, *args, **options):
         today = datetime.now()
         n_days_ago = today - timedelta(days=options['days'])
@@ -90,9 +90,8 @@ class Command(BaseCommand):
             end_time = time.time()
 
             elapsed_seconds = end_time - start_time
-            DEBUG_LOG.info("time elapsed: %s minutes" % elapsed_seconds * 60)
             elapsed_hours = math.ceil(elapsed_seconds / 3600)
-            logic.recently_updated_article_notifications(hours=elapsed_hours)
+            timeit("notifications")(logic.recently_updated_article_notifications)(hours=elapsed_hours)
 
         except KeyboardInterrupt:
             print('caught second ctrl-c')
