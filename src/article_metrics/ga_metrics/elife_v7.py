@@ -200,6 +200,8 @@ def event_counts(row_list):
     counts = map(event_count, row_list)
 
     def aggr(dic, pair):
+        if not pair:
+            return dic
         msid, count = pair
         doi = utils.msid2doi(msid)
         dic[doi] = dic.get(doi, 0) + count
