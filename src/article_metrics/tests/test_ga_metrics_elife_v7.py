@@ -18,9 +18,26 @@ def test_path_count():
     actual = elife_v7.path_count(fixture)
     assert actual == expected
 
+def test_path_counts__bad_cases():
+    cases = [
+        (None, 0, 0),
+        ({}, 0, 0),
+        ([], 0, 0),
+        ([{}], 0, 1),
+        ([{'dimensionValues': []}], 0, 1),
+        ([{'dimensionValues': [], 'metricValues': []}], 0, 1),
+        ([{'dimensionValues': [{'foo': 'bar'}], 'metricValues': []}], 0, 1),
+        ([{'dimensionValues': [{'foo': 'bar'}, {'baz': 'bup'}], 'metricValues': [{'foo': 'bar'}]}], 0, 1),
+    ]
+    for rows, expected, expected_warnings in cases:
+        with mock.patch('article_metrics.ga_metrics.elife_v7.LOG.warning') as m:
+            actual = elife_v7.path_counts(rows)
+            assert len(actual) == expected, "case: %s" % rows
+            assert m.call_count == expected_warnings
+
 def test_path_count__bad_article():
     expected = None
-    expected_msg = "ignoring article views row, failed to find a valid path: /articles/1234567"
+    expected_msg = "ignoring article views row: failed to find a valid path: /articles/1234567"
     fixture = {
         "dimensionValues": [
             {
@@ -36,7 +53,7 @@ def test_path_count__bad_article():
     with mock.patch('article_metrics.ga_metrics.elife_v7.LOG') as log:
         actual = elife_v7.path_count(fixture)
         assert actual == expected
-        assert log.debug.call_args[0][0] == expected_msg
+        assert log.warning.call_args[0][0] == expected_msg
 
 def test_event_count():
     expected = (80092, 717)
@@ -60,7 +77,7 @@ def test_event_count():
 
 def test_event_count__bad_article():
     expected = None
-    expected_msg = "ignoring article downloads row, failed to find a valid path: /articles/12345/foo"
+    expected_msg = "ignoring article downloads row: failed to find a valid path: /articles/12345/foo"
     fixture = {
         "dimensionValues": [
             {
@@ -79,11 +96,11 @@ def test_event_count__bad_article():
     with mock.patch('article_metrics.ga_metrics.elife_v7.LOG') as log:
         actual = elife_v7.event_count(fixture)
         assert actual == expected
-        assert log.debug.call_args[0][0] == expected_msg
+        assert log.warning.call_args[0][0] == expected_msg
 
 def test_event_count__other():
     expected = None
-    expected_msg = "found 'other' row with value '717'. GA has aggregated rows because query returned too much data."
+    expected_msg = "ignoring article downloads row: found 'other' row with value '717'. GA has aggregated rows because query returned too much data."
     fixture = {
         "dimensionValues": [
             {
@@ -103,6 +120,23 @@ def test_event_count__other():
         actual = elife_v7.event_count(fixture)
         assert actual == expected
         assert log.warning.call_args[0][0] == expected_msg
+
+def test_event_counts__bad_cases():
+    cases = [
+        (None, 0, 0),
+        ({}, 0, 0),
+        ([], 0, 0),
+        ([{}], 0, 1),
+        ([{'dimensionValues': []}], 0, 1),
+        ([{'dimensionValues': [], 'metricValues': []}], 0, 1),
+        ([{'dimensionValues': [{'foo': 'bar'}], 'metricValues': []}], 0, 1),
+        ([{'dimensionValues': [{'foo': 'bar'}, {'baz': 'bup'}], 'metricValues': [{'foo': 'bar'}]}], 0, 1),
+    ]
+    for rows, expected, expected_warnings in cases:
+        with mock.patch('article_metrics.ga_metrics.elife_v7.LOG.warning') as m:
+            actual = elife_v7.event_counts(rows)
+            assert len(actual) == expected, "case: %s" % rows
+            assert m.call_count == expected_warnings
 
 def mkrow(path, value):
     return {"dimensionValues": [{"value": "Download"}, {"value": path}], "metricValues": [{"value": str(value)}]}

@@ -100,9 +100,9 @@ def path_count(row):
         count_type = 'full' # vs 'abstract' or 'digest', from previous eras
         return data['artid'], count_type, int(count)
     except AssertionError as exc:
-        LOG.warning("ignoring article views row, %s" % exc, extra={'row': row})
+        LOG.warning("ignoring article views row: %s" % exc, extra={'row': row})
     except Exception as exc:
-        LOG.warning("unhandled exception parsing views row, ignoring row, %s" % exc, extra={'row': row})
+        LOG.warning("unhandled exception parsing views row, ignoring row: %s" % exc, extra={'row': row})
 
 
 def path_counts(path_count_pairs):
@@ -189,9 +189,9 @@ def event_count(row):
         ensure(len(bits) == 3, "failed to find a valid path: %s" % path)
         return int(bits[2]), int(count)
     except AssertionError as exc:
-        LOG.warning("ignoring article downloads row, %s" % exc, extra={'row': row})
+        LOG.warning("ignoring article downloads row: %s" % exc, extra={'row': row})
     except Exception as exc:
-        LOG.warning("unhandled exception parsing download event, ignoring row, %s" % exc, extra={'row': row})
+        LOG.warning("unhandled exception parsing download event, ignoring row: %s" % exc, extra={'row': row})
 
 def event_counts(row_list):
     "parses the list of rows returned by google to extract the doi and it's count"
