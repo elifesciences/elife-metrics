@@ -1,7 +1,7 @@
 from functools import reduce
 from datetime import datetime
 from . import elife_v1, utils
-from article_metrics.utils import ensure, lfilter
+from article_metrics.utils import ensure
 import re
 import logging
 
@@ -99,11 +99,14 @@ def path_count(row):
         count_type = 'full' # vs 'abstract' or 'digest', from previous eras
         return data['artid'], count_type, int(count)
     except AssertionError as exc:
-        LOG.debug("ignoring article views row, %s" % exc, extra={'row': row})
+        LOG.warning("ignoring article views row, %s" % exc, extra={'row': row})
+    except Exception as exc:
+        LOG.warning("unhandled exception parsing views row, ignoring row, %s" % exc, extra={'row': row})
+
 
 def path_counts(path_count_pairs):
     "takes a list of rows from GA4 and groups by msid, returning a list of (msid, count-type, count)"
-    path_count_triples = lfilter(None, [path_count(pair) for pair in path_count_pairs])
+    path_count_triples = filter(None, map(path_count, path_count_pairs or []))
     return elife_v1.group_results(path_count_triples)
 
 def event_counts_query(table_id, from_date, to_date):
@@ -184,10 +187,10 @@ def event_count(row):
         bits = path.split('/') # ['', 'articles', '80092']
         ensure(len(bits) == 3, "failed to find a valid path: %s" % path)
         return int(bits[2]), int(count)
-    except ValueError as exc:
-        LOG.warning(str(exc))
     except AssertionError as exc:
-        LOG.debug("ignoring article downloads row, %s" % exc, extra={'row': row})
+        LOG.warning("ignoring article downloads row, %s" % exc, extra={'row': row})
+    except Exception as exc:
+        LOG.warning("unhandled exception parsing download event, ignoring row, %s" % exc, extra={'row': row})
 
 def event_counts(row_list):
     "parses the list of rows returned by google to extract the doi and it's count"
@@ -197,11 +200,9 @@ def event_counts(row_list):
     # and reducing to
     #   {80082: 719}
     # shouldn't occur.
-    counts = map(event_count, row_list)
+    counts = filter(None, map(event_count, row_list or []))
 
     def aggr(dic, pair):
-        if not pair:
-            return dic
         msid, count = pair
         doi = utils.msid2doi(msid)
         dic[doi] = dic.get(doi, 0) + count

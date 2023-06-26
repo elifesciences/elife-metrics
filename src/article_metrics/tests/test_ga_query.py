@@ -1,9 +1,10 @@
+from unittest import mock
 from os.path import join
 from . import base
 import json
 from datetime import datetime, timedelta
 from article_metrics import utils
-from article_metrics.ga_metrics import utils as ga_utils, core, elife_v1
+from article_metrics.ga_metrics import utils as ga_utils, core, elife_v1, elife_v7
 from collections import Counter
 from unittest.mock import patch
 
@@ -204,6 +205,40 @@ class V6(base.SimpleBaseCase):
 
 class V7(base.SimpleBaseCase):
     "v7 era is the switch from GA3 to GA4"
+
+    def test_ga4_path_counts__bad_cases(self):
+        cases = [
+            (None, 0, 0),
+            ({}, 0, 0),
+            ([], 0, 0),
+            ([{}], 0, 1),
+            ([{'dimensionValues': []}], 0, 1),
+            ([{'dimensionValues': [], 'metricValues': []}], 0, 1),
+            ([{'dimensionValues': [{'foo': 'bar'}], 'metricValues': []}], 0, 1),
+            ([{'dimensionValues': [{'foo': 'bar'}, {'baz': 'bup'}], 'metricValues': [{'foo': 'bar'}]}], 0, 1),
+        ]
+        for rows, expected, expected_warnings in cases:
+            with mock.patch('article_metrics.ga_metrics.elife_v7.LOG.warning') as m:
+                actual = elife_v7.path_counts(rows)
+                assert len(actual) == expected, "case: %s" % rows
+                assert m.call_count == expected_warnings
+
+    def test_ga4_event_counts__bad_cases(self):
+        cases = [
+            (None, 0, 0),
+            ({}, 0, 0),
+            ([], 0, 0),
+            ([{}], 0, 1),
+            ([{'dimensionValues': []}], 0, 1),
+            ([{'dimensionValues': [], 'metricValues': []}], 0, 1),
+            ([{'dimensionValues': [{'foo': 'bar'}], 'metricValues': []}], 0, 1),
+            ([{'dimensionValues': [{'foo': 'bar'}, {'baz': 'bup'}], 'metricValues': [{'foo': 'bar'}]}], 0, 1),
+        ]
+        for rows, expected, expected_warnings in cases:
+            with mock.patch('article_metrics.ga_metrics.elife_v7.LOG.warning') as m:
+                actual = elife_v7.event_counts(rows)
+                assert len(actual) == expected, "case: %s" % rows
+                assert m.call_count == expected_warnings
 
     def test_v7_daily_views(self):
         table_id = ''
