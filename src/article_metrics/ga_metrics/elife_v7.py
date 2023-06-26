@@ -92,6 +92,7 @@ def path_count(row):
         ensure(len(row['metricValues']) == 1, "row with unexpected number of metricValues found: %s" % row)
         path = row['dimensionValues'][0]['value']
         count = row['metricValues'][0]['value']
+        ensure(path != "(other)", "found 'other' row with value '%s'. GA has aggregated rows because query returned too much data." % count)
         regex_obj = re.match(PATH_RE, path.lower())
         ensure(regex_obj, "failed to find a valid path: %s" % path)
         # "/articles/12345/executable" => {'artid': 12345}
@@ -183,7 +184,7 @@ def event_count(row):
         ensure(len(row['metricValues']) == 1, "row with unexpected number of metricValues found: %s" % row)
         path = row['dimensionValues'][1]['value']
         count = row['metricValues'][0]['value']
-        ensure(path != "(other)", "found 'other' row with value '%s'. GA has aggregated rows because query returned too much data." % count, ValueError)
+        ensure(path != "(other)", "found 'other' row with value '%s'. GA has aggregated rows because query returned too much data." % count)
         bits = path.split('/') # ['', 'articles', '80092']
         ensure(len(bits) == 3, "failed to find a valid path: %s" % path)
         return int(bits[2]), int(count)
