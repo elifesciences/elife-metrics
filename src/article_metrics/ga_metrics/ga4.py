@@ -98,7 +98,7 @@ def query_ga(query, **kwargs):
     while True:
         LOG.info("requesting page %s for query %s" % (page, query))  # ['filters']))
         response = _query_ga(query, **kwargs)
-        if 'rows' not in response:
+        if not response.get('rows'):
             break # empty response
         results.extend(response['rows'])
         if (results_pp * page) >= response['rowCount']:
