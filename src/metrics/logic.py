@@ -3,7 +3,7 @@ from article_metrics.utils import ensure, lmap, create_or_update, first, ymd, lf
 from article_metrics.ga_metrics import core as ga_core
 from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth
-from datetime import date
+from datetime import date, timedelta
 from django.db import transaction
 import logging
 
@@ -126,6 +126,13 @@ def build_ga_query(ptype, start_date=None, end_date=None):
     start_date = start_date or earliest_date
     end_date = end_date or latest_date
     ensure(start_date <= end_date, "start date %r cannot be greater than end date %r" % (start_date, end_date))
+
+    # lsh@2023-07-12: prevent empty/partial results by not querying for the current day, or a full day in the past.
+    today = date.today()
+    yesterday = today - timedelta(days=1)
+    if end_date >= today or end_date >= yesterday:
+        LOG.warning("truncating current/future 'end_date' to today - 24 hours to avoid empty/partial results.")
+        end_date = today - timedelta(days=1)
 
     # only those frames that overlap our start/end dates
     frame_list = interesting_frames(start_date, end_date, frame_list)
