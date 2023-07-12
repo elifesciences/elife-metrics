@@ -6,13 +6,13 @@
 
 from os.path import join
 import os, json, time, random
-from datetime import datetime
+from datetime import datetime, timedelta
 from googleapiclient import errors
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
-from .utils import ymd, month_min_max, d2dt, ensure
+from .utils import ymd, month_min_max, ensure
 from kids.cache import cache
 import logging
 from django.conf import settings
@@ -243,14 +243,9 @@ def output_path(results_type, from_date, to_date):
     "generates a path for results of the given type"
     # `output_path` now used by non-article metrics app to create a cache path for *their* ga responses
     #assert results_type in ['views', 'downloads'], "results type must be either 'views' or 'downloads', not %r" % results_type
-    if isinstance(from_date, str): # given strings
-        #from_date_dt = datetime.strptime(from_date, "%Y-%m-%d")
-        to_date_dt = datetime.strptime(to_date, "%Y-%m-%d")
-    else: # given date/datetime objects
-        to_date_dt = d2dt(to_date)
+    if not isinstance(from_date, str):
+        # given date/datetime objects
         from_date, to_date = ymd(from_date), ymd(to_date)
-
-    now, now_dt = ymd(datetime.now()), datetime.now()
 
     # different formatting if two different dates are provided
     if from_date == to_date:
@@ -258,21 +253,7 @@ def output_path(results_type, from_date, to_date):
     else:
         dt_str = "%s_%s" % (from_date, to_date)
 
-    # lsh@2023-07-11: disabled. GA4 doesn't do partial results.
-    # partial results and their weekly cleanup have also lead to the
-    # journal showing stale values for a long time.
-    #partial = ""
-    # if to_date == now or to_date_dt >= now_dt:
-    #    # anything gathered today or for the future (month ranges)
-    #    # will only ever be partial. when run again on a future day
-    #    # there will be cache miss and the full results downloaded
-    #    partial = ".partial"
-    if to_date == now or to_date_dt >= now_dt:
-        return
-
-    # ll: output/downloads/2014-04-01.json
-    # ll: output/views/2014-01-01_2014-01-31.json.partial
-    # return join(output_dir(), results_type, dt_str + ".json" + partial)
+    # "output/downloads/2014-04-01.json"
     return join(output_dir(), results_type, dt_str + ".json")
 
 def output_path_from_results(response, results_type=None):
@@ -288,8 +269,6 @@ def output_path_from_results(response, results_type=None):
 
 def write_results(results, path):
     "writes sanitised response from Google as json to the given path"
-    if not path:
-        return
     dirname = os.path.dirname(path)
     if not os.path.exists(dirname):
         assert os.system("mkdir -p %s" % dirname) == 0, "failed to make output dir %r" % dirname
@@ -317,8 +296,6 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     ensure(type(to_date_dt) == datetime, "to_date_dt must be a datetime object")
 
     from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
-    now_dt = datetime.now()
-    now = ymd(now_dt)
 
     # different formatting if two different dates are provided
     if from_date == to_date:
@@ -326,21 +303,8 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     else:
         dt_str = "%s_%s" % (from_date, to_date)
 
-    # lsh@2023-07-11: disabled. GA4 doesn't do partial results.
-    # partial results and their weekly cleanup have also lead to the
-    # journal showing stale values for a long time.
-    #partial = ""
-    # if to_date == now or to_date_dt >= now_dt:
-    #    # anything gathered today or for the future (month ranges)
-    #    # will only ever be partial. when run again on a future day
-    #    # there will be cache miss and the full results downloaded
-    #    partial = ".partial"
-    if to_date == now or to_date_dt >= now_dt:
-        return
-
     # ll: output/downloads/2014-04-01.json
-    # ll: output/views/2014-01-01_2014-01-31.json.partial
-    # return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json" + partial)
+    # ll: output/views/2014-01-01_2014-01-31.json
     return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json")
 
 def write_results_v2(results, path):
@@ -429,36 +393,43 @@ def article_metrics(table_id, from_date, to_date, cached=False, only_cached=Fals
 
 
 def generate_queries(table_id, query_func_name, datetime_list, use_cached=False, use_only_cached=False):
-    "returns a list of queries to be executed by google"
+    """returns a list of queries to be executed by Google Analytics.
+    queries outside valid date range may be dropped."""
     assert isinstance(query_func_name, str), "query func name must be a string"
     query_list = []
-    for start_date, end_date in datetime_list:
-        module = module_picker(start_date, end_date)
-        query_func = getattr(module, query_func_name)
-        query_type = 'views' if query_func_name == 'path_counts_query' else 'downloads'
+    now = datetime.now()
+    for from_date, to_date in datetime_list:
 
-        path = output_path(query_type, start_date, end_date)
-
-        LOG.debug("looking for metrics here: %s", path)
-        if use_cached:
-            if os.path.exists(path):
-                LOG.debug("we have %r results for %r to %r already", query_type, ymd(start_date), ymd(end_date))
-                continue
-            else:
-                LOG.info("no cache file for %r results for %r to %r: %s", query_type, ymd(start_date), ymd(end_date), path)
-        else:
-            LOG.debug("couldn't find file %r", path)
-
-        if use_only_cached:
-            LOG.info("skipping google query, using only cache files")
+        # lsh@2023-07-11: skip query if it looks like it would generate partial or empty results.
+        # GA3 generates partial results, GA4 generates empty results.
+        if to_date >= now:
+            LOG.debug("query skipped, a current or future date would generate partial or empty results.")
             continue
 
-        q = query_func(table_id, start_date, end_date)
+        # lsh@2023-07-11: skip query if less than 24 hours old
+        if to_date >= (now - timedelta(days=1)):
+            LOG.debug("query skipped, a date less than 24hrs in the past may generate partial or empty results.")
+            continue
+
+        module = module_picker(from_date, to_date)
+        query_func = getattr(module, query_func_name)
+        query_type = 'views' if query_func_name == 'path_counts_query' else 'downloads'
+        path = output_path(query_type, from_date, to_date)
+
+        if use_cached and os.path.exists(path):
+            # "query skipped, we have 'view' results for '2001-01-01' to '2001-01-02' already"
+            LOG.debug("query skipped, we have %r results for %r to %r already", query_type, ymd(from_date), ymd(to_date))
+            continue
+
+        if use_only_cached and not os.path.exists(path):
+            LOG.debug("query skipped, `use_only_cached` is True and expected cache file not found: " + path)
+            continue
+
+        q = query_func(table_id, from_date, to_date)
         query_list.append(q)
 
     if use_only_cached:
-        # code problem
-        assert query_list == [], "use_only_cached==True but we're accumulating queries somehow"
+        assert query_list == [], "`use_only_cached` is True but we're accumulating queries somehow. This is a programming error."
 
     return query_list
 

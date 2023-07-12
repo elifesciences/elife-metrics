@@ -113,7 +113,7 @@ class TestUtils(base.SimpleBaseCase):
         response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json'), 'r'))
         response['query']['start-date'] = today
         response['query']['end-date'] = today
-        expected_path = None # lsh@2023-07-12: partial results are no longer created
+        expected_path = join(self.test_output_dir, settings.GA_OUTPUT_SUBDIR, "views/%s.json" % today)
         path = core.output_path_from_results(response)
         self.assertEqual(path, expected_path)
 

@@ -50,7 +50,7 @@ def query_ga(ptype, query, replace_cache_files=False):
     end_dt = ga_utils.todt(query['dateRanges'][0]['endDate'])
 
     results_type = ptype
-    results, output_path = ga_core.query_ga_write_results_v2(query, start_dt, end_dt, results_type)
+    results, _ = ga_core.query_ga_write_results_v2(query, start_dt, end_dt, results_type)
     return results
 
 # --- processing

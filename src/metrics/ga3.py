@@ -44,7 +44,7 @@ def query_ga(ptype, query, results_pp=MAX_GA_RESULTS, replace_cache_files=False)
     LOG.info("querying GA for %ss between %s and %s" % (ptype, sd, ed))
     dump_path = ga_core.output_path(ptype, sd, ed)
     # TODO: this settings.TESTING check is a code smell.
-    if dump_path and os.path.exists(dump_path) and not settings.TESTING:
+    if os.path.exists(dump_path) and not settings.TESTING:
         if not replace_cache_files:
             LOG.info("(cache hit)")
             return json.load(open(dump_path, 'r'))
