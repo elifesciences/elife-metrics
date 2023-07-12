@@ -258,16 +258,22 @@ def output_path(results_type, from_date, to_date):
     else:
         dt_str = "%s_%s" % (from_date, to_date)
 
-    partial = ""
+    # lsh@2023-07-11: disabled. GA4 doesn't do partial results.
+    # partial results and their weekly cleanup have also lead to the
+    # journal showing stale values for a long time.
+    #partial = ""
+    # if to_date == now or to_date_dt >= now_dt:
+    #    # anything gathered today or for the future (month ranges)
+    #    # will only ever be partial. when run again on a future day
+    #    # there will be cache miss and the full results downloaded
+    #    partial = ".partial"
     if to_date == now or to_date_dt >= now_dt:
-        # anything gathered today or for the future (month ranges)
-        # will only ever be partial. when run again on a future day
-        # there will be cache miss and the full results downloaded
-        partial = ".partial"
+        return
 
     # ll: output/downloads/2014-04-01.json
     # ll: output/views/2014-01-01_2014-01-31.json.partial
-    return join(output_dir(), results_type, dt_str + ".json" + partial)
+    # return join(output_dir(), results_type, dt_str + ".json" + partial)
+    return join(output_dir(), results_type, dt_str + ".json")
 
 def output_path_from_results(response, results_type=None):
     """determines a path where the given response can live, using the
@@ -282,6 +288,8 @@ def output_path_from_results(response, results_type=None):
 
 def write_results(results, path):
     "writes sanitised response from Google as json to the given path"
+    if not path:
+        return
     dirname = os.path.dirname(path)
     if not os.path.exists(dirname):
         assert os.system("mkdir -p %s" % dirname) == 0, "failed to make output dir %r" % dirname
@@ -318,16 +326,22 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     else:
         dt_str = "%s_%s" % (from_date, to_date)
 
-    partial = ""
+    # lsh@2023-07-11: disabled. GA4 doesn't do partial results.
+    # partial results and their weekly cleanup have also lead to the
+    # journal showing stale values for a long time.
+    #partial = ""
+    # if to_date == now or to_date_dt >= now_dt:
+    #    # anything gathered today or for the future (month ranges)
+    #    # will only ever be partial. when run again on a future day
+    #    # there will be cache miss and the full results downloaded
+    #    partial = ".partial"
     if to_date == now or to_date_dt >= now_dt:
-        # anything gathered today or for the future (month ranges)
-        # will only ever be partial. when run again on a future day
-        # there will be cache miss and the full results downloaded
-        partial = ".partial"
+        return
 
     # ll: output/downloads/2014-04-01.json
     # ll: output/views/2014-01-01_2014-01-31.json.partial
-    return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json" + partial)
+    # return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json" + partial)
+    return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json")
 
 def write_results_v2(results, path):
     """writes `results` as json to the given `path`.

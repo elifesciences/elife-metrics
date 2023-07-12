@@ -48,7 +48,7 @@ class V3V4Transition(base.SimpleBaseCase):
 
 class V4(base.SimpleBaseCase):
     def setUp(self):
-        self.fixture_path = join(self.fixture_dir, '2017-10-01_2017-10-31.json.partial')
+        self.fixture_path = join(self.fixture_dir, '2017-10-01_2017-10-31.json')
         self.fixture = json.load(open(self.fixture_path, 'r'))
 
         # this fixture has a number of bad paths:
