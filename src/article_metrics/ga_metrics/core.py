@@ -101,11 +101,28 @@ def module_picker(from_date, to_date):
 #
 
 def valid_dt_pair(dt_pair, inception):
-    "returns true if both dates are greater than the date we started collecting on"
+    """returns True if both dates are greater than the date we started collecting on and,
+    the to-date does not include *today* as that would generate partial results in GA3,
+    the to-date does not include *yesterday* as that may generate empty results in GA4."""
     from_date, to_date = dt_pair
     ensure(isinstance(from_date, datetime), "from_date must be a datetime object, not %r" % (type(from_date),))
     ensure(isinstance(to_date, datetime), "to_date must be a datetime object, not %r" % (type(to_date),))
-    return from_date >= inception and to_date >= inception
+    ensure(from_date <= to_date, "from_date must be older than or the same as to the to_date")
+    if from_date < inception:
+        LOG.debug("date range invalid, it starts earlier than when we started collecting.")
+        return False
+
+    now = datetime.now()
+
+    if to_date >= now:
+        LOG.debug("date range invalid, current/future dates may generate partial or empty results.")
+        return False
+
+    if to_date >= (now - timedelta(days=1)):
+        LOG.debug("date range invalid, a date less than 24hrs in the past may generate partial or empty results.")
+        return False
+
+    return True
 
 def valid_view_dt_pair(dt_pair):
     "returns true if both dates are greater than the date we started collecting on"
@@ -394,22 +411,10 @@ def article_metrics(table_id, from_date, to_date, cached=False, only_cached=Fals
 
 def generate_queries(table_id, query_func_name, datetime_list, use_cached=False, use_only_cached=False):
     """returns a list of queries to be executed by Google Analytics.
-    queries outside valid date range may be dropped."""
+    it's assumed that date ranges that generate invalid queries have been filtered out by `valid_dt_pair`."""
     assert isinstance(query_func_name, str), "query func name must be a string"
     query_list = []
-    now = datetime.now()
     for from_date, to_date in datetime_list:
-
-        # lsh@2023-07-11: skip query if it looks like it would generate partial or empty results.
-        # GA3 generates partial results, GA4 generates empty results.
-        if to_date >= now:
-            LOG.debug("query skipped, a current or future date would generate partial or empty results.")
-            continue
-
-        # lsh@2023-07-11: skip query if less than 24 hours old
-        if to_date >= (now - timedelta(days=1)):
-            LOG.debug("query skipped, a date less than 24hrs in the past may generate partial or empty results.")
-            continue
 
         module = module_picker(from_date, to_date)
         query_func = getattr(module, query_func_name)
