@@ -236,6 +236,9 @@ def query_ga(query, num_attempts=5):
     """performs given query and fetches any further pages.
     concatenated results are returned in the response dict as `rows`."""
 
+    # lsh@2023-07-12: hard fail if we somehow managed to generate a query that might generate bad data
+    ensure(todt_notz(query['end_date']) < datetime.now(), "refusing to query GA3, query `end_date` will generate partial/empty results")
+
     results_pp = query.get('max_results', MAX_GA_RESULTS)
     query['max_results'] = results_pp
     query['start_index'] = 1
