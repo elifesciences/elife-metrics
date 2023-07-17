@@ -2,7 +2,7 @@ import typing
 from article_metrics import utils, models
 from . import base
 import pytz
-from datetime import datetime
+from datetime import datetime, date
 import pytest
 
 class TestUtils(base.BaseCase):
@@ -82,9 +82,8 @@ def test_first():
 
 def test_utcnow():
     "utcnow returns a UTC datetime"
-    # TODO: this test could be improved
     now = utils.utcnow()
-    now.tzinfo == pytz.utc
+    assert now.tzinfo == pytz.utc
 
 def test_todt():
     cases = [
@@ -97,7 +96,30 @@ def test_todt():
          datetime(year=2001, month=1, day=1, hour=14, minute=0, second=30, tzinfo=pytz.utc)),
     ]
     for string, expected in cases:
-        utils.todt(string) == expected
+        assert utils.todt(string) == expected
+
+def test_tod():
+    cases = [
+        # empties
+        (None, None),
+        ("", None),
+        # string date
+        ("2001-01-01", date(year=2001, month=1, day=1)),
+        # string datetime, no tz
+        ("2001-01-01T00:00:00", date(year=2001, month=1, day=1)),
+        # string datetime, with tz
+        ("2001-01-01T00:00:00Z", date(year=2001, month=1, day=1)),
+        # string datetime, with tz in 'past'
+        ("2001-01-01T00:00:00Z-23", date(year=2000, month=12, day=31)),
+        # date
+        (date(year=2001, month=1, day=1), date(year=2001, month=1, day=1)),
+        # datetime, no tz
+        (datetime(year=2001, month=1, day=1), date(year=2001, month=1, day=1)),
+        # datetime, with tz
+        (datetime(year=2001, month=1, day=1, tzinfo=pytz.utc), date(year=2001, month=1, day=1)),
+    ]
+    for given, expected in cases:
+        assert utils.tod(given) == expected
 
 def test_doi_to_msid():
     cases = [
@@ -106,7 +128,7 @@ def test_doi_to_msid():
         ('10.7554/elife.09560', 9560), # lowercase 'l' in 'elife'
     ]
     for given, expected in cases:
-        utils.doi2msid(given) == expected
+        assert utils.doi2msid(given) == expected
 
 def test_bad_doi_to_msid():
     cases = [
@@ -129,7 +151,7 @@ def test_msid_to_doi():
         (10627, '10.7554/eLife.10627')
     ]
     for given, expected in cases:
-        utils.msid2doi(given) == expected
+        assert utils.msid2doi(given) == expected
 
 def test_paginate():
     cases = [
