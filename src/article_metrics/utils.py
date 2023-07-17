@@ -194,7 +194,7 @@ def tod(val):
     "return a date value"
     if not val:
         return None
-    if isinstance(val, date):
+    if type(val) == date:
         return val
     val = todt(val)
     return val.date()

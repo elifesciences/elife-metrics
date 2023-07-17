@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from article_metrics import logic, models
+from article_metrics.utils import tod
 from metrics import logic as na_logic # non-article logic
 import logging
 
@@ -52,7 +53,7 @@ class Command(BaseCommand):
         n_days_ago = today - timedelta(days=options['days'])
         n_months_ago = today - relativedelta(months=options['months'])
         use_cached = options['cached']
-        only_cached = options['only_cached']
+        use_only_cached = options['only_cached']
 
         from_date = n_days_ago
         to_date = today
@@ -64,9 +65,9 @@ class Command(BaseCommand):
         # date ranges and caching arguments don't matter to citations right now
         # caching is feasible, but only crossref supports querying citations by date range
         sources = OrderedDict([
-            (NA_METRICS, (timeit("non-article-metrics")(na_logic.update_all_ptypes),)),
-            (GA_DAILY, (timeit("article-metrics-daily")(logic.import_ga_metrics), 'daily', from_date, to_date, use_cached, only_cached)),
-            (GA_MONTHLY, (timeit("article-metrics-monthly")(logic.import_ga_metrics), 'monthly', n_months_ago, to_date, use_cached, only_cached)),
+            (NA_METRICS, (timeit("non-article-metrics")(na_logic.update_all_ptypes), tod(from_date), tod(to_date))),
+            (GA_DAILY, (timeit("article-metrics-daily")(logic.import_ga_metrics), 'daily', from_date, to_date, use_cached, use_only_cached)),
+            (GA_MONTHLY, (timeit("article-metrics-monthly")(logic.import_ga_metrics), 'monthly', n_months_ago, to_date, use_cached, use_only_cached)),
             (models.CROSSREF, (timeit("crossref-citations")(logic.import_crossref_citations),)),
             (models.SCOPUS, (timeit("scopus-citations")(logic.import_scopus_citations),)),
             (models.PUBMED, (timeit("pmc-citations")(logic.import_pmc_citations),)),
