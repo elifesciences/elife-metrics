@@ -1,6 +1,5 @@
-from functools import partial
 from . import models, history, ga3, ga4
-from article_metrics.utils import ensure, lmap, create_or_update, first, ymd, lfilter, run
+from article_metrics.utils import ensure, lmap, create_or_update, first, ymd, lfilter
 from article_metrics.ga_metrics import core as ga_core
 from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth
@@ -110,7 +109,7 @@ def build_ga_query(ptype, start_date=None, end_date=None):
     overlap. These overlaps will truncate the current period to the epoch
     boundaries."""
 
-    ensure(is_ptype(ptype), "bad page type")
+    ensure(is_ptype(ptype), "bad page type: %s" % ptype)
 
     # if dates given, ensure they are date objects
     start_date and ensure(is_date(start_date), "bad start date")
@@ -183,7 +182,8 @@ def update_ptype(ptype, start_date=None, end_date=None, replace_cache_files=Fals
         LOG.error(err)
 
 def update_all_ptypes(start_date=None, end_date=None, replace_cache_files=False):
-    run(partial(update_ptype, start_date, end_date, replace_cache_files), models.PAGE_TYPES)
+    for ptype in models.PAGE_TYPES:
+        update_ptype(ptype, start_date, end_date, replace_cache_files)
 
 #
 #
@@ -211,9 +211,9 @@ def monthly_page_views(pobj):
 #
 
 def page_views(pid, ptype, period=DAY):
-    ensure(is_pid(pid), "bad page identifier", ValueError)
-    ensure(is_ptype(ptype), "bad page type", ValueError)
-    ensure(is_period(period), "bad period", ValueError)
+    ensure(is_pid(pid), "bad page identifier: %s" % pid, ValueError)
+    ensure(is_ptype(ptype), "bad page type: %s" % ptype, ValueError)
+    ensure(is_period(period), "bad period: %s" % period, ValueError)
     try:
         pobj = models.Page.objects.get(identifier=pid, type=ptype)
         dispatch = {
