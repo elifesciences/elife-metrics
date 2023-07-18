@@ -18,7 +18,7 @@ import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 from . import utils, ga4
-from article_metrics.utils import lfilter, todt_notz
+from article_metrics.utils import lfilter, todt_notz, datetime_now
 
 LOG = logging.getLogger(__name__)
 
@@ -102,23 +102,24 @@ def module_picker(from_date, to_date):
 
 def valid_dt_pair(dt_pair, inception):
     """returns True if both dates are greater than the date we started collecting on and,
-    the to-date does not include *today* as that would generate partial results in GA3,
+    the to-date does not include *today* as that would generate partial results in GA3 and
     the to-date does not include *yesterday* as that may generate empty results in GA4."""
     from_date, to_date = dt_pair
     ensure(isinstance(from_date, datetime), "from_date must be a datetime object, not %r" % (type(from_date),))
     ensure(isinstance(to_date, datetime), "to_date must be a datetime object, not %r" % (type(to_date),))
-    ensure(from_date <= to_date, "from_date must be older than or the same as to the to_date")
+    ensure(from_date <= to_date, "from_date must be older than or the same as the to_date")
     if from_date < inception:
         LOG.debug("date range invalid, it starts earlier than when we started collecting.")
         return False
 
-    now = datetime.now()
+    now = datetime_now()
 
     if to_date >= now:
         LOG.debug("date range invalid, current/future dates may generate partial or empty results.")
         return False
 
-    if to_date >= (now - timedelta(days=1)):
+    yesterday = now - timedelta(days=1)
+    if to_date >= yesterday:
         LOG.debug("date range invalid, a date less than 24hrs in the past may generate partial or empty results.")
         return False
 
@@ -236,8 +237,13 @@ def query_ga(query, num_attempts=5):
     """performs given query and fetches any further pages.
     concatenated results are returned in the response dict as `rows`."""
 
+    now = datetime_now()
+    yesterday = now - timedelta(days=1)
+    end_date = todt_notz(query['end_date'])
+
     # lsh@2023-07-12: hard fail if we somehow managed to generate a query that might generate bad data
-    ensure(todt_notz(query['end_date']) < datetime.now(), "refusing to query GA3, query `end_date` will generate partial/empty results")
+    ensure(end_date < now, "refusing to query GA3, query `end_date` will generate partial/empty results")
+    ensure(end_date < yesterday, "refusing to query GA3, query `end_date` will generate partial/empty results")
 
     results_pp = query.get('max_results', MAX_GA_RESULTS)
     query['max_results'] = results_pp

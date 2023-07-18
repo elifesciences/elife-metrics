@@ -1,5 +1,5 @@
 from article_metrics.ga_metrics.core import GA4_SWITCH
-from article_metrics.utils import lmap
+from article_metrics.utils import lmap, date_today
 from schema import Schema, And, Or, Use as Coerce, Optional, SchemaError
 import datetime
 from django.conf import settings
@@ -173,7 +173,7 @@ def frames_wrangler(frame_list):
 
     def fill_empties(frame):
         frame['starts'] = frame['starts'] or settings.INCEPTION.date()
-        frame['ends'] = frame['ends'] or datetime.date.today()
+        frame['ends'] = frame['ends'] or date_today()
         return frame
 
     frame_list = lmap(fill_empties, frame_list)

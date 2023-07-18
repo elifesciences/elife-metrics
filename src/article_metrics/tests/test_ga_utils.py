@@ -3,6 +3,7 @@ from os.path import join
 from . import base
 from datetime import datetime
 from article_metrics.ga_metrics import core, utils
+from article_metrics.utils import datetime_now
 from django.conf import settings
 
 class TestUtils(base.SimpleBaseCase):
@@ -109,7 +110,7 @@ class TestUtils(base.SimpleBaseCase):
 
     def test_output_path_for_partial_results(self):
         "the output path is correctly generated for requests that generate partial responses"
-        today = datetime.now().strftime('%Y-%m-%d')
+        today = datetime_now().strftime('%Y-%m-%d')
         response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json'), 'r'))
         response['query']['start-date'] = today
         response['query']['end-date'] = today

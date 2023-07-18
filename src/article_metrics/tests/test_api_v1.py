@@ -5,6 +5,7 @@ from django.urls import reverse
 from article_metrics import models, logic
 from datetime import datetime, timedelta
 from article_metrics.ga_metrics.utils import ymd
+from article_metrics.utils import datetime_now
 from . import base
 
 class TestAPI(base.BaseCase):
@@ -37,7 +38,7 @@ class TestAPI(base.BaseCase):
         doi = '10.7554/eLife.08007'
 
         metrics = models.Metric.objects.get(article__doi=doi)
-        this_month = ymd(datetime.now() - timedelta(days=1))[:-3]
+        this_month = ymd(datetime_now() - timedelta(days=1))[:-3]
         metrics.date = this_month
         metrics.save()
 
@@ -79,7 +80,7 @@ class TestAPI(base.BaseCase):
 
         # hack. the v1 api only queries the last 30 days and is not variable
         metric = models.Metric.objects.get(article__doi=doi)
-        yesterday = ymd(datetime.now() - timedelta(days=1))
+        yesterday = ymd(datetime_now() - timedelta(days=1))
         metric.date = yesterday
         metric.save()
 
@@ -132,8 +133,8 @@ class TestAPI(base.BaseCase):
         doi = '10.7554/eLife.09560'
 
         # hack. the v1 api only queries the last 30 days and is not variable
-        yesterday = str(ymd(datetime.now() - timedelta(days=1)))
-        day_before = str(ymd(datetime.now() - timedelta(days=2)))
+        yesterday = str(ymd(datetime_now() - timedelta(days=1)))
+        day_before = str(ymd(datetime_now() - timedelta(days=2)))
         m1, m2 = models.Metric.objects.filter(article__doi=doi)
         m1.date = day_before
         m2.date = yesterday

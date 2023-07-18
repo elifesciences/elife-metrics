@@ -1,9 +1,9 @@
 from functools import partial
-from datetime import datetime, timedelta
+from datetime import timedelta
 from . import ga_metrics, models, utils, events
 from django.conf import settings
 from django.db import transaction
-from .utils import first, create_or_update, ensure, splitfilter, comp, run, lfilter
+from .utils import first, create_or_update, ensure, splitfilter, comp, run, lfilter, datetime_now
 import logging
 
 LOG = logging.getLogger(__name__)
@@ -110,7 +110,7 @@ def import_ga_metrics(metrics_type='daily', from_date=None, to_date=None, use_ca
 
     table_id = 'ga:%s' % settings.GA3_TABLE_ID
     the_beginning = ga_metrics.core.VIEWS_INCEPTION
-    yesterday = datetime.now() - timedelta(days=1)
+    yesterday = datetime_now() - timedelta(days=1)
 
     if not from_date:
         from_date = the_beginning

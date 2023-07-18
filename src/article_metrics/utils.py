@@ -143,6 +143,16 @@ def subdict(d, kl):
 def exsubdict(d, kl):
     return {k: v for k, v in d.items() if k not in kl}
 
+def datetime_now(tz=None):
+    "small wrapper around datetime.datetime.now() for replacing during testing."
+    dt = datetime.now(tz=tz) if tz else datetime.now()
+    dt.replace(microsecond=0)
+    return dt
+
+def date_today():
+    "small wrapper around datetime.date.today() for replacing during testing."
+    return date.today()
+
 # TODO: code smell, remove conditional
 def fmtdt(dt, fmt="%Y-%m-%d"):
     if not dt:
@@ -202,7 +212,7 @@ def tod(val):
 def utcnow():
     "returns a UTC datetime stamp with a UTC timezone object attached"
     # there is a datetime.utcnow(), but it doesn't attach a timezone object
-    return datetime.now(pytz.utc).replace(microsecond=0)
+    return datetime_now(pytz.utc).replace(microsecond=0)
 
 def renkeys(d, keypair_list):
     for old_key, new_key in keypair_list:

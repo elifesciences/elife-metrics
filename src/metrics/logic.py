@@ -1,5 +1,5 @@
 from . import models, history, ga3, ga4
-from article_metrics.utils import ensure, lmap, create_or_update, first, ymd, lfilter
+from article_metrics.utils import ensure, lmap, create_or_update, first, ymd, lfilter, date_today
 from article_metrics.ga_metrics import core as ga_core
 from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth
@@ -128,11 +128,14 @@ def build_ga_query(ptype, start_date=None, end_date=None):
     ensure(start_date <= end_date, "start date %r cannot be greater than end date %r" % (start_date, end_date))
 
     # lsh@2023-07-12: prevent empty/partial results by not querying for the current day, or a full day in the past.
-    today = date.today()
+    today = date_today()
     yesterday = today - timedelta(days=1)
     if end_date >= today or end_date >= yesterday:
-        LOG.warning("truncating current/future 'end_date' to today - 24 hours to avoid empty/partial results.")
-        end_date = today - timedelta(days=1)
+        if start_date == end_date:
+            LOG.warning("dropping current/future date range to avoid empty/partial results.")
+            return []
+        LOG.warning("truncating current/future 'end_date' to today - 48 hours to avoid empty/partial results.")
+        end_date = yesterday - timedelta(days=1)
 
     # only those frames that overlap our start/end dates
     frame_list = interesting_frames(start_date, end_date, frame_list)
@@ -144,7 +147,6 @@ def build_ga_query(ptype, start_date=None, end_date=None):
 
     # each timeframe requires it's own pattern generation, post processing and normalisation
     query_list = [(frame, build_ga_query__queries_for_frame(ptype, frame, start_date, end_date)) for frame in frame_list]
-
     return query_list
 
 #

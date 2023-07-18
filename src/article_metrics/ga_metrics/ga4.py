@@ -6,9 +6,9 @@ import oauth2client.service_account
 import httplib2
 import logging
 from django.conf import settings
-from ..utils import ensure
+from ..utils import ensure, datetime_now
 from article_metrics.utils import todt_notz
-from datetime import datetime
+from datetime import timedelta
 
 LOG = logging.getLogger(__name__)
 
@@ -38,7 +38,11 @@ def _query_ga(query_map, num_attempts=5):
     ensure(isinstance(query_map['dateRanges'][0]['endDate'], str), 'endDate must be a string')
 
     # lsh@2023-07-12: hard fail if we somehow managed to generate a query that might generate bad data
-    ensure(todt_notz(query_map['dateRanges'][0]['endDate']) < datetime.now(), "refusing to query GA4, query `end_date` will generate partial/empty results")
+    now = datetime_now()
+    yesterday = now - timedelta(days=1)
+    end_date = todt_notz(query_map['dateRanges'][0]['endDate'])
+    ensure(end_date < now, "refusing to query GA4, query `end_date` will generate partial/empty results")
+    ensure(end_date < yesterday, "refusing to query GA4, query `end_date` will generate partial/empty results")
 
     property_id = 'properties/' + settings.GA4_TABLE_ID
     query = ga_service().properties().runReport(property=property_id, body=query_map)

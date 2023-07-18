@@ -1,3 +1,4 @@
+from unittest import mock
 from . import base
 from datetime import datetime, timedelta
 from article_metrics.ga_metrics import utils
@@ -86,3 +87,37 @@ class One(base.SimpleBaseCase):
             actual = core.module_picker(*dtpair)
             msg = 'given: %s, expected: %s. got %s' % (dtpair, expected_module, actual)
             self.assertEqual(expected_module, actual, msg)
+
+def test_valid_dt_pair():
+    now = datetime(year=2015, month=6, day=1, hour=0, minute=0, second=0)  # , tzinfo=pytz.utc)
+    yesterday = now - timedelta(days=1)
+    two_days_ago = yesterday - timedelta(days=1)
+    tomorrow = now + timedelta(days=1)
+    valid_cases = [
+        # months ago, valid
+        (datetime(year=2015, month=1, day=1), datetime(year=2015, month=1, day=2)),
+        # the day before yesterday, valid
+        (two_days_ago, two_days_ago),
+        # range ending the day before yesterday, valid
+        (datetime(year=2015, month=1, day=1), two_days_ago),
+    ]
+    invalid_cases = [
+        # today, invalid, partial results
+        (now, now),
+        # yesterday, invalid, partial results
+        (yesterday, yesterday),
+        # range involving today, invalid, partial results
+        (yesterday, now),
+        # range involving yesterday, invalid, partial results
+        (two_days_ago, yesterday),
+        # future date, invalid
+        (tomorrow, tomorrow),
+        # range involving a future date, invalid, partial results
+        (two_days_ago, tomorrow),
+    ]
+    inception = datetime(year=2001, month=1, day=1)
+    with mock.patch('article_metrics.ga_metrics.core.datetime_now', return_value=now):
+        for case in valid_cases:
+            assert core.valid_dt_pair(case, inception)
+        for case in invalid_cases:
+            assert not core.valid_dt_pair(case, inception)

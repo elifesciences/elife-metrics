@@ -15,7 +15,7 @@ htmlcov/
 app.cfg
 sqlite.cfg
 psql.cfg
-output/
+output*/
 /*.flag
 /client-secrets.json
 /newrelic.ini*

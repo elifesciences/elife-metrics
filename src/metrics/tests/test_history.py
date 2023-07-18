@@ -1,6 +1,7 @@
 from datetime import date
 from . import base
 from metrics import history, models
+from article_metrics.utils import date_today
 from django.conf import settings
 
 class One(base.BaseCase):
@@ -11,7 +12,7 @@ class One(base.BaseCase):
                 'frames': [
                     {'id': 1,
                      'starts': date(year=1997, month=8, day=29),
-                     'ends': None, # becomes date.today()
+                     'ends': None, # becomes date_today()
                      'pattern': '.*$'},
                     {'id': 2,
                      'starts': None, # becomes settings.INCEPTION
@@ -21,7 +22,7 @@ class One(base.BaseCase):
             }
         }
         results = history.type_history.validate(case)
-        self.assertEqual(results['judgement-day']['frames'][0]['ends'], date.today())
+        self.assertEqual(results['judgement-day']['frames'][0]['ends'], date_today())
         self.assertEqual(results['judgement-day']['frames'][-1]['starts'], settings.INCEPTION.date())
 
     def test_history_frames_sorted(self):
@@ -50,7 +51,7 @@ class One(base.BaseCase):
         case = {'foo': {'frames': [f2, f3, f1]}}
         results = history.type_history.validate(case)
         self.assertEqual(results['foo']['frames'][0]['starts'], settings.INCEPTION.date())
-        self.assertEqual(results['foo']['frames'][-1]['ends'], date.today())
+        self.assertEqual(results['foo']['frames'][-1]['ends'], date_today())
 
     def test_default_history_file(self):
         history.load_history() # no SchemaError errors thrown
