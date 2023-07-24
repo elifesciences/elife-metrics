@@ -4,6 +4,7 @@
 # Analytics API:
 # https://developers.google.com/analytics/devguides/reporting/core/v3/reference
 
+from functools import partial
 from os.path import join
 import os, json, time, random
 from datetime import datetime, timedelta
@@ -18,7 +19,7 @@ import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 from . import utils, ga4
-from article_metrics.utils import lfilter, todt_notz, datetime_now
+from article_metrics.utils import todt_notz, datetime_now, first, second, fmtdt
 
 LOG = logging.getLogger(__name__)
 
@@ -132,6 +133,17 @@ def valid_view_dt_pair(dt_pair):
 def valid_downloads_dt_pair(dt_pair):
     "returns true if both dates are greater than the date we started collecting on"
     return valid_dt_pair(dt_pair, DOWNLOADS_INCEPTION)
+
+def filter_date_list(fn, date_list):
+    fmt = partial(fmtdt, fmt="%Y-%m-%dT%H:%M:%S")
+    new_date_list = []
+    for dt_pair in date_list:
+        if not fn(dt_pair):
+            # "excluding invalid pair: 2001-01-01T00:00:00 - 2001-01-01T23:59:59"
+            LOG.warning("excluding invalid pair: %s - %s" % (fmt(first(dt_pair)), fmt(second(dt_pair))))
+            continue
+        new_date_list.append(dt_pair)
+    return new_date_list
 
 SANITISE_THESE = ['profileInfo', 'id', 'selfLink']
 
@@ -470,14 +482,14 @@ def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_onl
     date_list = utils.dt_range(from_date, to_date)
     query_list = []
 
-    views_dt_range = lfilter(valid_view_dt_pair, date_list)
+    views_dt_range = filter_date_list(valid_view_dt_pair, date_list)
     query_list.extend(generate_queries(table_id,
                                        'path_counts_query',
                                        views_dt_range,
                                        use_cached, use_only_cached))
     bulk_query(query_list, from_date, to_date, results_type='views')
 
-    pdf_dt_range = lfilter(valid_downloads_dt_pair, date_list)
+    pdf_dt_range = filter_date_list(valid_downloads_dt_pair, date_list)
     query_list.extend(generate_queries(table_id,
                                        'event_counts_query',
                                        pdf_dt_range,
@@ -490,8 +502,8 @@ def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_onl
 
 def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_only_cached=False):
     date_list = utils.dt_month_range(from_date, to_date)
-    views_dt_range = lfilter(valid_view_dt_pair, date_list)
-    pdf_dt_range = lfilter(valid_downloads_dt_pair, date_list)
+    views_dt_range = filter_date_list(valid_view_dt_pair, date_list)
+    pdf_dt_range = filter_date_list(valid_downloads_dt_pair, date_list)
 
     query_list = []
     query_list.extend(generate_queries(table_id,
