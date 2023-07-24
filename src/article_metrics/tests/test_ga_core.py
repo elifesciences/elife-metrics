@@ -89,7 +89,7 @@ class One(base.SimpleBaseCase):
             self.assertEqual(expected_module, actual, msg)
 
 def test_valid_dt_pair():
-    now = datetime(year=2015, month=6, day=1, hour=0, minute=0, second=0)  # , tzinfo=pytz.utc)
+    now = datetime(year=2015, month=6, day=1, hour=0, minute=0, second=0)
     yesterday = now - timedelta(days=1)
     two_days_ago = yesterday - timedelta(days=1)
     tomorrow = now + timedelta(days=1)

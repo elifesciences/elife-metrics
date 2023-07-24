@@ -37,7 +37,7 @@ def _query_ga(query_map, num_attempts=5):
     ensure(isinstance(query_map['dateRanges'][0]['startDate'], str), 'startDate must be a string: %s' % query_map)
     ensure(isinstance(query_map['dateRanges'][0]['endDate'], str), 'endDate must be a string')
 
-    # lsh@2023-07-12: hard fail if we somehow managed to generate a query that might generate bad data
+    # lsh@2023-07-12: hard fail if we somehow managed to generate a query that might generate partial data
     now = datetime_now()
     yesterday = now - timedelta(days=1)
     end_date = todt_notz(query_map['dateRanges'][0]['endDate'])

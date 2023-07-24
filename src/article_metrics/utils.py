@@ -146,7 +146,6 @@ def exsubdict(d, kl):
 def datetime_now(tz=None):
     "small wrapper around datetime.datetime.now() for replacing during testing."
     dt = datetime.now(tz=tz) if tz else datetime.now()
-    dt.replace(microsecond=0)
     return dt
 
 def date_today():
