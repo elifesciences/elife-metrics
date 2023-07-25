@@ -114,7 +114,9 @@ class TestUtils(base.SimpleBaseCase):
         response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json'), 'r'))
         response['query']['start-date'] = today
         response['query']['end-date'] = today
-        expected_path = join(self.test_output_dir, settings.GA_OUTPUT_SUBDIR, "views/%s.json" % today)
+        # lsh@2023-07-25: disabled cache paths for potentially partial/empty results.
+        #expected_path = join(self.test_output_dir, settings.GA_OUTPUT_SUBDIR, "views/%s.json" % today)
+        expected_path = None
         path = core.output_path_from_results(response)
         self.assertEqual(path, expected_path)
 
@@ -134,7 +136,8 @@ class TestUtils(base.SimpleBaseCase):
     def test_ga_response_sanitised_when_written(self):
         "responses from GA have certain values scrubbed from them before being written to disk"
         raw_response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json.raw'), 'r'))
-        output_path = core.write_results(raw_response, join(self.test_output_dir, 'foo.json'))
+        output_path = join(self.test_output_dir, 'foo.json')
+        core.write_results(raw_response, output_path)
         response = json.load(open(output_path, 'r'))
         for key in core.SANITISE_THESE:
             self.assertTrue(key not in response)

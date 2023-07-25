@@ -114,13 +114,14 @@ def valid_dt_pair(dt_pair, inception):
         return False
 
     now = datetime_now()
+    daily = to_date == from_date
 
-    if to_date >= now:
+    if daily and to_date >= now:
         LOG.debug("date range invalid, current/future dates may generate partial or empty results.")
         return False
 
     yesterday = now - timedelta(days=1)
-    if to_date >= yesterday:
+    if daily and to_date >= yesterday:
         LOG.debug("date range invalid, a date less than 24hrs in the past may generate partial or empty results.")
         return False
 
@@ -286,7 +287,8 @@ def output_path(results_type, from_date, to_date):
         from_date, to_date = ymd(from_date), ymd(to_date)
 
     # different formatting if two different dates are provided
-    if from_date == to_date:
+    daily = from_date == to_date
+    if daily:
         dt_str = to_date
     else:
         dt_str = "%s_%s" % (from_date, to_date)
@@ -303,7 +305,17 @@ def output_path_from_results(response, results_type=None):
     from_date = datetime.strptime(query['start-date'], "%Y-%m-%d")
     to_date = datetime.strptime(query['end-date'], "%Y-%m-%d")
     results_type = results_type or ('downloads' if 'ga:eventLabel' in query['filters'] else 'views')
-    return output_path(results_type, from_date, to_date)
+    path = output_path(results_type, from_date, to_date)
+
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+
+    # do not cache partial results
+    if to_date >= today or to_date >= yesterday:
+        LOG.warning("refusing to cache potentially partial or empty results: %s", path)
+        return None
+
+    return path
 
 def write_results(results, path):
     "writes sanitised response from Google as json to the given path"
@@ -311,14 +323,16 @@ def write_results(results, path):
     if not os.path.exists(dirname):
         assert os.system("mkdir -p %s" % dirname) == 0, "failed to make output dir %r" % dirname
     LOG.info("writing %r", path)
-    json.dump(sanitize_ga_response(results), open(path, 'w'), indent=4, sort_keys=True)
-    return path
+    with open(path, 'w') as fh:
+        json.dump(sanitize_ga_response(results), fh, indent=4, sort_keys=True)
 
 def query_ga_write_results(query, num_attempts=5):
     "convenience. queries GA then writes the results, returning both the original response and the path to results"
     response = query_ga(query, num_attempts)
     path = output_path_from_results(response)
-    return response, write_results(response, path)
+    if path:
+        write_results(response, path)
+    return response, path
 
 
 # --- END GA3 LOGIC
@@ -336,14 +350,25 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
 
     # different formatting if two different dates are provided
-    if from_date == to_date:
+    daily = from_date == to_date
+    if daily:
         dt_str = to_date
     else:
         dt_str = "%s_%s" % (from_date, to_date)
 
     # ll: output/downloads/2014-04-01.json
     # ll: output/views/2014-01-01_2014-01-31.json
-    return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json")
+    path = join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json")
+
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+
+    # do not cache partial results
+    if to_date_dt >= today or to_date_dt >= yesterday:
+        LOG.warning("refusing to cache potentially partial or empty results: %s", path)
+        return None
+
+    return path
 
 def write_results_v2(results, path):
     """writes `results` as json to the given `path`.
@@ -361,7 +386,8 @@ def query_ga_write_results_v2(query_map, from_date_dt, to_date_dt, results_type,
     query_start = todt_notz(query_map['dateRanges'][0]['startDate'])
     query_end = todt_notz(query_map['dateRanges'][0]['endDate'])
     path = output_path_v2(results_type, query_start, query_end)
-    write_results_v2(results, path)
+    if path:
+        write_results_v2(results, path)
     return results, path
 
 #
@@ -376,7 +402,7 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
 
     path = output_path_v2('views', from_date, to_date)
     module = module_picker(from_date, to_date)
-    if cached and os.path.exists(path):
+    if cached and path and os.path.exists(path):
         raw_data = json.load(open(path, 'r'))
     elif only_cached:
         # no cache exists and we've been told to only use cache.
@@ -385,8 +411,8 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
     else:
         # talk to google
         query_map = module.path_counts_query(table_id, from_date, to_date)
-        raw_data, actual_path = query_ga_write_results_v2(query_map, from_date, to_date, 'views')
-        assert path == actual_path, "the expected output path (%s) doesn't match the path actually written to (%s)" % (path, actual_path)
+        raw_data, _ = query_ga_write_results_v2(query_map, from_date, to_date, 'views')
+
     return module.path_counts(raw_data.get('rows', []))
 
 def article_downloads(table_id, from_date, to_date, cached=False, only_cached=False):
@@ -397,7 +423,7 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
 
     path = output_path_v2('downloads', from_date, to_date)
     module = module_picker(from_date, to_date)
-    if cached and os.path.exists(path):
+    if cached and path and os.path.exists(path):
         raw_data = json.load(open(path, 'r'))
     elif only_cached:
         # no cache exists and we've been told to only use cache.
@@ -406,8 +432,8 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
     else:
         # talk to google
         query_map = module.event_counts_query(table_id, from_date, to_date)
-        raw_data, actual_path = query_ga_write_results_v2(query_map, from_date, to_date, 'downloads')
-        assert path == actual_path, "the expected output path (%s) doesn't match the path actually written to (%s)" % (path, actual_path)
+        raw_data, _ = query_ga_write_results_v2(query_map, from_date, to_date, 'downloads')
+
     return module.event_counts(raw_data.get('rows', []))
 
 def article_metrics(table_id, from_date, to_date, cached=False, only_cached=False):

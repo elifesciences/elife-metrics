@@ -94,30 +94,37 @@ def test_valid_dt_pair():
     two_days_ago = yesterday - timedelta(days=1)
     tomorrow = now + timedelta(days=1)
     valid_cases = [
-        # months ago, valid
+        # daily
+
+        # daily, past date, valid
         (datetime(year=2015, month=1, day=1), datetime(year=2015, month=1, day=2)),
-        # the day before yesterday, valid
+        # daily, the day before yesterday, valid
         (two_days_ago, two_days_ago),
-        # range ending the day before yesterday, valid
+
+        # ranges
+        # these queries can't be discarded because we do monthly queries.
+        # so, we allow them here but may truncate them or refuse to cache their results elsewhere.
+
+        # a range ending the day before yesterday, valid, potentially partial results.
         (datetime(year=2015, month=1, day=1), two_days_ago),
+        # a range involving today, valid, partial results
+        (yesterday, now),
+        # a range involving yesterday, valid, potentially partial results
+        (two_days_ago, yesterday),
+        # a range involving a future date, valid, partial results
+        (two_days_ago, tomorrow),
     ]
     invalid_cases = [
-        # today, invalid, partial results
+        # daily, today, invalid, partial results
         (now, now),
-        # yesterday, invalid, partial results
+        # daily, yesterday, invalid, partial results
         (yesterday, yesterday),
-        # range involving today, invalid, partial results
-        (yesterday, now),
-        # range involving yesterday, invalid, partial results
-        (two_days_ago, yesterday),
-        # future date, invalid
+        # daily, future date, valid, empty results
         (tomorrow, tomorrow),
-        # range involving a future date, invalid, partial results
-        (two_days_ago, tomorrow),
     ]
     inception = datetime(year=2001, month=1, day=1)
     with mock.patch('article_metrics.ga_metrics.core.datetime_now', return_value=now):
         for case in valid_cases:
-            assert core.valid_dt_pair(case, inception)
+            assert core.valid_dt_pair(case, inception), "expected valid: %s" % (case,)
         for case in invalid_cases:
-            assert not core.valid_dt_pair(case, inception)
+            assert not core.valid_dt_pair(case, inception), "expected invalid: %s" % (case,)
