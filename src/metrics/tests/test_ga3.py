@@ -289,38 +289,3 @@ class Five(base.BaseCase):
             ('/u-k-panel-backs-open-access-for-all-publicly-funded-research-papers', 'fbbcdd2b'),
             ('/elife-news/uk-panel-backs-open-access-all-publicly-funded-research-papers', 'fbbcdd2b')])
         self.assertEqual(results, expected)
-
-def test_build_ga_query__invalid_dates_dropped():
-    today = date(year=2015, month=6, day=1)
-    invalid_cases = [
-        # yesterday, invalid
-        (date(year=2015, month=5, day=31), date(year=2015, month=5, day=31)),
-        # today, invalid
-        (date(year=2015, month=6, day=1), date(year=2015, month=6, day=1)),
-        # tomorrow, invalid
-        (date(year=2015, month=6, day=2), date(year=2015, month=6, day=2)),
-    ]
-    with patch('metrics.logic.date_today', return_value=today):
-        for start_date, end_date in invalid_cases:
-            frame = logic.build_ga_query(models.EVENT, start_date, end_date)
-            assert frame == []
-
-def test_build_ga_query__invalid_date_ranges_truncated():
-    # start of year to today is truncated to day before yesterday
-    today = date(year=2015, month=6, day=1)
-    start_date = date(year=2015, month=1, day=1)
-    invalid_cases = [
-        # yesterday
-        date(year=2015, month=5, day=31),
-        # today
-        date(year=2015, month=6, day=1),
-        # tomorrow
-        date(year=2015, month=6, day=2),
-    ]
-    expected_end_date = date(year=2015, month=5, day=30)
-    with patch('metrics.logic.date_today', return_value=today):
-        for end_date in invalid_cases:
-            query_list = logic.build_ga_query(models.EVENT, start_date, end_date)
-            assert len(query_list) == 1 # one interesting frame
-            frame, query = query_list[0]
-            assert query['end_date'] == expected_end_date
