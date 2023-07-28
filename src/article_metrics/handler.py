@@ -92,7 +92,7 @@ HANDLERS = {
 }
 DEFAULT_HANDLER = raise_handler
 
-MAX_RETRIES = 5
+MAX_RETRIES = 3
 
 def requests_get(*args, **kwargs):
     xid = kwargs.pop('opid', opid())
@@ -118,20 +118,18 @@ def requests_get(*args, **kwargs):
         #                                         send data before giving up, as a float, or a
         #                                         (connect timeout, read timeout) tuple.
         'timeout': (connect_timeout, read_timeout),
+    }
+    default_headers = {
         'User-Agent': settings.USER_AGENT,
     }
-    default_kwargs.update(kwargs)
-    kwargs = default_kwargs
+    final_headers = utils.merge(default_headers, kwargs.pop('headers', {}))
+    final_kwargs = utils.merge(default_kwargs, kwargs, {'headers': final_headers})
 
     try:
         # http://docs.python-requests.org/en/master/api/#request-sessions
         session = requests.Session()
-        # "max_retries" - The maximum number of retries each connection should attempt.
-        #                 Note, this applies only to failed DNS lookups, socket connections and connection timeouts,
-        #                 never to requests where data has made it to the server.
-        #                 If you need granular control over the conditions under which we retry a request,
-        #                 import urllib3’s Retry class and pass that instead.
-        #
+        # lsh@2023-07-28: handle network errors better
+        # - https://github.com/elifesciences/issues/issues/8386
         # - https://urllib3.readthedocs.io/en/stable/user-guide.html#retrying-requests
         # - https://urllib3.readthedocs.io/en/stable/reference/urllib3.util.html#urllib3.util.Retry
         max_retries_obj = Retry(**{
@@ -146,12 +144,10 @@ def requests_get(*args, **kwargs):
             # {backoff factor} * (2 ** {number of previous retries})
             # 0.5 => 0.5, 2.0, 4.0, 8.0, 16
             'backoff_factor': 0.5,
-            # not available until urllib3 >=2.0
-            #'backoff_max': 120.0, # seconds, default
         })
         adaptor = requests.adapters.HTTPAdapter(max_retries=max_retries_obj)
         session.mount('https://', adaptor)
-        resp = session.get(*args, **kwargs)
+        resp = session.get(*args, **final_kwargs)
         resp.raise_for_status()
         return resp
 
