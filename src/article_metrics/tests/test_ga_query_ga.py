@@ -1,4 +1,6 @@
-from . import base
+import datetime
+from unittest import mock
+import pytest
 from article_metrics.ga_metrics import core
 from apiclient import errors
 
@@ -20,7 +22,20 @@ class DummyQuery(object):
     def execute(self):
         raise errors.HttpError(self.resp, self.content)
 
-class TestQueryGA(base.SimpleBaseCase):
-    def test_exponential_backoff_applied_on_rate_limit(self):
-        query = DummyQuery(raises=503)
-        self.assertRaises(AssertionError, core._query_ga, query, num_attempts=1)
+def test_exponential_backoff_applied_on_rate_limit():
+    query = DummyQuery(raises=503)
+    with pytest.raises(AssertionError):
+        core._query_ga(query, num_attempts=1)
+
+def test_hard_fail_on_invalid_date():
+    now = datetime.datetime(year=2015, month=6, day=1)
+    cases = [
+        # '2015-05-30', # two days ago, a-ok
+        '2015-05-31', # one day ago, die
+        '2015-06-01', # today, die
+        '2015-06-02', # future date, die
+    ]
+    with mock.patch('article_metrics.ga_metrics.core.datetime_now', return_value=now):
+        with pytest.raises(AssertionError):
+            for case in cases:
+                core.query_ga({'end_date': case})

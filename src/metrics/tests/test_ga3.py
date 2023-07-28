@@ -2,7 +2,7 @@ from collections import OrderedDict
 from . import base
 import os
 from article_metrics import utils
-from article_metrics.utils import lmap, first, second, subdict
+from article_metrics.utils import lmap, first, second, subdict, date_today
 from metrics import logic, ga3, models, history
 from datetime import date, timedelta
 from unittest.mock import patch
@@ -78,7 +78,7 @@ class Two(base.BaseCase):
         midDec17 = date(year=2017, month=12, day=15)
         one_day = timedelta(days=1)
         two_days = timedelta(days=2)
-        to_day = date.today()
+        to_day = date_today()
 
         history_data = {
             'frames': [

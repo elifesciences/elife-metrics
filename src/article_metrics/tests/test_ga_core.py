@@ -1,3 +1,4 @@
+from unittest import mock
 from . import base
 from datetime import datetime, timedelta
 from article_metrics.ga_metrics import utils
@@ -86,3 +87,44 @@ class One(base.SimpleBaseCase):
             actual = core.module_picker(*dtpair)
             msg = 'given: %s, expected: %s. got %s' % (dtpair, expected_module, actual)
             self.assertEqual(expected_module, actual, msg)
+
+def test_valid_dt_pair():
+    now = datetime(year=2015, month=6, day=1, hour=0, minute=0, second=0)
+    yesterday = now - timedelta(days=1)
+    two_days_ago = yesterday - timedelta(days=1)
+    tomorrow = now + timedelta(days=1)
+    valid_cases = [
+        # daily
+
+        # daily, past date, valid
+        (datetime(year=2015, month=1, day=1), datetime(year=2015, month=1, day=2)),
+        # daily, the day before yesterday, valid
+        (two_days_ago, two_days_ago),
+
+        # ranges
+        # these queries can't be discarded because we do monthly queries.
+        # so, we allow them here but may truncate them or refuse to cache their results elsewhere.
+
+        # a range ending the day before yesterday, valid, potentially partial results.
+        (datetime(year=2015, month=1, day=1), two_days_ago),
+        # a range involving today, valid, partial results
+        (yesterday, now),
+        # a range involving yesterday, valid, potentially partial results
+        (two_days_ago, yesterday),
+        # a range involving a future date, valid, partial results
+        (two_days_ago, tomorrow),
+    ]
+    invalid_cases = [
+        # daily, today, invalid, partial results
+        (now, now),
+        # daily, yesterday, invalid, partial results
+        (yesterday, yesterday),
+        # daily, future date, valid, empty results
+        (tomorrow, tomorrow),
+    ]
+    inception = datetime(year=2001, month=1, day=1)
+    with mock.patch('article_metrics.ga_metrics.core.datetime_now', return_value=now):
+        for case in valid_cases:
+            assert core.valid_dt_pair(case, inception), "expected valid: %s" % (case,)
+        for case in invalid_cases:
+            assert not core.valid_dt_pair(case, inception), "expected invalid: %s" % (case,)

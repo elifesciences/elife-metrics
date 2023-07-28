@@ -3,6 +3,7 @@ from os.path import join
 from . import base
 from datetime import datetime
 from article_metrics.ga_metrics import core, utils
+from article_metrics.utils import datetime_now
 from django.conf import settings
 
 class TestUtils(base.SimpleBaseCase):
@@ -109,11 +110,13 @@ class TestUtils(base.SimpleBaseCase):
 
     def test_output_path_for_partial_results(self):
         "the output path is correctly generated for requests that generate partial responses"
-        today = datetime.now().strftime('%Y-%m-%d')
+        today = datetime_now().strftime('%Y-%m-%d')
         response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json'), 'r'))
         response['query']['start-date'] = today
         response['query']['end-date'] = today
-        expected_path = join(self.test_output_dir, settings.GA_OUTPUT_SUBDIR, "views/%s.json.partial" % today)
+        # lsh@2023-07-25: disabled cache paths for potentially partial/empty results.
+        #expected_path = join(self.test_output_dir, settings.GA_OUTPUT_SUBDIR, "views/%s.json" % today)
+        expected_path = None
         path = core.output_path_from_results(response)
         self.assertEqual(path, expected_path)
 
@@ -133,7 +136,8 @@ class TestUtils(base.SimpleBaseCase):
     def test_ga_response_sanitised_when_written(self):
         "responses from GA have certain values scrubbed from them before being written to disk"
         raw_response = json.load(open(join(self.fixture_dir, 'views-2016-02-24.json.raw'), 'r'))
-        output_path = core.write_results(raw_response, join(self.test_output_dir, 'foo.json'))
+        output_path = join(self.test_output_dir, 'foo.json')
+        core.write_results(raw_response, output_path)
         response = json.load(open(output_path, 'r'))
         for key in core.SANITISE_THESE:
             self.assertTrue(key not in response)

@@ -106,8 +106,8 @@ class TestGAImport(base.BaseCase):
         expected_article_count = 1119
         self.assertEqual(expected_article_count, models.Article.objects.count())
 
-    def test_partial_data_is_updated(self):
-        "ensure that any partial data is updated correctly when detected"
+    def test_data_is_updated(self):
+        "ensure data is updated correctly"
         self.assertEqual(0, models.Article.objects.count())
         ds1 = {
             'pdf': 0,
@@ -120,11 +120,16 @@ class TestGAImport(base.BaseCase):
             'source': models.GA,
         }
         logic.insert_row(ds1)
+
+        # rows were created
         self.assertEqual(1, models.Article.objects.count())
         self.assertEqual(1, models.Metric.objects.count())
+
+        # rows have correct values
         clean_metric = models.Metric.objects.get(article__doi='10.7554/eLife.00001')
         self.assertEqual(0, clean_metric.pdf)
 
+        # update row
         expected_update = {
             'pdf': 1,
             'full': 0,
@@ -136,6 +141,10 @@ class TestGAImport(base.BaseCase):
             'source': models.GA,
         }
         logic.insert_row(expected_update)
+
+        # no extra rows were created
         self.assertEqual(1, models.Metric.objects.count())
+
+        # rows have correct values
         clean_metric = models.Metric.objects.get(article__doi='10.7554/eLife.00001')
         self.assertEqual(1, clean_metric.pdf)

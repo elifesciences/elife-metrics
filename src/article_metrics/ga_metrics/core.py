@@ -4,21 +4,22 @@
 # Analytics API:
 # https://developers.google.com/analytics/devguides/reporting/core/v3/reference
 
+from functools import partial
 from os.path import join
 import os, json, time, random
-from datetime import datetime
+from datetime import datetime, timedelta
 from googleapiclient import errors
 from googleapiclient.discovery import build
 from oauth2client.client import AccessTokenRefreshError
 from oauth2client.service_account import ServiceAccountCredentials
 from httplib2 import Http
-from .utils import ymd, month_min_max, d2dt, ensure
+from .utils import ymd, month_min_max, ensure
 from kids.cache import cache
 import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
 from . import utils, ga4
-from article_metrics.utils import lfilter, todt_notz
+from article_metrics.utils import todt_notz, datetime_now, first, second, fmtdt
 
 LOG = logging.getLogger(__name__)
 
@@ -101,11 +102,30 @@ def module_picker(from_date, to_date):
 #
 
 def valid_dt_pair(dt_pair, inception):
-    "returns true if both dates are greater than the date we started collecting on"
+    """returns True if both dates are greater than the date we started collecting on and,
+    the to-date does not include *today* as that would generate partial results in GA3 and
+    the to-date does not include *yesterday* as that may generate empty results in GA4."""
     from_date, to_date = dt_pair
     ensure(isinstance(from_date, datetime), "from_date must be a datetime object, not %r" % (type(from_date),))
     ensure(isinstance(to_date, datetime), "to_date must be a datetime object, not %r" % (type(to_date),))
-    return from_date >= inception and to_date >= inception
+    ensure(from_date <= to_date, "from_date must be older than or the same as the to_date")
+    if from_date < inception:
+        LOG.debug("date range invalid, it starts earlier than when we started collecting.")
+        return False
+
+    now = datetime_now()
+    daily = to_date == from_date
+
+    if daily and to_date >= now:
+        LOG.debug("date range invalid, current/future dates may generate partial or empty results.")
+        return False
+
+    yesterday = now - timedelta(days=1)
+    if daily and to_date >= yesterday:
+        LOG.debug("date range invalid, a date less than 24hrs in the past may generate partial or empty results.")
+        return False
+
+    return True
 
 def valid_view_dt_pair(dt_pair):
     "returns true if both dates are greater than the date we started collecting on"
@@ -114,6 +134,17 @@ def valid_view_dt_pair(dt_pair):
 def valid_downloads_dt_pair(dt_pair):
     "returns true if both dates are greater than the date we started collecting on"
     return valid_dt_pair(dt_pair, DOWNLOADS_INCEPTION)
+
+def filter_date_list(fn, date_list):
+    fmt = partial(fmtdt, fmt="%Y-%m-%dT%H:%M:%S")
+    new_date_list = []
+    for dt_pair in date_list:
+        if not fn(dt_pair):
+            # "excluding invalid pair: 2001-01-01T00:00:00 - 2001-01-01T23:59:59"
+            LOG.warning("excluding invalid pair: %s - %s" % (fmt(first(dt_pair)), fmt(second(dt_pair))))
+            continue
+        new_date_list.append(dt_pair)
+    return new_date_list
 
 SANITISE_THESE = ['profileInfo', 'id', 'selfLink']
 
@@ -219,6 +250,14 @@ def query_ga(query, num_attempts=5):
     """performs given query and fetches any further pages.
     concatenated results are returned in the response dict as `rows`."""
 
+    now = datetime_now()
+    yesterday = now - timedelta(days=1)
+    end_date = todt_notz(query['end_date'])
+
+    # lsh@2023-07-12: hard fail if we somehow managed to generate a query that might generate bad data
+    ensure(end_date < now, "refusing to query GA3, query `end_date` will generate partial/empty results")
+    ensure(end_date < yesterday, "refusing to query GA3, query `end_date` will generate partial/empty results")
+
     results_pp = query.get('max_results', MAX_GA_RESULTS)
     query['max_results'] = results_pp
     query['start_index'] = 1
@@ -243,31 +282,19 @@ def output_path(results_type, from_date, to_date):
     "generates a path for results of the given type"
     # `output_path` now used by non-article metrics app to create a cache path for *their* ga responses
     #assert results_type in ['views', 'downloads'], "results type must be either 'views' or 'downloads', not %r" % results_type
-    if isinstance(from_date, str): # given strings
-        #from_date_dt = datetime.strptime(from_date, "%Y-%m-%d")
-        to_date_dt = datetime.strptime(to_date, "%Y-%m-%d")
-    else: # given date/datetime objects
-        to_date_dt = d2dt(to_date)
+    if not isinstance(from_date, str):
+        # given date/datetime objects
         from_date, to_date = ymd(from_date), ymd(to_date)
 
-    now, now_dt = ymd(datetime.now()), datetime.now()
-
     # different formatting if two different dates are provided
-    if from_date == to_date:
+    daily = from_date == to_date
+    if daily:
         dt_str = to_date
     else:
         dt_str = "%s_%s" % (from_date, to_date)
 
-    partial = ""
-    if to_date == now or to_date_dt >= now_dt:
-        # anything gathered today or for the future (month ranges)
-        # will only ever be partial. when run again on a future day
-        # there will be cache miss and the full results downloaded
-        partial = ".partial"
-
-    # ll: output/downloads/2014-04-01.json
-    # ll: output/views/2014-01-01_2014-01-31.json.partial
-    return join(output_dir(), results_type, dt_str + ".json" + partial)
+    # "output/downloads/2014-04-01.json"
+    return join(output_dir(), results_type, dt_str + ".json")
 
 def output_path_from_results(response, results_type=None):
     """determines a path where the given response can live, using the
@@ -278,7 +305,17 @@ def output_path_from_results(response, results_type=None):
     from_date = datetime.strptime(query['start-date'], "%Y-%m-%d")
     to_date = datetime.strptime(query['end-date'], "%Y-%m-%d")
     results_type = results_type or ('downloads' if 'ga:eventLabel' in query['filters'] else 'views')
-    return output_path(results_type, from_date, to_date)
+    path = output_path(results_type, from_date, to_date)
+
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+
+    # do not cache partial results
+    if to_date >= today or to_date >= yesterday:
+        LOG.warning("refusing to cache potentially partial or empty results: %s", path)
+        return None
+
+    return path
 
 def write_results(results, path):
     "writes sanitised response from Google as json to the given path"
@@ -286,14 +323,16 @@ def write_results(results, path):
     if not os.path.exists(dirname):
         assert os.system("mkdir -p %s" % dirname) == 0, "failed to make output dir %r" % dirname
     LOG.info("writing %r", path)
-    json.dump(sanitize_ga_response(results), open(path, 'w'), indent=4, sort_keys=True)
-    return path
+    with open(path, 'w') as fh:
+        json.dump(sanitize_ga_response(results), fh, indent=4, sort_keys=True)
 
 def query_ga_write_results(query, num_attempts=5):
     "convenience. queries GA then writes the results, returning both the original response and the path to results"
     response = query_ga(query, num_attempts)
     path = output_path_from_results(response)
-    return response, write_results(response, path)
+    if path:
+        write_results(response, path)
+    return response, path
 
 
 # --- END GA3 LOGIC
@@ -309,25 +348,27 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     ensure(type(to_date_dt) == datetime, "to_date_dt must be a datetime object")
 
     from_date, to_date = ymd(from_date_dt), ymd(to_date_dt)
-    now_dt = datetime.now()
-    now = ymd(now_dt)
 
     # different formatting if two different dates are provided
-    if from_date == to_date:
+    daily = from_date == to_date
+    if daily:
         dt_str = to_date
     else:
         dt_str = "%s_%s" % (from_date, to_date)
 
-    partial = ""
-    if to_date == now or to_date_dt >= now_dt:
-        # anything gathered today or for the future (month ranges)
-        # will only ever be partial. when run again on a future day
-        # there will be cache miss and the full results downloaded
-        partial = ".partial"
-
     # ll: output/downloads/2014-04-01.json
-    # ll: output/views/2014-01-01_2014-01-31.json.partial
-    return join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json" + partial)
+    # ll: output/views/2014-01-01_2014-01-31.json
+    path = join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json")
+
+    today = datetime.now()
+    yesterday = today - timedelta(days=1)
+
+    # do not cache partial results
+    if to_date_dt >= today or to_date_dt >= yesterday:
+        LOG.warning("refusing to cache potentially partial or empty results: %s", path)
+        return None
+
+    return path
 
 def write_results_v2(results, path):
     """writes `results` as json to the given `path`.
@@ -345,7 +386,8 @@ def query_ga_write_results_v2(query_map, from_date_dt, to_date_dt, results_type,
     query_start = todt_notz(query_map['dateRanges'][0]['startDate'])
     query_end = todt_notz(query_map['dateRanges'][0]['endDate'])
     path = output_path_v2(results_type, query_start, query_end)
-    write_results_v2(results, path)
+    if path:
+        write_results_v2(results, path)
     return results, path
 
 #
@@ -360,7 +402,7 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
 
     path = output_path_v2('views', from_date, to_date)
     module = module_picker(from_date, to_date)
-    if cached and os.path.exists(path):
+    if cached and path and os.path.exists(path):
         raw_data = json.load(open(path, 'r'))
     elif only_cached:
         # no cache exists and we've been told to only use cache.
@@ -369,8 +411,8 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
     else:
         # talk to google
         query_map = module.path_counts_query(table_id, from_date, to_date)
-        raw_data, actual_path = query_ga_write_results_v2(query_map, from_date, to_date, 'views')
-        assert path == actual_path, "the expected output path (%s) doesn't match the path actually written to (%s)" % (path, actual_path)
+        raw_data, _ = query_ga_write_results_v2(query_map, from_date, to_date, 'views')
+
     return module.path_counts(raw_data.get('rows', []))
 
 def article_downloads(table_id, from_date, to_date, cached=False, only_cached=False):
@@ -381,7 +423,7 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
 
     path = output_path_v2('downloads', from_date, to_date)
     module = module_picker(from_date, to_date)
-    if cached and os.path.exists(path):
+    if cached and path and os.path.exists(path):
         raw_data = json.load(open(path, 'r'))
     elif only_cached:
         # no cache exists and we've been told to only use cache.
@@ -390,8 +432,8 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
     else:
         # talk to google
         query_map = module.event_counts_query(table_id, from_date, to_date)
-        raw_data, actual_path = query_ga_write_results_v2(query_map, from_date, to_date, 'downloads')
-        assert path == actual_path, "the expected output path (%s) doesn't match the path actually written to (%s)" % (path, actual_path)
+        raw_data, _ = query_ga_write_results_v2(query_map, from_date, to_date, 'downloads')
+
     return module.event_counts(raw_data.get('rows', []))
 
 def article_metrics(table_id, from_date, to_date, cached=False, only_cached=False):
@@ -415,36 +457,31 @@ def article_metrics(table_id, from_date, to_date, cached=False, only_cached=Fals
 
 
 def generate_queries(table_id, query_func_name, datetime_list, use_cached=False, use_only_cached=False):
-    "returns a list of queries to be executed by google"
+    """returns a list of queries to be executed by Google Analytics.
+    it's assumed that date ranges that generate invalid queries have been filtered out by `valid_dt_pair`."""
     assert isinstance(query_func_name, str), "query func name must be a string"
     query_list = []
-    for start_date, end_date in datetime_list:
-        module = module_picker(start_date, end_date)
+    for from_date, to_date in datetime_list:
+
+        module = module_picker(from_date, to_date)
         query_func = getattr(module, query_func_name)
         query_type = 'views' if query_func_name == 'path_counts_query' else 'downloads'
+        path = output_path(query_type, from_date, to_date)
 
-        path = output_path(query_type, start_date, end_date)
-
-        LOG.debug("looking for metrics here: %s", path)
-        if use_cached:
-            if os.path.exists(path):
-                LOG.debug("we have %r results for %r to %r already", query_type, ymd(start_date), ymd(end_date))
-                continue
-            else:
-                LOG.info("no cache file for %r results for %r to %r: %s", query_type, ymd(start_date), ymd(end_date), path)
-        else:
-            LOG.debug("couldn't find file %r", path)
-
-        if use_only_cached:
-            LOG.info("skipping google query, using only cache files")
+        if use_cached and os.path.exists(path):
+            # "query skipped, we have 'view' results for '2001-01-01' to '2001-01-02' already"
+            LOG.debug("query skipped, we have %r results for %r to %r already", query_type, ymd(from_date), ymd(to_date))
             continue
 
-        q = query_func(table_id, start_date, end_date)
+        if use_only_cached and not os.path.exists(path):
+            LOG.debug("query skipped, `use_only_cached` is True and expected cache file not found: " + path)
+            continue
+
+        q = query_func(table_id, from_date, to_date)
         query_list.append(q)
 
     if use_only_cached:
-        # code problem
-        assert query_list == [], "use_only_cached==True but we're accumulating queries somehow"
+        assert query_list == [], "`use_only_cached` is True but we're accumulating queries somehow. This is a programming error."
 
     return query_list
 
@@ -471,14 +508,14 @@ def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_onl
     date_list = utils.dt_range(from_date, to_date)
     query_list = []
 
-    views_dt_range = lfilter(valid_view_dt_pair, date_list)
+    views_dt_range = filter_date_list(valid_view_dt_pair, date_list)
     query_list.extend(generate_queries(table_id,
                                        'path_counts_query',
                                        views_dt_range,
                                        use_cached, use_only_cached))
     bulk_query(query_list, from_date, to_date, results_type='views')
 
-    pdf_dt_range = lfilter(valid_downloads_dt_pair, date_list)
+    pdf_dt_range = filter_date_list(valid_downloads_dt_pair, date_list)
     query_list.extend(generate_queries(table_id,
                                        'event_counts_query',
                                        pdf_dt_range,
@@ -491,8 +528,8 @@ def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_onl
 
 def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_only_cached=False):
     date_list = utils.dt_month_range(from_date, to_date)
-    views_dt_range = lfilter(valid_view_dt_pair, date_list)
-    pdf_dt_range = lfilter(valid_downloads_dt_pair, date_list)
+    views_dt_range = filter_date_list(valid_view_dt_pair, date_list)
+    pdf_dt_range = filter_date_list(valid_downloads_dt_pair, date_list)
 
     query_list = []
     query_list.extend(generate_queries(table_id,

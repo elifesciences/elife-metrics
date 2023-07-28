@@ -1,6 +1,7 @@
 from collections import OrderedDict
-from datetime import datetime, timedelta
+from datetime import timedelta
 from .ga_metrics import utils as ga_utils
+from .utils import datetime_now
 from .ga_metrics.core import ymd
 from django.conf import settings
 from . import models
@@ -36,8 +37,8 @@ def group_daily_by_date(daily_results):
     return grouper(MetricSerializer(daily_results, many=True).data, lambda obj: obj['date'])
 
 def daily_last_n_days(doi, days=30, source=models.GA):
-    yesterday = datetime.now() - timedelta(days=1)
-    n_days_ago = datetime.now() - timedelta(days=days)
+    yesterday = datetime_now() - timedelta(days=1)
+    n_days_ago = datetime_now() - timedelta(days=days)
     return daily(doi, n_days_ago, yesterday, source)
 
 def monthly(doi, from_date, to_date, source=models.GA):
@@ -56,7 +57,7 @@ def monthly_since_ever(doi, source=models.GA):
     #the_beginning = ga_metrics.core.VIEWS_INCEPTION
     # BROKEN
     the_beginning = settings.INCEPTION
-    return monthly(doi, the_beginning, datetime.now(), source)
+    return monthly(doi, the_beginning, datetime_now(), source)
 
 def group_monthly_results(results):
     def grouper(iterable, func):
