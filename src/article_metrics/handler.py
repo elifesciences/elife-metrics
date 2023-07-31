@@ -1,3 +1,4 @@
+from urllib3.util.retry import Retry
 from datetime import timedelta
 from os.path import join
 from django.conf import settings
@@ -100,20 +101,53 @@ def requests_get(*args, **kwargs):
     }
     handler_opts = kwargs.pop('opts', {})
 
+    # "It’s a good practice to set connect timeouts to slightly larger than a multiple of 3,
+    # which is the default TCP packet retransmission window."
+    # - https://docs.python-requests.org/en/latest/user/advanced/#timeouts
+    connect_timeout = 3.05 # seconds
+
+    # "... the read timeout is the number of seconds the client will wait for the server to send
+    # a response. (Specifically, it’s the number of seconds that the client will wait between bytes
+    # sent from the server. In 99.9% of cases, this is the time before the server sends the first byte)."
+    read_timeout = 9 # seconds
+
     # set any defaults for requests here
     default_kwargs = {
-        'timeout': (3.05, 9), # connect time out, read timeout
+        # https://docs.python-requests.org/en/latest/api/#requests.request
+        # "timeout (float or tuple)" (optional) - How many seconds to wait for the server to
+        #                                         send data before giving up, as a float, or a
+        #                                         (connect timeout, read timeout) tuple.
+        'timeout': (connect_timeout, read_timeout),
     }
-    default_kwargs.update(kwargs)
-    kwargs = default_kwargs
+    default_headers = {
+        'User-Agent': settings.USER_AGENT,
+    }
+    final_headers = utils.merge(default_headers, kwargs.pop('headers', {}))
+    final_kwargs = utils.merge(default_kwargs, kwargs, {'headers': final_headers})
 
     try:
         # http://docs.python-requests.org/en/master/api/#request-sessions
         session = requests.Session()
-        adaptor = requests.adapters.HTTPAdapter(max_retries=MAX_RETRIES)
+        # lsh@2023-07-28: handle network errors better
+        # - https://github.com/elifesciences/issues/issues/8386
+        # - https://urllib3.readthedocs.io/en/stable/user-guide.html#retrying-requests
+        # - https://urllib3.readthedocs.io/en/stable/reference/urllib3.util.html#urllib3.util.Retry
+        max_retries_obj = Retry(**{
+            'total': MAX_RETRIES,
+            'connect': MAX_RETRIES,
+            'read': MAX_RETRIES,
+            # How many times to retry on bad status codes.
+            # These are retries made on responses, where status code matches status_forcelist.
+            'status': MAX_RETRIES,
+            'status_forcelist': [413, 429, 503, # defaults
+                                 500, 502, 504],
+            # {backoff factor} * (2 ** {number of previous retries})
+            # 0.5 => 0.5, 2.0, 4.0, 8.0, 16
+            'backoff_factor': 0.5,
+        })
+        adaptor = requests.adapters.HTTPAdapter(max_retries=max_retries_obj)
         session.mount('https://', adaptor)
-
-        resp = session.get(*args, **kwargs)
+        resp = session.get(*args, **final_kwargs)
         resp.raise_for_status()
         return resp
 

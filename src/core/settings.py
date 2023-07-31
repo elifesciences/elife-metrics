@@ -52,7 +52,7 @@ def cfg(path, default=0xDEADBEEF):
 # used to know how far to go back in metrics gathering
 INCEPTION = datetime(year=2012, month=12, day=1)
 DOI_PREFIX = '10.7554'
-USER_AGENT = "elife-metrics (https://github.com/elifesciences/elife-metrics)"
+USER_AGENT = "elife-metrics/master (https://github.com/elifesciences/elife-metrics)"
 CONTACT_EMAIL = "it-admin@elifesciences.org"
 
 OUTPUT_PATH = join(EXT_DIR if USE_EXT else PROJECT_DIR, 'output')

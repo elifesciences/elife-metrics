@@ -26,7 +26,6 @@ def fetch_page(api_key, doi_prefix, page=0, per_page=25):
     headers = {
         'Accept': 'application/json',
         'X-ELS-APIKey': api_key,
-        'User-Agent': settings.USER_AGENT,
     }
     # https://dev.elsevier.com/tecdoc_cited_by_in_scopus.html
     # http://api.elsevier.com/documentation/SCOPUSSearchAPI.wadl
