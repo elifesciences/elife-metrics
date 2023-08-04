@@ -92,7 +92,7 @@ HANDLERS = {
 }
 DEFAULT_HANDLER = raise_handler
 
-MAX_RETRIES = 3
+MAX_RETRIES = 5
 
 def requests_get(*args, **kwargs):
     xid = kwargs.pop('opid', opid())
@@ -142,7 +142,7 @@ def requests_get(*args, **kwargs):
             'status_forcelist': [413, 429, 503, # defaults
                                  500, 502, 504],
             # {backoff factor} * (2 ** {number of previous retries})
-            # 0.5 => 0.5, 2.0, 4.0, 8.0, 16
+            # 0.5 => 1.0, 2.0, 4.0, 8.0, 16
             'backoff_factor': 0.5,
         })
         adaptor = requests.adapters.HTTPAdapter(max_retries=max_retries_obj)
