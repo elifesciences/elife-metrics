@@ -8,11 +8,17 @@ import pytest
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
 TABLE_ID = 'ga:82618489'
 BASE_DATE = datetime(year=2001, month=1, day=1)
+FIXTURE_DIR = os.path.join(THIS_DIR, 'fixtures')
 
-def fixture_path(path):
-    path = os.path.join(THIS_DIR, 'fixtures', path)
+def fixture_path(fixture_name):
+    path = os.path.join(FIXTURE_DIR, fixture_name)
     utils.ensure(os.path.exists(path), "fixture not found: %s" % path)
     return path
+
+def fixture_json(fixture_name):
+    "returns the contents of `fixture_name` as JSON"
+    with open(fixture_path(fixture_name), 'r') as fh:
+        return json.load(fh)
 
 def resp_json(resp):
     # json.loads(resp.bytes.decode('utf-8')) # python3
@@ -83,7 +89,7 @@ class SimpleBaseCase(unittest.TestCase):
     table_id = TABLE_ID
     maxDiff = None
     this_dir = THIS_DIR
-    fixture_dir = os.path.join(this_dir, 'fixtures')
+    fixture_dir = FIXTURE_DIR
 
 @pytest.mark.django_db
 class BaseCase(SimpleBaseCase, DjangoTestCase):
