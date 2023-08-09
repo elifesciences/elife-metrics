@@ -1,5 +1,4 @@
-from os.path import join
-import json
+import pytest
 import responses
 from . import base
 from article_metrics.pm import citations
@@ -17,130 +16,123 @@ def test_norm_pmcid():
         ('PMC1234567', '1234567')
     ]
     for given, expected in cases:
-        assert citations.norm_pmcid(given) == expected
+        assert expected == citations.norm_pmcid(given)
 
+@responses.activate
+def test_fetch_pmids():
+    "test that a pmid and pmcid can be fetched"
+    fixture = base.fixture_json('pm-fetch-pmids-response.json')
+    responses.add(responses.GET, citations.PMID_URL, **{
+        'json': fixture,
+        'status': 200,
+        'content_type': 'application/json'})
+    expected = {
+        'pmid': '26354291',
+        'pmcid': 'PMC4559886'
+    }
+    assert expected == citations._fetch_pmids('10.7554/eLife.09560')
 
-class One(base.BaseCase):
-    def setUp(self):
-        self.doi = '10.7554/eLife.09560'
-        self.pmid = '26354291'
-        self.pmcid = 'PMC4559886'
+@responses.activate
+@pytest.mark.django_db
+def test_resolve_pmcid():
+    "test that a pmid and pmcid can be fetched if an article is missing theirs"
+    art = models.Article(**{
+        'doi': '10.7554/eLife.09560',
+        'pmid': None,
+        'pmcid': None
+    })
+    art.save()
 
-    @responses.activate
-    def test_fetch_pmids(self):
-        "test that a pmid and pmcid can be fetched"
-        fixture = join(self.fixture_dir, 'pm-fetch-pmids-response.json')
-        expected_body_content = json.load(open(fixture, 'r'))
-        responses.add(responses.GET, citations.PMID_URL, **{
-            'json': expected_body_content,
-            'status': 200,
-            'content_type': 'application/json'})
+    fixture = base.fixture_json('pm-fetch-pmids-response.json')
+    responses.add(responses.GET, citations.PMID_URL, **{
+        'json': fixture,
+        'status': 200,
+        'content_type': 'application/json'})
 
-        expected = {
-            # 'doi': '10.7554/eLife.09560', # removed from response, prefer the doi we already have
-            'pmid': '26354291',
-            'pmcid': 'PMC4559886'
-        }
-        self.assertEqual(expected, citations._fetch_pmids('10.7554/eLife.09560'))
+    given = citations.resolve_pmcid(art)
+    expected = 'PMC4559886'
+    assert expected == given
+    models.Article.objects.get(pmcid=expected)
 
-    @responses.activate
-    def test_resolve_pmcid(self):
-        "test that a pmid and pmcid can be fetched if an article is missing theirs"
-        art = models.Article(**{
-            'doi': '10.7554/eLife.09560',
-            'pmid': None,
-            'pmcid': None
-        })
-        art.save()
+@pytest.mark.django_db
+def test_resolve_pmcid_preexisting():
+    "test that no lookup for a pmcid is done if Article already has such an id"
+    art = models.Article(**{
+        'doi': '10.7554/eLife.09560',
+        'pmid': None,
+        'pmcid': 'NOTAPMCID',
+    })
+    art.save()
+    given = citations.resolve_pmcid(art)
+    expected = 'NOTAPMCID'
+    assert expected == given
+    models.Article.objects.get(pmcid=expected)
 
-        fixture = join(self.fixture_dir, 'pm-fetch-pmids-response.json')
-        expected_body_content = json.load(open(fixture, 'r'))
-        responses.add(responses.GET, citations.PMID_URL, **{
-            'json': expected_body_content,
-            'status': 200,
-            'content_type': 'application/json'})
+@responses.activate
+def test_citation_fetch():
+    fixture = base.fixture_json('pm-citation-request-response-09560.json')
+    responses.add(responses.GET, citations.PM_URL, **{
+        'json': fixture,
+        'content_type': 'application/json'})
+    pmcid = 'PMC4559886'
+    result = citations.fetch([pmcid]).json()['linksets'][0]
+    expected = 17
+    assert expected == len(result['linksetdbs'][0]['links'])
 
-        given = citations.resolve_pmcid(art)
-        expected = 'PMC4559886'
-        self.assertEqual(expected, given)
-        models.Article.objects.get(pmcid=expected)
+@responses.activate
+@pytest.mark.django_db
+def test_citations_fetch_all():
+    doi = '10.7554/eLife.09560'
+    pmid = '26354291'
+    pmcid = 'PMC4559886'
+    art = models.Article(**{
+        'doi': doi,
+        'pmid': pmid,
+        'pmcid': pmcid
+    })
+    art.save()
 
-    # @responses.activate # unnecessary
-    def test_resolve_pmcid_preexisting(self):
-        "test that no lookup for a pmcid is done if Article already has such an id"
-        art = models.Article(**{
-            'doi': '10.7554/eLife.09560',
-            'pmid': None,
-            'pmcid': 'NOTAPMCID',
-        })
-        art.save()
-        given = citations.resolve_pmcid(art)
-        expected = 'NOTAPMCID'
-        self.assertEqual(expected, given)
-        models.Article.objects.get(pmcid=expected)
+    fixture = base.fixture_json('pm-citation-request-response-09560.json')
+    responses.add(responses.GET, citations.PM_URL, **{
+        'json': fixture,
+        'status': 200,
+        'content_type': 'application/json'})
 
-    @responses.activate
-    def test_citation_fetch(self):
-        fixture = join(self.fixture_dir, 'pm-citation-request-response-09560.json')
-        expected_body_content = json.load(open(fixture, 'r'))
-        responses.add(responses.GET, citations.PM_URL, **{
-            'json': expected_body_content,
-            'content_type': 'application/json'})
+    expected_citations = len(fixture['linksets'][0]['linksetdbs'][0]['links'])
+    expected = [{
+        'source': 'pubmed',
+        'pmcid': pmcid,
+        'num': expected_citations,
+        'source_id': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4559886/'}]
 
-        result = citations.fetch([self.pmcid]).json()['linksets'][0]
-        expected = 17
-        self.assertEqual(len(result['linksetdbs'][0]['links']), expected)
+    results = list(citations.citations_for_all_articles())
+    assert expected == results
 
-    @responses.activate
-    def test_citations_fetch_all(self):
-        art = models.Article(**{
-            'doi': self.doi,
-            'pmid': self.pmid,
-            'pmcid': self.pmcid
-        })
-        art.save()
+@responses.activate
+@pytest.mark.django_db
+def test_count_response():
+    msid = 9560
+    doi = '10.7554/eLife.09560'
+    pmid = '26354291'
+    pmcid = 'PMC4559886'
+    art = models.Article(**{
+        'doi': doi,
+        'pmid': pmid,
+        'pmcid': pmcid
+    })
+    art.save()
 
-        fixture = join(self.fixture_dir, 'pm-citation-request-response-09560.json')
-        expected_body_content = json.load(open(fixture, 'r'))
-        responses.add(responses.GET, citations.PM_URL, **{
-            'json': expected_body_content,
-            'status': 200,
-            'content_type': 'application/json'})
+    fixture = base.fixture_json('pm-citation-request-response-09560.json')
+    responses.add(responses.GET, citations.PM_URL, **{
+        'json': fixture,
+        'status': 200,
+        'content_type': 'application/json'})
 
-        expected_citations = len(expected_body_content['linksets'][0]['linksetdbs'][0]['links'])
-        expected = [{
-            'source': 'pubmed',
-            'pmcid': self.pmcid,
-            'num': expected_citations,
-            'source_id': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4559886/'}]
+    expected = [{
+        'pmcid': 'PMC4559886',
+        'source': 'pubmed',
+        'source_id': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4559886/',
+        'num': 17}]
 
-        results = list(citations.citations_for_all_articles())
-        assert results == expected
-
-    @responses.activate
-    def test_count_response(self):
-        art = models.Article(**{
-            'doi': self.doi,
-            'pmid': self.pmid,
-            'pmcid': self.pmcid
-        })
-        art.save()
-
-        msid = 9560
-
-        fixture = join(self.fixture_dir, 'pm-citation-request-response-09560.json')
-        expected_body_content = json.load(open(fixture, 'r'))
-
-        responses.add(responses.GET, citations.PM_URL, **{
-            'json': expected_body_content,
-            'status': 200,
-            'content_type': 'application/json'})
-
-        expected = [{
-            'pmcid': 'PMC4559886',
-            'source': 'pubmed',
-            'source_id': 'https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4559886/',
-            'num': 17}]
-
-        self.assertEqual(citations.count_for_msid(msid), expected)
-        self.assertEqual(citations.count_for_doi(self.doi), expected)
+    assert expected == citations.count_for_msid(msid)
+    assert expected == citations.count_for_doi(doi)

@@ -1,26 +1,21 @@
 import typing
 from article_metrics import utils, models
-from . import base
 import pytz
 from datetime import datetime, date
 import pytest
 
-class TestUtils(base.BaseCase):
-    def setUp(self):
-        pass
+@pytest.mark.django_db
+def test_create_or_update():
+    obj, created, updated = utils.create_or_update(models.Article, {'doi': '10.7554/eLife.1234'})
+    assert obj
+    assert created is True
+    assert updated is False
 
-    def tearDown(self):
-        pass
-
-    def test_create_or_update(self):
-        obj, created, updated = utils.create_or_update(models.Article, {'doi': '10.7554/eLife.1234'})
-        self.assertTrue(obj)
-        self.assertEqual(True, created)
-        self.assertEqual(False, updated)
-
-    def test_create_or_update_bad_keylist(self):
-        utils.create_or_update(models.Article, {'doi': '10.7554/eLife.1234', 'pmid': 1})
-        self.assertRaises(AssertionError, utils.create_or_update, models.Article, {'pmid': 1}, key_list=['???'])
+@pytest.mark.django_db
+def test_create_or_update_bad_keylist():
+    utils.create_or_update(models.Article, {'doi': '10.7554/eLife.1234', 'pmid': 1})
+    with pytest.raises(AssertionError):
+        utils.create_or_update(models.Article, {'pmid': 1}, key_list=['???'])
 
 def test_isint():
     int_list = [

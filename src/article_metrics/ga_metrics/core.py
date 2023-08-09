@@ -283,7 +283,7 @@ def output_path(results_type, from_date, to_date):
     # `output_path` now used by non-article metrics app to create a cache path for *their* ga responses
     #assert results_type in ['views', 'downloads'], "results type must be either 'views' or 'downloads', not %r" % results_type
     if not isinstance(from_date, str):
-        # given date/datetime objects
+        # convert date/datetime objects to strings
         from_date, to_date = ymd(from_date), ymd(to_date)
 
     # different formatting if two different dates are provided
@@ -293,7 +293,7 @@ def output_path(results_type, from_date, to_date):
     else:
         dt_str = "%s_%s" % (from_date, to_date)
 
-    # "output/downloads/2014-04-01.json"
+    # "output/downloads/2014-04-01.json", "output/downloads/2014-04-01_2014-04-30.json"
     return join(output_dir(), results_type, dt_str + ".json")
 
 def output_path_from_results(response, results_type=None):
@@ -362,9 +362,10 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
 
     today = datetime.now()
     yesterday = today - timedelta(days=1)
+    partial_results = to_date_dt >= today or to_date_dt >= yesterday
 
     # do not cache partial results
-    if to_date_dt >= today or to_date_dt >= yesterday:
+    if partial_results:
         LOG.warning("refusing to cache potentially partial or empty results: %s", path)
         return None
 
