@@ -194,7 +194,7 @@ class DummyQuery(object):
         self.resp.reason = 'dummy reason'
         self.resp.status = raises
         self.content = b'{"data": {"error": {"message": "dummy error message"}}}'
-        
+
     def execute(self):
         raise apiclient.errors.HttpError(self.resp, self.content)
 
