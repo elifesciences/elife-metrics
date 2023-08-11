@@ -307,7 +307,7 @@ def output_path_from_results(response, results_type=None):
     results_type = results_type or ('downloads' if 'ga:eventLabel' in query['filters'] else 'views')
     path = output_path(results_type, from_date, to_date)
 
-    today = datetime.now()
+    today = datetime_now()
     yesterday = today - timedelta(days=1)
 
     # do not cache partial results
@@ -360,7 +360,7 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     # ll: output/views/2014-01-01_2014-01-31.json
     path = join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json")
 
-    today = datetime.now()
+    today = datetime_now()
     yesterday = today - timedelta(days=1)
     partial_results = to_date_dt >= today or to_date_dt >= yesterday
 

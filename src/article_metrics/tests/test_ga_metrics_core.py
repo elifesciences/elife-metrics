@@ -151,8 +151,8 @@ def test_output_path_for_download_results(test_output_dir):
     path = core.output_path_from_results(response)
     assert expected == path
 
-def test_output_path_for_partial_results():
-    "the output path is correctly generated for requests that generate partial responses"
+def test_output_path_for_partial_daily_results():
+    "partial, or potentially partial, daily results are not cached."
     today = datetime_now().strftime('%Y-%m-%d')
     response = base.fixture_json('views-2016-02-24.json')
     response['query']['start-date'] = today
@@ -163,6 +163,18 @@ def test_output_path_for_partial_results():
     path = core.output_path_from_results(response)
     assert expected == path
 
+def test_output_path_for_partial_monthly_results():
+    "partial monthly results are not cached"
+    now = datetime(year=2001, month=1, day=15)
+    today = utils.ymd("2001-01-15")
+    response = base.fixture_json('views-2016-02-24.json')
+    response['query']['start-date'] = "2001-01-01"
+    response['query']['end-date'] = "2001-01-31"
+    expected = None
+    with mock.patch('article_metrics.ga_metrics.core.datetime_now', return_value=now):
+        path = core.output_path_from_results(response)
+        assert expected == path
+    
 def test_output_path_for_unknown_results():
     "a helpful assertion error is raised if we're given results that can't be parsed"
     with pytest.raises(AssertionError):
