@@ -19,9 +19,8 @@ def test_bad_metrics():
     for bad_pid in [1, {}, []]:
         for bad_ptype in [1, 'foo', {}, []]:
             for bad_period in [1, 'foo', {}, []]:
-                # TODO: revisit this test, why isn't bad_period being used?
                 with pytest.raises(ValueError):
-                    logic.page_views(bad_pid, bad_ptype)
+                    logic.page_views(bad_pid, bad_ptype, bad_period)
 
 @pytest.mark.django_db
 def test_daily_metrics():

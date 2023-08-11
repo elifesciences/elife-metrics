@@ -113,7 +113,6 @@ def test_api():
             # all requests are successful
             assert resp.status_code == 200
             # all requests return json
-            # json.loads(resp.bytes.decode('utf-8')) # python3
             json.loads(resp.content.decode('utf-8'))
 
 # WARN! non-deterministic results!
@@ -154,6 +153,7 @@ def test_citations_missing_article():
     url = reverse('v2:alm', kwargs={'msid': 1234, 'metric': 'citations'})
     resp = Client().get(url)
     assert resp.status_code == 404
+
 @pytest.mark.django_db
 def test_citations_missing_citations():
     "a request for an article that exists but has no citations returns a list of citation providers with a count of zero"
@@ -180,7 +180,6 @@ def test_citations_missing_citations():
     ]
 
     actual_response = resp.data
-    #self.assertCountEqual(expected_response, actual_response)
     assert len(expected_response) == len(actual_response)
 
 @pytest.mark.django_db
@@ -271,6 +270,7 @@ def test_monthly_views():
     resp = Client().get(url, {'by': models.MONTH})
     assert resp.status_code == 200
     assert expected_response == resp.data
+
 @pytest.mark.django_db
 def test_monthly_downloads():
     cases = {
@@ -333,6 +333,7 @@ def test_results_single_summary():
     resp = Client().get(url)
     assert resp.status_code == 200
     assert resp.json() == expected_response
+
 @pytest.mark.django_db
 def test_results_multiple_summary():
     cases = {
@@ -384,6 +385,7 @@ def test_paginate_results():
         url = reverse('v2:summary')
         resp = client.get(url, {'page': page, 'per-page': 1, 'order': 'asc'})
         assert resp.json() == expected_response
+
 @pytest.mark.django_db
 def test_one_bad_apple_1():
     "articles with bad dois don't prevent an entire summary from being returned"
@@ -407,6 +409,7 @@ def test_one_bad_apple_1():
         ]
     }
     assert resp.json() == expected_response
+
 @pytest.mark.django_db
 def test_results_single_article_summary():
     "summaries can be provided on a per-article basis. results are the same as regular summary, just reduced to one item"
