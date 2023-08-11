@@ -1,59 +1,61 @@
+import pytest
 from . import base
-import os
 from article_metrics.utils import tod
 from metrics import logic, models
 from datetime import date, timedelta
 from unittest.mock import patch
 from django.db.models import Sum
-import json
 
-class One(base.BaseCase):
-    def test_no_nothing(self):
-        "logic.page_views returns None when Page not found"
-        expected_result = None
-        pid, ptype = 'foo', 'event'
-        self.assertEqual(logic.page_views(pid, ptype), expected_result)
+@pytest.mark.django_db
+def test_no_nothing():
+    "logic.page_views returns None when Page not found"
+    expected = None
+    pid, ptype = 'foo', 'event'
+    assert expected == logic.page_views(pid, ptype)
 
-    def test_bad_metrics(self):
-        "logic.page_views throws ValueError when we give it gibberish"
-        etc = self
-        for bad_pid in [1, {}, [], etc]:
-            for bad_ptype in [1, 'foo', {}, [], etc]:
-                for bad_period in [1, 'foo', {}, [], etc]:
-                    # TODO: revisit this test, why isn't bad_period being used?
-                    self.assertRaises(ValueError, logic.page_views, bad_pid, bad_ptype)
+@pytest.mark.django_db
+def test_bad_metrics():
+    "logic.page_views throws ValueError when we give it gibberish"
+    for bad_pid in [1, {}, []]:
+        for bad_ptype in [1, 'foo', {}, []]:
+            for bad_period in [1, 'foo', {}, []]:
+                # TODO: revisit this test, why isn't bad_period being used?
+                with pytest.raises(ValueError):
+                    logic.page_views(bad_pid, bad_ptype)
 
-    def test_daily_metrics(self):
-        "logic.page_views returns the sum of all daily hits and a chop'able queryset"
-        fixture = [
-            ('pants', 'event', '2016-01-01', 1),
-            ('pants', 'event', '2016-01-02', 2),
-            ('pants', 'event', '2016-01-03', 4),
-            ('pants', 'event', '2016-01-04', 8)
+@pytest.mark.django_db
+def test_daily_metrics():
+    "logic.page_views returns the sum of all daily hits and a chop'able queryset"
+    fixture = [
+        ('pants', 'event', '2016-01-01', 1),
+        ('pants', 'event', '2016-01-02', 2),
+        ('pants', 'event', '2016-01-03', 4),
+        ('pants', 'event', '2016-01-04', 8)
 
-            # it's obvious the pants event is exponentially popular
-        ]
-        base.insert_metrics(fixture)
+        # it's obvious the pants event is exponentially popular
+    ]
+    base.insert_metrics(fixture)
 
-        expected_sum = 15
-        total, qobj = logic.page_views('pants', 'event', logic.DAY)
-        self.assertEqual(total, expected_sum)
-        self.assertEqual(qobj.count(), len(fixture))
+    expected_sum = 15
+    total, qobj = logic.page_views('pants', 'event', logic.DAY)
+    assert total == expected_sum
+    assert qobj.count() == len(fixture)
 
-    def test_monthly_metrics(self):
-        "logic.page_views returns the sum of all monthly hits (same as sum of all daily hits) and a chop'able queryset"
-        fixture = [
-            ('pants', 'event', '2016-01-30', 1),
-            ('pants', 'event', '2016-01-31', 2),
-            ('pants', 'event', '2016-02-01', 3),
-        ]
-        base.insert_metrics(fixture)
+@pytest.mark.django_db
+def test_monthly_metrics():
+    "logic.page_views returns the sum of all monthly hits (same as sum of all daily hits) and a chop'able queryset"
+    fixture = [
+        ('pants', 'event', '2016-01-30', 1),
+        ('pants', 'event', '2016-01-31', 2),
+        ('pants', 'event', '2016-02-01', 3),
+    ]
+    base.insert_metrics(fixture)
 
-        expected_sum = 6
-        expected_result_count = 2 # results span two months
-        total, qobj = logic.page_views('pants', 'event', logic.MONTH)
-        self.assertEqual(total, expected_sum)
-        self.assertEqual(qobj.count(), expected_result_count)
+    expected_sum = 6
+    expected_result_count = 2 # results span two months
+    total, qobj = logic.page_views('pants', 'event', logic.MONTH)
+    assert total == expected_sum
+    assert qobj.count() == expected_result_count
 
 def test_interesting_frames():
     one_day = timedelta(days=1)
@@ -102,79 +104,80 @@ def test_aggregate():
     ])
     assert logic.aggregate(normalised_rows) == expected_result
 
-class Three(base.BaseCase):
+@pytest.mark.django_db
+def test_insert():
+    assert models.Page.objects.count() == 0
+    assert models.PageType.objects.count() == 0
+    assert models.PageCount.objects.count() == 0
 
-    def test_insert(self):
-        self.assertEqual(models.Page.objects.count(), 0)
-        self.assertEqual(models.PageType.objects.count(), 0)
-        self.assertEqual(models.PageCount.objects.count(), 0)
+    aggregated_rows = logic.asmaps([
+        ("/events/foo", tod("2018-01-01"), 1),
+        ("/events/foo", tod("2018-01-02"), 2),
+        ("/events/foo", tod("2018-01-03"), 4),
+        ("/events/bar", tod("2018-01-03"), 1)
+    ])
+    results = logic.update_page_counts(models.EVENT, aggregated_rows)
+    assert len(results) == len(aggregated_rows)
 
-        aggregated_rows = logic.asmaps([
-            ("/events/foo", tod("2018-01-01"), 1),
-            ("/events/foo", tod("2018-01-02"), 2),
-            ("/events/foo", tod("2018-01-03"), 4),
-            ("/events/bar", tod("2018-01-03"), 1)
-        ])
-        results = logic.update_page_counts(models.EVENT, aggregated_rows)
-        self.assertEqual(len(results), len(aggregated_rows))
+    assert models.PageType.objects.count() == 1
+    assert models.Page.objects.count() == 2
+    assert models.PageCount.objects.count() == 4
 
-        self.assertEqual(models.PageType.objects.count(), 1)
-        self.assertEqual(models.Page.objects.count(), 2)
-        self.assertEqual(models.PageCount.objects.count(), 4)
+@pytest.mark.django_db
+def test_double_insert():
+    aggregated_rows = logic.asmaps([
+        ("/events/foo", tod("2018-01-01"), 1),
+        ("/events/foo", tod("2018-01-02"), 2),
+        ("/events/foo", tod("2018-01-03"), 4),
+        ("/events/bar", tod("2018-01-03"), 1)
+    ])
+    results = logic.update_page_counts(models.EVENT, aggregated_rows)
+    assert len(results) == len(aggregated_rows)
+    assert models.PageType.objects.count() == 1
+    assert models.Page.objects.count() == 2
+    assert models.PageCount.objects.count() == 4
+    expected_total = 8
+    actual_total = lambda: models.PageCount.objects.aggregate(total=Sum('views'))['total']
+    assert expected_total == actual_total()
 
-    def test_double_insert(self):
-        aggregated_rows = logic.asmaps([
-            ("/events/foo", tod("2018-01-01"), 1),
-            ("/events/foo", tod("2018-01-02"), 2),
-            ("/events/foo", tod("2018-01-03"), 4),
-            ("/events/bar", tod("2018-01-03"), 1)
-        ])
-        results = logic.update_page_counts(models.EVENT, aggregated_rows)
-        self.assertEqual(len(results), len(aggregated_rows))
-        self.assertEqual(models.PageType.objects.count(), 1)
-        self.assertEqual(models.Page.objects.count(), 2)
-        self.assertEqual(models.PageCount.objects.count(), 4)
-        expected_total = 8
-        actual_total = lambda: models.PageCount.objects.aggregate(total=Sum('views'))['total']
-        self.assertEqual(expected_total, actual_total())
+    # increase the view count, insert again.
+    aggregated_rows = logic.asmaps([
+        ("/events/foo", tod("2018-01-01"), 2),
+        ("/events/foo", tod("2018-01-02"), 4),
+        ("/events/foo", tod("2018-01-03"), 8),
+        ("/events/bar", tod("2018-01-03"), 2)
+    ])
+    results = logic.update_page_counts(models.EVENT, aggregated_rows)
+    assert len(results) == len(aggregated_rows)
 
-        # increase the view count, insert again.
-        aggregated_rows = logic.asmaps([
-            ("/events/foo", tod("2018-01-01"), 2),
-            ("/events/foo", tod("2018-01-02"), 4),
-            ("/events/foo", tod("2018-01-03"), 8),
-            ("/events/bar", tod("2018-01-03"), 2)
-        ])
-        results = logic.update_page_counts(models.EVENT, aggregated_rows)
-        self.assertEqual(len(results), len(aggregated_rows))
+    # these numbers should have stayed the same
+    assert models.PageType.objects.count() == 1
+    assert models.Page.objects.count() == 2
+    assert models.PageCount.objects.count() == 4
 
-        # these numbers should have stayed the same
-        self.assertEqual(models.PageType.objects.count(), 1)
-        self.assertEqual(models.Page.objects.count(), 2)
-        self.assertEqual(models.PageCount.objects.count(), 4)
+    # but this should reflect the new total
+    expected_total = 16
+    assert expected_total == actual_total()
 
-        # but this should reflect the new total
-        expected_total = 16
-        self.assertEqual(expected_total, actual_total())
+@pytest.mark.django_db
+def test_update_ptype():
+    "`update_ptype` convenience function behaves as expected"
+    assert models.Page.objects.count() == 0
+    assert models.PageType.objects.count() == 0
+    assert models.PageCount.objects.count() == 0
 
-    def test_update_ptype(self):
-        "`update_ptype` convenience function behaves as expected"
-        self.assertEqual(models.Page.objects.count(), 0)
-        self.assertEqual(models.PageType.objects.count(), 0)
-        self.assertEqual(models.PageCount.objects.count(), 0)
+    fixture = base.fixture_json('ga-response-events-frame2.json')
 
-        fixture = json.load(open(os.path.join(self.fixture_dir, 'ga-response-events-frame2.json'), 'r'))
+    frame = {'id': '2', 'prefix': '/events'}
+    frame_query_list = [(frame, [{}])]
+    with patch('metrics.logic.build_ga_query', return_value=frame_query_list):
+        with patch('metrics.logic.query_ga', return_value=fixture):
+            logic.update_ptype(models.EVENT)
 
-        frame = {'id': '2', 'prefix': '/events'}
-        frame_query_list = [(frame, [{}])]
-        with patch('metrics.logic.build_ga_query', return_value=frame_query_list):
-            with patch('metrics.logic.query_ga', return_value=fixture):
-                logic.update_ptype(models.EVENT)
-
-        self.assertEqual(models.Page.objects.count(), 13)
-        self.assertEqual(models.PageType.objects.count(), 1) # 'event'
-        # not the same as len(fixture.rows) because of aggregation
-        self.assertEqual(models.PageCount.objects.count(), 138)
+    assert models.Page.objects.count() == 13
+    assert models.PageType.objects.count() == 1 # 'event'
+    # not the same as len(fixture.rows) because of aggregation
+    assert models.PageCount.objects.count() == 138
 
 def test_build_ga_query__invalid_dates_dropped():
     today = date(year=2015, month=6, day=1)
