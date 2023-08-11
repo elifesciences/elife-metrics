@@ -1,12 +1,10 @@
-import os, json
-from django.test import TestCase as DjangoTestCase, TransactionTestCase
-import unittest
+import os
+import json
 from article_metrics import utils, models, logic
 from datetime import timedelta, datetime
 import pytest
 
 THIS_DIR = os.path.dirname(os.path.realpath(__file__))
-TABLE_ID = 'ga:82618489'
 BASE_DATE = datetime(year=2001, month=1, day=1)
 FIXTURE_DIR = os.path.join(THIS_DIR, 'fixtures')
 
@@ -19,10 +17,6 @@ def fixture_json(fixture_name):
     "returns the contents of `fixture_name` as JSON"
     with open(fixture_path(fixture_name), 'r') as fh:
         return json.load(fh)
-
-def resp_json(resp):
-    # json.loads(resp.bytes.decode('utf-8')) # python3
-    return json.loads(resp.content.decode('utf-8')) # resp.json() fails with header issues
 
 def insert_metrics(abbr_list):
     "function to bypass scraping logic and insert metrics and citations directly into db"
@@ -84,55 +78,40 @@ def insert_metrics(abbr_list):
         date += timedelta(days=1)
         wrangle(msid, data, date)
 
-class SimpleBaseCase(unittest.TestCase):
-    "use this base if you don't need database wrangling"
-    table_id = TABLE_ID
-    maxDiff = None
-    this_dir = THIS_DIR
-    fixture_dir = FIXTURE_DIR
-
-@pytest.mark.django_db
-class BaseCase(SimpleBaseCase, DjangoTestCase):
-    # https://docs.djangoproject.com/en/1.10/topics/testing/tools/#django.test.TestCase
-    pass
-
-@pytest.mark.django_db(transaction=True)
-class TransactionBaseCase(SimpleBaseCase, TransactionTestCase):
-    pass
-
 #
 # tests the insert_logic above
 #
 
-class BaseLogic(BaseCase):
-    def test_insert_metrics(self):
-        cases = {
-            # msid, citations, downloads, views
-            '1234': (1, 2, 3),
-            '5677': (4, 6, 7)
-        }
-        insert_metrics(cases)
-        self.assertEqual(models.Article.objects.count(), len(cases.keys()))
-        self.assertEqual(models.Metric.objects.count(), len(cases.keys()))
-        self.assertEqual(models.Citation.objects.count(), len(cases.keys()))
+@pytest.mark.django_db
+def test_insert_metrics():
+    cases = {
+        # msid, citations, downloads, views
+        '1234': (1, 2, 3),
+        '5677': (4, 6, 7)
+    }
+    insert_metrics(cases)
+    assert models.Article.objects.count() == len(cases.keys())
+    assert models.Metric.objects.count() == len(cases.keys())
+    assert models.Citation.objects.count() == len(cases.keys())
 
-        for msid, triple in cases.items():
-            doi = utils.msid2doi(msid)
-            models.Article.objects.get(doi=doi)
+    for msid, triple in cases.items():
+        doi = utils.msid2doi(msid)
+        models.Article.objects.get(doi=doi)
 
-            citations, downloads, views = triple
+        citations, downloads, views = triple
 
-            models.Metric.objects.get(article__doi=doi, pdf=downloads, full=views)
-            models.Citation.objects.get(article__doi=doi, num=citations)
+        models.Metric.objects.get(article__doi=doi, pdf=downloads, full=views)
+        models.Citation.objects.get(article__doi=doi, num=citations)
 
-    def test_insert_metrics_many_citations(self):
-        cases = {
-            # msid, citations, downloads, views
-            '1234': ([1, 2, 3], 0, 0),
-            '5678': ([4, 5, 6], 0, 0),
-        }
-        insert_metrics(cases)
-        self.assertEqual(models.Article.objects.count(), len(cases.keys()))
-        self.assertEqual(models.Metric.objects.count(), len(cases.keys()))
+@pytest.mark.django_db
+def test_insert_metrics_many_citations():
+    cases = {
+        # msid, citations, downloads, views
+        '1234': ([1, 2, 3], 0, 0),
+        '5678': ([4, 5, 6], 0, 0),
+    }
+    insert_metrics(cases)
+    assert models.Article.objects.count() == len(cases.keys())
+    assert models.Metric.objects.count() == len(cases.keys())
 
-        self.assertEqual(models.Citation.objects.count(), len(cases.keys()) * 3)
+    assert models.Citation.objects.count() == len(cases.keys()) * 3

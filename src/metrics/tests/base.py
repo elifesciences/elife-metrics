@@ -1,5 +1,5 @@
 import os
-from django.test import TestCase as DjangoTestCase
+import json
 from metrics import models
 from article_metrics.utils import lmap
 
@@ -11,6 +11,11 @@ def fixture_path(path):
     assert os.path.exists(path), "fixture not found: %s" % path
     return path
 
+def fixture_json(fixture_name):
+    "returns the contents of `fixture_name` as JSON"
+    with open(fixture_path(fixture_name), 'r') as fh:
+        return json.load(fh)
+
 def insert_metrics(list_of_rows):
     def _insert(row):
         pid, ptype, date, views = row
@@ -19,8 +24,3 @@ def insert_metrics(list_of_rows):
         pcount, _ = models.PageCount.objects.get_or_create(page=page, views=views, date=date)
         return (ptype, page, pcount)
     return lmap(_insert, list_of_rows)
-
-class BaseCase(DjangoTestCase):
-    maxDiff = None
-    this_dir = THIS_DIR
-    fixture_dir = FIXTURE_DIR
