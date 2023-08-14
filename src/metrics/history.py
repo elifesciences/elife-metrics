@@ -10,6 +10,12 @@ LOG = logging.getLogger(__name__)
 
 one_day = datetime.timedelta(days=1)
 
+# note: these frames, without caching (because of partial output path logic),
+# will eventually grow very large and risk sampling or GA 'other' grouping.
+# artifical frames here would be one solution to query partitioning.
+# *article* metrics do this naturally with monthly ranges.
+# GA4_SWITCH = 2023-03-20
+
 HISTORY_DATA = {
     'blog-article': {
         'frames': [
