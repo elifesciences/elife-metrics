@@ -191,7 +191,7 @@ def requests_get(*args, **kwargs):
 
 
 def capture_parse_error(fn):
-    """wrapper around a parse function that captures any errors to a special log for debugger.
+    """wrapper around a parse function that captures any errors to a special log for debugging.
     first argument to decorated function *must* be the data that is being parsed."""
     def wrap(data, *args, **kwargs):
         xid = opid()

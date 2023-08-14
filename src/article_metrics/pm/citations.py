@@ -85,7 +85,11 @@ def fetch(pmcid_list):
         'email': settings.CONTACT_EMAIL,
         'retmode': 'json'
     }
-    return handler.requests_get(PM_URL, params=params, headers=headers)
+    try:
+        return handler.requests_get(PM_URL, params=params, headers=headers)
+    except requests.exceptions.RetryError:
+        LOG.warning("failed to fetch a list of PMC citations: %s" % ", ".join(pmcid_list))
+        return None
 
 @handler.capture_parse_error
 def parse_result(result):
@@ -112,8 +116,9 @@ def fetch_parse(pmcid_list):
 
     for page, sub_pmcid_list in enumerate(utils.paginate(pmcid_list, MAX_PER_PAGE)):
         LOG.debug("page %s, %s per-page", page + 1, MAX_PER_PAGE)
-
         resp = fetch(sub_pmcid_list)
+        if resp is None:
+            continue
         result = resp.json()["linksets"]
         # result is a list of maps. add all maps returned to a single list ...
         results.extend(result)
@@ -127,6 +132,8 @@ def fetch_parse_v2(pmcid_list):
     for page, sub_pmcid_list in enumerate(utils.paginate_v2(pmcid_list, MAX_PER_PAGE)):
         LOG.debug("page %s, %s per-page", page + 1, MAX_PER_PAGE)
         resp = fetch(sub_pmcid_list)
+        if resp is None:
+            continue
         for result in resp.json()["linksets"]:
             yield parse_result(result)
 
@@ -173,7 +180,8 @@ def count_for_qs(qs):
     """the queryset `qs` fetches objects in chunks of 2000 by default when using iterator().
     `resolve_pmcid` will consume each of those objects one by one,
     possibly doing a network fetch and a db upsert if IDs are not present,
-    and yielding a list of maps behind it.k
+    and yielding a list of maps behind it.
+
     `fetch_parse_v2` will consume this list in batches of `MAX_PER_PAGE`,
     processing each search result in the page before yielding them individually to logic.import_pmc_citations,
     that will upsert (or not) each result into the db individually."""

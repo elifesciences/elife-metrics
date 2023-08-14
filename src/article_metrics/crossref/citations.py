@@ -1,3 +1,4 @@
+import requests
 from dateutil.relativedelta import relativedelta
 from article_metrics import models, utils, handler
 from django.conf import settings
@@ -23,11 +24,16 @@ def fetch(doi):
     headers = {
         'Accept': 'application/json'
     }
-    resp = handler.requests_get(URL, params=params, headers=headers, opts={
-        401: handler.LOGIT, # when a doi gets into system (like via scopus) that crossref doesn't associate with account
-        404: handler.IGNORE, # these happen often for articles with 0 citations
-    })
-    return resp.content if resp else None
+    try:
+        resp = handler.requests_get(URL, params=params, headers=headers, opts={
+            401: handler.LOGIT, # when a doi gets into system (like via scopus) that crossref doesn't associate with account
+            404: handler.IGNORE, # these happen often for articles with 0 citations
+        })
+        return resp.content if resp else None
+    except requests.exceptions.RetryError:
+        # we tried N times to fetch article and received unhandled responses.
+        LOG.warning("failed to fetch a list of crossref citations: %s" % (doi, ))
+        return None
 
 @handler.capture_parse_error
 def parse(xmlbytes, doi):
