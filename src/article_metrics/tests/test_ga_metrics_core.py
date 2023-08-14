@@ -102,16 +102,18 @@ def test_valid_dt_pair():
     tomorrow = now + timedelta(days=1)
     valid_cases = [
         # daily
-
-        # daily, past date, valid
+        # some distant past date
         (datetime(year=2015, month=1, day=1), datetime(year=2015, month=1, day=2)),
-        # daily, the day before yesterday, valid
+        # the day before yesterday, valid, but potentially invalid results
         (two_days_ago, two_days_ago),
+        # yesterday, valid, partial results
+        (yesterday, yesterday),
+        # today, valid, partial results
+        (now, now),
+        # daily, future date, empty results
+        (tomorrow, tomorrow),
 
         # ranges
-        # these queries can't be discarded because we do monthly queries.
-        # so, we allow them here but may truncate them or refuse to cache their results elsewhere.
-
         # a range ending the day before yesterday, valid, potentially partial results.
         (datetime(year=2015, month=1, day=1), two_days_ago),
         # a range involving today, valid, partial results
@@ -121,20 +123,10 @@ def test_valid_dt_pair():
         # a range involving a future date, valid, partial results
         (two_days_ago, tomorrow),
     ]
-    invalid_cases = [
-        # daily, today, invalid, partial results
-        (now, now),
-        # daily, yesterday, invalid, partial results
-        (yesterday, yesterday),
-        # daily, future date, valid, empty results
-        (tomorrow, tomorrow),
-    ]
     inception = datetime(year=2001, month=1, day=1)
     with mock.patch('article_metrics.ga_metrics.core.datetime_now', return_value=now):
         for case in valid_cases:
             assert core.valid_dt_pair(case, inception), "expected valid: %s" % (case,)
-        for case in invalid_cases:
-            assert not core.valid_dt_pair(case, inception), "expected invalid: %s" % (case,)
 
 def test_output_path_for_view_results(test_output_dir):
     "the output path is correctly generated for views"
@@ -151,8 +143,8 @@ def test_output_path_for_download_results(test_output_dir):
     path = core.output_path_from_results(response)
     assert expected == path
 
-def test_output_path_for_partial_results():
-    "the output path is correctly generated for requests that generate partial responses"
+def test_output_path_for_partial_daily_results():
+    "partial, or potentially partial, daily results are not cached."
     today = datetime_now().strftime('%Y-%m-%d')
     response = base.fixture_json('views-2016-02-24.json')
     response['query']['start-date'] = today
@@ -162,6 +154,17 @@ def test_output_path_for_partial_results():
     expected = None
     path = core.output_path_from_results(response)
     assert expected == path
+
+def test_output_path_for_partial_monthly_results():
+    "partial monthly results are not cached"
+    today = datetime(year=2001, month=1, day=15)
+    response = base.fixture_json('views-2016-02-24.json')
+    response['query']['start-date'] = "2001-01-01"
+    response['query']['end-date'] = "2001-01-31"
+    expected = None
+    with mock.patch('article_metrics.ga_metrics.core.datetime_now', return_value=today):
+        path = core.output_path_from_results(response)
+        assert expected == path
 
 def test_output_path_for_unknown_results():
     "a helpful assertion error is raised if we're given results that can't be parsed"
@@ -202,16 +205,3 @@ def test_exponential_backoff_applied_on_rate_limit():
     query = DummyQuery(raises=503)
     with pytest.raises(AssertionError):
         core._query_ga(query, num_attempts=1)
-
-def test_hard_fail_on_invalid_date():
-    now = datetime(year=2015, month=6, day=1)
-    cases = [
-        # '2015-05-30', # two days ago, a-ok
-        '2015-05-31', # one day ago, die
-        '2015-06-01', # today, die
-        '2015-06-02', # future date, die
-    ]
-    with mock.patch('article_metrics.ga_metrics.core.datetime_now', return_value=now):
-        with pytest.raises(AssertionError):
-            for case in cases:
-                core.query_ga({'end_date': case})
