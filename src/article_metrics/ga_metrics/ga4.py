@@ -6,9 +6,7 @@ import oauth2client.service_account
 import httplib2
 import logging
 from django.conf import settings
-from ..utils import ensure, datetime_now
-from article_metrics.utils import todt_notz
-from datetime import timedelta
+from ..utils import ensure
 
 LOG = logging.getLogger(__name__)
 
@@ -35,19 +33,9 @@ def _query_ga(query_map, num_attempts=5):
     applies exponential back-off if rate limited or when service is unavailable."""
 
     from_date, to_date = query_map['dateRanges'][0]['startDate'], query_map['dateRanges'][0]['endDate']
-    daily = from_date == to_date
 
     ensure(isinstance(from_date, str), 'startDate must be a string: %s' % query_map)
     ensure(isinstance(to_date, str), 'endDate must be a string')
-
-    # lsh@2023-07-12: hard fail if we somehow managed to generate a query that might generate partial data
-    now = datetime_now()
-    yesterday = now - timedelta(days=1)
-    to_date_obj = todt_notz(to_date)
-
-    if daily:
-        ensure(to_date_obj < now, "refusing to query GA4, query `end_date` will generate partial/empty results")
-        ensure(to_date_obj < yesterday, "refusing to query GA4, query `end_date` will generate partial/empty results")
 
     property_id = 'properties/' + settings.GA4_TABLE_ID
     query = ga_service().properties().runReport(property=property_id, body=query_map)

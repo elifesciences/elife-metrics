@@ -102,9 +102,7 @@ def module_picker(from_date, to_date):
 #
 
 def valid_dt_pair(dt_pair, inception):
-    """returns True if both dates are greater than the date we started collecting on and,
-    the to-date does not include *today* as that would generate partial results in GA3 and
-    the to-date does not include *yesterday* as that may generate empty results in GA4."""
+    """returns True if both dates are greater than the date we started collecting on."""
     from_date, to_date = dt_pair
     ensure(isinstance(from_date, datetime), "from_date must be a datetime object, not %r" % (type(from_date),))
     ensure(isinstance(to_date, datetime), "to_date must be a datetime object, not %r" % (type(to_date),))
@@ -112,19 +110,6 @@ def valid_dt_pair(dt_pair, inception):
     if from_date < inception:
         LOG.debug("date range invalid, it starts earlier than when we started collecting.")
         return False
-
-    now = datetime_now()
-    daily = to_date == from_date
-
-    if daily and to_date >= now:
-        LOG.debug("date range invalid, current/future dates may generate partial or empty results.")
-        return False
-
-    yesterday = now - timedelta(days=1)
-    if daily and to_date >= yesterday:
-        LOG.debug("date range invalid, a date less than 24hrs in the past may generate partial or empty results.")
-        return False
-
     return True
 
 def valid_view_dt_pair(dt_pair):
@@ -250,14 +235,6 @@ def query_ga(query, num_attempts=5):
     """performs given query and fetches any further pages.
     concatenated results are returned in the response dict as `rows`."""
 
-    now = datetime_now()
-    yesterday = now - timedelta(days=1)
-    end_date = todt_notz(query['end_date'])
-
-    # lsh@2023-07-12: hard fail if we somehow managed to generate a query that might generate bad data
-    ensure(end_date < now, "refusing to query GA3, query `end_date` will generate partial/empty results")
-    ensure(end_date < yesterday, "refusing to query GA3, query `end_date` will generate partial/empty results")
-
     results_pp = query.get('max_results', MAX_GA_RESULTS)
     query['max_results'] = results_pp
     query['start_index'] = 1
@@ -307,11 +284,9 @@ def output_path_from_results(response, results_type=None):
     results_type = results_type or ('downloads' if 'ga:eventLabel' in query['filters'] else 'views')
     path = output_path(results_type, from_date, to_date)
 
-    today = datetime_now()
-    yesterday = today - timedelta(days=1)
-
     # do not cache partial results
-    if to_date >= today or to_date >= yesterday:
+    cache_threshold = datetime_now() - timedelta(days=3)
+    if to_date >= cache_threshold:
         LOG.warning("refusing to cache potentially partial or empty results: %s", path)
         return None
 
@@ -360,12 +335,9 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     # ll: output/views/2014-01-01_2014-01-31.json
     path = join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json")
 
-    today = datetime_now()
-    yesterday = today - timedelta(days=1)
-    partial_results = to_date_dt >= today or to_date_dt >= yesterday
-
     # do not cache partial results
-    if partial_results:
+    cache_threshold = datetime_now() - timedelta(days=3)
+    if to_date_dt >= cache_threshold:
         LOG.warning("refusing to cache potentially partial or empty results: %s", path)
         return None
 
