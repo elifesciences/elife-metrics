@@ -184,6 +184,12 @@ def update_all_ptypes(start_date=None, end_date=None, replace_cache_files=False)
     for ptype in models.PAGE_TYPES:
         update_ptype(ptype, start_date, end_date, replace_cache_files)
 
+def update_all_ptypes_latest_frame():
+    for ptype in models.PAGE_TYPES:
+        history_data = history.ptype_history(ptype)
+        latest_frame = history_data['frames'][-1]
+        update_ptype(ptype, start_date=latest_frame['starts'], end_date=None)
+
 #
 #
 #

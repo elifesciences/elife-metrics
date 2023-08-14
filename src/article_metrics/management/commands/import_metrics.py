@@ -4,8 +4,7 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from article_metrics import logic, models
-from article_metrics.utils import tod
-from metrics import logic as na_logic # non-article logic
+import metrics
 import logging
 
 DEBUG_LOG = logging.getLogger('debugger')
@@ -38,7 +37,10 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         # views+downloads
         # import the last two days by default
-        parser.add_argument('--days', nargs='?', type=int, default=2)
+        # lsh@2023-08-14: changed default from 2 days to 5 days.
+        # as results from the last 3 days are no longer cached because of partial results,
+        # this will see 2 cache hits and 3 cache misses on days with partial results.
+        parser.add_argument('--days', nargs='?', type=int, default=5)
         # import the last two months by default
         parser.add_argument('--months', nargs='?', type=int, default=2)
 
@@ -65,7 +67,11 @@ class Command(BaseCommand):
         # date ranges and caching arguments don't matter to citations right now
         # caching is feasible, but only crossref supports querying citations by date range
         sources = OrderedDict([
-            (NA_METRICS, (timeit("non-article-metrics")(na_logic.update_all_ptypes), tod(from_date), tod(to_date))),
+            # lsh@2023-08-14: `logic.update_all_ptypes_latest_frame` queries on frame boundaries.
+            # Because the frame boundary extends to 'today' a cache file will not be generated.
+            # This is what we want. For now it avoids accumulating files and partial results at the
+            # expense of daily queries with larger results (<10MB).
+            (NA_METRICS, (timeit("non-article-metrics")(metrics.logic.update_all_ptypes_latest_frame),)),
             (GA_DAILY, (timeit("article-metrics-daily")(logic.import_ga_metrics), 'daily', from_date, to_date, use_cached, use_only_cached)),
             (GA_MONTHLY, (timeit("article-metrics-monthly")(logic.import_ga_metrics), 'monthly', n_months_ago, to_date, use_cached, use_only_cached)),
             (models.CROSSREF, (timeit("crossref-citations")(logic.import_crossref_citations),)),
