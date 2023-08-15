@@ -1,3 +1,5 @@
+import requests
+import pytest
 import time
 import json
 from os.path import join
@@ -94,6 +96,25 @@ def test_scopus_search():
 
         expected = len([r for r in results if 'bad' not in r])
         assert total_results - bad_eggs == expected
+
+@responses.activate
+def test_scopus_search__initial_failure():
+    "failure to fetch the first page of results cancels operation"
+    response = requests.exceptions.RetryError()
+    responses.add(responses.GET, citations.URL, body=response)
+    with pytest.raises(AssertionError):
+        list(citations.search())
+
+@responses.activate
+def test_scopus_search__failure():
+    "failure to fetch a page of results skips result"
+    response1 = {'search-results': {'opensearch:totalResults': 2, 'entry': []}}
+    response2 = requests.exceptions.RetryError()
+    responses.add(responses.GET, citations.URL, json=response1)
+    responses.add(responses.GET, citations.URL, body=response2)
+    # only the initial response is returned
+    expected = {'entry': [], 'opensearch:totalResults': 2}
+    assert next(citations.search()) == expected
 
 @responses.activate
 def test_many_scopus_requests():

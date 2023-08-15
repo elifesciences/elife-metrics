@@ -32,7 +32,7 @@ def fetch(doi):
         return resp.content if resp else None
     except requests.exceptions.RetryError:
         # we tried N times to fetch article and received unhandled responses.
-        LOG.warning("failed to fetch a list of crossref citations: %s" % (doi, ))
+        LOG.warning("failed to fetch a list of crossref citations: %s", doi)
         return None
 
 @handler.capture_parse_error

@@ -34,7 +34,6 @@ def _fetch_pmids(doi):
     resp.raise_for_status()
 
     data = resp.json()
-    # ll:
     # {
     # "status": "ok",
     # "responseDate": "2017-01-31 13:35:10",
@@ -88,7 +87,7 @@ def fetch(pmcid_list):
     try:
         return handler.requests_get(PM_URL, params=params, headers=headers)
     except requests.exceptions.RetryError:
-        LOG.warning("failed to fetch a list of PMC citations: %s" % ", ".join(pmcid_list))
+        LOG.warning("failed to fetch a list of PMC citations: %s", ", ".join(pmcid_list))
         return None
 
 @handler.capture_parse_error
