@@ -1,3 +1,4 @@
+import requests
 import pytest
 import responses
 from . import base
@@ -78,6 +79,24 @@ def test_citation_fetch():
     result = citations.fetch([pmcid]).json()['linksets'][0]
     expected = 17
     assert expected == len(result['linksetdbs'][0]['links'])
+
+@responses.activate
+def test_citation_fetch__failed():
+    responses.add(responses.GET, citations.PM_URL, body=requests.exceptions.RetryError())
+    pmcid = 'PMC4559886'
+    assert citations.fetch([pmcid]) is None
+
+@responses.activate
+def test_fetch_parse__failed():
+    responses.add(responses.GET, citations.PM_URL, body=requests.exceptions.RetryError())
+    pmcid = 'PMC4559886'
+    assert list(citations.fetch_parse([pmcid])) == []
+
+@responses.activate
+def test_fetch_parse_v2__failed():
+    responses.add(responses.GET, citations.PM_URL, body=requests.exceptions.RetryError())
+    pmcid = 'PMC4559886'
+    assert list(citations.fetch_parse_v2([pmcid])) == []
 
 @responses.activate
 @pytest.mark.django_db

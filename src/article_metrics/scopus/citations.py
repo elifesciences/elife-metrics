@@ -29,7 +29,11 @@ def fetch_page(api_key, doi_prefix, page=0, per_page=25):
     }
     # https://dev.elsevier.com/tecdoc_cited_by_in_scopus.html
     # http://api.elsevier.com/documentation/SCOPUSSearchAPI.wadl
-    return handler.requests_get(URL, params=params, headers=headers)
+    try:
+        return handler.requests_get(URL, params=params, headers=headers)
+    except requests.exceptions.RetryError:
+        LOG.warning("failed to fetch a page of SCOPUS search results: page=%s, per_page=%s" % (page, per_page))
+        return None
 
 def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     """searches scopus, returning a generator that will iterate through each page
@@ -39,7 +43,9 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     page = 0
     per_page = 25 # max per page
 
-    data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page).json()
+    data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page)
+    ensure(data is not None, "failed to fetch first page of scopus results, cannot continue.")
+    data = data.json()
 
     yield data['search-results']
 
@@ -57,7 +63,10 @@ def search(api_key=settings.SCOPUS_KEY, doi_prefix=settings.DOI_PREFIX):
     try:
         for page in range(page + 1, end_page):
             try:
-                data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page).json()
+                data = fetch_page(api_key, doi_prefix, page=page, per_page=per_page)
+                if data is None:
+                    continue
+                data = data.json()
                 yield data['search-results']
 
                 # find the first entry in the search results with a 'citedby-count'.
