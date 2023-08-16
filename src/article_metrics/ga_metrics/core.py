@@ -17,7 +17,7 @@ from .utils import ymd, month_min_max, ensure
 from kids.cache import cache
 import logging
 from django.conf import settings
-from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
+from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7, elife_v8
 from . import utils, ga4
 from article_metrics.utils import todt_notz, datetime_now, first, second, fmtdt
 
@@ -56,10 +56,16 @@ URL_PARAMS = datetime(year=2021, month=11, day=30)
 # switch from ga3 to ga4
 GA4_SWITCH = datetime(year=2023, month=3, day=20)
 
+# switch from custom 'Download' events to automaticly collected ga4 'file_download' events.
+GA4_DOWNLOADS_SWITCH = datetime(year=2023, month=6, day=12)
+
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
     daily = from_date == to_date
     monthly = not daily
+
+    if from_date >= GA4_DOWNLOADS_SWITCH:
+        return elife_v8
 
     if from_date >= GA4_SWITCH:
         return elife_v7

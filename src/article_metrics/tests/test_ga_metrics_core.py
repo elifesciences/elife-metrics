@@ -8,7 +8,7 @@ from . import base
 from datetime import datetime, timedelta
 from article_metrics.utils import datetime_now
 from article_metrics.ga_metrics import utils
-from article_metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
+from article_metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7, elife_v8
 from django.conf import settings
 import apiclient
 
@@ -47,6 +47,9 @@ def test_module_picker_daily():
 
         # on the day of the GA4 switch, we use v7 urls
         (core.GA4_SWITCH, elife_v7),
+
+        # on the day the Downloads died, we use file_downloads
+        (core.GA4_DOWNLOADS_SWITCH, elife_v8),
     ]
     for dt, expected_module in expectations:
         assert expected_module == core.module_picker(dt, dt), \
