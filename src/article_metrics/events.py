@@ -28,7 +28,8 @@ def event_bus_conn(**overrides):
 def notify(obj, **kwargs):
     "notify the event bus that this Citation or Metric has changes"
     if settings.DEBUG:
-        LOG.warning("application is in DEBUG mode, nobody will be notified.")
+        # lsh@2023-08-18: disabled, warning moved to `logic.notify` to prevent spamming the console.
+        #LOG.warning("application is in DEBUG mode, nobody will be notified.")
         return
     try:
         msg = {
