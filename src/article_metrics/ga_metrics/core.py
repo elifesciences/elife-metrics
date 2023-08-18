@@ -394,15 +394,15 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
         LOG.warning("given date range %r for views is older than known inception %r, skipping", (ymd(from_date), ymd(to_date)), VIEWS_INCEPTION)
         return {}
 
-    module = module_picker(from_date, to_date)
+    elife_module = module_picker(from_date, to_date)
 
     raw_data = load_cache('views', from_date, to_date, cached, only_cached)
     if raw_data is None:
         # talk to google
-        query_map = module.path_counts_query(table_id, from_date, to_date)
+        query_map = elife_module.path_counts_query(table_id, from_date, to_date)
         raw_data, _ = query_ga_write_results_v2(query_map, from_date, to_date, 'views')
 
-    return module.path_counts(raw_data.get('rows', []))
+    return elife_module.path_counts(raw_data.get('rows', []))
 
 def article_downloads(table_id, from_date, to_date, cached=False, only_cached=False):
     "returns article download data either from the cache or from talking to google"
@@ -410,15 +410,15 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
         LOG.warning("given date range %r for downloads is older than known inception %r, skipping", (ymd(from_date), ymd(to_date)), DOWNLOADS_INCEPTION)
         return {}
 
-    module = module_picker(from_date, to_date)
+    elife_module = module_picker(from_date, to_date)
 
     raw_data = load_cache('downloads', from_date, to_date, cached, only_cached)
     if raw_data is None:
         # talk to google
-        query_map = module.event_counts_query(table_id, from_date, to_date)
+        query_map = elife_module.event_counts_query(table_id, from_date, to_date)
         raw_data, _ = query_ga_write_results_v2(query_map, from_date, to_date, 'downloads')
 
-    return module.event_counts(raw_data.get('rows', []))
+    return elife_module.event_counts(raw_data.get('rows', []))
 
 def article_metrics(table_id, from_date, to_date, cached=False, only_cached=False):
     "returns a dictionary of article metrics, combining both article views and pdf downloads"

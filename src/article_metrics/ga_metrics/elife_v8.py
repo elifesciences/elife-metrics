@@ -7,6 +7,7 @@ import logging
 LOG = logging.getLogger(__name__)
 
 # lsh@2023-08-16: switch from `Download` events to `file_download` events.
+# event counting is _slightly_ different to v7 as well.
 # view counting has stayed the same.
 path_counts_query = elife_v7.path_counts_query
 path_counts = elife_v7.path_counts
