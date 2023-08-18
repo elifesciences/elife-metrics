@@ -91,9 +91,9 @@ def event_count(row):
     }
     """
     try:
-        ensure(len(row['dimensionValues']) == 2, "row with unexpected number of dimensionValues found: %s" % row)
+        ensure(len(row['dimensionValues']) == 3, "row with unexpected number of dimensionValues found: %s" % row)
         ensure(len(row['metricValues']) == 1, "row with unexpected number of metricValues found: %s" % row)
-        path = row['dimensionValues'][1]['value']
+        path = row['dimensionValues'][2]['value']
         count = row['metricValues'][0]['value']
         ensure(path != "(other)", "found 'other' row with value '%s'. GA has aggregated rows because query returned too much data." % count)
         bits = path.split('/') # ['', 'articles', '80092']
