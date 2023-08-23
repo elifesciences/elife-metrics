@@ -227,7 +227,6 @@ def test_v7_daily_views():
     table_id = ''
     from_dt = to_dt = core.GA4_SWITCH
     fixture_path = base.fixture_path('v7--views--2022-12-01.json')
-    fixture = base.fixture_json('v7--views--2022-12-01.json')
     fixture = json.load(open(fixture_path, 'r'))
     with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
         with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):

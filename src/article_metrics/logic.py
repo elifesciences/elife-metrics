@@ -30,9 +30,6 @@ def notify(obj, **kwargs):
     if not transaction.get_autocommit():
         # we're inside a managed transaction.
         # send the notification only after successful commit
-        if settings.DEBUG:
-            LOG.warning("application is in DEBUG mode, nobody will be notified of metric updates.")
-            return
         transaction.on_commit(lambda: events.notify(obj, **kwargs))
     else:
         events.notify(obj, **kwargs)

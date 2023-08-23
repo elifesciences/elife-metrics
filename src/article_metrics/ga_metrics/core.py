@@ -319,7 +319,9 @@ def query_ga_write_results(query, num_attempts=5):
 # --- END GA3 LOGIC
 
 def cacheable(to_date_dt):
-    "returns `True` if a cache file would be written."
+    "returns `True` if a cache file would be written for `to_date_dt`, or a range ending on this day."
+    # GA4 has been observed returning partial results for up to 48 hours in the past.
+    # a three day offset here eliminates the current partial day as well as two whole days.
     cache_threshold = datetime_now() - timedelta(days=3)
     return to_date_dt < cache_threshold
 
@@ -354,6 +356,10 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     return path
 
 def load_cache(results_type, from_date, to_date, cached, only_cached):
+    """returns the contents of the cached data for the given `results_type` on the given date range.
+    returns an empty dict when `cached` is `True`, `only_cached` is `True` but no cached file exists.
+    returns `None` when `cached` is `False`.
+    returns `None` when given date range is not cachable."""
     if cached and cacheable(to_date):
         path = output_path_v2(results_type, from_date, to_date)
         has_cache = path and os.path.exists(path)

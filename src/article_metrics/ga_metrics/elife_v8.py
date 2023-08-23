@@ -7,8 +7,9 @@ import logging
 LOG = logging.getLogger(__name__)
 
 # lsh@2023-08-16: switch from `Download` events to `file_download` events.
-# event counting is _slightly_ different to v7 as well.
-# view counting has stayed the same.
+# event counting in v8 is _slightly_ different to v7.
+# view counting is the same.
+
 path_counts_query = elife_v7.path_counts_query
 path_counts = elife_v7.path_counts
 
@@ -73,23 +74,25 @@ def event_counts_query(table_id, from_date, to_date):
 
 def event_count(row):
     """returns a pair of (path, download-count) from given `row`.
-
-    `row` looks like:
-    {
-        "dimensionValues": [
-            {
-                "value": "file_download"
-            },
-            {
-                "value": "/articles/80092"
-            }
-        ],
-        "metricValues": [
-            {
-                "value": "717"
-            }
-        ]
-    }
+    a `row` looks like:
+        {
+            "dimensionValues": [
+                {
+                    "value": "file_download"
+                },
+                {
+                    "value": "pdf"
+                },
+                {
+                    "value": "/articles/03728"
+                }
+            ],
+            "metricValues": [
+                {
+                    "value": "2"
+                }
+            ]
+        }
     """
     try:
         ensure(len(row['dimensionValues']) == 3, "row with unexpected number of dimensionValues found: %s" % row)
