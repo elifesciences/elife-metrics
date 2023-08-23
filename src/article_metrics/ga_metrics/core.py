@@ -17,7 +17,7 @@ from .utils import ymd, month_min_max, ensure
 from kids.cache import cache
 import logging
 from django.conf import settings
-from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
+from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7, elife_v8
 from . import utils, ga4
 from article_metrics.utils import todt_notz, datetime_now, first, second, fmtdt
 
@@ -56,10 +56,16 @@ URL_PARAMS = datetime(year=2021, month=11, day=30)
 # switch from ga3 to ga4
 GA4_SWITCH = datetime(year=2023, month=3, day=20)
 
+# switch from custom 'Download' events to the automatically collected ga4 'file_download' events.
+GA4_DOWNLOADS_SWITCH = datetime(year=2023, month=6, day=12)
+
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
     daily = from_date == to_date
     monthly = not daily
+
+    if from_date >= GA4_DOWNLOADS_SWITCH:
+        return elife_v8
 
     if from_date >= GA4_SWITCH:
         return elife_v7
@@ -312,6 +318,13 @@ def query_ga_write_results(query, num_attempts=5):
 
 # --- END GA3 LOGIC
 
+def cacheable(to_date_dt):
+    "returns `True` if a cache file would be written for `to_date_dt`, or a range ending on this day."
+    # GA4 has been observed returning partial results for up to 48 hours in the past.
+    # a three day offset here eliminates the current partial day as well as two whole days.
+    cache_threshold = datetime_now() - timedelta(days=3)
+    return to_date_dt < cache_threshold
+
 def output_path_v2(results_type, from_date_dt, to_date_dt):
     """generates a path for results of the given type.
     same logic as `output_path`, but more strict.
@@ -336,12 +349,26 @@ def output_path_v2(results_type, from_date_dt, to_date_dt):
     path = join(settings.GA_OUTPUT_SUBDIR, results_type, dt_str + ".json")
 
     # do not cache partial results
-    cache_threshold = datetime_now() - timedelta(days=3)
-    if to_date_dt >= cache_threshold:
-        LOG.warning("refusing to cache potentially partial or empty results: %s", path)
+    if not cacheable(to_date_dt):
+        LOG.warning("cache file will not be written: %s", path)
         return None
 
     return path
+
+def load_cache(results_type, from_date, to_date, cached, only_cached):
+    """returns the contents of the cached data for the given `results_type` on the given date range.
+    returns an empty dict when `cached` is `True`, `only_cached` is `True` but no cached file exists.
+    returns `None` when `cached` is `False`.
+    returns `None` when given date range is not cachable."""
+    if cached and cacheable(to_date):
+        path = output_path_v2(results_type, from_date, to_date)
+        has_cache = path and os.path.exists(path)
+        if has_cache:
+            with open(path, 'r') as fh:
+                return json.load(fh)
+        elif only_cached:
+            # no cache exists and we've been told to only use cache.
+            return {}
 
 def write_results_v2(results, path):
     """writes `results` as json to the given `path`.
@@ -373,20 +400,15 @@ def article_views(table_id, from_date, to_date, cached=False, only_cached=False)
         LOG.warning("given date range %r for views is older than known inception %r, skipping", (ymd(from_date), ymd(to_date)), VIEWS_INCEPTION)
         return {}
 
-    path = output_path_v2('views', from_date, to_date)
-    module = module_picker(from_date, to_date)
-    if cached and path and os.path.exists(path):
-        raw_data = json.load(open(path, 'r'))
-    elif only_cached:
-        # no cache exists and we've been told to only use cache.
-        # no results found.
-        raw_data = {}
-    else:
+    elife_module = module_picker(from_date, to_date)
+
+    raw_data = load_cache('views', from_date, to_date, cached, only_cached)
+    if raw_data is None:
         # talk to google
-        query_map = module.path_counts_query(table_id, from_date, to_date)
+        query_map = elife_module.path_counts_query(table_id, from_date, to_date)
         raw_data, _ = query_ga_write_results_v2(query_map, from_date, to_date, 'views')
 
-    return module.path_counts(raw_data.get('rows', []))
+    return elife_module.path_counts(raw_data.get('rows', []))
 
 def article_downloads(table_id, from_date, to_date, cached=False, only_cached=False):
     "returns article download data either from the cache or from talking to google"
@@ -394,129 +416,37 @@ def article_downloads(table_id, from_date, to_date, cached=False, only_cached=Fa
         LOG.warning("given date range %r for downloads is older than known inception %r, skipping", (ymd(from_date), ymd(to_date)), DOWNLOADS_INCEPTION)
         return {}
 
-    path = output_path_v2('downloads', from_date, to_date)
-    module = module_picker(from_date, to_date)
-    if cached and path and os.path.exists(path):
-        raw_data = json.load(open(path, 'r'))
-    elif only_cached:
-        # no cache exists and we've been told to only use cache.
-        # no results found.
-        raw_data = {}
-    else:
+    elife_module = module_picker(from_date, to_date)
+
+    raw_data = load_cache('downloads', from_date, to_date, cached, only_cached)
+    if raw_data is None:
         # talk to google
-        query_map = module.event_counts_query(table_id, from_date, to_date)
+        query_map = elife_module.event_counts_query(table_id, from_date, to_date)
         raw_data, _ = query_ga_write_results_v2(query_map, from_date, to_date, 'downloads')
 
-    return module.event_counts(raw_data.get('rows', []))
+    return elife_module.event_counts(raw_data.get('rows', []))
 
 def article_metrics(table_id, from_date, to_date, cached=False, only_cached=False):
     "returns a dictionary of article metrics, combining both article views and pdf downloads"
-    views = article_views(table_id, from_date, to_date, cached, only_cached)
-    downloads = article_downloads(table_id, from_date, to_date, cached, only_cached)
+    return {
+        'views': article_views(table_id, from_date, to_date, cached, only_cached),
+        'downloads': article_downloads(table_id, from_date, to_date, cached, only_cached),
+    }
 
-    download_dois = set(downloads.keys())
-    views_dois = set(views.keys())
-    sset = download_dois - views_dois
-    if sset:
-        msg = "downloads with no corresponding page view: %r"
-        LOG.debug(msg, {missing_doi: downloads[missing_doi] for missing_doi in list(sset)})
-
-    # keep the two separate until we introduce POAs? or just always
-    return {'views': views, 'downloads': downloads}
-
-
-# --- bulk.py, bulk requests to GA
-# --- used to be a separate module, tacked on here so I don't go cross-eyed switching panes
-
-
-def generate_queries(table_id, query_func_name, datetime_list, use_cached=False, use_only_cached=False):
-    """returns a list of queries to be executed by Google Analytics.
-    it's assumed that date ranges that generate invalid queries have been filtered out by `valid_dt_pair`."""
-    assert isinstance(query_func_name, str), "query func name must be a string"
-    query_list = []
-    for from_date, to_date in datetime_list:
-
-        module = module_picker(from_date, to_date)
-        query_func = getattr(module, query_func_name)
-        query_type = 'views' if query_func_name == 'path_counts_query' else 'downloads'
-        path = output_path(query_type, from_date, to_date)
-
-        if use_cached and os.path.exists(path):
-            # "query skipped, we have 'view' results for '2001-01-01' to '2001-01-02' already"
-            LOG.debug("query skipped, we have %r results for %r to %r already", query_type, ymd(from_date), ymd(to_date))
-            continue
-
-        if use_only_cached and not os.path.exists(path):
-            LOG.debug("query skipped, `use_only_cached` is True and expected cache file not found: " + path)
-            continue
-
-        q = query_func(table_id, from_date, to_date)
-        query_list.append(q)
-
-    if use_only_cached:
-        assert query_list == [], "`use_only_cached` is True but we're accumulating queries somehow. This is a programming error."
-
-    return query_list
-
-def bulk_query(query_list, from_dt, to_dt, results_type):
-    """executes a list of queries for their side effects (caching).
-    results do not accumulate in memory, returns nothing."""
-    for query in query_list:
-        query_ga_write_results_v2(query, from_dt, to_dt, results_type)
-
-def metrics_for_range(table_id, dt_range_list, use_cached=False, use_only_cached=False):
+def metrics_for_range(table_id, dt_range_list, cached=False, only_cached=False):
     """query each `(from-date, to-date)` pair in `dt_range_list`.
     returns a map of `{(from-date, to-date): {'views': {...}, 'downloads': {...}}`"""
     results = {}
     for from_date, to_date in dt_range_list:
-        res = article_metrics(table_id, from_date, to_date, use_cached, use_only_cached)
+        res = article_metrics(table_id, from_date, to_date, cached, only_cached)
         results[(ymd(from_date), ymd(to_date))] = res
     return results
 
-def daily_metrics_between(table_id, from_date, to_date, use_cached=True, use_only_cached=False):
+def daily_metrics_between(table_id, from_date, to_date, cached=True, only_cached=False):
     "does a DAILY query between two dates, NOT a single query within a date range."
-    # lsh@2022-12-14: while this per-day querying was perhaps an inefficient decision in UA (GA3),
-    # it's a good choice in GA4 as it avoids `(other)` row aggregation. At least for now.
+    date_range = utils.dt_range(from_date, to_date)
+    return metrics_for_range(table_id, date_range, cached, only_cached)
 
-    date_list = utils.dt_range(from_date, to_date)
-    query_list = []
-
-    views_dt_range = filter_date_list(valid_view_dt_pair, date_list)
-    query_list.extend(generate_queries(table_id,
-                                       'path_counts_query',
-                                       views_dt_range,
-                                       use_cached, use_only_cached))
-    bulk_query(query_list, from_date, to_date, results_type='views')
-
-    pdf_dt_range = filter_date_list(valid_downloads_dt_pair, date_list)
-    query_list.extend(generate_queries(table_id,
-                                       'event_counts_query',
-                                       pdf_dt_range,
-                                       use_cached, use_only_cached))
-    bulk_query(query_list, from_date, to_date, results_type='downloads')
-
-    # everything should be cached by now
-    use_cached = True # DELIBERATE
-    return metrics_for_range(table_id, views_dt_range, use_cached, use_only_cached)
-
-def monthly_metrics_between(table_id, from_date, to_date, use_cached=True, use_only_cached=False):
-    date_list = utils.dt_month_range(from_date, to_date)
-    views_dt_range = filter_date_list(valid_view_dt_pair, date_list)
-    pdf_dt_range = filter_date_list(valid_downloads_dt_pair, date_list)
-
-    query_list = []
-    query_list.extend(generate_queries(table_id,
-                                       'path_counts_query',
-                                       views_dt_range,
-                                       use_cached, use_only_cached))
-    bulk_query(query_list, from_date, to_date, 'views')
-
-    query_list.extend(generate_queries(table_id,
-                                       'event_counts_query',
-                                       pdf_dt_range,
-                                       use_cached, use_only_cached))
-    bulk_query(query_list, from_date, to_date, 'downloads')
-
-    # everything should be cached by now
-    use_cached = True # DELIBERATE
-    return metrics_for_range(table_id, views_dt_range, use_cached, use_only_cached)
+def monthly_metrics_between(table_id, from_date, to_date, cached=True, only_cached=False):
+    date_range = utils.dt_month_range(from_date, to_date)
+    return metrics_for_range(table_id, date_range, cached, only_cached)

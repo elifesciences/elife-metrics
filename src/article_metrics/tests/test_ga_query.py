@@ -67,7 +67,7 @@ def test_daily_query_results_correct_post_switch():
 @pytest.mark.django_db
 def test_elife_v4_excludes_bad_paths():
     fixture_path = base.fixture_path('2017-10-01_2017-10-31.json')
-    fixture = base.fixture_json('2017-10-01_2017-10-31.json')
+    fixture = json.load(open(fixture_path, 'r'))
 
     # this fixture has a number of bad paths:
     bad_eggs = [
@@ -99,7 +99,7 @@ def test_elife_v4_excludes_bad_paths():
 def test_v5_daily():
     "the daily `/article/123` and `/article/123/executable` sums add up"
     fixture_path = base.fixture_path('v5--views--2020-02-22.json')
-    fixture = base.fixture_json('v5--views--2020-02-22.json')
+    fixture = json.load(open(fixture_path, 'r'))
 
     from_dt = to_dt = datetime(2020, 2, 22) # daily
     with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
@@ -127,7 +127,7 @@ def test_v5_daily():
 def test_v5_monthly():
     "the monthly `/article/123` and `/article/123/executable` sums add up"
     fixture_path = base.fixture_path('v5--views--2020-03-01_2020-03-31.json')
-    fixture = base.fixture_json('v5--views--2020-03-01_2020-03-31.json')
+    fixture = json.load(open(fixture_path, 'r'))
 
     from_dt, to_dt = datetime(2020, 3, 1), datetime(2020, 3, 31) # monthly
     with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
@@ -157,7 +157,7 @@ def test_v5_monthly():
 @pytest.mark.django_db
 def test_v6_daily():
     fixture_path = base.fixture_path('v6--views--2021-11-30.json')
-    fixture = base.fixture_json('v6--views--2021-11-30.json')
+    fixture = json.load(open(fixture_path, 'r'))
 
     from_dt = to_dt = datetime(2021, 12, 1) # daily
     with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
@@ -187,7 +187,7 @@ def test_v6_daily():
 @pytest.mark.django_db
 def test_v6_monthly():
     fixture_path = base.fixture_path('v6--views--2021-11-01_2021-11-30.json')
-    fixture = base.fixture_json('v6--views--2021-11-01_2021-11-30.json')
+    fixture = json.load(open(fixture_path, 'r'))
 
     # it's a 2021-11 fixture but we'll use 2021-12 dates so that the v6 module is picked.
     from_dt, to_dt = datetime(2021, 12, 1), datetime(2021, 12, 31) # monthly
@@ -227,7 +227,7 @@ def test_v7_daily_views():
     table_id = ''
     from_dt = to_dt = core.GA4_SWITCH
     fixture_path = base.fixture_path('v7--views--2022-12-01.json')
-    fixture = base.fixture_json('v7--views--2022-12-01.json')
+    fixture = json.load(open(fixture_path, 'r'))
     with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
         with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
             results = core.article_views(table_id, from_dt, to_dt, cached=False, only_cached=False)
@@ -255,7 +255,7 @@ def test_v7_monthly_views():
     one_month = timedelta(days=31)
     from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH + one_month)
     fixture_path = base.fixture_path('v7--views--2022-11-01_2022-11-30.json')
-    fixture = base.fixture_json('v7--views--2022-11-01_2022-11-30.json')
+    fixture = json.load(open(fixture_path, 'r'))
     with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
         with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
             results = core.article_views(table_id, from_dt, to_dt, cached=False, only_cached=False)
@@ -313,7 +313,7 @@ def test_v7_monthly_downloads():
     one_month = timedelta(days=31) # an overlap for month ranges will use elife-v6.
     from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH + one_month)
     fixture_path = base.fixture_path('v7--downloads--2022-11-01_2022-11-30.json')
-    fixture = base.fixture_json('v7--downloads--2022-11-01_2022-11-30.json')
+    fixture = json.load(open(fixture_path, 'r'))
     with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
         with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
             results = core.article_downloads(table_id, from_dt, to_dt, cached=False, only_cached=False)
@@ -332,6 +332,58 @@ def test_v7_monthly_downloads():
 
     assert expected_num_rows == len(results)
     assert expected_total == sum(results.values())
+    for msid, expected_count in expected_sample:
+        doi = utils.msid2doi(msid)
+        assert expected_count == results[doi]
+
+def test_v8_daily_downloads():
+    table_id = ''
+    from_dt = to_dt = core.GA4_DOWNLOADS_SWITCH
+    fixture_path = base.fixture_path('v8--downloads--2023-08-13.json')
+    fixture = json.load(open(fixture_path, 'r'))
+    with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
+        with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
+            results = core.article_downloads(table_id, from_dt, to_dt, cached=False, only_cached=False)
+
+    expected_num_rows = 496 # 497 # we have a duplicate event for 7939 after msid normalisation
+    expected_total = 609
+    assert expected_num_rows == len(results)
+    assert expected_total == sum(results.values())
+
+    # representative sample
+    expected_sample = [
+        (7939, 2),
+        (86090, 11),
+        (58039, 1),
+    ]
+
+    for msid, expected_count in expected_sample:
+        doi = utils.msid2doi(msid)
+        assert expected_count == results[doi]
+
+def test_v8_monthly_downloads():
+    table_id = ''
+    one_month = timedelta(days=31) # an overlap for month ranges will use elife-v6.
+    from_dt, to_dt = ga_utils.month_min_max(core.GA4_DOWNLOADS_SWITCH + one_month)
+    fixture_path = base.fixture_path('v8--downloads--2023-07-01_2023-07-31.json')
+    fixture = json.load(open(fixture_path, 'r'))
+    with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
+        with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
+            results = core.article_downloads(table_id, from_dt, to_dt, cached=False, only_cached=False)
+
+    expected_num_rows = 414
+    expected_total = 1291
+    assert expected_num_rows == len(results)
+    assert expected_total == sum(results.values())
+
+    # representative sample
+    expected_sample = [
+        (3080, 8),
+        (2872, 14),
+        (2758, 23),
+        (1684, 1),
+    ]
+
     for msid, expected_count in expected_sample:
         doi = utils.msid2doi(msid)
         assert expected_count == results[doi]

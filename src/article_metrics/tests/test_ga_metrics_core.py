@@ -8,7 +8,7 @@ from . import base
 from datetime import datetime, timedelta
 from article_metrics.utils import datetime_now
 from article_metrics.ga_metrics import utils
-from article_metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7
+from article_metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7, elife_v8
 from django.conf import settings
 import apiclient
 
@@ -17,6 +17,13 @@ def fixture_test_output_dir():
     name = tempfile.mkdtemp()
     yield name
     shutil.rmtree(name)
+
+@pytest.fixture(name='temp_json_file')
+def fixture_temp_json_file():
+    with tempfile.NamedTemporaryFile() as temp_json_file:
+        temp_json_file.write(b'''{"foo": "bar"}\n''')
+        temp_json_file.seek(0)
+        yield temp_json_file
 
 def test_module_picker_daily():
     d1 = timedelta(days=1)
@@ -47,6 +54,9 @@ def test_module_picker_daily():
 
         # on the day of the GA4 switch, we use v7 urls
         (core.GA4_SWITCH, elife_v7),
+
+        # on the day the Downloads died, we use file_downloads
+        (core.GA4_DOWNLOADS_SWITCH, elife_v8),
     ]
     for dt, expected_module in expectations:
         assert expected_module == core.module_picker(dt, dt), \
@@ -187,6 +197,8 @@ def test_ga_response_sanitised_when_written(test_output_dir):
     for key in core.SANITISE_THESE:
         assert key not in response
 
+# ---
+
 # because you can't do: setattr(object(), 'foo', 'bar')
 class Object(object):
     pass
@@ -205,3 +217,45 @@ def test_exponential_backoff_applied_on_rate_limit():
     query = DummyQuery(raises=503)
     with pytest.raises(AssertionError):
         core._query_ga(query, num_attempts=1)
+
+# ---
+
+def test_load_cache(temp_json_file):
+    past_dt = datetime(year=2001, month=1, day=1)
+    future_dt = datetime(year=2050, month=1, day=1)
+    uncacheable_dt1 = datetime_now()
+    uncacheable_dt2 = datetime_now() - timedelta(days=1)
+    uncacheable_dt3 = datetime_now() - timedelta(days=2)
+    cacheable_dt = datetime_now() - timedelta(days=4)
+
+    cached_data = {'foo': 'bar'}
+    no_data = None
+
+    cases = [
+        # cached data available and only cached is true, return cached data
+        (('views', past_dt, past_dt, True, True), cached_data),
+        # cached data available but only cached is false, return cached data
+        (('views', past_dt, past_dt, True, False), cached_data),
+
+        # recent cacheable data available
+        (('views', cacheable_dt, cacheable_dt, True, False), cached_data),
+
+        # recent cacheable data unavailable
+        (('views', uncacheable_dt1, uncacheable_dt1, True, False), no_data),
+        (('views', uncacheable_dt2, uncacheable_dt2, True, False), no_data),
+        (('views', uncacheable_dt3, uncacheable_dt3, True, False), no_data),
+
+        # uncacheable data, bad date
+        (('views', future_dt, future_dt, True, False), no_data),
+    ]
+
+    with mock.patch('article_metrics.ga_metrics.core.output_path_v2', return_value=temp_json_file.name):
+        for (results_type, start_dt, end_dt, cached, only_cached), expected in cases:
+            actual = core.load_cache(results_type, start_dt, end_dt, cached, only_cached)
+            assert actual == expected
+
+    # valid date, use cached, use only cached, but no cached data available
+    with mock.patch('article_metrics.ga_metrics.core.output_path_v2', return_value='/path/does/not/exist'):
+        expected = {}
+        actual = core.load_cache(results_type, cacheable_dt, cacheable_dt, True, True)
+        assert actual == expected
