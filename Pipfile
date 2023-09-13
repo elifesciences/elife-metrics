@@ -16,7 +16,6 @@ djangorestframework = "~=3.9"
 et3 = "~=1.5"
 google-api-python-client = "~=1.7"
 "kids.cache" = "==0.0.7"
-newrelic = "~=7.16"
 oauth2client = "~=4.1"
 # psycopg2 doesn't use semver.
 psycopg2-binary = "==2.9.*"

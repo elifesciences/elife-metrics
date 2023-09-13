@@ -18,5 +18,4 @@ psql.cfg
 output*/
 /*.flag
 /client-secrets.json
-/newrelic.ini*
 /uwsgi.ini
