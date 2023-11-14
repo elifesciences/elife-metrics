@@ -4,7 +4,6 @@
 # Analytics API:
 # https://developers.google.com/analytics/devguides/reporting/core/v3/reference
 
-from functools import partial
 from os.path import join
 import os, json, time, random
 from datetime import datetime, timedelta
@@ -19,7 +18,7 @@ import logging
 from django.conf import settings
 from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7, elife_v8
 from . import utils, ga4
-from article_metrics.utils import todt_notz, datetime_now, first, second, fmtdt
+from article_metrics.utils import todt_notz, datetime_now
 
 LOG = logging.getLogger(__name__)
 
@@ -125,17 +124,6 @@ def valid_view_dt_pair(dt_pair):
 def valid_downloads_dt_pair(dt_pair):
     "returns true if both dates are greater than the date we started collecting on"
     return valid_dt_pair(dt_pair, DOWNLOADS_INCEPTION)
-
-def filter_date_list(fn, date_list):
-    fmt = partial(fmtdt, fmt="%Y-%m-%dT%H:%M:%S")
-    new_date_list = []
-    for dt_pair in date_list:
-        if not fn(dt_pair):
-            # "excluding invalid pair: 2001-01-01T00:00:00 - 2001-01-01T23:59:59"
-            LOG.warning("excluding invalid pair: %s - %s" % (fmt(first(dt_pair)), fmt(second(dt_pair))))
-            continue
-        new_date_list.append(dt_pair)
-    return new_date_list
 
 SANITISE_THESE = ['profileInfo', 'id', 'selfLink']
 

@@ -80,17 +80,6 @@ class Metric(models.Model):
         unique_together = ('article', 'date', 'period', 'source')
         ordering = ('date',)
 
-    def as_row(self):
-        return {
-            'full': self.full,
-            'abstract': self.abstract,
-            'digest': self.digest,
-            'pdf': self.pdf,
-            'source': self.source,
-            'period': self.period,
-            'date': self.date,
-        }
-
     def __str__(self):
         return '%s,%s,%s,%s,%s,%s' % (self.article, self.date, self.source, self.full, self.pdf, self.digest)
 

@@ -31,9 +31,9 @@ def chop(q, page, per_page, order):
         order_by = '-' + order_by
 
     more_sorting = {
-        models.Citation: lambda ob: (order_by, 'source'),
+        models.Citation: lambda _: (order_by, 'source'),
     }
-    default = lambda ob: (order_by,)
+    default = lambda _: (order_by,)
     order_by = more_sorting.get(q.model, default)(order_by)
 
     q = q.order_by(*order_by)
