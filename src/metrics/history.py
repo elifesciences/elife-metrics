@@ -197,8 +197,10 @@ type_str = And(str, len) # non-empty string
 only_one_optional_date = lambda d: d['starts'] or d['ends']
 no_lonesome_redirect_prefix = lambda data: ('path-map' in data or 'path-map-file' in data) if 'redirect-prefix' in data else True
 
+'''
 def exactly_one(d, *keys):
     return [k in d for k in keys].count(True) == 1
+'''
 
 def exactly_one_if_any(d, *keys):
     return [k in d for k in keys].count(True) in [0, 1]

@@ -104,10 +104,6 @@ def first(x):
 def second(x):
     return nth(1, x)
 
-def firstnn(x):
-    "given sequential `x`, returns the first non-nil value"
-    return first(lfilter(None, x))
-
 def rest(x):
     return x[1:]
 
@@ -336,22 +332,22 @@ def partial_match(patn, real):
 # don't use if we ever go concurrent
 # http://blog.gregburek.com/2011/12/05/Rate-limiting-with-decorators/
 # https://stackoverflow.com/questions/667508/whats-a-good-rate-limiting-algorithm/667706#667706
-def simple_rate_limiter1(maxPerSecond):
-    minInterval = 1.0 / float(maxPerSecond)
-
-    def decorate(func):
-        lastTimeCalled = [0.0]
-
-        def rateLimitedFunction(*args, **kargs):
-            elapsed = time.clock() - lastTimeCalled[0]
-            leftToWait = minInterval - elapsed
-            if leftToWait > 0:
-                time.sleep(leftToWait)
-            ret = func(*args, **kargs)
-            lastTimeCalled[0] = time.clock()
-            return ret
-        return rateLimitedFunction
-    return decorate
+# def simple_rate_limiter1(maxPerSecond):
+#    minInterval = 1.0 / float(maxPerSecond)
+#
+#    def decorate(func):
+#        lastTimeCalled = [0.0]
+#
+#        def rateLimitedFunction(*args, **kargs):
+#            elapsed = time.clock() - lastTimeCalled[0]
+#            leftToWait = minInterval - elapsed
+#            if leftToWait > 0:
+#                time.sleep(leftToWait)
+#            ret = func(*args, **kargs)
+#            lastTimeCalled[0] = time.clock()
+#            return ret
+#        return rateLimitedFunction
+#    return decorate
 
 # a thread-safe, 3.8 compatible variation on the above
 # - https://gist.github.com/gregburek/1441055?permalink_comment_id=1848222#gistcomment-1848222
