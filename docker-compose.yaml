@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: example_password
+    healthcheck:
+      test: pg_isready -d db_prod
+      interval: 10s
+      timeout: 3s
+      retries: 3
+  localstack:
+    image: localstack/localstack:3.2
+    environment:
+    - SERVICES=sqs
+    - AWS_DEFAULT_REGION=eu-east-1
+
+  migrate:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    build:
+      context: .
+    command:
+      /app/migrate.sh
+    volumes:
+    - ./schema/metrics:/app/schema/metrics
+    - ./schema/sql:/app/schema/sql
+    - ./src:/app/src
+    - ./.docker/app.cfg:/app/app.cfg
+    - ./.docker/migrate.sh:/app/migrate.sh
+
+
+  app:
+    depends_on:
+      postgres:
+        condition: service_healthy
+      localstack:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: curl http://localhost:8000
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    build:
+      context: .
+    ports:
+    - 8000:8000
+    volumes:
+    - ./schema/metrics:/app/schema/metrics
+    - ./schema/sql:/app/schema/sql
+    - ./src:/app/src
+    - ./.docker/app.cfg:/app/app.cfg
+    - ./.docker/migrate.sh:/app/migrate.sh
