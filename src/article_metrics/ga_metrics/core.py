@@ -52,11 +52,17 @@ RDS_ADDITION = datetime(year=2020, month=2, day=21)
 # whitelisted urlparams
 URL_PARAMS = datetime(year=2021, month=11, day=30)
 
+# /reviewed-preprints go-live
+# lsh@2024-04-05: added the RPP_ADDITION era and adjusted the patterns for subsequent eras.
+# we've never had to deal with non-continguous eras before.
+RPP_ADDITION = datetime(year=2022, month=10, day=18)
+
 # switch from ga3 to ga4
 GA4_SWITCH = datetime(year=2023, month=3, day=20)
 
 # switch from custom 'Download' events to the automatically collected ga4 'file_download' events.
 GA4_DOWNLOADS_SWITCH = datetime(year=2023, month=6, day=12)
+
 
 def module_picker(from_date, to_date):
     "returns the module we should be using for scraping this date range."
@@ -64,14 +70,20 @@ def module_picker(from_date, to_date):
     monthly = not daily
 
     if from_date >= GA4_DOWNLOADS_SWITCH:
-        return elife_v8
+        #return elife_v8
+        return elife_v9
 
     if from_date >= GA4_SWITCH:
-        return elife_v7
+        #return elife_v7
+        return elife_v8
 
     if from_date > URL_PARAMS:
-        return elife_v6
+        #return elife_v6
+        return elife_v7
 
+    #if from_date >= RPP_ADDITION:
+    #    return elife_v6
+    
     if from_date >= RDS_ADDITION:
         return elife_v5
 
