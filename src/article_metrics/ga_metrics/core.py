@@ -70,19 +70,16 @@ def module_picker(from_date, to_date):
     monthly = not daily
 
     if from_date >= GA4_DOWNLOADS_SWITCH:
-        #return elife_v8
         return elife_v9
 
     if from_date >= GA4_SWITCH:
-        #return elife_v7
         return elife_v8
 
     if from_date > URL_PARAMS:
-        #return elife_v6
         return elife_v7
 
-    #if from_date >= RPP_ADDITION:
-    #    return elife_v6
+    if from_date >= RPP_ADDITION:
+        return elife_v6
     
     if from_date >= RDS_ADDITION:
         return elife_v5

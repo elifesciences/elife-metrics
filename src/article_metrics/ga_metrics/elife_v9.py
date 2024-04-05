@@ -52,7 +52,8 @@ def event_counts_query(table_id, from_date, to_date):
                             "fieldName": "pagePath",
                             "stringFilter": {
                                 "matchType": "FULL_REGEXP",
-                                "value": "^/articles/\\d+$",
+                                # lsh@2024-04-05: at time of writing no download events are being captured.
+                                "value": "^/(articles|reviewed-preprints)/\\d+$",
                                 "caseSensitive": True
                             },
                         }
@@ -100,7 +101,7 @@ def event_count(row):
         path = row['dimensionValues'][2]['value']
         count = row['metricValues'][0]['value']
         ensure(path != "(other)", "found 'other' row with value '%s'. GA has aggregated rows because query returned too much data." % count)
-        bits = path.split('/') # ['', 'articles', '80092']
+        bits = path.split('/') # ['', 'articles', '80092'], ['', 'reviewed-preprints', '12345']
         ensure(len(bits) == 3, "failed to find a valid path: %s" % path)
         return int(bits[2]), int(count)
     except AssertionError as exc:

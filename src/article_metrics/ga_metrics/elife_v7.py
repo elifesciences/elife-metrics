@@ -18,8 +18,8 @@ def path_counts_query(table_id, from_date, to_date):
     explanation = (
         # non-regex GA prefix where '=~' means 'match regex'
         "ga:pagePath=~"
-        # captures all articles
-        "^/articles/[0-9]+"
+        # captures all articles and reviewed-preprints
+        "^/(articles|reviewed-preprints)/[0-9]+"
         # including executable articles
         "(/executable)?"
         # opens optional section for matching url parameters
@@ -39,7 +39,7 @@ def path_counts_query(table_id, from_date, to_date):
         # if we don't stop the matching here it goes on to match anything.
         "$"
     )
-    ga_filter = "ga:pagePath=~^/articles/[0-9]+(/executable)?((\\?|&){1}.*?(twclid|utm_campaign|utm_source=content_alert)+.*?)?$"
+    ga_filter = "ga:pagePath=~^/(articles|reviewed-preprints)/[0-9]+(/executable)?((\\?|&){1}.*?(twclid|utm_campaign|utm_source=content_alert)+.*?)?$"
     assert ga_filter == explanation, "explanation of filter differs from the actual filter."
 
     new_query['filters'] = ga_filter
@@ -52,7 +52,7 @@ def path_counts_query(table_id, from_date, to_date):
 # this is a bad regex. it's been matching against "/articles/1234567890" and counting it as "/articles/12345"
 #REGEX = r"/articles/(?P<artid>\d{1,5})"
 # we now want 1-6 article digits, followed by the end of the line ($) OR url parameters, an anchor or a slash '/'
-REGEX = r"/articles/((?P<artid>\d{1,6})($|[?&#/]{1}){1})"
+REGEX = r"/(?:articles|reviewed-preprints)/((?P<artid>\d{1,6})($|[?&#/]{1}){1})"
 PATH_RE = re.compile(REGEX, re.IGNORECASE)
 
 def path_count(pair):

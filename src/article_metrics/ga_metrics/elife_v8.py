@@ -19,7 +19,7 @@ def path_counts_query(table_id, from_date, to_date):
 
     explanation = (
         # captures all articles
-        "^/articles/[0-9]+"
+        "^/(articles|reviewed-preprints)/[0-9]+"
         # including executable articles
         "(/executable)?"
         # opens optional section for matching url parameters
@@ -39,7 +39,7 @@ def path_counts_query(table_id, from_date, to_date):
         # if we don't stop the matching here it goes on to match anything.
         "$"
     )
-    ga_filter = "^/articles/[0-9]+(/executable)?((\\?|&){1}.*?(twclid|utm_campaign|utm_source=content_alert)+.*?)?$"
+    ga_filter = "^/(articles|reviewed-preprints)/[0-9]+(/executable)?((\\?|&){1}.*?(twclid|utm_campaign|utm_source=content_alert)+.*?)?$"
     assert ga_filter == explanation, "explanation of filter differs from the actual filter."
 
     return {"dimensions": [{"name": "pagePathPlusQueryString"}],
@@ -66,7 +66,7 @@ def path_counts_query(table_id, from_date, to_date):
 # this is a bad regex. it's been matching against "/articles/1234567890" and counting it as "/articles/12345"
 #REGEX = r"/articles/(?P<artid>\d{1,5})"
 # we now want 1-6 article digits, followed by the end of the line ($) OR url parameters, an anchor or a slash '/'
-REGEX = r"/articles/((?P<artid>\d{1,6})($|[?&#/]{1}){1})"
+REGEX = r"/(?P:articles|reviewed-preprints)/((?P<artid>\d{1,6})($|[?&#/]{1}){1})"
 PATH_RE = re.compile(REGEX, re.IGNORECASE)
 
 def path_count(row):
@@ -148,7 +148,8 @@ def event_counts_query(table_id, from_date, to_date):
                             "fieldName": "pagePath",
                             "stringFilter": {
                                 "matchType": "FULL_REGEXP",
-                                "value": "^/articles/\\d+$",
+                                # lsh@2024-04-05: at time of writing no download events are being captured. 
+                                "value": "^/(articles|reviewed-preprints)/\\d+$",
                                 "caseSensitive": True
                             },
                         }
@@ -185,7 +186,7 @@ def event_count(row):
         path = row['dimensionValues'][1]['value']
         count = row['metricValues'][0]['value']
         ensure(path != "(other)", "found 'other' row with value '%s'. GA has aggregated rows because query returned too much data." % count)
-        bits = path.split('/') # ['', 'articles', '80092']
+        bits = path.split('/') # ['', 'articles', '80092'], ['', 'reviewed-preprints', '12345']
         ensure(len(bits) == 3, "failed to find a valid path: %s" % path)
         return int(bits[2]), int(count)
     except AssertionError as exc:
