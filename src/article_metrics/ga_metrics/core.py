@@ -56,6 +56,7 @@ URL_PARAMS = datetime(year=2021, month=11, day=30)
 # lsh@2024-04-05: added the RPP_ADDITION era and adjusted the patterns for subsequent eras.
 # we've never had to deal with non-continguous eras before.
 RPP_ADDITION = datetime(year=2022, month=10, day=18)
+RPP_ADDITION_MONTH = month_min_max(RPP_ADDITION)
 
 # switch from ga3 to ga4
 GA4_SWITCH = datetime(year=2023, month=3, day=20)
@@ -73,6 +74,13 @@ def module_picker(from_date, to_date):
 
     if from_date >= GA4_SWITCH:
         return elife_v7
+
+    if monthly and \
+       (from_date, to_date) == RPP_ADDITION_MONTH:
+        # business rule: if the given from-to dates represent a
+        # monthly date range and that date range is the same year+month
+        # we added /reviewed-preprints, use the vX patterns.
+        return elife_vX
 
     if from_date >= RPP_ADDITION:
         return elife_vX

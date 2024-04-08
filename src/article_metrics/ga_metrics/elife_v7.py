@@ -182,7 +182,7 @@ def event_count(row):
         path = row['dimensionValues'][1]['value']
         count = row['metricValues'][0]['value']
         ensure(path != "(other)", "found 'other' row with value '%s'. GA has aggregated rows because query returned too much data." % count)
-        bits = path.split('/') # ['', 'articles', '80092']
+        bits = path.split('/') # ['', 'articles', '80092'], ['', 'reviewed-preprints', '80092']
         ensure(len(bits) == 3, "failed to find a valid path: %s" % path)
         return int(bits[2]), int(count)
     except AssertionError as exc:

@@ -74,6 +74,7 @@ def test_module_picker_monthly():
     feb2020 = datetime(year=2020, month=2, day=1), datetime(year=2020, month=2, day=28)
     mar2020 = datetime(year=2020, month=3, day=1), datetime(year=2021, month=11, day=30)
     dec2021 = datetime(year=2021, month=12, day=1), datetime(year=2023, month=3, day=31)
+    oct2022 = datetime(year=2022, month=10, day=1), datetime(year=2022, month=10, day=31)
     apr2023 = datetime(year=2023, month=4, day=1), datetime(year=2023, month=3, day=31)
 
     cases = [
@@ -100,6 +101,9 @@ def test_module_picker_monthly():
         (mar2020, elife_v5),
 
         (dec2021, elife_v6),
+
+        # on the month of the addition of /reviewed-preprints, we switch to vX
+        (oct2022, elife_vX),
 
         (apr2023, elife_v7),
     ]

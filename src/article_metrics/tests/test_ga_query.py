@@ -220,6 +220,10 @@ def test_v6_monthly():
             for msid, expected_count in expected_sample:
                 assert expected_count == results[utils.msid2doi(msid)]
 
+# --- vX. era is the switch to /reviewed-preprint
+
+# TODO!
+                
 # --- V7. era is the switch from GA3 to GA4
 
 @pytest.mark.django_db
