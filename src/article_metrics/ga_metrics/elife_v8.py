@@ -52,7 +52,7 @@ def event_counts_query(table_id, from_date, to_date):
                             "fieldName": "pagePath",
                             "stringFilter": {
                                 "matchType": "FULL_REGEXP",
-                                "value": "^/articles/\\d+$",
+                                "value": "^/(articles|reviewed-preprints)/\\d+$",
                                 "caseSensitive": True
                             },
                         }
