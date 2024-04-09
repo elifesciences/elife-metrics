@@ -220,9 +220,62 @@ def test_v6_monthly():
             for msid, expected_count in expected_sample:
                 assert expected_count == results[utils.msid2doi(msid)]
 
-# --- vX. era is the switch to /reviewed-preprint
+# --- vX era is the switch to /reviewed-preprint
 
-# TODO!
+@pytest.mark.django_db
+def test_vX_daily():
+    "the daily `/article/123`, '/reviewed-preprints/123 sums add up"
+    fixture_path = base.fixture_path('vX--views--2022-10-20.json')
+    fixture = json.load(open(fixture_path, 'r'))
+
+    from_dt = to_dt = datetime(2022, 10, 20) # daily
+    with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
+        with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
+            ga_table_id = '0xdeadbeef'
+            results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
+            expected_total_results = 8203 # total results after counting (not rows in fixture)
+            expected_total = Counter(full=61626, abstract=0, digest=0) # total of all results
+
+            # mix of `/article` and `/reviewed-preprint`
+            expected_sample = {
+                # I added a dummy row to the fixture for 1 regular /articles/80494 hit
+                80494: Counter(full=442, abstract=0, digest=0),
+                80729: Counter(full=130, abstract=0, digest=0),
+                80984: Counter(full=145, abstract=0, digest=0),
+                81535: Counter(full=413, abstract=0, digest=0)
+            }
+
+            assert expected_total_results == len(results)
+            assert expected_total == elife_v1.count_counter_list(results.values())
+            for msid, expected_count in expected_sample.items():
+                key = utils.msid2doi(msid)
+                assert expected_count == results[key]
+
+@pytest.mark.django_db
+def test_vX_monthly():
+    fixture_path = base.fixture_path('vX--views--2022-10-01_2022-10-31.json')
+    fixture = json.load(open(fixture_path, 'r'))
+
+    from_dt, to_dt = datetime(2022, 10, 1), datetime(2022, 10, 31) # monthly
+    with patch('article_metrics.ga_metrics.core.query_ga_write_results', return_value=(fixture, fixture_path)):
+        with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
+            ga_table_id = '0xdeadbeef'
+            results = core.article_views(ga_table_id, from_dt, to_dt, cached=False, only_cached=False)
+            expected_num_results = 13667
+            expected_total = Counter(full=850797, abstract=0, digest=0)
+
+            # representative sample of `/article` and `/reviewed-preprints`
+            expected_sample = [
+                (80494, Counter(full=1278, abstract=0, digest=0)),
+                # 80729 went on to become a VOR in Nov but got 1 hit in Oct
+                (80729, Counter(full=395, abstract=0, digest=0)), 
+                (80984, Counter(full=473, abstract=0, digest=0)),
+            ]
+
+            assert expected_num_results == len(results)
+            assert expected_total == elife_v1.count_counter_list(results.values())
+            for msid, expected_count in expected_sample:
+                assert expected_count == results[utils.msid2doi(msid)]
                 
 # --- V7. era is the switch from GA3 to GA4
 
