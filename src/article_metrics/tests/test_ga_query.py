@@ -283,22 +283,24 @@ def test_vX_monthly():
 def test_v7_daily_views():
     table_id = ''
     from_dt = to_dt = core.GA4_SWITCH
-    fixture_path = base.fixture_path('v7--views--2022-12-01.json')
+    fixture_path = base.fixture_path('v7--views--2023-03-20.json')
     fixture = json.load(open(fixture_path, 'r'))
     with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
         with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
             results = core.article_views(table_id, from_dt, to_dt, cached=False, only_cached=False)
 
-    expected_num_rows = 7890
-    expected_total = Counter(full=32877, abstract=0, digest=0)
+    expected_num_rows = 9840
+    expected_total = Counter(full=40825, abstract=0, digest=0)
 
     # representative sample of `/article` and `/article/executable`, /article?foo=...
     expected_sample = [
-        (83292, Counter(full=761, abstract=0, digest=0)),
-        (83071, Counter(full=652, abstract=0, digest=0)),
-        (10989, Counter(full=24, abstract=0, digest=0)),
-        # 11 regular, 1 /executable
-        (61523, Counter(full=11 + 1, abstract=0, digest=0))
+        (83292, Counter(full=13, abstract=0, digest=0)),
+        (83071, Counter(full=16, abstract=0, digest=0)),
+        (10989, Counter(full=8, abstract=0, digest=0)),
+        # 1 regular, 1 /executable
+        (61523, Counter(full=1 + 2, abstract=0, digest=0)),
+        # 16 regular, 6 /reviewed-preprint
+        (80984, Counter(full=16 + 6, abstract=0, digest=0)),
     ]
 
     assert expected_num_rows == len(results)
@@ -311,24 +313,28 @@ def test_v7_monthly_views():
     table_id = ''
     one_month = timedelta(days=31)
     from_dt, to_dt = ga_utils.month_min_max(core.GA4_SWITCH + one_month)
-    fixture_path = base.fixture_path('v7--views--2022-11-01_2022-11-30.json')
+    fixture_path = base.fixture_path('v7--views--2023-04-01_2023-04-30.json')
     fixture = json.load(open(fixture_path, 'r'))
     with patch('article_metrics.ga_metrics.core.query_ga_write_results_v2', return_value=(fixture, fixture_path)):
         with patch('article_metrics.ga_metrics.core.output_path_v2', return_value=fixture_path):
             results = core.article_views(table_id, from_dt, to_dt, cached=False, only_cached=False)
 
-    expected_num_rows = 9952
-    expected_total = Counter(full=772733, abstract=0, digest=0)
+    expected_num_rows = 14715
+    expected_total = Counter(full=778518, abstract=0, digest=0)
 
-    # representative sample of `/article` and `/article/executable`, /article?foo=...
+    # representative sample of `/article` and `/article/executable`, `/article?foo=...`, `/reviewed-preprints`
     expected_sample = [
-        (83292, Counter(full=2518, abstract=0, digest=0)),
-        (83071, Counter(full=3186, abstract=0, digest=0)),
-        (10989, Counter(full=409, abstract=0, digest=0)),
-        # 81 regular, 22 executable
-        (61523, Counter(full=81 + 22, abstract=0, digest=0)),
-        # 20 regular, 31 executable
-        (30274, Counter(full=20 + 31, abstract=0, digest=0))
+        (83292, Counter(full=228, abstract=0, digest=0)),
+        (83071, Counter(full=468, abstract=0, digest=0)),
+        (10989, Counter(full=431, abstract=0, digest=0)),
+        # 60 regular, 36 executable
+        (61523, Counter(full=60 + 36, abstract=0, digest=0)),
+        # 13 regular, 5 executable
+        (30274, Counter(full=13 + 5, abstract=0, digest=0)),
+        # 5 regular, 113 reviewed-preprint
+        (80494, Counter(full=5 + 113, abstract=0, digest=0)),
+        # 113 regular, 22 reviewed-preprint
+        (80729, Counter(full=113 + 22, abstract=0, digest=0)),
     ]
 
     assert expected_num_rows == len(results)

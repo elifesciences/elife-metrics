@@ -126,13 +126,14 @@ def test_event_counts():
 
 def test_event_counts__multiple_counts():
     expected = {
-        '10.7554/eLife.90560': 10,
+        '10.7554/eLife.90560': 15,
     }
     fixture = [
         mkrow("/articles/90560", 1),
         mkrow("/articles/90560", 2),
         mkrow("/articles/90560", 3),
         mkrow("/reviewed-preprints/90560", 4),
+        mkrow("/reviewed-preprints/90560", 5),
     ]
     actual = elife_v7.event_counts(fixture)
     assert actual == expected
