@@ -16,7 +16,7 @@ from .utils import ymd, month_min_max, ensure
 from kids.cache import cache
 import logging
 from django.conf import settings
-from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7, elife_v8
+from . import elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_vX, elife_v7, elife_v8
 from . import utils, ga4
 from article_metrics.utils import todt_notz, datetime_now
 
@@ -52,6 +52,12 @@ RDS_ADDITION = datetime(year=2020, month=2, day=21)
 # whitelisted urlparams
 URL_PARAMS = datetime(year=2021, month=11, day=30)
 
+# /reviewed-preprints go-live
+# lsh@2024-04-05: added the RPP_ADDITION era and adjusted the patterns for subsequent eras.
+# we've never had to deal with non-continguous eras before.
+RPP_ADDITION = datetime(year=2022, month=10, day=18)
+RPP_ADDITION_MONTH = month_min_max(RPP_ADDITION)
+
 # switch from ga3 to ga4
 GA4_SWITCH = datetime(year=2023, month=3, day=20)
 
@@ -68,6 +74,16 @@ def module_picker(from_date, to_date):
 
     if from_date >= GA4_SWITCH:
         return elife_v7
+
+    if monthly and \
+       (from_date, to_date) == RPP_ADDITION_MONTH:
+        # business rule: if the given from-to dates represent a
+        # monthly date range and that date range is the same year+month
+        # we added /reviewed-preprints, use the vX patterns.
+        return elife_vX
+
+    if from_date >= RPP_ADDITION:
+        return elife_vX
 
     if from_date > URL_PARAMS:
         return elife_v6
