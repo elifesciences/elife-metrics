@@ -206,6 +206,9 @@ def summary(request, msid=None):
         }
         return Response(payload, content_type="application/json")
 
+    except Http404:
+        raise # msid DNE, handled, ignore
+
     except AssertionError as err:
         raise ValidationError(err) # 400, client error
 
