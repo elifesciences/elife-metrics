@@ -8,7 +8,7 @@ from . import base
 from datetime import datetime, timedelta
 from article_metrics.utils import datetime_now
 from article_metrics.ga_metrics import utils
-from article_metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_v7, elife_v8
+from article_metrics.ga_metrics import core, elife_v1, elife_v2, elife_v3, elife_v4, elife_v5, elife_v6, elife_vX, elife_v7, elife_v8
 from django.conf import settings
 import apiclient
 
@@ -52,6 +52,9 @@ def test_module_picker_daily():
         # on the day *after* the capturing of url parameters, we use v6 urls
         (core.URL_PARAMS + d1, elife_v6),
 
+        # on the day the /reviewed-preprints route was switched on
+        (core.RPP_ADDITION, elife_vX),
+
         # on the day of the GA4 switch, we use v7 urls
         (core.GA4_SWITCH, elife_v7),
 
@@ -71,6 +74,7 @@ def test_module_picker_monthly():
     feb2020 = datetime(year=2020, month=2, day=1), datetime(year=2020, month=2, day=28)
     mar2020 = datetime(year=2020, month=3, day=1), datetime(year=2021, month=11, day=30)
     dec2021 = datetime(year=2021, month=12, day=1), datetime(year=2023, month=3, day=31)
+    oct2022 = datetime(year=2022, month=10, day=1), datetime(year=2022, month=10, day=31)
     apr2023 = datetime(year=2023, month=4, day=1), datetime(year=2023, month=3, day=31)
 
     cases = [
@@ -97,6 +101,9 @@ def test_module_picker_monthly():
         (mar2020, elife_v5),
 
         (dec2021, elife_v6),
+
+        # on the month of the addition of /reviewed-preprints, we switch to vX
+        (oct2022, elife_vX),
 
         (apr2023, elife_v7),
     ]
