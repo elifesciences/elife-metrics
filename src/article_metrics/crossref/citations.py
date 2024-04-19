@@ -13,6 +13,8 @@ URL = "https://doi.crossref.org/servlet/getForwardLinks"
 def fetch(doi):
     LOG.info("fetching crossref citations for %s" % doi)
     params = {
+        # include citations from posted content (including preprints)
+        'include_postedcontent': 'true',
         'usr': settings.CROSSREF_USER,
         'pwd': settings.CROSSREF_PASS,
         'doi': doi,
