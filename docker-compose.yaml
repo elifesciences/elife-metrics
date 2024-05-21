@@ -2,16 +2,23 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_PASSWORD: example_password
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
     healthcheck:
       test: pg_isready -d db_prod
       interval: 10s
       timeout: 3s
       retries: 3
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./.docker/data:/data
+    ports:
+      - 5432:5432
+
   localstack:
     image: localstack/localstack:3.2
     environment:
-    - SERVICES=sqs
+    - SERVICES=sns
     - AWS_DEFAULT_REGION=eu-east-1
 
   migrate:
@@ -28,7 +35,6 @@ services:
     - ./src:/app/src
     - ./.docker/app.cfg:/app/app.cfg
     - ./.docker/migrate.sh:/app/migrate.sh
-
 
   app:
     depends_on:
@@ -53,3 +59,6 @@ services:
     - ./src:/app/src
     - ./.docker/app.cfg:/app/app.cfg
     - ./.docker/migrate.sh:/app/migrate.sh
+
+volumes:
+    db_data:

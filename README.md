@@ -21,9 +21,113 @@ would yield a response similar to:
 
     {"total":1,"items":[{"id":9560,"views":227913,"downloads":16498,"crossref":103,"pubmed":21,"scopus":52}]}
 
-## Local dev
+------------
 
-### installation
+## Local development
+
+### Prerequisites
+
+Docker
+Docker Compose
+
+#### 3rd Party credentials for local development
+
+The service has dependencies on the following 3rd party services:  
+
+[`crossref`](https://www.crossref.org)
+[`scopus`](https://www.scopus.com/home.uri)
+[`Google Analytics`](https://developers.google.com/analytics/devguides/collection/ga4)
+
+Each of these require credentials to be set in the environment. You will need to set these up in your local environment 
+in order to ingest/generate metrics data locally.
+
+In the `.docker/app.cfg` file, you will need to set the following variables with real values:
+
+```
+[scopus]
+apikey: <scopus api key>
+
+[crossref]
+user: <crossref user>
+pass: <crossref pass>
+```
+For Google Analytics, you will need to provide a `client_secrets.json` file in the root of the project.
+
+Example `client-secrets.json` file:
+```json
+{
+  "private_key_id": "<private_key_id>",
+  "private_key": "<private_key>",
+  "client_id": "<client_id>",
+  "client_email": "<client_email>",
+  "type": "service_account"
+}
+```
+
+#### TODO: AWS Section
+...
+
+### (Optional) Prepare for seeding the local database
+If you want to seed the local database with some data, one way is to populate the `.docker/pg_import_data.sql` file with the
+ desired contents. In a later step you can execute the import command to load the data into the database.
+
+### Build
+```bash
+docker-compose build
+```
+
+### Run
+```bash
+docker-compose up --wait
+```
+
+### (Optional) Importing data into the local database
+```bash
+docker-compose exec postgres psql -U postgres -d postgres -f /data/pg_import_data.sql
+```
+
+### Stop
+```bash
+docker-compose down
+````
+
+### Running linting
+```bash
+docker-compose exec app bash -c "./.lint.sh"
+```
+
+### Running tests
+```bash
+docker-compose exec app bash -c "./.test.sh"
+```
+
+### Working with local ingestion
+
+#### Fetching Articles
+To download a list of PMCIDs and create the relevant articles in the db run:
+
+```bash
+docker-compose exec app bash -c "./download-pmcids.sh"
+```
+
+#### Fetching Metrics
+To fetch metrics for the articles in the db:
+
+```bash
+docker-compose exec app bash -c "python src/manage.py ingest_metrics"
+```
+
+You can also pass in the number of days and months to look back for metrics data should you need to:
+
+```bash
+docker-compose exec app bash -c "python src/manage.py ingest_metrics --days 999 --months 999"
+```
+
+(If not provided, the defaults at the time of writing are 5 days and 2 months)
+
+------------
+
+### Legacy non-docker installation
 
 [code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh)
 
@@ -52,19 +156,10 @@ would yield a response similar to:
     ./manage.sh runserver
     firefox http://127.0.0.1:8000/api/docs/
 
-## Docker dev
-
-### building
-
-    docker compose build
-
-### running
-
-    docker compose up --wait
 
 ## Copyright & Licence
 
-Copyright 2016-2022 eLife Sciences. Licensed under the [GPLv3](LICENCE.txt)
+Copyright 2016-2024 eLife Sciences. Licensed under the [GPLv3](LICENCE.txt)
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
