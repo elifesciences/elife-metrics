@@ -73,32 +73,32 @@ If you want to seed the local database with some data, one way is to populate th
 
 ### Build
 ```bash
-docker compose build
+make build
 ```
 
 ### Run
 ```bash
-docker compose up --wait
+make run
 ```
 
 ### (Optional) Importing data into the local database
 ```bash
-docker compose exec postgres psql -U postgres -d postgres -f /data/pg_import_data.sql
+make import-data
 ```
 
 ### Stop
 ```bash
-docker compose down
+make stop
 ````
 
 ### Running linting
 ```bash
-docker compose exec app bash -c "./.lint.sh"
+make lint
 ```
 
 ### Running tests
 ```bash
-docker compose exec app bash -c "./.test.sh"
+make test
 ```
 
 ### Working with local ingestion
@@ -107,14 +107,14 @@ docker compose exec app bash -c "./.test.sh"
 To download a list of PMCIDs and create the relevant articles in the db run:
 
 ```bash
-docker compose exec app bash -c "./download-pmcids.sh"
+make fetch-articles
 ```
 
 #### Fetching Metrics
 To fetch metrics for the articles in the db:
 
 ```bash
-docker compose exec app bash -c "python src/manage.py ingest_metrics"
+make fetch-metrics
 ```
 
 You can also pass in the number of days and months to look back for metrics data should you need to:
