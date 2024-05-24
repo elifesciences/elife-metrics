@@ -22,4 +22,4 @@ fetch-articles:
 	$(DOCKER_COMPOSE) exec app bash -c "./download-pmcids.sh"
 
 fetch-metrics:
-	$(DOCKER_COMPOSE) exec app bash -c "python src/manage.py ingest_metrics"
+	$(DOCKER_COMPOSE) exec app bash -c "python src/manage.py import_metrics"
