@@ -59,6 +59,7 @@ services:
     - ./src:/app/src
     - ./.docker/app.cfg:/app/app.cfg
     - ./.docker/migrate.sh:/app/migrate.sh
+    - ./client-secrets.json:/app/client-secrets.json
 
 volumes:
     db_data:
