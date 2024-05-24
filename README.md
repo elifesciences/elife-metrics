@@ -73,32 +73,32 @@ If you want to seed the local database with some data, one way is to populate th
 
 ### Build
 ```bash
-docker-compose build
+docker compose build
 ```
 
 ### Run
 ```bash
-docker-compose up --wait
+docker compose up --wait
 ```
 
 ### (Optional) Importing data into the local database
 ```bash
-docker-compose exec postgres psql -U postgres -d postgres -f /data/pg_import_data.sql
+docker compose exec postgres psql -U postgres -d postgres -f /data/pg_import_data.sql
 ```
 
 ### Stop
 ```bash
-docker-compose down
+docker compose down
 ````
 
 ### Running linting
 ```bash
-docker-compose exec app bash -c "./.lint.sh"
+docker compose exec app bash -c "./.lint.sh"
 ```
 
 ### Running tests
 ```bash
-docker-compose exec app bash -c "./.test.sh"
+docker compose exec app bash -c "./.test.sh"
 ```
 
 ### Working with local ingestion
@@ -107,20 +107,20 @@ docker-compose exec app bash -c "./.test.sh"
 To download a list of PMCIDs and create the relevant articles in the db run:
 
 ```bash
-docker-compose exec app bash -c "./download-pmcids.sh"
+docker compose exec app bash -c "./download-pmcids.sh"
 ```
 
 #### Fetching Metrics
 To fetch metrics for the articles in the db:
 
 ```bash
-docker-compose exec app bash -c "python src/manage.py ingest_metrics"
+docker compose exec app bash -c "python src/manage.py ingest_metrics"
 ```
 
 You can also pass in the number of days and months to look back for metrics data should you need to:
 
 ```bash
-docker-compose exec app bash -c "python src/manage.py ingest_metrics --days 999 --months 999"
+docker compose exec app bash -c "python src/manage.py ingest_metrics --days 999 --months 999"
 ```
 
 (If not provided, the defaults at the time of writing are 5 days and 2 months)
