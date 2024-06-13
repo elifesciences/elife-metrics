@@ -8,7 +8,9 @@ import logging
 from datetime import datetime, date
 import dateutil
 import dateutil.parser
+from django.conf import settings
 import pytz
+import requests
 
 LOG = logging.getLogger(__name__)
 
@@ -396,3 +398,31 @@ def merge(*dicts):
         c.update(copy.deepcopy(b))
         return c
     return reduce(_merge, dicts)
+
+def get_article_versions(article_id):
+    """
+    Fetches the versions of a given article based on the latest doiVersion.
+
+    Parameters:
+    article_id (str): The ID of the article for which versions are to be fetched.
+
+    Returns:
+    list: A list of integers representing the versions of the article.
+    If an error occurs, an empty list is returned.
+
+    Example:
+    >>> get_article_versions('85111')
+    [1, 2, 3]
+    """
+    try:
+        response = requests.get(f"{settings.LAX_URL}/{article_id}")
+        response.raise_for_status()
+        data = response.json()
+        doi_version = data.get('doiVersion')
+        if doi_version:
+            version = doi_version.split('.')[-1]
+            return [i for i in range(1, int(version) + 1)]
+    except requests.exceptions.RequestException:
+        LOG.error(f"Failed to fetch article versions for {article_id}")
+
+    return []
