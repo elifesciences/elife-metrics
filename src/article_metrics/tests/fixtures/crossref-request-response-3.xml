@@ -1,0 +1,264 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<crossref_result version="2.0" xmlns="http://www.crossref.org/qrschema/2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.crossref.org/qrschema/2.0 http://www.crossref.org/qrschema/crossref_query_output2.0.xsd">
+ <query_result>
+  <head>
+   <email_address>none</email_address>
+   <doi_batch_id>none</doi_batch_id>
+  </head>
+  <body>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2041-9015</issn>
+     <journal_title>Papers from the Institute of Archaeology</journal_title>
+     <article_title>“What’s in a Name?” The Taxonomy &amp; Phylogeny of Early Homo</article_title>
+     <volume>25</volume>
+     <issue>2</issue>
+     <item_number item_number_type="article-number">12</item_number>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.5334/pia.499</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <book_cite fl_count="0">
+     <isbn type="electronic">978-3-319-16999-6</isbn>
+     <volume_title>Encyclopedia of Evolutionary Psychological Science</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Scott A.</given_name>
+       <surname>Williams</surname>
+      </contributor>
+     </contributors>
+     <first_page>1</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <component_number>Chapter 3423-1</component_number>
+     <doi type="book_content">10.1007/978-3-319-16999-6_3423-1</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>Comment on “Deliberate body disposal by hominins in the Dinaledi Chamber, Cradle of Humankind, South Africa?” [J. Hum. Evol. 96 (2016) 145–148]</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>P.H.G.M.</given_name>
+       <surname>Dirks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>L.R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>J.</given_name>
+       <surname>Hawks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>P.S.</given_name>
+       <surname>Randolph-Quinney</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>L.R.</given_name>
+       <surname>Backwell</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>E.M.</given_name>
+       <surname>Roberts</surname>
+      </contributor>
+     </contributors>
+     <volume>96</volume>
+     <first_page>149</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.04.007</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <journal_cite fl_count="0">
+     <issn type="print">2332-8940</issn>
+     <issn type="electronic">2332-8959</issn>
+     <journal_title>Temperature</journal_title>
+     <journal_abbreviation>Temperature</journal_abbreviation>
+     <article_title>The cock, the Academy, and the best scientific journal in the world</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Andrej A</given_name>
+       <surname>Romanovsky</surname>
+      </contributor>
+     </contributors>
+     <volume>2</volume>
+     <issue>4</issue>
+     <first_page>435</first_page>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1080/23328940.2015.1113097</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <book_cite fl_count="0">
+     <issn type="print">1574-3489</issn>
+     <issn type="electronic">1574-3497</issn>
+     <isbn type="print">978-1-4939-3644-1</isbn>
+     <isbn type="electronic">978-1-4939-3646-5</isbn>
+     <series_title>Developments in Primatology: Progress and Prospects</series_title>
+     <volume_title>The Evolution of the Primate Hand</volume_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Erik</given_name>
+       <surname>Trinkaus</surname>
+      </contributor>
+     </contributors>
+     <first_page>545</first_page>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <component_number>Chapter 19</component_number>
+     <doi type="book_content">10.1007/978-1-4939-3646-5_19</doi>
+    </book_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>Skull diversity in the Homo lineage and the relative position of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Lauren</given_name>
+       <surname>Schroeder</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Jill E.</given_name>
+       <surname>Scott</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Heather M.</given_name>
+       <surname>Garvin</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Myra F.</given_name>
+       <surname>Laird</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Mana</given_name>
+       <surname>Dembo</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Davorka</given_name>
+       <surname>Radovčić</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Darryl J.</given_name>
+       <surname>de Ruiter</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Rebecca R.</given_name>
+       <surname>Ackermann</surname>
+      </contributor>
+     </contributors>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.09.014</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <journal_cite fl_count="0">
+     <issn type="print">00472484</issn>
+     <journal_title>Journal of Human Evolution</journal_title>
+     <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+     <article_title>The upper limb of Homo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Elen M.</given_name>
+       <surname>Feuerriegel</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>David J.</given_name>
+       <surname>Green</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Christopher S.</given_name>
+       <surname>Walker</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Peter</given_name>
+       <surname>Schmid</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>John</given_name>
+       <surname>Hawks</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Lee R.</given_name>
+       <surname>Berger</surname>
+      </contributor>
+      <contributor first-author="false" sequence="additional" contributor_role="author">
+       <given_name>Steven E.</given_name>
+       <surname>Churchill</surname>
+      </contributor>
+     </contributors>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.jhevol.2016.09.013</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <journal_cite fl_count="0">
+     <issn type="electronic">2050-084X</issn>
+     <journal_title>eLife</journal_title>
+     <article_title>The many mysteries ofHomo naledi</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>Chris</given_name>
+       <surname>Stringer</surname>
+      </contributor>
+     </contributors>
+     <volume>4</volume>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.7554/eLife.10627</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <journal_cite fl_count="0">
+     <issn type="print">00928674</issn>
+     <journal_title>Cell</journal_title>
+     <journal_abbreviation>Cell</journal_abbreviation>
+     <article_title>Matters of Size</article_title>
+     <volume>163</volume>
+     <issue>5</issue>
+     <first_page>1043</first_page>
+     <year>2015</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.1016/j.cell.2015.11.014</doi>
+    </journal_cite>
+   </forward_link>
+   <forward_link doi="10.7554/eLife.09560.2">
+    <journal_cite fl_count="0">
+     <issn type="print">0038-2353</issn>
+     <issn type="electronic">1996-7489</issn>
+     <journal_title>South African Journal of Science</journal_title>
+     <journal_abbreviation>S. Afr. J. Sci</journal_abbreviation>
+     <article_title>The possibility of lichen growth on bones of Homo naledi: Were they exposed to light?</article_title>
+     <contributors>
+      <contributor first-author="true" sequence="first" contributor_role="author">
+       <given_name>J. Francis</given_name>
+       <surname>Thackeray</surname>
+      </contributor>
+     </contributors>
+     <volume>Volume 112</volume>
+     <issue>Number 7/8</issue>
+     <year>2016</year>
+     <publication_type>full_text</publication_type>
+     <doi type="journal_article">10.17159/sajs.2016/a0167</doi>
+    </journal_cite>
+   </forward_link>
+  </body>
+ </query_result>
+</crossref_result>
+
