@@ -127,6 +127,37 @@ docker compose exec app bash -c "python src/manage.py ingest_metrics --days 999 
 
 ------------
 
+#### Fetching Citation Counts for an Article
+For use as a debugging utility, to fetch citation counts for all versions of an article (currently Crossref only) run:
+
+```bash
+make fetch-citation-counts-for-article ARTICLE_ID="85111"
+```
+(note this does not persist the data in the database)
+
+Example output:
+```
+Article with id 85111 exists
+INFO - fetching crossref citations for 10.7554/eLife.85111
+INFO - fetching crossref citations for 10.7554/eLife.85111.1
+INFO - fetching crossref citations for 10.7554/eLife.85111.2
+INFO - fetching crossref citations for 10.7554/eLife.85111.3
+
+Citation data for 85111: [
+ {'doi': '10.7554/eLife.85111', 'num': 16, 'source': 'crossref', 'source_id': 'https://doi.org/10.7554/eLife.85111'}, 
+ {'doi': '10.7554/eLife.85111.1', 'num': 12, 'source': 'crossref', 'source_id': 'https://doi.org/10.7554/eLife.85111.1'}, 
+ {'doi': '10.7554/eLife.85111.2', 'num': 3, 'source': 'crossref', 'source_id': 'https://doi.org/10.7554/eLife.85111.2'}, 
+ {'doi': '10.7554/eLife.85111.3', 'num': 3, 'source': 'crossref', 'source_id': 'https://doi.org/10.7554/eLife.85111.3'}
+]
+
+Combined citation data for 85111: {
+ 'doi': '10.7554/eLife.85111', 
+ 'num': 34, 
+ 'source': 'crossref', 
+ 'source_id': 'https://doi.org/10.7554/eLife.85111'
+}
+```
+
 ### Legacy non-docker installation
 
 [code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh)
