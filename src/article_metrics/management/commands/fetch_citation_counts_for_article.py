@@ -22,7 +22,11 @@ class Command(BaseCommand):
         results = []
 
         umbrella_doi = msid2doi(article_id)
-        results.append(count_for_doi(umbrella_doi))
+        umbrella_doi_results = count_for_doi(umbrella_doi)
+        if not umbrella_doi_results:
+            return results
+
+        results.append(umbrella_doi_results)
 
         for version in get_article_versions(article_id):
             doi = f"{msid2doi(article_id)}.{version}"

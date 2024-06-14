@@ -55,19 +55,17 @@ def parse(xmlbytes, doi):
 def count_for_doi(doi, include_all_versions=False):
     results = parse(fetch(doi), doi)
 
-    if not include_all_versions:
-        # Just return the results for the umbrella doi
-        return results
+    if results and include_all_versions:
+        count_for_versions = 0
+        for version in utils.get_article_versions(utils.doi2msid(doi)):
+            v_doi = f"{doi}.{version}"
+            v_results = parse(fetch(v_doi), v_doi)
 
-    count_for_versions = 0
-    for version in utils.get_article_versions(utils.doi2msid(doi)):
-        v_doi = f"{doi}.{version}"
-        v_results = parse(fetch(v_doi), v_doi)
+            if v_results:
+                count_for_versions += v_results['num']
 
-        if v_results:
-            count_for_versions += v_results['num']
+        results['num'] += count_for_versions
 
-    results['num'] += count_for_versions
     return results
 
 
