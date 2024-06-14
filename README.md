@@ -32,13 +32,13 @@ Docker Compose
 
 #### 3rd Party credentials for local development
 
-The service has dependencies on the following 3rd party services:  
+The service has dependencies on the following 3rd party services:
 
 [`crossref`](https://www.crossref.org)
 [`scopus`](https://www.scopus.com/home.uri)
 [`Google Analytics`](https://developers.google.com/analytics/devguides/collection/ga4)
 
-Each of these require credentials to be set in the environment. You will need to set these up in your local environment 
+Each of these require credentials to be set in the environment. You will need to set these up in your local environment
 in order to ingest/generate metrics data locally.
 
 In the `.docker/app.cfg` file, you will need to set the following variables with real values:
@@ -51,9 +51,9 @@ apikey: <scopus api key>
 user: <crossref user>
 pass: <crossref pass>
 ```
-For Google Analytics, you will need to provide a `client_secrets.json` file in the root of the project.
+For Google Analytics, you will need to provide a `client_secrets.json` file in the `.docker` directory of the project.
 
-Example `client-secrets.json` file:
+Example `.docker/client-secrets.json` file:
 ```json
 {
   "private_key_id": "<private_key_id>",
