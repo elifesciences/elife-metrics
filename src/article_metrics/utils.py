@@ -420,8 +420,8 @@ def get_article_versions(article_id):
         data = response.json()
         doi_version = data.get('doiVersion')
         if doi_version:
-            version = doi_version.split('.')[-1]
-            return [i for i in range(1, int(version) + 1)]
+            latest_doi_version = doi_version.split('.')[-1]
+            return list(range(1, int(latest_doi_version) + 1))
     except requests.exceptions.RequestException:
         LOG.error(f"Failed to fetch article versions for {article_id}")
 
