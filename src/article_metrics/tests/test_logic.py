@@ -1,3 +1,4 @@
+import pathlib
 from unittest import mock
 from article_metrics import models, logic, utils
 from datetime import datetime
@@ -12,12 +13,30 @@ def test_import_crossref_citations():
     assert models.Article.objects.count() == 1
     assert models.Citation.objects.count() == 0
 
-    crossref_response = open(base.fixture_path("crossref-request-response.xml"), 'r').read()
+    crossref_response = pathlib.Path(base.fixture_path("crossref-request-response.xml")).read_text()
     expected_citations = 53
-    with mock.patch('article_metrics.crossref.citations.fetch', return_value=crossref_response):
-        logic.import_crossref_citations()
-        assert models.Citation.objects.count() == 1
-        assert models.Citation.objects.get(source=models.CROSSREF).num == expected_citations
+    with mock.patch('article_metrics.crossref.citations.fetch', side_effect=[crossref_response]):
+        with mock.patch('article_metrics.utils.get_article_versions', return_value=[]):
+            logic.import_crossref_citations()
+            assert models.Citation.objects.count() == 1
+            assert models.Citation.objects.get(source=models.CROSSREF).num == expected_citations
+
+@pytest.mark.django_db
+def test_import_crossref_citations_for_multiple_versions():
+    utils.create_or_update(models.Article, {'doi': '10.7554/eLife.09560'}, ['doi'])
+    assert models.Article.objects.count() == 1
+    assert models.Citation.objects.count() == 0
+
+    crossref_response_1 = pathlib.Path(base.fixture_path("crossref-request-response.xml")).read_text()
+    crossref_response_2 = pathlib.Path(base.fixture_path("crossref-request-response-2.xml")).read_text()
+    crossref_response_3 = pathlib.Path(base.fixture_path("crossref-request-response-3.xml")).read_text()
+    expected_citations = 66 # 53 (umbrella) + 3 (v1) + 10 (v2)
+    with mock.patch('article_metrics.crossref.citations.fetch',
+                    side_effect=[crossref_response_1, crossref_response_2, crossref_response_3]):
+        with mock.patch('article_metrics.utils.get_article_versions', return_value=[1, 2]):
+            logic.import_crossref_citations()
+            assert models.Citation.objects.count() == 1
+            assert models.Citation.objects.get(source=models.CROSSREF).num == expected_citations
 
 @pytest.mark.django_db
 def test_import_scopus_citations():

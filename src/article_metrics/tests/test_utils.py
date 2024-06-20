@@ -2,7 +2,10 @@ import typing
 from article_metrics import utils, models
 import pytz
 from datetime import datetime, date
+from django.conf import settings
 import pytest
+import requests
+from unittest.mock import Mock
 
 @pytest.mark.django_db
 def test_create_or_update():
@@ -192,3 +195,26 @@ def test_flatten():
     ]
     for given, expected in cases:
         assert utils.flatten(given) == expected
+
+def test_get_article_versions():
+    article_id = '85111'
+
+    requests.get = Mock()
+    mock_response = Mock()
+    mock_response.json.return_value = {'doiVersion': f'10.7554/eLife.{article_id}.3'}
+    mock_response.raise_for_status.return_value = None
+    requests.get.return_value = mock_response
+
+    versions = utils.get_article_versions(article_id)
+
+    assert versions == [1, 2, 3]
+    requests.get.assert_called_once_with(f"{settings.LAX_URL}/{article_id}")
+
+def test_get_article_versions_error():
+    article_id = '85111'
+    requests.get = Mock(side_effect=requests.exceptions.RequestException)
+
+    versions = utils.get_article_versions(article_id)
+
+    assert versions == []
+    requests.get.assert_called_once_with(f"{settings.LAX_URL}/{article_id}")

@@ -303,3 +303,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 GA_SECRETS_LOCATION = os.path.join(PROJECT_DIR, 'client-secrets.json')
 assert os.path.exists(GA_SECRETS_LOCATION), "client-secrets.json not found. I looked here: %s" % GA_SECRETS_LOCATION
+
+LAX_URL = "https://prod--gateway.elifesciences.org/articles"

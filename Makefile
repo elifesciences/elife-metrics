@@ -23,3 +23,6 @@ fetch-articles:
 
 fetch-metrics:
 	$(DOCKER_COMPOSE) exec app bash -c "python src/manage.py import_metrics"
+
+fetch-citation-counts-for-article:
+	$(DOCKER_COMPOSE) exec app bash -c "python src/manage.py fetch_citation_counts_for_article $(ARTICLE_ID)"

@@ -52,15 +52,29 @@ def parse(xmlbytes, doi):
         'source_id': 'https://doi.org/' + doi
     }
 
-def count_for_doi(doi):
-    return parse(fetch(doi), doi)
+def count_for_doi(doi, include_all_versions=False):
+    results = parse(fetch(doi), doi)
+
+    if results and include_all_versions:
+        count_for_versions = 0
+        for version in utils.get_article_versions(utils.doi2msid(doi)):
+            v_doi = f"{doi}.{version}"
+            v_results = parse(fetch(v_doi), v_doi)
+
+            if v_results:
+                count_for_versions += v_results['num']
+
+        results['num'] += count_for_versions
+
+    return results
+
 
 def count_for_msid(msid):
     return count_for_doi(utils.msid2doi(msid))
 
 def count_for_qs(qs):
     for art in qs:
-        yield count_for_doi(art.doi)
+        yield count_for_doi(art.doi, include_all_versions=True)
 
 #
 #
