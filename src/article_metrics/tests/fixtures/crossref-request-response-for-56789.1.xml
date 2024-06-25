@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<crossref_result version="2.0" xmlns="http://www.crossref.org/qrschema/2.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://www.crossref.org/qrschema/2.0 http://www.crossref.org/qrschema/crossref_query_output2.0.xsd">
+    <query_result>
+        <head>
+            <email_address>none</email_address>
+            <doi_batch_id>none</doi_batch_id>
+        </head>
+        <body>
+        <forward_link doi="10.7554/eLife.56789.1">
+            <journal_cite fl_count="0">
+                <issn type="electronic">2041-9015</issn>
+                <journal_title>Papers from the Institute of Archaeology</journal_title>
+                <article_title>“What’s in a Name?” The Taxonomy &amp; Phylogeny of Early Homo</article_title>
+                <volume>25</volume>
+                <issue>2</issue>
+                <item_number item_number_type="article-number">12</item_number>
+                <year>2016</year>
+                <publication_type>full_text</publication_type>
+                <doi type="journal_article">10.5334/pia.499</doi>
+            </journal_cite>
+        </forward_link>
+        <forward_link doi="10.7554/eLife.56789.1">
+            <book_cite fl_count="0">
+                <isbn type="electronic">978-3-319-16999-6</isbn>
+                <volume_title>Encyclopedia of Evolutionary Psychological Science</volume_title>
+                <contributors>
+                    <contributor first-author="true" sequence="first" contributor_role="author">
+                        <given_name>Scott A.</given_name>
+                        <surname>Williams</surname>
+                    </contributor>
+                </contributors>
+                <first_page>1</first_page>
+                <year>2016</year>
+                <publication_type>full_text</publication_type>
+                <component_number>Chapter 3423-1</component_number>
+                <doi type="book_content">10.1007/978-3-319-16999-6_3423-1</doi>
+            </book_cite>
+        </forward_link>
+        <forward_link doi="10.7554/eLife.56789.1">
+            <journal_cite fl_count="0">
+                <issn type="print">00472484</issn>
+                <journal_title>Journal of Human Evolution</journal_title>
+                <journal_abbreviation>Journal of Human Evolution</journal_abbreviation>
+                <article_title>Comment on “Deliberate body disposal by hominins in the Dinaledi Chamber, Cradle of
+                    Humankind, South Africa?” [J. Hum. Evol. 96 (2016) 145–148]
+                </article_title>
+                <contributors>
+                    <contributor first-author="true" sequence="first" contributor_role="author">
+                        <given_name>P.H.G.M.</given_name>
+                        <surname>Dirks</surname>
+                    </contributor>
+                    <contributor first-author="false" sequence="additional" contributor_role="author">
+                        <given_name>L.R.</given_name>
+                        <surname>Berger</surname>
+                    </contributor>
+                    <contributor first-author="false" sequence="additional" contributor_role="author">
+                        <given_name>J.</given_name>
+                        <surname>Hawks</surname>
+                    </contributor>
+                    <contributor first-author="false" sequence="additional" contributor_role="author">
+                        <given_name>P.S.</given_name>
+                        <surname>Randolph-Quinney</surname>
+                    </contributor>
+                    <contributor first-author="false" sequence="additional" contributor_role="author">
+                        <given_name>L.R.</given_name>
+                        <surname>Backwell</surname>
+                    </contributor>
+                    <contributor first-author="false" sequence="additional" contributor_role="author">
+                        <given_name>E.M.</given_name>
+                        <surname>Roberts</surname>
+                    </contributor>
+                </contributors>
+                <volume>96</volume>
+                <first_page>149</first_page>
+                <year>2016</year>
+                <publication_type>full_text</publication_type>
+                <doi type="journal_article">10.1016/j.jhevol.2016.04.007</doi>
+            </journal_cite>
+        </forward_link>
+        </body>
+    </query_result>
+</crossref_result>

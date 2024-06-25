@@ -19,6 +19,13 @@ import logging
 LOG = logging.getLogger(__name__)
 
 PROFILING = False
+
+ctype_idx = {
+    'citations': 'application/vnd.elife.metric-citations+json;version=1',
+    'downloads': 'application/vnd.elife.metric-time-period+json;version=1',
+    'page-views': 'application/vnd.elife.metric-time-period+json;version=1',
+}
+
 def profile(fn):
     "prints profiling stats using cProfile when used a view decorator."
 
@@ -149,11 +156,6 @@ def article_metrics(request, msid, metric):
         payload = logic.pad_citations(payload) if metric == 'citations' else payload
 
         # respond
-        ctype_idx = {
-            'citations': 'application/vnd.elife.metric-citations+json;version=1',
-            'downloads': 'application/vnd.elife.metric-time-period+json;version=1',
-            'page-views': 'application/vnd.elife.metric-time-period+json;version=1',
-        }
         return Response(payload, content_type=ctype_idx[metric])
 
     except Http404:
@@ -233,5 +235,29 @@ def summary2(request):
         raise ValidationError(err) # 400, client error
 
     except Exception as err:
+        LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
+        raise # 500, server error
+
+
+@api_view(['GET'])
+def article_metrics_by_version(request, msid, metric, version):
+    """Dynamically pulls in the citations for the target doi version"""
+
+    try:
+        if metric != 'citations':
+            raise ValidationError("only 'citations' are currently supported for versioned article metrics")
+
+        get_object_or_404(models.Article, doi=msid2doi(msid))
+        payload = logic.citations_by_version(msid, version)
+
+        return Response(payload, content_type=ctype_idx[metric])
+
+    except Http404:
+        raise # Article DNE, handled, ignore
+
+    except AssertionError as err:
+        raise ValidationError(err) # 400, client error
+
+    except BaseException as err:
         LOG.exception("unhandled exception attempting to serve article metrics: %s", err)
         raise # 500, server error

@@ -1,3 +1,5 @@
+import pathlib
+from unittest import mock
 import pytest
 import json
 from article_metrics import models, utils
@@ -476,3 +478,42 @@ def test_one_bad_apple_2():
         }]
     }
     assert resp.json() == expected_response
+
+@pytest.mark.django_db
+def test_citations_by_version():
+    utils.create_or_update(models.Article, {'doi': '10.7554/eLife.56789'}, ['doi'])
+    expected_response = [
+        {
+            'service': models.CROSSREF_LABEL,
+            'uri': 'https://doi.org/10.7554/eLife.56789.1',
+            'citations': 3
+        },
+        {
+            'service': models.PUBMED_LABEL,
+            'uri': '',
+            'citations': 0
+        },
+        {
+            'service': models.SCOPUS_LABEL,
+            'uri': '',
+            'citations': 0
+        }
+    ]
+
+    crossref_response = pathlib.Path(base.fixture_path("crossref-request-response-for-56789.1.xml")).read_text()
+
+    with mock.patch('article_metrics.crossref.citations.fetch', side_effect=[crossref_response]):
+        url = reverse('v2:alm-for-version', kwargs={'msid': 56789, 'metric': 'citations', 'version': 1})
+        resp = Client().get(url)
+        assert resp.status_code == 200
+        actual_response = resp.data
+        assert expected_response == actual_response
+
+@pytest.mark.django_db
+def test_citations_by_version_article_not_found_in_crossref():
+    utils.create_or_update(models.Article, {'doi': '10.7554/eLife.11111'}, ['doi'])
+
+    with mock.patch('article_metrics.crossref.citations.fetch', side_effect=[None]):
+        url = reverse('v2:alm-for-version', kwargs={'msid': 11111, 'metric': 'citations', 'version': 1})
+        resp = Client().get(url)
+        assert resp.status_code == 404
