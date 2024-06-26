@@ -10,7 +10,6 @@ import logging
 import metrics.models
 import article_metrics.crossref.citations as crossref
 from django.db import connection
-from django.http import Http404
 from django.conf import settings
 from psycopg2.extensions import AsIs
 
@@ -177,7 +176,7 @@ def citations_by_version(msid, version):
     crossref_citations = crossref.parse(crossref.fetch(doi), doi)
 
     if not crossref_citations:
-        raise Http404("article version not found")
+        return None
 
     # citations have to return zeroes for any missing sources
     return [

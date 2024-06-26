@@ -20,7 +20,7 @@ LOG = logging.getLogger(__name__)
 
 PROFILING = False
 
-ctype_idx = {
+CTYPE_IDX = {
     'citations': 'application/vnd.elife.metric-citations+json;version=1',
     'downloads': 'application/vnd.elife.metric-time-period+json;version=1',
     'page-views': 'application/vnd.elife.metric-time-period+json;version=1',
@@ -156,7 +156,7 @@ def article_metrics(request, msid, metric):
         payload = logic.pad_citations(payload) if metric == 'citations' else payload
 
         # respond
-        return Response(payload, content_type=ctype_idx[metric])
+        return Response(payload, content_type=CTYPE_IDX[metric])
 
     except Http404:
         raise # Article DNE, handled, ignore
@@ -248,10 +248,12 @@ def article_metrics_by_version(request, msid, metric, version):
             raise ValidationError("only 'citations' are currently supported for versioned article metrics")
 
         get_object_or_404(models.Article, doi=msid2doi(msid))
-        payload = logic.citations_by_version(msid, version)
+        payload = logic.citations_by_version(msid, version) # pylint: disable=E1111
 
-        return Response(payload, content_type=ctype_idx[metric])
+        if not payload:
+            raise Http404("article version does not exist")
 
+        return Response(payload, content_type=CTYPE_IDX[metric])
     except Http404:
         raise # Article DNE, handled, ignore
 

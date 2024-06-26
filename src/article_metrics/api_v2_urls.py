@@ -6,7 +6,7 @@ urlpatterns = ([
     # article-level metrics
     re_path(r'^ping$', views.ping, name='ping'),
     re_path(r'^article/(?P<msid>\d+)/(?P<metric>(citations|downloads|page-views))$', views.article_metrics, name='alm'),
-    re_path(r'^article/(?P<msid>\d+)/(?P<metric>(citations|downloads|page-views))/version/(?P<version>\d+)$',
+    re_path(r'^article/(?P<msid>\d+)/(?P<metric>(citations))/version/(?P<version>\d+)$',
             views.article_metrics_by_version, name='alm-for-version'),
 
     re_path(r'^article/(?P<msid>\d+)/summary$', views.summary, name='article-summary'),
