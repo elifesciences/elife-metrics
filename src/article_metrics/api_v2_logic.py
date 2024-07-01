@@ -8,8 +8,9 @@ from kids.cache import cache
 from django.db.models import Sum, F, Max
 import logging
 import metrics.models
-from django.conf import settings
+import article_metrics.crossref.citations as crossref
 from django.db import connection
+from django.conf import settings
 from psycopg2.extensions import AsIs
 
 LOG = logging.getLogger(__name__)
@@ -167,3 +168,31 @@ def summary(page, per_page, order):
     start_pos = per_page * (page - 1) # slices are 0-based
     offset = start_pos + per_page
     return len(rows), rows[start_pos:offset]
+
+
+@cache(use=TWO_MIN_CACHE)
+def citations_by_version(msid, version):
+    doi = f"{utils.msid2doi(msid)}.{version}"
+    crossref_citations = crossref.parse(crossref.fetch(doi), doi)
+
+    if not crossref_citations:
+        return None
+
+    # citations have to return zeroes for any missing sources
+    return [
+        {
+            'service': models.CROSSREF_LABEL,
+            'uri': crossref_citations['source_id'],
+            'citations': crossref_citations['num']
+        },
+        {
+            'service': models.PUBMED_LABEL,
+            'uri': '',
+            'citations': 0
+        },
+        {
+            'service': models.SCOPUS_LABEL,
+            'uri': '',
+            'citations': 0
+        }
+    ]
