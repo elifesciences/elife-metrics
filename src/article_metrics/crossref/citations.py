@@ -10,6 +10,9 @@ LOG = logging.getLogger(__name__)
 
 URL = "https://doi.crossref.org/servlet/getForwardLinks"
 
+class FetchCrossrefCitationsError(RuntimeError):
+    pass
+
 def fetch(doi):
     LOG.info("fetching crossref citations for %s" % doi)
     params = {
@@ -32,10 +35,8 @@ def fetch(doi):
             404: handler.IGNORE, # these happen often for articles with 0 citations
         })
         return resp.content if resp else None
-    except requests.exceptions.RetryError:
-        # we tried N times to fetch article and received unhandled responses.
-        LOG.warning("failed to fetch a list of crossref citations: %s", doi)
-        return None
+    except requests.exceptions.RequestException:
+        raise FetchCrossrefCitationsError(f'failled to fetch crossref citation for {doi}')
 
 @handler.capture_parse_error
 def parse(xmlbytes, doi):
@@ -53,20 +54,23 @@ def parse(xmlbytes, doi):
     }
 
 def count_for_doi(doi, include_all_versions=False):
-    results = parse(fetch(doi), doi)
+    try:
+        results = parse(fetch(doi), doi)
+        if results and include_all_versions:
+            count_for_versions = 0
+            for version in utils.get_article_versions(utils.doi2msid(doi)):
+                v_doi = f"{doi}.{version}"
+                v_results = parse(fetch(v_doi), v_doi)
 
-    if results and include_all_versions:
-        count_for_versions = 0
-        for version in utils.get_article_versions(utils.doi2msid(doi)):
-            v_doi = f"{doi}.{version}"
-            v_results = parse(fetch(v_doi), v_doi)
+                if v_results:
+                    count_for_versions += v_results['num']
 
-            if v_results:
-                count_for_versions += v_results['num']
+            results['num'] += count_for_versions
 
-        results['num'] += count_for_versions
-
-    return results
+        return results
+    except FetchCrossrefCitationsError as e:
+        LOG.warning('%r', e)
+        return None
 
 
 def count_for_msid(msid):
