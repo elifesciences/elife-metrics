@@ -1,0 +1,20 @@
+# Note: Requires credentials in .env (see .env.template)
+
+@crossrefApiUsername = {{$dotenv CROSSREF_API_USERNAME}}
+@crossrefApiPassword = {{$dotenv CROSSREF_API_PASSWORD}}
+
+### Using DOI Prefix and date range
+
+GET https://doi.crossref.org/servlet/getForwardLinks?usr={{crossrefApiUsername}}&pwd={{crossrefApiPassword}}&include_postedcontent=true&doi=10.7554&startDate=2000-01-01&endDate=2013-12-01
+
+### Using DOI Prefix and date range
+
+GET https://doi.crossref.org/servlet/getForwardLinks?usr={{crossrefApiUsername}}&pwd={{crossrefApiPassword}}&include_postedcontent=true&doi=10.7554&startDate=2025-01-01&endDate=2025-01-02
+
+### Using DOI (incl posted)
+
+GET https://doi.crossref.org/servlet/getForwardLinks?usr={{crossrefApiUsername}}&pwd={{crossrefApiPassword}}&include_postedcontent=true&doi=10.7554/eLife.94917.1
+
+### Using DOI (excl posted)
+
+GET https://doi.crossref.org/servlet/getForwardLinks?usr={{crossrefApiUsername}}&pwd={{crossrefApiPassword}}&include_postedcontent=false&doi=10.7554/eLife.94917.1
