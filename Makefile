@@ -1,12 +1,17 @@
 DOCKER_COMPOSE = docker compose
 
+copy-docker-app-cfg-if-not-exists:
+	@if [ ! -f .docker/app.cfg ]; then \
+		cp .docker/app.cfg.template .docker/app.cfg; \
+	fi
+
 download-or-update-api-raml:
 	./download-api-raml.sh
 
 build:
 	$(DOCKER_COMPOSE) build
 
-run:
+run: copy-docker-app-cfg-if-not-exists
 	$(DOCKER_COMPOSE) up --wait
 
 stop:
