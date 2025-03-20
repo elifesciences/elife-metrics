@@ -5,7 +5,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     healthcheck:
-      test: pg_isready -d db_prod
+      test: pg_isready -U postgres -d postgres
       interval: 10s
       timeout: 3s
       retries: 3
