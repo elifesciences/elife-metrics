@@ -1,5 +1,8 @@
 DOCKER_COMPOSE = docker compose
 
+download-or-update-api-raml:
+	./download-api-raml.sh
+
 build:
 	$(DOCKER_COMPOSE) build
 
@@ -8,6 +11,9 @@ run:
 
 stop:
 	$(DOCKER_COMPOSE) down
+
+logs:
+	$(DOCKER_COMPOSE) logs -f
 
 lint:
 	$(DOCKER_COMPOSE) exec app bash -c "./.lint.sh"
