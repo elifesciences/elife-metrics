@@ -21,3 +21,4 @@ output*/
 /uwsgi.ini
 /test-data/.env
 .docker/client-secrets.json
+.pytest_cache
