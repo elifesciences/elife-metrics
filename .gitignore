@@ -20,3 +20,4 @@ output*/
 /client-secrets.json
 /uwsgi.ini
 /test-data/.env
+.docker/client-secrets.json
