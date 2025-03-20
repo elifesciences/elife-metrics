@@ -19,3 +19,4 @@ output*/
 /*.flag
 /client-secrets.json
 /uwsgi.ini
+/test-data/.env
