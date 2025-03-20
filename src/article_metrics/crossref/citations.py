@@ -35,7 +35,7 @@ def fetch(doi):
             404: handler.IGNORE, # these happen often for articles with 0 citations
         })
         return resp.content if resp else None
-    except requests.exceptions.RequestException:ß
+    except requests.exceptions.RequestException:
         raise FetchCrossrefCitationsError(f'failled to fetch crossref citation for {doi}')
 
 @handler.capture_parse_error
