@@ -48,7 +48,7 @@ services:
       test: curl http://localhost:8000
       interval: 10s
       timeout: 3s
-      retries: 3
+      retries: 10
     build:
       context: .
     ports:
