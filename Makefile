@@ -1,12 +1,15 @@
 DOCKER_COMPOSE = docker compose
 
+.docker/app.cfg:
+	cp .docker/app.cfg.template .docker/app.cfg
+
 download-or-update-api-raml:
 	./download-api-raml.sh
 
 build:
 	$(DOCKER_COMPOSE) build
 
-run:
+run: .docker/app.cfg
 	$(DOCKER_COMPOSE) up --wait
 
 stop:
