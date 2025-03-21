@@ -19,7 +19,9 @@ For example, the [Homo Naledi](https://dx.doi.org/10.7554/eLife.09560) article:
 
 would yield a response similar to:
 
-    {"total":1,"items":[{"id":9560,"views":227913,"downloads":16498,"crossref":103,"pubmed":21,"scopus":52}]}
+```json
+{"total":1,"items":[{"id":9560,"views":227913,"downloads":16498,"crossref":103,"pubmed":21,"scopus":52}]}
+```
 
 ------------
 
@@ -43,7 +45,7 @@ in order to ingest/generate metrics data locally.
 
 In the `.docker/app.cfg` file, you will need to set the following variables with real values:
 
-```
+```ini
 [scopus]
 apikey: <scopus api key>
 
@@ -51,9 +53,11 @@ apikey: <scopus api key>
 user: <crossref user>
 pass: <crossref pass>
 ```
+
 For Google Analytics, you will need to provide a `client_secrets.json` file in the `.docker` directory of the project.
 
 Example `.docker/client-secrets.json` file:
+
 ```json
 {
   "private_key_id": "<private_key_id>",
@@ -65,38 +69,46 @@ Example `.docker/client-secrets.json` file:
 ```
 
 #### TODO: AWS Section
+
 ...
 
 ### (Optional) Prepare for seeding the local database
+
 If you want to seed the local database with some data, one way is to populate the `.docker/pg_import_data.sql` file with the
  desired contents. In a later step you can execute the import command to load the data into the database.
 
 ### Build
+
 ```bash
 make build
 ```
 
 ### Run
+
 ```bash
 make run
 ```
 
 ### (Optional) Importing data into the local database
+
 ```bash
 make import-data
 ```
 
 ### Stop
+
 ```bash
 make stop
 ````
 
 ### Running linting
+
 ```bash
 make lint
 ```
 
 ### Running tests
+
 ```bash
 make test
 ```
@@ -124,6 +136,7 @@ Note: some docker setups may not react to file changes
 ### Working with local ingestion
 
 #### Fetching Articles
+
 To download a list of PMCIDs and create the relevant articles in the db run:
 
 ```bash
@@ -131,6 +144,7 @@ make fetch-articles
 ```
 
 #### Fetching Metrics
+
 To fetch metrics for the articles in the db:
 
 ```bash
@@ -148,15 +162,18 @@ docker compose exec app bash -c "python src/manage.py ingest_metrics --days 999 
 ------------
 
 #### Fetching Citation Counts for an Article
+
 For use as a debugging utility, to fetch citation counts for all versions of an article (currently Crossref only) run:
 
 ```bash
 make fetch-citation-counts-for-article ARTICLE_ID="85111"
 ```
+
 (note this does not persist the data in the database)
 
 Example output:
-```
+
+```text
 Article with id 85111 exists
 INFO - fetching crossref citations for 10.7554/eLife.85111
 INFO - fetching crossref citations for 10.7554/eLife.85111.1
@@ -182,31 +199,38 @@ Combined citation data for 85111: {
 
 [code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh)
 
-    git clone https://github.com/elifesciences/elife-metrics
-    cd elife-metrics
-    ./install.sh
+```shell
+git clone https://github.com/elifesciences/elife-metrics
+cd elife-metrics
+./install.sh
+```
 
 ### updating
 
 [code](https://github.com/elifesciences/elife-metrics/blob/master/install.sh)
 
-    git pull
-    ./install.sh
-    ./migrate.sh
+```shell
+git pull
+./install.sh
+./migrate.sh
+```
 
 ### testing
 
 [code](https://github.com/elifesciences/elife-metrics/blob/master/src/metrics/tests/)
 
-    ./project_tests.sh
+```shell
+./project_tests.sh
+```
 
 ### running
 
 [code](https://github.com/elifesciences/elife-metrics/blob/master/manage.sh)
 
-    ./manage.sh runserver
-    firefox http://127.0.0.1:8000/api/docs/
-
+```shell
+./manage.sh runserver
+firefox http://127.0.0.1:8000/api/docs/
+```
 
 ## Copyright & Licence
 
