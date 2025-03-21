@@ -1,5 +1,7 @@
 DOCKER_COMPOSE = docker compose
 
+PYTEST_WATCH_MODULES = src
+
 copy-docker-app-cfg-if-not-exists:
 	@if [ ! -f .docker/app.cfg ]; then \
 		cp .docker/app.cfg.template .docker/app.cfg; \
@@ -25,6 +27,14 @@ lint:
 
 test:
 	$(DOCKER_COMPOSE) exec app bash -c "./.test.sh"
+
+watch:
+	$(DOCKER_COMPOSE) exec app bash -c \
+		'DJANGO_SETTINGS_MODULE=core.settings \
+		python -m pytest_watcher \
+		--runner=venv/bin/python \
+		. \
+		-m pytest -vv $(PYTEST_WATCH_MODULES)'
 
 import-data:
 	$(DOCKER_COMPOSE) exec postgres psql -U postgres -d postgres -f /data/pg_import_data.sql
