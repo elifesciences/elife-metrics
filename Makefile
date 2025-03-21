@@ -39,6 +39,7 @@ watch:
 	$(DOCKER_COMPOSE) exec app bash -c \
 		'DJANGO_SETTINGS_MODULE=core.settings \
 		python -m pytest_watcher \
+		--now \
 		--runner=venv/bin/python \
 		. \
 		-m pytest -vv $(PYTEST_WATCH_MODULES)'
