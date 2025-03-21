@@ -32,6 +32,12 @@ class TestCommand:
         with pytest.raises(SystemExit):
             parser.parse_args(['--source', 'invalid'])
 
+    def test_be_able_to_pass_in_an_article(self, command: Command):
+        parser = argparse.ArgumentParser()
+        command.add_arguments(parser=parser)
+        args = parser.parse_args(['--article-id', '12345'])
+        assert args.article_id == '12345'
+
 class TestGetSources:
     def test_should_return_all_sources(self, command: Command):
         parser = argparse.ArgumentParser()

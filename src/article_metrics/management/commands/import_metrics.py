@@ -93,6 +93,13 @@ class Command(BaseCommand):
             required=False
         )
 
+        parser.add_argument(
+            '--article-id',
+            help='Select article to process (by default it will process all)',
+            type=str,
+            required=False
+        )
+
         # use cache files if they exist
         parser.add_argument('--cached', dest='cached', action="store_true", default=True)
         # import *only* from cached results, don't try to fetch from remote
