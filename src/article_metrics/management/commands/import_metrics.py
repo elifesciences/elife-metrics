@@ -88,6 +88,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--source',
             help='Select source to process (by default it will process all)',
+            choices=ALL_SOURCES_KEYS,
             type=str,
             required=False
         )

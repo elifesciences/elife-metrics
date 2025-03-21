@@ -23,8 +23,14 @@ class TestCommand:
     def test_should_be_able_to_pass_in_a_source(self, command: Command):
         parser = argparse.ArgumentParser()
         command.add_arguments(parser=parser)
-        args = parser.parse_args(['--source', 'crossref-citations'])
-        assert args.source == 'crossref-citations'
+        args = parser.parse_args(['--source', models.CROSSREF])
+        assert args.source == models.CROSSREF
+
+    def test_should_reject_invalid_source(self, command: Command):
+        parser = argparse.ArgumentParser()
+        command.add_arguments(parser=parser)
+        with pytest.raises(SystemExit):
+            parser.parse_args(['--source', 'invalid'])
 
 class TestGetSources:
     def test_should_return_all_sources(self, command: Command):

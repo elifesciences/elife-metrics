@@ -164,7 +164,7 @@ docker compose exec app bash -c "python src/manage.py ingest_metrics --days 999 
 #### Fetching Citation Counts for a Single Article
 
 ```bash
-make fetch-metrics SOURCE=crossref-citations ARTICLE_ID="85111"
+make fetch-metrics SOURCE=crossref ARTICLE_ID="85111"
 ```
 
 #### Fetching Citation Counts for an Article
