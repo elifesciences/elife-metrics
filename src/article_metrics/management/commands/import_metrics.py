@@ -44,6 +44,13 @@ class Command(BaseCommand):
         # import the last two months by default
         parser.add_argument('--months', nargs='?', type=int, default=2)
 
+        parser.add_argument(
+            '--source',
+            help='Select source to process (by default it will process all)',
+            type=str,
+            required=False
+        )
+
         # use cache files if they exist
         parser.add_argument('--cached', dest='cached', action="store_true", default=True)
         # import *only* from cached results, don't try to fetch from remote
