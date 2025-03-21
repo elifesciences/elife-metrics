@@ -101,6 +101,26 @@ make lint
 make test
 ```
 
+### Run test watching for files changes
+
+```bash
+make dev-watch
+```
+
+Note: Some tests will fail because they require a database to be running. You can run over a subset passing PYTEST_WATCH_MODULES to make
+
+```bash
+make dev-watch PYTEST_WATCH_MODULES="src/article_metrics/tests/test_crossref_citations.py"
+```
+
+You can run a watch within docker compose with the database using:
+
+```bash
+make watch
+```
+
+Note: some docker setups may not react to file changes
+
 ### Working with local ingestion
 
 #### Fetching Articles
