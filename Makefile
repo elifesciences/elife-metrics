@@ -1,3 +1,7 @@
+VENV = venv
+PIP = $(VENV)/bin/pip
+PYTHON = $(VENV)/bin/python
+
 DOCKER_COMPOSE = docker compose
 
 PYTEST_WATCH_MODULES = src
@@ -14,6 +18,16 @@ create-dummy-docker-client-secrets-if-not-exists:
 
 download-or-update-api-raml:
 	./download-api-raml.sh
+
+
+dev-watch: create-dummy-docker-client-secrets-if-not-exists
+	GOOGLE_APPLICATION_CREDENTIALS=.docker/client-secrets.json \
+		DJANGO_SETTINGS_MODULE=core.settings \
+		$(PYTHON) -m pytest_watcher \
+		--now \
+		--runner=$(VENV)/bin/python \
+		. \
+		-m pytest -vv $(PYTEST_WATCH_MODULES)
 
 build:
 	$(DOCKER_COMPOSE) build
