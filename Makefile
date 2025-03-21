@@ -6,6 +6,9 @@ DOCKER_COMPOSE = docker compose
 
 PYTEST_WATCH_MODULES = src
 
+SOURCE =
+ARTICLE_ID =
+
 copy-docker-app-cfg-if-not-exists:
 	@if [ ! -f .docker/app.cfg ]; then \
 		cp .docker/app.cfg.template .docker/app.cfg; \
@@ -65,7 +68,8 @@ fetch-articles:
 	$(DOCKER_COMPOSE) exec app bash -c "./download-pmcids.sh"
 
 fetch-metrics:
-	$(DOCKER_COMPOSE) exec app bash -c "python src/manage.py import_metrics"
+	$(DOCKER_COMPOSE) exec app bash -c \
+		"python src/manage.py import_metrics --source=$(SOURCE)"
 
 fetch-citation-counts-for-article:
 	$(DOCKER_COMPOSE) exec app bash -c "python src/manage.py fetch_citation_counts_for_article $(ARTICLE_ID)"
