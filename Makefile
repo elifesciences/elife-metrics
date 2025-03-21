@@ -7,13 +7,20 @@ copy-docker-app-cfg-if-not-exists:
 		cp .docker/app.cfg.template .docker/app.cfg; \
 	fi
 
+create-dummy-docker-client-secrets-if-not-exists:
+	@if [ ! -f .docker/client-secrets.json ]; then \
+		touch .docker/client-secrets.json; \
+	fi
+
 download-or-update-api-raml:
 	./download-api-raml.sh
 
 build:
 	$(DOCKER_COMPOSE) build
 
-run: copy-docker-app-cfg-if-not-exists
+run: \
+	copy-docker-app-cfg-if-not-exists \
+	create-dummy-docker-client-secrets-if-not-exists
 	$(DOCKER_COMPOSE) up --wait
 
 stop:
