@@ -35,6 +35,7 @@ services:
     - ./src:/app/src
     - ./.docker/app.cfg:/app/app.cfg
     - ./.docker/migrate.sh:/app/migrate.sh
+    - ./.docker/client-secrets.json:/app/client-secrets.json
 
   app:
     depends_on:
