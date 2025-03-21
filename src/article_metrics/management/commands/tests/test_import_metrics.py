@@ -2,6 +2,7 @@ import argparse
 
 import pytest
 
+from article_metrics import models
 from article_metrics.management.commands.import_metrics import Command
 from src.article_metrics.management.commands.import_metrics import get_sources
 from src.article_metrics.management.commands.import_metrics import ALL_SOURCES_KEYS
@@ -32,3 +33,10 @@ class TestGetSources:
         args = parser.parse_args([])
 
         assert set(get_sources(vars(args)).keys()) == set(ALL_SOURCES_KEYS)
+
+    def test_should_only_return_selected_source(self, command: Command):
+        parser = argparse.ArgumentParser()
+        command.add_arguments(parser=parser)
+        args = parser.parse_args(['--source', models.CROSSREF])
+
+        assert set(get_sources(vars(args)).keys()) == {models.CROSSREF}

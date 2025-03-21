@@ -62,6 +62,14 @@ def get_sources(options: dict):
         (models.PUBMED, (timeit("pmc-citations")(logic.import_pmc_citations),)),
     ])
 
+    selected_source = options['source']
+    if selected_source:
+        sources = OrderedDict([
+            (key, source)
+            for key, source in sources.items()
+            if key == selected_source
+        ])
+
     return sources
 
 class Command(BaseCommand):
