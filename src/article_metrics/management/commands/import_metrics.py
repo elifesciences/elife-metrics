@@ -10,6 +10,11 @@ import logging
 DEBUG_LOG = logging.getLogger('debugger')
 LOG = logging.getLogger(__name__)
 
+GA_DAILY = 'ga-daily'
+GA_MONTHLY = 'ga-monthly'
+NA_METRICS = 'non-article-metrics'
+ALL_SOURCES_KEYS = [NA_METRICS, GA_DAILY, GA_MONTHLY, models.CROSSREF, models.SCOPUS, models.PUBMED]
+
 def timeit(label):
     def wrap1(fn):
         def wrap2(*args, **kwargs):
@@ -40,9 +45,6 @@ def get_sources(options: dict):
 
     from_date = n_days_ago
     to_date = today
-
-    GA_DAILY, GA_MONTHLY = 'ga-daily', 'ga-monthly'
-    NA_METRICS = 'non-article-metrics'
 
     # the mapping of sources and how to call them.
     # date ranges and caching arguments don't matter to citations right now
