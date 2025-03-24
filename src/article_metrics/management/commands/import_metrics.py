@@ -44,6 +44,10 @@ def get_sources(options: dict) -> Mapping[str, Tuple[Callable, ...]]:
     use_cached = options['cached']
     use_only_cached = options['only_cached']
     article_id = options['article_id']
+    selected_source = options['source']
+
+    if article_id:
+        assert selected_source == models.CROSSREF, 'Only Crossref source supported with article id'
 
     from_date = n_days_ago
     to_date = today
@@ -64,7 +68,6 @@ def get_sources(options: dict) -> Mapping[str, Tuple[Callable, ...]]:
         (models.PUBMED, (timeit("pmc-citations")(logic.import_pmc_citations),)),
     ])
 
-    selected_source = options['source']
     if selected_source:
         sources = OrderedDict([
             (key, source)

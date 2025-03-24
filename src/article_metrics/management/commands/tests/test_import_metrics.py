@@ -63,3 +63,19 @@ class TestGetSources:
         sources = get_sources(vars(args))
         assert set(sources.keys()) == {models.CROSSREF}
         assert sources[models.CROSSREF][1] == '12345'
+
+    def test_should_reject_article_id_without_source_being_selected(self, command: Command):
+        parser = argparse.ArgumentParser()
+        command.add_arguments(parser=parser)
+        args = parser.parse_args(['--article-id', '12345'])
+
+        with pytest.raises(AssertionError):
+            get_sources(vars(args))
+
+    def test_should_reject_article_id_with_source_other_than_crossref(self, command: Command):
+        parser = argparse.ArgumentParser()
+        command.add_arguments(parser=parser)
+        args = parser.parse_args(['--source', models.SCOPUS, '--article-id', '12345'])
+
+        with pytest.raises(AssertionError):
+            get_sources(vars(args))
