@@ -169,6 +169,6 @@ def import_pmc_citations():
     run(comp(partial(insert_citation, aid='pmcid'), countable), results)
 
 def import_crossref_citations(msid: Optional[str] = None):
-    from .crossref.citations import citations_for_all_articles
-    results = citations_for_all_articles(msid=msid)
+    from .crossref.citations import citations_for_articles
+    results = citations_for_articles(msid=msid)
     run(comp(insert_citation, countable), lfilter(None, results))

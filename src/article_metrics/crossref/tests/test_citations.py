@@ -6,7 +6,7 @@ import pytest
 
 from article_metrics.crossref import citations
 from article_metrics import utils
-from article_metrics.crossref.citations import citations_for_all_articles
+from article_metrics.crossref.citations import citations_for_articles
 
 
 @pytest.fixture(name='models_mock', autouse=True)
@@ -27,7 +27,7 @@ class TestCitationsForAllArticles:
         models_mock: MagicMock,
         count_for_qs_mock: MagicMock
     ):
-        citations_for_all_articles()
+        citations_for_articles()
         count_for_qs_mock.assert_called_with(
             models_mock.Article.objects.all.return_value
         )
@@ -37,7 +37,7 @@ class TestCitationsForAllArticles:
         models_mock: MagicMock,
         count_for_qs_mock: MagicMock
     ):
-        citations_for_all_articles('12345')
+        citations_for_articles('12345')
         count_for_qs_mock.assert_called_with(
             models_mock.Article.objects.filter(doi=utils.msid2doi('12345'))
         )

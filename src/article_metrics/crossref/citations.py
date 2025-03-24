@@ -85,7 +85,7 @@ def count_for_qs(qs):
 #
 #
 
-def citations_for_all_articles(msid: Optional[str] = None):
+def citations_for_articles(msid: Optional[str] = None):
     if msid:
         return count_for_qs(models.Article.objects.filter(doi=utils.msid2doi(msid)))
     return count_for_qs(models.Article.objects.all())

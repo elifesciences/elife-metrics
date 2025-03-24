@@ -8,19 +8,19 @@ from article_metrics.scopus import citations as scopus_citations
 import pytest
 
 
-@pytest.fixture(name='citations_for_all_articles_mock')
+@pytest.fixture(name='citations_for_articles_mock')
 def _citations_for_all_articles_mock() -> Iterator[mock.MagicMock]:
-    with mock.patch('article_metrics.crossref.citations.citations_for_all_articles') as _mock:
+    with mock.patch('article_metrics.crossref.citations.citations_for_articles') as _mock:
         yield _mock
 
 
 class TestImportCrossrefCitations:
     def test_pass_msid_to_citations_for_all_articles(
         self,
-        citations_for_all_articles_mock: mock.MagicMock
+        citations_for_articles_mock: mock.MagicMock
     ):
         logic.import_crossref_citations(msid='12345')
-        citations_for_all_articles_mock.assert_called_with(msid='12345')
+        citations_for_articles_mock.assert_called_with(msid='12345')
 
 
 @pytest.mark.django_db
