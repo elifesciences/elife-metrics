@@ -161,6 +161,12 @@ docker compose exec app bash -c "python src/manage.py ingest_metrics --days 999 
 
 ------------
 
+#### Fetching Citation Counts for a Single Article
+
+```bash
+make fetch-metrics SOURCE=crossref ARTICLE_ID="85111"
+```
+
 #### Fetching Citation Counts for an Article
 
 For use as a debugging utility, to fetch citation counts for all versions of an article (currently Crossref only) run:
