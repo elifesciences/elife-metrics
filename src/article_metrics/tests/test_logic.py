@@ -7,8 +7,6 @@ from . import base
 from article_metrics.scopus import citations as scopus_citations
 import pytest
 
-from article_metrics import logic
-
 
 @pytest.fixture(name='citations_for_all_articles_mock')
 def _citations_for_all_articles_mock() -> Iterator[mock.MagicMock]:
