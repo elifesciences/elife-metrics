@@ -1,5 +1,6 @@
 from functools import partial
 from datetime import timedelta
+from typing import Optional
 from . import ga_metrics, models, utils, events
 from django.conf import settings
 from django.db import transaction
@@ -167,7 +168,7 @@ def import_pmc_citations():
     results = citations_for_all_articles()
     run(comp(partial(insert_citation, aid='pmcid'), countable), results)
 
-def import_crossref_citations():
+def import_crossref_citations(msid: Optional[str] = None):
     from .crossref.citations import citations_for_all_articles
-    results = citations_for_all_articles()
+    results = citations_for_all_articles(msid=msid)
     run(comp(insert_citation, countable), lfilter(None, results))
