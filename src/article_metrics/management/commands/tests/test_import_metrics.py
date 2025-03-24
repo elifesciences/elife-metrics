@@ -3,8 +3,8 @@ import pytest
 
 from article_metrics import models
 from article_metrics.management.commands.import_metrics import Command
-from src.article_metrics.management.commands.import_metrics import get_sources
-from src.article_metrics.management.commands.import_metrics import ALL_SOURCES_KEYS
+from article_metrics.management.commands.import_metrics import get_sources
+from article_metrics.management.commands.import_metrics import ALL_SOURCES_KEYS
 
 
 @pytest.fixture(name='command')

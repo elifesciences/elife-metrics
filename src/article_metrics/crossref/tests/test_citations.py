@@ -5,7 +5,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from article_metrics.crossref import citations
-from src.article_metrics import utils
+from article_metrics import utils
 from article_metrics.crossref.citations import citations_for_all_articles
 
 
