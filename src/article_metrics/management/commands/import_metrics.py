@@ -1,6 +1,7 @@
 import time, math
 from collections import OrderedDict
 from datetime import datetime, timedelta
+from typing import Callable, Mapping, Tuple
 from dateutil.relativedelta import relativedelta
 from django.core.management.base import BaseCommand
 from article_metrics import logic, models
@@ -36,12 +37,13 @@ def timeit(label):
         return wrap2
     return wrap1
 
-def get_sources(options: dict):
+def get_sources(options: dict) -> Mapping[str, Tuple[Callable, ...]]:
     today = datetime.now()
     n_days_ago = today - timedelta(days=options['days'])
     n_months_ago = today - relativedelta(months=options['months'])
     use_cached = options['cached']
     use_only_cached = options['only_cached']
+    article_id = options['article_id']
 
     from_date = n_days_ago
     to_date = today
@@ -57,7 +59,7 @@ def get_sources(options: dict):
         (NA_METRICS, (timeit("non-article-metrics")(metrics.logic.update_all_ptypes_latest_frame),)),
         (GA_DAILY, (timeit("article-metrics-daily")(logic.import_ga_metrics), 'daily', from_date, to_date, use_cached, use_only_cached)),
         (GA_MONTHLY, (timeit("article-metrics-monthly")(logic.import_ga_metrics), 'monthly', n_months_ago, to_date, use_cached, use_only_cached)),
-        (models.CROSSREF, (timeit("crossref-citations")(logic.import_crossref_citations),)),
+        (models.CROSSREF, (timeit("crossref-citations")(logic.import_crossref_citations), article_id)),
         (models.SCOPUS, (timeit("scopus-citations")(logic.import_scopus_citations),)),
         (models.PUBMED, (timeit("pmc-citations")(logic.import_pmc_citations),)),
     ])

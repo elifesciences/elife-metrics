@@ -1,8 +1,11 @@
 import argparse
+from unittest.mock import MagicMock, patch
+from typing import Iterator
 
 import pytest
 
 from article_metrics import models
+from article_metrics.management.commands import import_metrics
 from article_metrics.management.commands.import_metrics import Command
 from src.article_metrics.management.commands.import_metrics import get_sources
 from src.article_metrics.management.commands.import_metrics import ALL_SOURCES_KEYS
@@ -12,7 +15,6 @@ from src.article_metrics.management.commands.import_metrics import ALL_SOURCES_K
 def _command() -> Command:
     command = Command()
     return command
-
 
 class TestCommand:
     def test_should_not_require_any_arguments(self, command: Command):
@@ -52,3 +54,12 @@ class TestGetSources:
         args = parser.parse_args(['--source', models.CROSSREF])
 
         assert set(get_sources(vars(args)).keys()) == {models.CROSSREF}
+
+    def test_should_only_return_selected_article(self, command: Command):
+        parser = argparse.ArgumentParser()
+        command.add_arguments(parser=parser)
+        args = parser.parse_args(['--source', models.CROSSREF, '--article-id', '12345'])
+
+        sources = get_sources(vars(args))
+        assert set(sources.keys()) == {models.CROSSREF}
+        assert sources[models.CROSSREF][1] == '12345'
