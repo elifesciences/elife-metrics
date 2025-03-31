@@ -268,7 +268,7 @@ def test_vX_monthly():
             expected_sample = [
                 (80494, Counter(full=1278, abstract=0, digest=0)),
                 # 80729 went on to become a VOR in Nov but got 1 hit in Oct
-                (80729, Counter(full=395, abstract=0, digest=0)), 
+                (80729, Counter(full=395, abstract=0, digest=0)),
                 (80984, Counter(full=473, abstract=0, digest=0)),
             ]
 
@@ -276,7 +276,7 @@ def test_vX_monthly():
             assert expected_total == elife_v1.count_counter_list(results.values())
             for msid, expected_count in expected_sample:
                 assert expected_count == results[utils.msid2doi(msid)]
-                
+
 # --- V7. era is the switch from GA3 to GA4
 
 @pytest.mark.django_db

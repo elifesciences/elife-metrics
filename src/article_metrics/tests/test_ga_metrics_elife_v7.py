@@ -64,7 +64,7 @@ def test_event_count__rpp():
     fixture = mkrow("/reviewed-preprints/80092", "717")
     actual = elife_v7.event_count(fixture)
     assert actual == expected
-    
+
 def test_event_count__bad_article():
     expected = None
     expected_msg = "ignoring article downloads row: failed to find a valid path: /articles/12345/foo"
@@ -82,7 +82,7 @@ def test_event_count__bad_rpp():
         actual = elife_v7.event_count(fixture)
         assert actual == expected
         assert log.warning.call_args[0][0] == expected_msg
-        
+
 def test_event_count__other():
     expected = None
     expected_msg = "ignoring article downloads row: found 'other' row with value '717'. GA has aggregated rows because query returned too much data."

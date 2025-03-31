@@ -86,11 +86,11 @@ def test_utcnow():
 def test_todt():
     cases = [
         # naive dtstr becomes utc
-        ("2001-01-01", \
+        ("2001-01-01",
          datetime(year=2001, month=1, day=1, tzinfo=pytz.utc)),
 
         # aware but non-utc become utc
-        ("2001-01-01T23:30:30+09:30", \
+        ("2001-01-01T23:30:30+09:30",
          datetime(year=2001, month=1, day=1, hour=14, minute=0, second=30, tzinfo=pytz.utc)),
     ]
     for string, expected in cases:
