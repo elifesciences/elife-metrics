@@ -10,21 +10,6 @@ import logging
 
 LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
 
-if not settings.TESTING:
-    requests_cache.install_cache(**{
-        # install cache kwargs
-        # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/patcher.py#L19
-        # this is where 'cache_name' becomes the sqlite backend's 'db_name':
-        # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/session.py#L39
-        'cache_name': settings.CACHE_NAME,
-        'backend': 'sqlite',
-        'expire_after': timedelta(hours=24 * settings.CACHE_EXPIRY),
-
-        # sqlite-backend kwargs
-        # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/backends/sqlite.py#L20
-        'fast_save': True,
-    })
-
 def clear_expired():
     requests_cache.remove_expired_responses()
     return settings.CACHE_NAME
@@ -127,7 +112,23 @@ def requests_get(*args, **kwargs):
 
     try:
         # http://docs.python-requests.org/en/master/api/#request-sessions
-        session = requests.Session()
+        if not settings.TESTING:
+            session = requests_cache.CachedSession(
+                'demo_cache',
+                # install cache kwargs
+                # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/patcher.py#L19
+                # this is where 'cache_name' becomes the sqlite backend's 'db_name':
+                # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/session.py#L39
+                cache_name = settings.CACHE_NAME,
+                backend = 'sqlite',
+                expire_after = timedelta(hours=24 * settings.CACHE_EXPIRY),
+
+                # sqlite-backend kwargs
+                # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/backends/sqlite.py#L20
+                fast_save = True,
+            )
+        else:
+            session = requests.Session()
         # lsh@2023-07-28: handle network errors better
         # - https://github.com/elifesciences/issues/issues/8386
         # - https://urllib3.readthedocs.io/en/stable/user-guide.html#retrying-requests
