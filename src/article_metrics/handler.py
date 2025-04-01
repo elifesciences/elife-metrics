@@ -1,5 +1,4 @@
 from urllib3.util.retry import Retry
-from datetime import timedelta
 from os.path import join
 from django.conf import settings
 import inspect
@@ -8,22 +7,9 @@ from article_metrics import utils
 import requests, requests_cache
 import logging
 
+from typing import Optional
+
 LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
-
-if not settings.TESTING:
-    requests_cache.install_cache(**{
-        # install cache kwargs
-        # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/patcher.py#L19
-        # this is where 'cache_name' becomes the sqlite backend's 'db_name':
-        # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/session.py#L39
-        'cache_name': settings.CACHE_NAME,
-        'backend': 'sqlite',
-        'expire_after': timedelta(hours=24 * settings.CACHE_EXPIRY),
-
-        # sqlite-backend kwargs
-        # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/backends/sqlite.py#L20
-        'fast_save': True,
-    })
 
 def clear_expired():
     requests_cache.remove_expired_responses()
@@ -94,7 +80,7 @@ DEFAULT_HANDLER = raise_handler
 
 MAX_RETRIES = 5
 
-def requests_get(*args, **kwargs):
+def http_get_using_session(*args, session: requests.Session, **kwargs):
     xid = kwargs.pop('opid', opid())
     ctx = {
         'id': xid
@@ -125,9 +111,7 @@ def requests_get(*args, **kwargs):
     final_headers = utils.merge(default_headers, kwargs.pop('headers', {}))
     final_kwargs = utils.merge(default_kwargs, kwargs, {'headers': final_headers})
 
-    try:
-        # http://docs.python-requests.org/en/master/api/#request-sessions
-        session = requests.Session()
+    try:  
         # lsh@2023-07-28: handle network errors better
         # - https://github.com/elifesciences/issues/issues/8386
         # - https://urllib3.readthedocs.io/en/stable/user-guide.html#retrying-requests
@@ -140,7 +124,7 @@ def requests_get(*args, **kwargs):
             # These are retries made on responses, where status code matches status_forcelist.
             'status': MAX_RETRIES,
             'status_forcelist': [413, 429, 503, # defaults
-                                 500, 502, 504],
+                                500, 502, 504],
             # {backoff factor} * (2 ** {number of previous retries})
             # 0.5 => 1.0, 2.0, 4.0, 8.0, 16
             'backoff_factor': 0.5,
@@ -189,6 +173,15 @@ def requests_get(*args, **kwargs):
         LOG.exception("unhandled exception", extra=ctx)
         raise
 
+def requests_get(*args, requests_session: Optional[requests.Session] = None, **kwargs):
+    if requests_session is not None:
+        return http_get_using_session(*args, session=requests_session, **kwargs)
+    if not settings.TESTING:
+        session = utils.create_caching_session()
+    else:
+        session = requests.Session()
+    with session:
+        return http_get_using_session(*args, session=session, **kwargs)
 
 def capture_parse_error(fn):
     """wrapper around a parse function that captures any errors to a special log for debugging.

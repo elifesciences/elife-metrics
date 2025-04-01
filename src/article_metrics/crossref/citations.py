@@ -14,7 +14,7 @@ URL = "https://doi.crossref.org/servlet/getForwardLinks"
 class FetchCrossrefCitationsError(RuntimeError):
     pass
 
-def fetch(doi):
+def fetch(doi, requests_session: Optional[requests.Session] = None):
     LOG.info("fetching crossref citations for %s" % doi)
     params = {
         # include citations from posted content (including preprints)
@@ -31,7 +31,7 @@ def fetch(doi):
         'Accept': 'application/json'
     }
     try:
-        resp = handler.requests_get(URL, params=params, headers=headers, opts={
+        resp = handler.requests_get(URL, params=params, headers=headers, requests_session=requests_session, opts={
             401: handler.LOGIT, # when a doi gets into system (like via scopus) that crossref doesn't associate with account
             404: handler.IGNORE, # these happen often for articles with 0 citations
         })

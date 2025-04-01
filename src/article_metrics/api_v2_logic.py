@@ -1,6 +1,8 @@
 import cachetools
 import os
 from collections import OrderedDict
+
+import requests
 from . import models
 from . import utils
 from .utils import ensure, rest, lmap
@@ -173,7 +175,8 @@ def summary(page, per_page, order):
 @cache(use=TWO_MIN_CACHE)
 def citations_by_version(msid, version):
     doi = f"{utils.msid2doi(msid)}.{version}"
-    crossref_citations = crossref.parse(crossref.fetch(doi), doi)
+    with requests.Session() as requests_session:
+        crossref_citations = crossref.parse(crossref.fetch(doi, requests_session=requests_session), doi)
 
     if not crossref_citations:
         return None

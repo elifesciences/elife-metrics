@@ -5,12 +5,12 @@ import os, json, copy
 import tempfile, shutil
 from functools import wraps, partial, reduce
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import dateutil
 import dateutil.parser
 from django.conf import settings
 import pytz
-import requests
+import requests, requests_cache
 
 LOG = logging.getLogger(__name__)
 
@@ -399,6 +399,13 @@ def merge(*dicts):
         return c
     return reduce(_merge, dicts)
 
+def create_caching_session():
+    return requests_cache.CachedSession(
+        cache_name=settings.CACHE_NAME,
+        backend='sqlite',
+        expire_after=timedelta(hours=24 * settings.CACHE_EXPIRY)
+    )
+
 def get_article_versions(article_id):
     """
     Fetches the versions of a given article based on the latest doiVersion.
@@ -415,7 +422,11 @@ def get_article_versions(article_id):
     [1, 2, 3]
     """
     try:
-        response = requests.get(f"{settings.LAX_URL}/{article_id}")
+        if not settings.TESTING:
+            with create_caching_session() as session:
+                response = session.get(f"{settings.LAX_URL}/{article_id}")
+        else:
+            response = requests.get(f"{settings.LAX_URL}/{article_id}")
         response.raise_for_status()
         data = response.json()
         doi_version = data.get('doiVersion')
