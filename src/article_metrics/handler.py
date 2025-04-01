@@ -114,7 +114,6 @@ def requests_get(*args, **kwargs):
         # http://docs.python-requests.org/en/master/api/#request-sessions
         if not settings.TESTING:
             session = requests_cache.CachedSession(
-                'demo_cache',
                 # install cache kwargs
                 # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/patcher.py#L19
                 # this is where 'cache_name' becomes the sqlite backend's 'db_name':
