@@ -9,8 +9,7 @@ import logging
 
 from typing import Optional
 
-# LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
-LOG = logging.getLogger(__name__) # ! logs to a different file at a finer level
+LOG = logging.getLogger('debugger') # ! logs to a different file at a finer level
 
 def clear_expired():
     requests_cache.remove_expired_responses()
@@ -82,8 +81,6 @@ DEFAULT_HANDLER = raise_handler
 MAX_RETRIES = 5
 
 def http_get_using_session(*args, session: requests.Session, **kwargs):
-    print('session', session)
-    LOG.info('session: %r', session)
     xid = kwargs.pop('opid', opid())
     ctx = {
         'id': xid
