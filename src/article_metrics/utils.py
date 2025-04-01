@@ -417,17 +417,9 @@ def get_article_versions(article_id):
     try:
         if not settings.TESTING:
             session = requests_cache.CachedSession(
-                # install cache kwargs
-                # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/patcher.py#L19
-                # this is where 'cache_name' becomes the sqlite backend's 'db_name':
-                # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/session.py#L39
                 cache_name=settings.CACHE_NAME,
                 backend='sqlite',
-                expire_after=timedelta(hours=24 * settings.CACHE_EXPIRY),
-
-                # sqlite-backend kwargs
-                # - https://github.com/reclosedev/requests-cache/blob/c4b9e4d4dcad5470de4a30464a6ac8a875615ad9/requests_cache/backends/sqlite.py#L20
-                fast_save=True,
+                expire_after=timedelta(hours=24 * settings.CACHE_EXPIRY)
             )
             response = session.get(f"{settings.LAX_URL}/{article_id}")
         else:
