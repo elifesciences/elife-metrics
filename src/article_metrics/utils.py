@@ -399,6 +399,13 @@ def merge(*dicts):
         return c
     return reduce(_merge, dicts)
 
+def create_caching_session():
+    return requests_cache.CachedSession(
+        cache_name=settings.CACHE_NAME,
+        backend='sqlite',
+        expire_after=timedelta(hours=24 * settings.CACHE_EXPIRY)
+    )
+
 def get_article_versions(article_id):
     """
     Fetches the versions of a given article based on the latest doiVersion.
@@ -416,11 +423,7 @@ def get_article_versions(article_id):
     """
     try:
         if not settings.TESTING:
-            session = requests_cache.CachedSession(
-                cache_name=settings.CACHE_NAME,
-                backend='sqlite',
-                expire_after=timedelta(hours=24 * settings.CACHE_EXPIRY)
-            )
+            session = create_caching_session()
             response = session.get(f"{settings.LAX_URL}/{article_id}")
         else:
             session = requests.Session()

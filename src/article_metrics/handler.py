@@ -1,5 +1,4 @@
 from urllib3.util.retry import Retry
-from datetime import timedelta
 from os.path import join
 from django.conf import settings
 import inspect
@@ -113,11 +112,7 @@ def requests_get(*args, **kwargs):
     try:
         # http://docs.python-requests.org/en/master/api/#request-sessions
         if not settings.TESTING:
-            session = requests_cache.CachedSession(
-                cache_name = settings.CACHE_NAME,
-                backend = 'sqlite',
-                expire_after = timedelta(hours=24 * settings.CACHE_EXPIRY)
-            )
+            session = utils.create_caching_session()
         else:
             session = requests.Session()
         # lsh@2023-07-28: handle network errors better
