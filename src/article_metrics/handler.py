@@ -119,24 +119,25 @@ def requests_get(*args, **kwargs):
         # - https://github.com/elifesciences/issues/issues/8386
         # - https://urllib3.readthedocs.io/en/stable/user-guide.html#retrying-requests
         # - https://urllib3.readthedocs.io/en/stable/reference/urllib3.util.html#urllib3.util.Retry
-        max_retries_obj = Retry(**{
-            'total': MAX_RETRIES,
-            'connect': MAX_RETRIES,
-            'read': MAX_RETRIES,
-            # How many times to retry on bad status codes.
-            # These are retries made on responses, where status code matches status_forcelist.
-            'status': MAX_RETRIES,
-            'status_forcelist': [413, 429, 503, # defaults
-                                 500, 502, 504],
-            # {backoff factor} * (2 ** {number of previous retries})
-            # 0.5 => 1.0, 2.0, 4.0, 8.0, 16
-            'backoff_factor': 0.5,
-        })
-        adaptor = requests.adapters.HTTPAdapter(max_retries=max_retries_obj)
-        session.mount('https://', adaptor)
-        resp = session.get(*args, **final_kwargs)
-        resp.raise_for_status()
-        return resp
+        with session:
+            max_retries_obj = Retry(**{
+                'total': MAX_RETRIES,
+                'connect': MAX_RETRIES,
+                'read': MAX_RETRIES,
+                # How many times to retry on bad status codes.
+                # These are retries made on responses, where status code matches status_forcelist.
+                'status': MAX_RETRIES,
+                'status_forcelist': [413, 429, 503, # defaults
+                                    500, 502, 504],
+                # {backoff factor} * (2 ** {number of previous retries})
+                # 0.5 => 1.0, 2.0, 4.0, 8.0, 16
+                'backoff_factor': 0.5,
+            })
+            adaptor = requests.adapters.HTTPAdapter(max_retries=max_retries_obj)
+            session.mount('https://', adaptor)
+            resp = session.get(*args, **final_kwargs)
+            resp.raise_for_status()
+            return resp
 
     except requests.HTTPError as err:
         # non 2xx response

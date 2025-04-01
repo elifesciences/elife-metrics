@@ -423,10 +423,9 @@ def get_article_versions(article_id):
     """
     try:
         if not settings.TESTING:
-            session = create_caching_session()
-            response = session.get(f"{settings.LAX_URL}/{article_id}")
+            with create_caching_session() as session:
+                response = session.get(f"{settings.LAX_URL}/{article_id}")
         else:
-            session = requests.Session()
             response = requests.get(f"{settings.LAX_URL}/{article_id}")
         response.raise_for_status()
         data = response.json()
