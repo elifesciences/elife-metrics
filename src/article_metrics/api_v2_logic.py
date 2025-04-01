@@ -12,6 +12,8 @@ import article_metrics.crossref.citations as crossref
 from django.db import connection
 from django.conf import settings
 from psycopg2.extensions import AsIs
+import requests_cache
+from datetime import timedelta
 
 LOG = logging.getLogger(__name__)
 
@@ -173,7 +175,12 @@ def summary(page, per_page, order):
 @cache(use=TWO_MIN_CACHE)
 def citations_by_version(msid, version):
     doi = f"{utils.msid2doi(msid)}.{version}"
-    crossref_citations = crossref.parse(crossref.fetch(doi), doi)
+    with requests_cache.CachedSession(
+        cache_name=settings.CACHE_NAME,
+        backend='sqlite',
+        expire_after=timedelta(hours=24 * settings.CACHE_EXPIRY)
+    ) as requests_session:
+        crossref_citations = crossref.parse(crossref.fetch(doi, requests_session=requests_session), doi)
 
     if not crossref_citations:
         return None
