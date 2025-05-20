@@ -18,3 +18,7 @@ GET https://doi.crossref.org/servlet/getForwardLinks?usr={{crossrefApiUsername}}
 ### Using DOI (excl posted)
 
 GET https://doi.crossref.org/servlet/getForwardLinks?usr={{crossrefApiUsername}}&pwd={{crossrefApiPassword}}&include_postedcontent=false&doi=10.7554/eLife.94917.1
+
+
+### Using DOI (incl posted) with no version
+GET https://doi.crossref.org/servlet/getForwardLinks?usr={{crossrefApiUsername}}&pwd={{crossrefApiPassword}}&include_postedcontent=true&doi=10.7554/eLife.89095
