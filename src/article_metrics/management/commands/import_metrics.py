@@ -63,9 +63,9 @@ def get_sources(options: dict) -> Mapping[str, Tuple[Callable, ...]]:
         (NA_METRICS, (timeit("non-article-metrics")(metrics.logic.update_all_ptypes_latest_frame),)),
         (GA_DAILY, (timeit("article-metrics-daily")(logic.import_ga_metrics), 'daily', from_date, to_date, use_cached, use_only_cached)),
         (GA_MONTHLY, (timeit("article-metrics-monthly")(logic.import_ga_metrics), 'monthly', n_months_ago, to_date, use_cached, use_only_cached)),
-        (models.CROSSREF, (timeit("crossref-citations")(logic.import_crossref_citations), article_id)),
-        (models.SCOPUS, (timeit("scopus-citations")(logic.import_scopus_citations),)),
-        (models.PUBMED, (timeit("pmc-citations")(logic.import_pmc_citations),)),
+        # (models.CROSSREF, (timeit("crossref-citations")(logic.import_crossref_citations), article_id)),
+        # (models.SCOPUS, (timeit("scopus-citations")(logic.import_scopus_citations),)),
+        # (models.PUBMED, (timeit("pmc-citations")(logic.import_pmc_citations),)),
     ])
 
     if selected_source:
