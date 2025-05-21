@@ -1,7 +1,7 @@
 import argparse
 import pytest
 
-from article_metrics import models
+# from article_metrics import models
 from article_metrics.management.commands.import_metrics import GA_DAILY, Command
 from article_metrics.management.commands.import_metrics import get_sources
 from article_metrics.management.commands.import_metrics import ALL_SOURCES_KEYS
