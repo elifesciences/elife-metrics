@@ -14,7 +14,8 @@ LOG = logging.getLogger(__name__)
 GA_DAILY = 'ga-daily'
 GA_MONTHLY = 'ga-monthly'
 NA_METRICS = 'non-article-metrics'
-ALL_SOURCES_KEYS = [NA_METRICS, GA_DAILY, GA_MONTHLY, models.CROSSREF, models.SCOPUS, models.PUBMED]
+# ALL_SOURCES_KEYS = [NA_METRICS, GA_DAILY, GA_MONTHLY, models.CROSSREF, models.SCOPUS, models.PUBMED]
+ALL_SOURCES_KEYS = [NA_METRICS, GA_DAILY, GA_MONTHLY]
 
 def timeit(label):
     def wrap1(fn):

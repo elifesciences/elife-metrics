@@ -111,7 +111,7 @@ def http_get_using_session(*args, session: requests.Session, **kwargs):
     final_headers = utils.merge(default_headers, kwargs.pop('headers', {}))
     final_kwargs = utils.merge(default_kwargs, kwargs, {'headers': final_headers})
 
-    try:  
+    try:
         # lsh@2023-07-28: handle network errors better
         # - https://github.com/elifesciences/issues/issues/8386
         # - https://urllib3.readthedocs.io/en/stable/user-guide.html#retrying-requests
